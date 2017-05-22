@@ -18,83 +18,6 @@ class GameManager{
 
     constructor(app){
         this.app = app;
-        this.socket = require('socket.io-client').connect();
-        this._initListener();
-
-        this.entities={};
-
-        this.players={};
-        this.player_texture=null;
-
-
-        this.context={
-            world:new PIXI.Container(),
-            players:new PIXI.Container(),
-            entities:new PIXI.Container()
-        };
-
-        this.context.world.interactive = true;
-       // this.context.world.buttonMode = true;
-        this.context.world.width=1000;
-        this.context.world.height= 1000;
-        this.context.world.background = 0x109FFF;
-
-
-
-      /*  this.app.stage.interactive = true;
-        this.app.stage.buttonMode = true;*/
-
-
-        this.context.world.on('mousedown', this.onDragStart.bind(this) )
-            .on('touchstart', this.onDragStart.bind(this))
-            // events for drag end
-            .on('mouseup', this.onDragEnd.bind(this))
-            .on('mouseupoutside', this.onDragEnd.bind(this))
-            .on('touchend', this.onDragEnd.bind(this))
-            .on('touchendoutside', this.onDragEnd.bind(this))
-            // events for drag move
-            .on('mousemove', this.onDragMove.bind(this))
-            .on('touchmove', this.onDragMove.bind(this));
-
-
-        this.context.players.on('mousemove', this.sendMousePos.bind(this))
-            .on('touchmove', this.sendMousePos.bind(this));
-        
-
-        this.app.stage.addChild(this.context.world);
-
-        var graphics = new PIXI.Graphics();
-        graphics.beginFill(0xFFFF00);
-        graphics.lineStyle(5, 0xFF0000);
-        this.context.world.hitArea = new PIXI.Rectangle(0,0,Statics.PLAYGROUND.WIDTH,Statics.PLAYGROUND.HEIGHT);
-        graphics.drawRect(0, 0, 1000,1000);
-        this.context.world.addChild(graphics);
-
-
-        this.context.world.addChild(this.context.entities);
-        this.context.players.interactive = true;
-        this.context.world.addChild(this.context.players);
-
-
-
-
-     //   window.addEventListener("resize", this.updateCam.bind(this));
-
-
-        document.addEventListener("mousewheel", this.zoom.bind(this), false);
-
-/*
-        PIXI.loader.add( {
-            name:"cursor",
-            url: RELATIVE_PATH+Statics.PATHS.RESOURCE_PATH+"/cursor.png"
-        }).once('complete', function (loader, resources) {
-            this.player_texture = PIXI.loader.resources["cursor"].texture;
-            var keys = Object.keys(this.players);
-            for(var i=0;i<keys.length;i++){
-                this.players[keys[i]].sprite.setTexture(this.player_texture);
-            }
-
-        }.bind(this)).load();*/
     }
 
 
@@ -245,7 +168,7 @@ console.log("ssdfsd");
                 );
         }
 
-
+/*
         if(!this.player_texture){
             toLoad.push(
                 {
@@ -253,18 +176,28 @@ console.log("ssdfsd");
                     url: RELATIVE_PATH+Statics.PATHS.RESOURCE_PATH+"/cursor.png"
                 }
             );
+        }*/
+
+
+
+        this.player_texture = PIXI.loader.resources[Statics.RESOURCES.CURSOR].texture;
+        var keys = Object.keys(this.players);
+        for(var i=0;i<keys.length;i++){
+            this.players[keys[i]].sprite.texture = this.player_texture;
         }
+
+
 
 
         PIXI.loader.add(toLoad).once('complete', function (loader, resources) {
 
-            if(!this.player_texture){
+         /*   if(!this.player_texture){
                 this.player_texture = PIXI.loader.resources["cursor"].texture;
                 var keys = Object.keys(this.players);
                 for(var i=0;i<keys.length;i++){
                     this.players[keys[i]].sprite.texture = this.player_texture;
                 }
-            }
+            }*/
 
             for(var i in game.entities) {
                 var cur = this._convertServerEntity(game.entities[i]); //new Entity(e,id,e.isStackable, PIXI.loader.resources[e.texture_name].texture,e.x,e.y,e.width,e.height,e.scale);
@@ -316,7 +249,60 @@ console.log("ssdfsd");
     }
 
     start(){
-        this.updateCam();
+        this.socket = require('socket.io-client').connect();
+        this._initListener();
+
+        this.entities={};
+
+        this.players={};
+        this.player_texture=null;
+
+
+        this.context={
+            world:new PIXI.Container(),
+            players:new PIXI.Container(),
+            entities:new PIXI.Container()
+        };
+
+        this.context.world.interactive = true;
+        // this.context.world.buttonMode = true;
+        this.context.world.width=1000;
+        this.context.world.height= 1000;
+        this.context.world.background = 0x109FFF;
+
+        this.context.world.on('mousedown', this.onDragStart.bind(this) )
+            .on('touchstart', this.onDragStart.bind(this))
+            // events for drag end
+            .on('mouseup', this.onDragEnd.bind(this))
+            .on('mouseupoutside', this.onDragEnd.bind(this))
+            .on('touchend', this.onDragEnd.bind(this))
+            .on('touchendoutside', this.onDragEnd.bind(this))
+            // events for drag move
+            .on('mousemove', this.onDragMove.bind(this))
+            .on('touchmove', this.onDragMove.bind(this));
+
+
+        this.context.players.on('mousemove', this.sendMousePos.bind(this))
+            .on('touchmove', this.sendMousePos.bind(this));
+
+
+        this.app.stage.addChild(this.context.world);
+
+        var graphics = new PIXI.Graphics();
+        graphics.beginFill(0xFFFF00);
+        graphics.lineStyle(5, 0xFF0000);
+        this.context.world.hitArea = new PIXI.Rectangle(0,0,Statics.PLAYGROUND.WIDTH,Statics.PLAYGROUND.HEIGHT);
+        graphics.drawRect(0, 0, 1000,1000);
+        this.context.world.addChild(graphics);
+
+
+        this.context.world.addChild(this.context.entities);
+        this.context.players.interactive = true;
+        this.context.world.addChild(this.context.players);
+
+        document.addEventListener("mousewheel", this.zoom.bind(this), false);
+
+       // this.updateCam();
 
         InputHandler.setMapping(Statics.GLOBALS.KEY_MAPPING);
 

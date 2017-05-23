@@ -41,6 +41,10 @@ window.hideLoadingDialog=function(){
 window.onload = function() {
     window.showLoadingDialog();
     var screen = document.getElementById("stage");
+    // prevent context menu on gameplay
+    screen.oncontextmenu = function (e) {
+        e.preventDefault();
+    };
 
     var app = new PIXI.Application(800, 600, {backgroundColor : 0x1099bb});
     screen.appendChild(app.view);

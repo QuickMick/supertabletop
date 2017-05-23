@@ -37,7 +37,7 @@ class GameManager{
         );
 
         // init the inputhandler
-        InputHandler.init(this.app.stage);
+        InputHandler.init(this.app);
 
         this.gameTable.min_zoom = Config.ZOOM.MIN;
         this.gameTable.max_zoom = Config.ZOOM.MAX;

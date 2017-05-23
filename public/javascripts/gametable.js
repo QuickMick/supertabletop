@@ -46,7 +46,33 @@ class GameTable extends PIXI.Container {
             .on('touchmove', this._onDragMove.bind(this));
 */
         //document.addEventListener("mousewheel", this._zoom.bind(this), false);
-        InputHandler.on("mousewheel", this._zoom.bind(this), false);
+        InputHandler.on("mousewheel", this._zoom.bind(this), false)
+            .on("mousemove",this._mouseMove.bind(this));
+
+        InputHandler.mapping.GRAB_CAMERA.on("pressed",function(){this.mouseGrabed=true;}.bind(this))
+                                        .on("released",function(){delete this.mouseGrabed;}.bind(this));
+    }
+
+    /**
+     *
+     * @param evt
+     * @private
+     */
+    _mouseMove(evt){
+        if(!this.mouseGrabed) return;
+
+/*
+        var dx = this.pos.old.x - this.pos.new.x;
+        var dy = this.pos.old.y - this.pos.new.y;
+*/
+console.log(this.position,evt.dx,evt.dy);
+        this.position.x +=evt.dx;
+        this.position.y +=evt.dy;
+
+        // if(dx >0 || dy>0) {
+        this.updateCam();
+        // }
+      //  this.pos.old = {x:this.pos.new.x,y:this.pos.new.y};
     }
 
     /**
@@ -174,6 +200,7 @@ class GameTable extends PIXI.Container {
     }
 
     updateCam(){
+
         var w = this.hitArea.width;
         var h = this.hitArea.height;
         var z = this._current_zoom;

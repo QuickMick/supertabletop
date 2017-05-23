@@ -32,7 +32,7 @@ class InputHandler extends EventEmitter{
     }
 
 
-    init(stage){
+    init(app){
         //add key listeners
         window.addEventListener("keydown", this._keyDown.bind(this), false);
         window.addEventListener("keyup", this._keyUp.bind(this), false);
@@ -41,12 +41,22 @@ class InputHandler extends EventEmitter{
         window.addEventListener("mousedown", this._mouseDown.bind(this), false);
         window.addEventListener("mouseup", this._mouseUp.bind(this), false);
 
-        stage.interactive = true;
-        stage.on('mousemove', this._onMouseMove.bind(this))
-            .on('touchmove', this._onMouseMove.bind(this));
+        app.stage.interactive = true;
 
         document.addEventListener("mousewheel", this._mouseWheelMove.bind(this), false);
+
+
+        app.stage.on('mousemove', this._onMouseMove.bind(this), false)
+            .on('touchmove', this._onMouseMove.bind(this), false);
+
+       // app.ticker.add(this.update.bind({self:this,app:app}));
     }
+
+/*
+    update(){
+        this.self._onMouseMove({data:{global:this.app.renderer.plugins.interaction.mouse.global}});
+    }*/
+
 
     _mouseWheelMove(evt){
         this.emit(MOUSEWHEEL,{delta:evt.deltaY});
@@ -110,20 +120,15 @@ class InputHandler extends EventEmitter{
         this.mouse.dx = this.mouse.x - this.mouse.lastX;
         this.mouse.dy = this.mouse.y - this.mouse.lastY;
 
-        if(this.mouse.dx > 0 || this.mouse.dy > 0 ){
+        if(this.mouse.dx != 0 || this.mouse.dy != 0 ){
           /*  if(this.onMouseMove){
                 this.onMouseMove();
             }*/
 
-            this.emit(MOUSEMOVE,Object.assign({},this.mouse));
+            this.emit(MOUSEMOVE,this.mouse);
         }
 
     }
-
-    update(){
-       // console.log("TEST");
-    }
-
 }
 
 module.exports = new InputHandler();

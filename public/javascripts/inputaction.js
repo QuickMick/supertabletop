@@ -92,7 +92,7 @@ class InputAction extends EventEmitter
             if(keyState.keyboard_keys[this.keyboard_keys[i]]) {
                 this.currentState = true;
                // this.emit(PRESSED,{keyboardKey:this.keyboard_keys[i],source:this});
-                return;
+                break;
             }
         }
 
@@ -101,7 +101,7 @@ class InputAction extends EventEmitter
             if(keyState.mouse_buttons[this.mouse_buttons[i]]) {
                 this.currentState = true;
               //  this.emit(PRESSED,{mouseKey:this.mouse_buttons[i],source:this});
-                return;
+                break;
             }
         }
         if(this.wasPressed){

@@ -57,17 +57,17 @@ class Entity extends PIXI.Sprite {
 
         // ------- init surfaces -------------
         this.surfaces = [];
-        for(var i=0; i< entity.surfaces.length;i++){
+        for(let i=0; i< entity.surfaces.length;i++){
             var  curSurface = entity.surfaces[i];
             // init surface
             var newSurface = {
                 // if the texture is not available, take the default texture, which is already set as "this.texture"
                 // the texture itselfe is a function, which returns the texture, or the missing texture if not possible TODO: geht des?
-                texture: function(){ PIXI.loader.resources[entity.surfaces[i].texture] ? PIXI.loader.resources[entity.surfaces[i].texture].texture : PIXI.loader.resources[DEFAULT_RESOURCES.missing_texture_substitute.texture].texture;} ,
+                texture: entity.surfaces[i].texture || PIXI.loader.resources[DEFAULT_RESOURCES.empty_texture],//PIXI.loader.resources[entity.surfaces[i].texture] ? PIXI.loader.resources[entity.surfaces[i].texture].texture : PIXI.loader.resources[DEFAULT_RESOURCES.missing_texture_substitute.texture].texture,// function(){ PIXI.loader.resources[entity.surfaces[i].texture] ? PIXI.loader.resources[entity.surfaces[i].texture].texture : PIXI.loader.resources[DEFAULT_RESOURCES.missing_texture_substitute.texture].texture;} ,
                 // normalize/convert the color of the surface
-                color: Util.parseColor(entity.front.color),
-                // if text  is no array, then convert it to an array
-                text: Array.isArray(curSurface.text)?curSurface.text:[].concat(curSurface.text)
+                color: Util.parseColor(entity.surfaces[i].color),
+                // if text  is no array, then convert it to an array, if text is undefined, put empty array instead
+                text: curSurface.text?(Array.isArray(curSurface.text)?curSurface.text:[].concat(curSurface.text)) : []
             };
 
             this.surfaces.push(newSurface);
@@ -104,7 +104,14 @@ class Entity extends PIXI.Sprite {
 
         this.removeAll(); // remove text from old surface
 
-        this.texture = curSurface.texture;
+        // set texture if available
+
+        if(PIXI.loader.resources[curSurface.texture] && PIXI.loader.resources[curSurface.texture].texture){
+            this.texture = PIXI.loader.resources[curSurface.texture].texture;
+        }else{
+            this.texture= PIXI.loader.resources[DEFAULT_RESOURCES.missing_texture_substitute.texture].texture;
+        }
+
         this.tint = curSurface.color;
 
         // show text

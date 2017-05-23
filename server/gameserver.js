@@ -4,6 +4,8 @@
 'use strict';
 
 var Statics = require('./../core/statics');
+var Packages = require('./../core/packages');
+
 var Globals = require('./globals');
 var fs = require('fs');
 
@@ -45,7 +47,7 @@ class GameServer{
     }
 
     loadGame(user,game){
-        var resource_path = Path.join(Globals.ROOT,"public",Config.PATHS.USERS,user,game,Globals.GAME_DEFINITION_FILE); //path.join(global.appRoot, content_file);
+        var resource_path = Path.join(Globals.ROOT,"public",Config.PATHS.USERS_RESOURCES,user,game,Globals.GAME_DEFINITION_FILE); //path.join(global.appRoot, content_file);
         console.log("load game: "+resource_path);
         this.game = JSON.parse(fs.readFileSync(resource_path));
 
@@ -71,37 +73,6 @@ class GameServer{
             this._addEntity(this._reviveEntity(this.game.object_def[c.type],c));
         }
 
-/*
-console.log(gameJSON);
-
-        //TODO load --> _addEntity
-
-        var e = new ServerEntity();
-        e.x=100;
-        e.y=100;
-        e.width=100;
-        e.height=100;
-        e.texture_name="c1.png";
-        this._addEntity(e);
-
-
-        var e2 = new ServerEntity();
-        e2.x=200;
-        e2.y=100;
-        e2.width=100;
-        e2.height=100;
-        e2.texture_name="c2.png";
-        this._addEntity(e2);
-
-
-        this.game = {
-            entities:[e,e2],
-            stacks:[],
-            creator:"mick",
-            game:"codewords"
-        };
-
-*/
 
         delete this.game.unstacked;
         delete this.game.stacked;
@@ -111,7 +82,7 @@ console.log(gameJSON);
         }.bind(this));
 
 
-      //  this.boradcast(Statics.PROTOCOL.SERVER.INIT_GAME,{msg:"",data:this.game});
+        this.boradcast(Packages.PROTOCOL.SERVER.INIT_GAME,Packages.createEvent(Packages.SERVER_ID,this.game));
 
     }
 
@@ -143,8 +114,9 @@ console.log(gameJSON);
                     if(i==overwrite_path.length-1){ // if last element, then set the real value
                         currentDepthObject[curKey] = instance.overwrite[key];
                     }else if(!result[curKey]){      // if object does not exist,
-                        result[curKey]={};          // then create it
+                        currentDepthObject[curKey]={};          // then create it
                     }
+                    currentDepthObject=currentDepthObject[curKey];  // and set as new depth object
                 }
             }
         }
@@ -179,7 +151,7 @@ console.log(gameJSON);
         }.bind(this));
 
        // client.on('event', function(data){console.log("evt")});
-
+/*
         client.on(Statics.PROTOCOL.CLIENT.DRAG_START,
             function(data){
 
@@ -227,21 +199,21 @@ console.log(gameJSON);
                 this.boradcastExceptSender(client,Statics.PROTOCOL.CLIENT.CLIENT_MOUSE_MOVE,data);
             }.bind(this)
         );
+*/
 
-
-
+/*
         for (var k in this.entities) {
             if (!this.entities.hasOwnProperty(k))
                 continue;
             this._sendToClient(client,Statics.PROTOCOL.SERVER.ADD_ENTITY,{msg:"",data:this.entities[k]});
-        }
+        }*/
 
     }
 
     _s_connected(clientSocket){
         var rc = this.getRandomColor();
         var name = "ranz";
-        this.boradcastExceptSender(clientSocket,Statics.PROTOCOL.SERVER.CLIENT_CONNECTED,{msg:"",data:{id:clientSocket.id,color:rc,name:name}});
+        this.boradcastExceptSender(clientSocket,Packages.PROTOCOL.SERVER.CLIENT_CONNECTED,{msg:"",data:{id:clientSocket.id,color:rc,name:name}});
 
         this.connections[clientSocket.id] = {socket:clientSocket,color:rc,name:name};
         console.log("Connected: "+clientSocket.id+" Users: "+Object.keys(this.connections).length);
@@ -252,19 +224,19 @@ console.log(gameJSON);
         }
 
 
-        this._sendToClient(clientSocket,Statics.PROTOCOL.CLIENT.USER_INFO,{msg:"",data:{user_id:clientSocket.id,admin:this.admin == clientSocket.id}}); // true, wenn connected is admin
+        this._sendToClient(clientSocket,Packages.PROTOCOL.SERVER.USER_INFO,{msg:"",data:{user_id:clientSocket.id,admin:this.admin == clientSocket.id}}); // true, wenn connected is admin
 
 
         this.game.entities = Object.keys(this.entities).map(function(key) {
             return this.entities[key];
         }.bind(this));
-        this._sendToClient(clientSocket,Statics.PROTOCOL.SERVER.INIT_GAME,{msg:"",data:this.game});
+        this._sendToClient(clientSocket,Packages.PROTOCOL.SERVER.INIT_GAME,{msg:"",data:this.game});
 
 
         var keys = Object.keys(this.connections);
         for(var i=0; i<keys.length;i++){
             if(keys[i] == clientSocket.id)continue;
-            this._sendToClient(clientSocket,Statics.PROTOCOL.SERVER.CLIENT_CONNECTED ,{msg:"",data: {id:keys[i],color:this.connections[keys[i]].color}});
+            this._sendToClient(clientSocket,Packages.PROTOCOL.SERVER.CLIENT_CONNECTED ,{msg:"",data: {id:keys[i],color:this.connections[keys[i]].color}});
         }
 
     }
@@ -272,7 +244,7 @@ console.log(gameJSON);
     _s_disconnected(clientSocket,data){
         console.log("disconnect: "+clientSocket.id);
 
-        this.boradcastExceptSender(clientSocket,Statics.PROTOCOL.SERVER.CLIENT_DISCONNECTED,{msg:"",data:{id:clientSocket.id}});
+        this.boradcastExceptSender(clientSocket,Packages.PROTOCOL.SERVER.CLIENT_DISCONNECTED,{msg:"",data:{id:clientSocket.id}});
 
         if (this.connections.hasOwnProperty(clientSocket.id)) {
             delete this.connections[clientSocket.id];

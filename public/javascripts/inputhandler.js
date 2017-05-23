@@ -5,16 +5,12 @@
  * Created by Mick on 18.12.2016.
  */
 
-class InputHandler{
+var EventEmitter = require('eventemitter3');
+
+const MOUSEMOVE= "mousemove";
+class InputHandler extends EventEmitter{
     constructor(){
-        //add key listeners
-        window.addEventListener("keydown", this._keyDown.bind(this), false);
-        window.addEventListener("keyup", this._keyUp.bind(this), false);
-
-        //add mouse listeners
-        window.addEventListener("mousedown", this._mouseDown.bind(this), false);
-        window.addEventListener("mouseup", this._mouseUp.bind(this), false);
-
+        super();
         // contains every keys, which are pressed since the last update cycle
         this.keyState = {
             keyboard_keys:{},
@@ -34,6 +30,21 @@ class InputHandler{
         this.mapping= null;
     }
 
+
+    init(stage){
+        //add key listeners
+        window.addEventListener("keydown", this._keyDown.bind(this), false);
+        window.addEventListener("keyup", this._keyUp.bind(this), false);
+
+        //add mouse listeners
+        window.addEventListener("mousedown", this._mouseDown.bind(this), false);
+        window.addEventListener("mouseup", this._mouseUp.bind(this), false);
+
+        stage.interactive = true;
+        stage.on('mousemove', this._onMouseMove.bind(this))
+            .on('touchmove', this._onMouseMove.bind(this));
+    }
+
     setMapping(mapping){
         this.mapping = mapping;
     }
@@ -41,7 +52,7 @@ class InputHandler{
     _keyDown(event){
         this.keyState.keyboard_keys[event.keyCode] = true;
    //     event.preventDefault();
-        this.update();
+        this._processKeyInteraction();
     }
 
     _keyUp(event){
@@ -49,14 +60,13 @@ class InputHandler{
             delete this.keyState.keyboard_keys[event.keyCode];
         }
      //   event.preventDefault();
-        this.update();
+        this._processKeyInteraction();
     }
 
     _mouseDown(event){
         this.keyState.mouse_buttons[event.button] = true;
       //  event.preventDefault();
-
-        this.update();
+        this._processKeyInteraction();
     }
 
     _mouseUp(event){
@@ -64,11 +74,11 @@ class InputHandler{
             delete this.keyState.mouse_buttons[event.button];
         }
 
-        this.update();
+        this._processKeyInteraction();
      //   event.preventDefault();
     }
 
-    update(){
+    _processKeyInteraction(){
         //return, if there is no mapping available
         if(! this.mapping) return;
 
@@ -77,6 +87,34 @@ class InputHandler{
             if (!this.mapping.hasOwnProperty(key)) continue;
             this.mapping[key].update(this.keyState);
         }
+    }
+
+    _onMouseMove(evt) {
+
+        var m = evt.data.global;
+
+        this.mouse.lastX = this.mouse.x;
+        this.mouse.lastY = this.mouse.y;
+
+        this.mouse.x = m.x;
+        this.mouse.y = m.y;
+
+        // set the delta mouse movement
+        this.mouse.dx = this.mouse.x - this.mouse.lastX;
+        this.mouse.dy = this.mouse.y - this.mouse.lastY;
+
+        if(this.mouse.dx > 0 || this.mouse.dy > 0 ){
+          /*  if(this.onMouseMove){
+                this.onMouseMove();
+            }*/
+
+            this.emit(MOUSEMOVE,Object.assign({},this.mouse));
+        }
+
+    }
+
+    update(){
+       // console.log("TEST");
     }
 
 }

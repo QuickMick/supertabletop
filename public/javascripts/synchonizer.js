@@ -3,10 +3,10 @@
  */
 'use strict';
 
-
-var Statics = require("./../../core/statics");
 var Packages = require("./../../core/packages");
 var GameState = require("./gamestate");
+
+//var EntityManager = require("./entitymanager");
 
 class Synchronizer{
 
@@ -61,25 +61,32 @@ class Synchronizer{
         this._queue = {};
     }
 
-    init() {
-        if (this.socket) return;
+    init(entityManager){
+        if(!entityManager)
+            throw "entitymanager is required in order to establish a connection";
+        this.entityManager = entityManager;
+
+        if (this.socket){
+            console.log("synchronizer already initialized!");
+            return;
+        }
 
         this.socket = require('socket.io-client').connect();
         this._initHandlers();
-        setInterval(this.sendAll.bind(this), Statics.PROTOCOL.CLIENT_UPDATE_INTERVAL);
+        setInterval(this.sendAll.bind(this), Packages.PROTOCOL.CLIENT_UPDATE_INTERVAL);
     }
 
     _initHandlers(){
         // neue Nachricht
-        this.socket.on(Packages.PROTOCOL.CLIENT.INIT_GAME, function (data) {
-            this._initGame(data.data);
+        this.socket.on(Packages.PROTOCOL.SERVER.INIT_GAME, function (evt) {
+            this.entityManager.initGame(evt.data);
         }.bind(this));
 
-        this.socket.on(Packages.PROTOCOL.CLIENT.USER_INFO, function (evt) {
+        this.socket.on(Packages.PROTOCOL.SERVER.USER_INFO, function (evt) {
             GameState.CURRENT_USER = evt.data.user_id;
         }.bind(this));
 
-        this.socket.on(Statics.PROTOCOL.SERVER.UPDATE_STATE, function (data) {
+        this.socket.on(Packages.PROTOCOL.SERVER.UPDATE_STATE, function (evt) {
            // TODO
         }.bind(this));
 

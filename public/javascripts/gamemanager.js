@@ -9,7 +9,8 @@ var Resources = require('./../resources/resources.json');
 var GameTable = require('./gametable');
 var EntityManager = require('./entitymanager');
 var PlayerManager = require('./playermanager');
-
+var Synchronizer = require('./synchonizer');
+var InputHandler = require('./inputhandler');
 
 var RELATIVE_PATH = "./../";
 
@@ -35,6 +36,9 @@ class GameManager{
             this.app.renderer
         );
 
+        // init the inputhandler
+        InputHandler.init(this.app.stage);
+
         this.gameTable.min_zoom = Config.ZOOM.MIN;
         this.gameTable.max_zoom = Config.ZOOM.MAX;
         this.gameTable.zoom_sensivity = Config.ZOOM.SENSIVITY;
@@ -44,15 +48,15 @@ class GameManager{
         this.gameTable.addChild(PlayerManager);
         this.app.stage.addChild(this.gameTable);
 
-        // show default table texture
-
-
+        // add default table
         this.gameTable.setTable(
             Resources.default.content.table.width,
             Resources.default.content.table.height,
             PIXI.loader.resources[Resources.default.content.table.texture].texture
         );
 
+        // initialize socket-connection/synchronizer
+        Synchronizer.init(EntityManager);
 
         /*
         this.context={

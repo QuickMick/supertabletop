@@ -1,13 +1,21 @@
 /**
  * Created by Mick on 18.12.2016.
  */
-class InputAction
+
+var EventEmitter = require('eventemitter3');
+
+const PRESSED ="pressed";
+const RELEASED = "released";
+//const ISDOWN = "isdown";
+
+class InputAction extends EventEmitter
 {
     /**
      *
      * @param name: name of this action, e.g. walk_left
      */
     constructor(name,keys,mouseButtons){
+        super();
         this.name = name;           // name of the action
         this.keyboard_keys = keys || [];    // all keycodes which are triggering this action
         this.mouse_buttons = mouseButtons || [];
@@ -83,9 +91,7 @@ class InputAction
         for(let i=0; i < this.keyboard_keys.length;i++){
             if(keyState.keyboard_keys[this.keyboard_keys[i]]) {
                 this.currentState = true;
-                if(this.onPress){
-                    this.onPress();
-                }
+               // this.emit(PRESSED,{keyboardKey:this.keyboard_keys[i],source:this});
                 return;
             }
         }
@@ -94,11 +100,14 @@ class InputAction
         for(let i=0; i < this.mouse_buttons.length;i++){
             if(keyState.mouse_buttons[this.mouse_buttons[i]]) {
                 this.currentState = true;
-                if(this.onRelease){
-                    this.onRelease();
-                }
+              //  this.emit(PRESSED,{mouseKey:this.mouse_buttons[i],source:this});
                 return;
             }
+        }
+        if(this.wasPressed){
+            this.emit(PRESSED,{source:this});
+        }else if(this.wasReleased){
+            this.emit(RELEASED,{source:this});
         }
     }
 }

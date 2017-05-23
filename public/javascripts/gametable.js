@@ -55,6 +55,7 @@ class GameTable extends PIXI.Container {
      * @param texture
      */
     setTable(width,height,texture){
+
         // set new hitArea and size
         this.width = width;
         this.height = height;

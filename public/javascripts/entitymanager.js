@@ -4,6 +4,12 @@
 'use strict';
 require('pixi.js');
 
+var Path = require('path');
+var Config = require('./../resources/config.json');
+var Entity = require('./entity');
+
+const RELATIVE_PATH = "./../";
+
 class EntityManager extends PIXI.Container{
 
     constructor(){
@@ -28,7 +34,7 @@ class EntityManager extends PIXI.Container{
      * @param game resource from server, contains all data about entities, game info and resources
      * @private
      */
-    _initGame(game){
+    initGame(game){
         console.log("result: " + game);
         window.showLoadingDialog();
         // prepare resource list
@@ -38,26 +44,24 @@ class EntityManager extends PIXI.Container{
             PIXI.loader.add(
                 {
                     name:name,
-                    url: RELATIVE_PATH+Statics.PATHS.RESOURCE_PATH+"/"+game.creator+"/"+game.name+"/"+name
+                    url: Path.join(RELATIVE_PATH,Config.PATHS.USERS_RESOURCES,game.creator,game.name,name)
                 }
             );
         }
-
-        for(let i=0; i< game.unstacked.length;i++) {
-            this.addEntity(new Entity(game.unstacked[i]));
+        var newEntityList = [];
+        for(let i=0; i< game.entities.length;i++) {
+            var newEntity =new Entity(game.entities[i]);
+            newEntityList.push(newEntity);
+            this.addEntity(newEntity);
         }
 
         window.hideLoadingDialog();
-        // once the gfx is loaded,
+        // once the gfx is loaded, force every entity, to show its real texture instead of the placeholder
         PIXI.loader.once('complete', function (loader, resources) {
-            /*  for(var i in game.entities) {
-             var cur = this._convertServerEntity(game.entities[i]);
-
-                this.entities[cur.id] = cur;
-                this.context.entities.addChild(cur.sprite);
-
-                window.hideLoadingDialog();
-            }*/
+            for(let i=0; i< newEntityList.length;i++) {
+                var c =newEntityList[i];
+                c.showSurface(c.surfaceIndex);
+            }
         }.bind(this)).load();
     }
 

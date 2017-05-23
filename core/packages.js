@@ -5,14 +5,15 @@
 
 module.exports =
 {
-    createEvent:function (id) {
-        return {id:id,data:{}};
+    createEvent:function (id,data) {
+        return {id:id,data:data || {}};
     },
     CLIENT_UPDATE_INTERVAL: 100,
+    SERVER_ID:"SERVER",
     PROTOCOL: {
        CLIENT: {
            SEND_STATE: "send_state",
-           USER_INFO: "userinfo",
+
         /*   CMD_RESULT: "cmd_result",
            DRAG_START: "DRAG_START",
            DRAG_MOVE: "DRAG_MOVE",
@@ -21,6 +22,7 @@ module.exports =
            CLIENT_MOUSE_MOVE: "CLIENT_MOUSE_MOVE"*/
        },
        SERVER: {
+           USER_INFO: "userinfo",
            UPDATE_STATE: "update_state",
            INIT_GAME: "init_game",
            CLIENT_CONNECTED: "CLIENT_CONNECTED",

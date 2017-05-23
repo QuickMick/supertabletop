@@ -88,6 +88,7 @@ window.onload = function() {
 
         var gameManager =  new GameManager(app);
         app.ticker.add(gameManager.update);
+       // app.ticker.add(require('./inputhandler').update);
         gameManager.start();
 
         function resize() {

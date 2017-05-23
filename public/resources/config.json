@@ -5,10 +5,11 @@
     "SENSIVITY": 0.1
   },
   "KEY_MAPPING":{
-    "TURN":{"keyboard":[70],"mouse":[]}
+    "TURN":{"keyboard":[70],"mouse":[]},
+    "GRAB_CAMERA":{"keyboard":[],"mouse":[2]}
   },
   "PATHS":{
     "RESOURCE_BASE":"resources",
-    "USERS":"resources/users"
+    "USERS_RESOURCES":"resources/users"
   }
 }

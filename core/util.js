@@ -16,6 +16,7 @@ class Util{
      * @returns {Number} color as int
      */
     parseColor(colorString){
+        if(!colorString) return 0xFFFFFF;
         var color = parseInt(colorString.replace("#", "0x"));
         return !Number.isNaN(color)?color: 0xFFFFFF;
     }

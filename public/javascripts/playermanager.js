@@ -25,6 +25,7 @@ class PlayerManager extends PIXI.Container {
          * @type {object} --> id:sprite
          */
         this.players = {};
+
     }
 
     /**

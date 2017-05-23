@@ -5,15 +5,24 @@
 
 require('pixi.js');
 
-class DragCamera extends PIXI.Container {
-    constructor(width,height,renderer){
+class GameTable extends PIXI.Container {
+
+    /**
+     * creates a new camera
+     * @param width Playground size
+     * @param height Playground size
+     * @param renderer pixi renderer
+     */
+    constructor(renderer){
         super();
-       // this.width = width;
-       // this.height = height;
-
-        this.hitArea = new PIXI.Rectangle(0,0,width,height);
-
         this.renderer = renderer;
+
+        /**
+         * Thisn container holds the sprite of the table
+         * @type {PIXI.Container}
+         */
+        this.tableContainer = new PIXI.Container();
+        this.addChild(this.tableContainer);
 
         this._current_zoom = 1;
         this.zoom_sensivity = 0.1;
@@ -37,6 +46,30 @@ class DragCamera extends PIXI.Container {
             .on('touchmove', this._onDragMove.bind(this));
 
         document.addEventListener("mousewheel", this._zoom.bind(this), false);
+    }
+
+    /**
+     * Sets a table to the camera
+     * @param width
+     * @param height
+     * @param texture
+     */
+    setTable(width,height,texture){
+        // set new hitArea and size
+        this.width = width;
+        this.height = height;
+        this.hitArea = new PIXI.Rectangle(0,0,width,height);
+
+        // remove the previous table
+        this.tableContainer.removeAll();
+
+        // create sprite for texture
+        var defaultTable = new PIXI.Sprite(texture);
+        this.tableContainer.width = defaultTable.width = width;
+        this.tableContainer.height = defaultTable.height =height;
+
+        // finaly add the new table
+        this.tableContainer.addChild(defaultTable);
     }
 
     _onDragStart(event) {
@@ -74,12 +107,12 @@ class DragCamera extends PIXI.Container {
             this.position.x -=dx;
             this.position.y -=dy;
 
-            if(dx >0 || dy>0) {
+           // if(dx >0 || dy>0) {
                 this.updateCam();
                 if(this.onMoving){
                     this.onMoving(this);
                 }
-            }
+           // }
             this.pos.old = {x:this.pos.new.x,y:this.pos.new.y};
         }
     }
@@ -104,7 +137,7 @@ class DragCamera extends PIXI.Container {
     }
 
     set max_zoom(v){
-        this.max_zoom=v;
+        this._max_zoom=v;
         if(v<this._current_zoom){
             this._current_zoom = v;
         }
@@ -138,10 +171,11 @@ class DragCamera extends PIXI.Container {
     }
 
     updateCam(){
-        var w = this.width;
-        var h = this.height;
+        var w = this.hitArea.width;
+        var h = this.hitArea.height;
         var z = this._current_zoom;
 
+        //TODO: folgendes wird warscheinlich nicht funktionieren, wenn drehen drin is
         if(w* z> this.renderer.width) {
             if (this.position.x < this.renderer.width - w*z) this.position.x = this.renderer.width - w*z;
             if (this.position.x > 0) this.position.x = 0;
@@ -158,4 +192,4 @@ class DragCamera extends PIXI.Container {
     }
 }
 
-module.exports = DragCamera;
+module.exports = GameTable;

@@ -2,11 +2,11 @@
  * Created by Mick on 19.05.2017.
  */
 module.exports ={};
-
+/*
 module.exports.PLAYGROUND = {
     WIDTH:1000,
     HEIGHT:1000
-};
+};*/
 /*
 module.exports.RESOURCES={
     CURSOR:"cursor.png"
@@ -18,15 +18,17 @@ module.exports.GLOBALS = {
     CURRENT_ZOOM:1
 };
 
+
+/*
 module.exports.ZOOM = {
     MAX:2.5,
     MIN:0.3,
     SENSIVITY:0.1
-};
-
+};*/
+/*
 module.exports.PATHS={
-    RESOURCE_PATH:"images",
-};
+    RESOURCE_PATH:"resources/users",
+};*/
 
 /*
 module.exports.PROTOCOL = {
@@ -53,7 +55,7 @@ module.exports.PROTOCOL = {
         CLIENT_DISCONNECTED : "CLIENT_DISCONNECTED"
     }
 };*/
-
+/*
 module.exports.CMD = {
     NATIV : "n "
-};
+};*/

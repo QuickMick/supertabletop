@@ -17,7 +17,7 @@ class Entity extends PIXI.Sprite {
             throw "cannot instatiate an entity without a texture!";
         }
         // ensure, that the surfaces object is an array, if not, then convert it to an array
-        entity.surfaces = Array.isArray(entity.surfaces)?entity.surfaces:[].concat(entity.surfaces;
+        entity.surfaces = Array.isArray(entity.surfaces)?entity.surfaces:[].concat(entity.surfaces);
 
         super(PIXI.loader.resources[DEFAULT_RESOURCES.missing_texture_substitute.texture].texture);
 
@@ -48,10 +48,8 @@ class Entity extends PIXI.Sprite {
             }
         }
 
-
         // ------- init entity values --------
         this.ENTITY_ID = entity.id;
-     //   this.entity = entity;
         this.turnable = entity.turnable || false;
         this.stackable = entity.stackable || false;
 
@@ -64,7 +62,8 @@ class Entity extends PIXI.Sprite {
             // init surface
             var newSurface = {
                 // if the texture is not available, take the default texture, which is already set as "this.texture"
-                texture: PIXI.loader.resources[entity.surfaces[i].texture] ? (PIXI.loader.resources[entity.surfaces[i].texture].texture || this.texture) : this.texture,
+                // the texture itselfe is a function, which returns the texture, or the missing texture if not possible TODO: geht des?
+                texture: function(){ PIXI.loader.resources[entity.surfaces[i].texture] ? PIXI.loader.resources[entity.surfaces[i].texture].texture : PIXI.loader.resources[DEFAULT_RESOURCES.missing_texture_substitute.texture].texture;} ,
                 // normalize/convert the color of the surface
                 color: Util.parseColor(entity.front.color),
                 // if text  is no array, then convert it to an array
@@ -74,54 +73,12 @@ class Entity extends PIXI.Sprite {
             this.surfaces.push(newSurface);
         }
 
-
-
-        // init text
-        /* for (var j = 0; i < curSurface.text.length; j++) {
-         var cText = curSurface.text[j];
-         var font = cText.font || "monospace";
-         var size = cText.size || 12;
-         var color = Util.parseColor(cText.color);
-         newSurface.text.push({
-         font: font,
-         size: size,
-         color: color
-         });
-         }*/
-
-        // create our little bunny friend..
+        // finally, display the visible surface
+        this.showSurface(this.surfaceIndex);
 /*
-        if (!this.turnable || (this.turnable && this.top)) {
-            super(PIXI.loader.resources[e.front.texture].texture);
-            if (entity.front.color) {
-                this.tint = parseInt(e.front.color);
-            }
-
-        } else {
-            super(PIXI.loader.resources[e.back.texture].texture);
-            if (entity.back.color) {
-                this.tint = parseInt(e.back.color);
-            }
-        }
-
-
-        if (e.top && e.text && e.text.content) {
-            var font = e.text.font || "monospace";
-            var size = e.text.size || 12;
-            var color = e.text.color ? parseInt(e.text.color) : 0xFFFFFF;
-
-            this.addChild(new PIXI.Text(e.text.content, {font: size + "pt " + font, fill: color}));
-        }
-
- */
-
-
-        // make it a bit bigger, so it's easier to grab
-        //  bunny.scale.set(3);
-
         // setup events
-        this    // events for drag start
-            .on('mousedown', this.onDragStart.bind(this))
+            // events for drag start
+        this.on('mousedown', this.onDragStart.bind(this))
             .on('touchstart', this.onDragStart.bind(this))
             // events for drag end
             .on('mouseup', this.onDragEnd.bind(this))
@@ -133,12 +90,7 @@ class Entity extends PIXI.Sprite {
             .on('touchmove', this.onDragMove.bind(this))
             .on('mouseover', this.onOver.bind(this))
             .on('mouseout', this.onOut.bind(this));
-
-        // move the sprite to its designated position
-
-
-        // set hitarea scaled mit
-
+*/
     }
 
 
@@ -147,15 +99,12 @@ class Entity extends PIXI.Sprite {
      * @param front
      */
     showSurface(index){
-        if(!front && !this.entity.turnable){
-            console.log("cannot turn unturnable entity");
-            return;
-        }
         this.surfaceIndex = index || 0;
         var curSurface = this.surfaces[this.surfaceIndex];
-        this.removeAll();
 
-        this.texture = PIXI.loader.resources[curSurface.texture].texture;
+        this.removeAll(); // remove text from old surface
+
+        this.texture = curSurface.texture;
         this.tint = curSurface.color;
 
         // show text
@@ -175,15 +124,7 @@ class Entity extends PIXI.Sprite {
     }
 
 
-
-
-
-
-
-
-
-
-
+/*
 
     turn(force) {
         console.log("turn", this.id, force);
@@ -339,7 +280,7 @@ class Entity extends PIXI.Sprite {
             this.synchronize(Statics.PROTOCOL.CLIENT.DRAG_MOVE, this.id);
         }
     }
-
+*/
 }
 
 module.exports = Entity;

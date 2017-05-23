@@ -7,6 +7,9 @@ var Statics = require('./../core/statics');
 var Globals = require('./globals');
 var fs = require('fs');
 
+var Path = require('path');
+var Config = require('./../public/resources/config.json');
+
 /*
 class ServerEntity{
     constructor(){
@@ -42,7 +45,7 @@ class GameServer{
     }
 
     loadGame(user,game){
-        var resource_path = Globals.ROOT+"/public/"+Statics.PATHS.RESOURCE_PATH+"/"+user+"/"+game+"/"+Globals.GAME_DEFINITION_FILE; //path.join(global.appRoot, content_file);
+        var resource_path = Path.join(Globals.ROOT,"public",Config.PATHS.USERS,user,game,Globals.GAME_DEFINITION_FILE); //path.join(global.appRoot, content_file);
         console.log("load game: "+resource_path);
         this.game = JSON.parse(fs.readFileSync(resource_path));
 
@@ -108,25 +111,41 @@ console.log(gameJSON);
         }.bind(this));
 
 
-        this.boradcast(Statics.PROTOCOL.SERVER.INIT_GAME,{msg:"",data:this.game});
+      //  this.boradcast(Statics.PROTOCOL.SERVER.INIT_GAME,{msg:"",data:this.game});
 
     }
 
 
+    /**
+     * Overwrites the default values from the basetype.
+     * Object.assign was not used, because it would overwrite the arrays completely.
+     * This method copies and changes array items
+     * @param basetype of the entity, contains all default values
+     * @param instance contains all specialized values, e.g. position, or unique texture
+     * @private
+     */
     _reviveEntity(basetype,instance){
         // load the default entity
-        let result = basetype;
-
-        // take default entity
-        result = JSON.parse(JSON.stringify(basetype));
-
-     //   result.position = instance.position;
+        let result = JSON.parse(JSON.stringify(basetype));
 
         //but override changes
         if(instance.overwrite) {
             for (let key in instance.overwrite) {
                 if (!instance.overwrite.hasOwnProperty(key)) continue;
-                result[key] = instance.overwrite[key];
+
+                var overwrite_path = key.split(".");    // get the path of the value, which should be overwritten
+                var currentDepthObject = result;        // latest object of the path
+
+                // go down the whole path, till the path can be set
+                for(let i=0; i< overwrite_path.length;i++){
+                    var curKey = overwrite_path[i]; // current validated key
+
+                    if(i==overwrite_path.length-1){ // if last element, then set the real value
+                        currentDepthObject[curKey] = instance.overwrite[key];
+                    }else if(!result[curKey]){      // if object does not exist,
+                        result[curKey]={};          // then create it
+                    }
+                }
             }
         }
         return result;

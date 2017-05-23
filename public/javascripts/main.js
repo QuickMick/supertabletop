@@ -9,6 +9,7 @@ var GameManager = require('./gamemanager');
 var InputAction = require('./inputaction');
 
 var Resources = require('./../resources/resources.json');
+var Config = require('./../resources/config.json');
 
 var Path = require('path');
 
@@ -28,18 +29,33 @@ else if (window.webkitRequestAnimationFrame)
     window.requestAnimationFrame=window.webkitRequestAnimationFrame;
 
 
+window.showLoadingDialog=function(){
+    document.getElementById("loading-overlay").style.display=""; //"flex";
+};
+
+window.hideLoadingDialog=function(){
+    document.getElementById("loading-overlay").style.display="none";
+};
+
 
 window.onload = function() {
+    window.showLoadingDialog();
     var screen = document.getElementById("stage");
 
     var app = new PIXI.Application(800, 600, {backgroundColor : 0x1099bb});
     screen.appendChild(app.view);
 
+    // load all keys located in config.json
+    var keyMapping = {};
+    for(let key in Config.KEY_MAPPING){
+        var cur = Config.KEY_MAPPING[key];
+        keyMapping[key] = new InputAction(key,cur.keyboard, cur.mouse);
+    }
     // init key mapping
-    Statics.GLOBALS.KEY_MAPPING = {
+   /* Statics.GLOBALS.KEY_MAPPING = {
         TURN:new InputAction("TURN", [70])
-    };
-    require('./inputhandler').setMapping(Statics.GLOBALS.KEY_MAPPING);
+    };*/
+    require('./inputhandler').setMapping(keyMapping);
 
 
     // preparing loading game resouces
@@ -54,7 +70,7 @@ window.onload = function() {
             if (!current_area.content.hasOwnProperty(content_key)) continue;
 
             var resource_name = current_area.content[content_key].texture;
-            var resource_path = Path.join(RELATIVE_PATH,folder,resource_name);
+            var resource_path = Path.join(Config.PATHS.RESOURCE_BASE,folder,resource_name);
 
             PIXI.loader.add({
                 name: resource_name,
@@ -65,8 +81,7 @@ window.onload = function() {
 
     // load game resources and once finished, start the game
     PIXI.loader.once('complete', function(){
-        document.getElementById("loadingscreen").style.display="none";
-        screen.style.display="flex";
+        window.hideLoadingDialog();
 
         window.addEventListener("resize", resize);
 
@@ -78,7 +93,7 @@ window.onload = function() {
         function resize() {
             var x = screen.getBoundingClientRect();
             app.renderer.resize(x.width,x.height);
-            gameManager.updateCam();
+            gameManager.gameTable.updateCam();
         }
         resize();
     }.bind(this)).load();

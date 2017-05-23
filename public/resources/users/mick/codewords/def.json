@@ -6,6 +6,10 @@
     "caption":"codewords instructions",
     "text":"asdf södkf laskföl kaslöf ak"
   },
+  "table_size":{
+    "width":1500,
+    "height":1000
+},
   "object_def":{
     "wordcard":{
       "classification": "card",

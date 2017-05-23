@@ -1,0 +1,14 @@
+{
+  "ZOOM": {
+    "MAX": 2.5,
+    "MIN": 0.3,
+    "SENSIVITY": 0.1
+  },
+  "KEY_MAPPING":{
+    "TURN":{"keyboard":[70],"mouse":[]}
+  },
+  "PATHS":{
+    "RESOURCE_BASE":"resources",
+    "USERS":"resources/users"
+  }
+}

@@ -10,6 +10,7 @@ module.exports = {
      */
     USER_ID:null,
 
+
     /**
      * {Float] current zoom level
      */

@@ -28,6 +28,10 @@ class PlayerManager extends PIXI.Container {
 
     }
 
+    init(){
+
+    }
+
     /**
      * @param @type {object} player_data {id,color,position,color,cursor_type}
      */

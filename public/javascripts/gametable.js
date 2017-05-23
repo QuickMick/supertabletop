@@ -30,28 +30,13 @@ class GameTable extends PIXI.Container {
         this._min_zoom = 0.4;
         this._max_zoom = 2.5;
 
-        this.isMoving = false;
-
-
         this.interactive = true;
-/*
-        this.on('mousedown', this._onDragStart.bind(this) )
-            .on('touchstart', this._onDragStart.bind(this))
-            // events for drag end
-            .on('mouseup', this._onDragEnd.bind(this))
-            .on('mouseupoutside', this._onDragEnd.bind(this))
-            .on('touchend', this._onDragEnd.bind(this))
-            .on('touchendoutside', this._onDragEnd.bind(this))
-            // events for drag move
-            .on('mousemove', this._onDragMove.bind(this))
-            .on('touchmove', this._onDragMove.bind(this));
-*/
-        //document.addEventListener("mousewheel", this._zoom.bind(this), false);
+
         InputHandler.on("mousewheel", this._zoom.bind(this), false)
                     .on("mousemove",this._mouseMove.bind(this));
 
-        InputHandler.mapping.GRAB_CAMERA.on("pressed",function(){GameState.CAMERA_GRABED=true;}.bind(this))
-                                        .on("released",function(){GameState.CAMERA_GRABED=false;}.bind(this));
+        InputHandler.mapping.MOUSE_LEFT.on("pressed",function(){GameState.CAMERA_GRABBED=true;}.bind(this))
+                                        .on("released",function(){GameState.CAMERA_GRABBED=false;}.bind(this));
     }
 
     /**
@@ -60,8 +45,7 @@ class GameTable extends PIXI.Container {
      * @private
      */
     _mouseMove(evt){
-        console.log(GameState.CAMERA_GRABED);
-        if(!GameState.CAMERA_GRABED) return;
+        if(!GameState.CAMERA_GRABBED) return;
 
         this.position.x +=evt.dx;
         this.position.y +=evt.dy;
@@ -92,51 +76,6 @@ class GameTable extends PIXI.Container {
         // finaly add the new table
         this.tableContainer.addChild(defaultTable);
     }
-
-  /*  _onDragStart(event) {
-        // store a reference to the data
-        // the reason for this is because of multitouch
-        // we want to track the movement of this particular touch
-        this.data = event.data;
-        this.dragging = true;
-        this.pos = {
-            old:event.data.global,
-            new:event.data.global
-        };
-        this.isMoving = true;
-
-        if(this.onDragStart){
-            this.onDragStart(this);
-        }
-    }
-
-    _onDragEnd() {
-        this.dragging = false;
-        this.data = null;
-        this.pos=null;
-        this.isMoving = false;
-        if(this.onDragEnd){
-            this.onDragEnd(this);
-        }
-    }
-
-    _onDragMove() {
-        if (this.dragging) {
-            var dx = this.pos.old.x - this.pos.new.x;
-            var dy = this.pos.old.y - this.pos.new.y;
-
-            this.position.x -=dx;
-            this.position.y -=dy;
-
-           // if(dx >0 || dy>0) {
-                this.updateCam();
-                if(this.onMoving){
-                    this.onMoving(this);
-                }
-           // }
-            this.pos.old = {x:this.pos.new.x,y:this.pos.new.y};
-        }
-    }*/
 
     get min_zoom(){
         return this._min_zoom;

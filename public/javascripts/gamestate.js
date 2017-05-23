@@ -4,31 +4,50 @@
  *
  * Constains current shared global values, describing the current state of the game
  */
-module.exports = {
-    /**
-     * {String} ID of the current user
-     */
-    USER_ID:null,
+class GameState{
+    constructor(){
+        /**
+         * {String} ID of the current user
+         */
+        this.USER_ID=null;
+
+        /**
+         * true, when the camera is moving,
+         * otherwise false.
+         *
+         */
+        this._camera_grabbed=false;
+
+        /**
+         * Contains all selected entities, which will be
+         * get affected by the user input
+         */
+        this._selected_entities=[];
+    }
 
     /**
-     * true, when the camera is moving,
-     * otherwise false.
-     *
+     * camera loses grab if an entity is selected
+     * @returns {boolean}
+     * @constructor
      */
-    CAMERA_GRABED:false
+    get CAMERA_GRABBED(){
+        if((this._selected_entities||[]).length >0) return false;
+        return this._camera_grabbed;
+    }
+
+    set CAMERA_GRABBED(v){
+        this._camera_grabbed = v;
+    }
+
+    get SELECTED_ENTITIES(){
+        return this._selected_entities;
+    }
+
+    set SELECTED_ENTITIES(v){
+        this._selected_entities = v || [];
+    }
 
 
-    /**
-     * {Float] current zoom level
-     */
-  //  CURRENT_ZOOM:1,
+}
 
-    /**
-     * {object} Contains all display PIXI.container
-     */
-   /* DISPLAY_CONTAINER:{
-        CAMERA:null,
-        ENTITY:null,
-        PLAYER:null
-    }*/
-};
+module.exports = new GameState();

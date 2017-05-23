@@ -3,10 +3,15 @@
  */
 'use strict';
 require('pixi.js');
+require('pixi-filters');
 
 var Path = require('path');
 var Config = require('./../resources/config.json');
 var Entity = require('./entity');
+
+var InputHandler = require('./inputhandler');
+
+var GameState = require('./gamestate');
 
 const RELATIVE_PATH = "./../";
 
@@ -14,7 +19,6 @@ class EntityManager extends PIXI.Container{
 
     constructor(){
         super();
-
         /**
          * Contains a mapping from entity ID to the entity itself,
          * additionally, the entities are added to the children list of this container
@@ -22,7 +26,14 @@ class EntityManager extends PIXI.Container{
          */
         this.entities = {
             //ID: ENTITY(SPRITE)
-        }
+        };
+
+        this.selectionFilter = new PIXI.filters.BloomFilter();
+       // this.selectedEntities = [];
+    }
+
+    init(){
+        InputHandler.mapping.MOUSE_LEFT.on("released",this._releaseSelection.bind(this));
     }
 
 
@@ -41,6 +52,7 @@ class EntityManager extends PIXI.Container{
 
         for(let i in game.resources){
             var name = game.resources[i];
+
             PIXI.loader.add(
                 {
                     name:name,
@@ -68,6 +80,34 @@ class EntityManager extends PIXI.Container{
     addEntity(entity){
         this.entities[entity.ENTITY_ID] = entity;
         this.addChild(entity);
+
+        entity.on('mousedown', this._onEntityClick.bind(this))
+            .on('touchstart', this._onEntityClick.bind(this));
+    }
+
+    _onEntityClick(event){
+        // no entity_id? so its propably no entity
+        if(!event.currentTarget || !event.currentTarget.ENTITY_ID) return;
+
+        var entity = event.currentTarget;
+        GameState.SELECTED_ENTITIES.push(entity);
+        entity.filters = (entity.filters || []).concat([this.selectionFilter]);
+    }
+
+    _releaseSelection(evt){
+
+        for(var i=0;i<GameState.SELECTED_ENTITIES.length;i++){
+            var n = [];
+            var filters = GameState.SELECTED_ENTITIES[i].filters;
+            for(var j=0; j<filters.length;j++){
+                if(filters[j] != this.selectionFilter)
+                n.push(filters[j]);
+            }
+            GameState.SELECTED_ENTITIES[i].filters=n;
+
+        }
+        GameState.SELECTED_ENTITIES =[];
+
     }
 
 

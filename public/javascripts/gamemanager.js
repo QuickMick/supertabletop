@@ -31,13 +31,17 @@ class GameManager{
     }
 
     start(){
+        // init the inputhandler
+
+
         // setup main gameTable container
         this.gameTable = new GameTable(
             this.app.renderer
         );
 
-        // init the inputhandler
         InputHandler.init(this.app);
+        EntityManager.init();
+        PlayerManager.init();
 
         this.gameTable.min_zoom = Config.ZOOM.MIN;
         this.gameTable.max_zoom = Config.ZOOM.MAX;
@@ -57,39 +61,12 @@ class GameManager{
 
         // initialize socket-connection/synchronizer
         Synchronizer.init(EntityManager);
-
-        /*
-        this.context={
-            world:new PIXI.Container(),
-            players:new PIXI.Container(),
-            entities:new PIXI.Container()
-        };
-        var graphics = new PIXI.Graphics();
-        graphics.beginFill(0xFFFF00);
-        graphics.lineStyle(5, 0xFF0000);
-
-        graphics.drawRect(0, 0, 1000,1000);
-        this.context.world.addChild(graphics);
-
-        this.context.players.interactive = true;
-        this.context.world.addChild(this.context.entities);
-
-        this.context.world.addChild(this.context.players);*/
     }
 
     update(delta){
 
     }
 
-/*
-    this.context.players.on('mousemove', this.sendMousePos.bind(this))
-.on('touchmove', this.sendMousePos.bind(this));
-
-
-    sendMousePos(data) {
-        var cp = data.data.getLocalPosition(this.context.players.parent);
-        this.sendMessage(Statics.PROTOCOL.CLIENT.CLIENT_MOUSE_MOVE,{msg:"",data:{x:cp.x,y:cp.y}});
-    }*/
 }
 
 module.exports=GameManager;

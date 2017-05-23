@@ -3,9 +3,9 @@
  */
 "use strict";
 require('pixi.js');
-var GameState = require('./gamestate');
 
 var Util = require("./../../core/util");
+
 
 var DEFAULT_RESOURCES = require("./../resources/resources.json").default.content;
 
@@ -79,27 +79,22 @@ class Entity extends PIXI.Sprite {
 
         // setup events
             // events for drag start
-        this.on('mousedown', this.onClick.bind(this))
-            .on('touchstart', this.onClick.bind(this));
-            // events for drag end
-        /*        .on('mouseup', this.onDragEnd.bind(this))
-            .on('mouseupoutside', this.onDragEnd.bind(this))
-            .on('touchend', this.onDragEnd.bind(this))
-            .on('touchendoutside', this.onDragEnd.bind(this))
-            // events for drag move
-            .on('mousemove', this.onDragMove.bind(this))
-            .on('touchmove', this.onDragMove.bind(this))
-            .on('mouseover', this.onOver.bind(this))
-            .on('mouseout', this.onOut.bind(this));
-*/
+     /*   this.on('mousedown', this.onClick.bind(this))
+            .on('touchstart', this.onClick.bind(this));*/
     }
-
+/*
     onClick(event){
         // prevents camera from moving, when entity is clicked
         GameState.CAMERA_GRABED=false;
         event.stopped  = true;
-    }
+        GameState.SELECTED_ENTITIES.push(this);
 
+
+        // this.filters=[new PIXI.filters.GlowFilter(renderer.width, renderer.height, 15, 2, 1, 0xFF0000, 0.5)];
+
+        this.filters = [new PIXI.filters.BloomFilter()];
+    }
+*/
 
     /**
      * Changes the surface which is shown
@@ -129,7 +124,7 @@ class Entity extends PIXI.Sprite {
             var color = Util.parseColor(cText.color);
             var cPixiText = new PIXI.Text(cText.content, {font: size + "pt " + font, fill: color});
 
-            if(cText.position) {    // set offset of the text
+            if(cText.position) {    // set offset ofs the text
                 cPixiText.position.x = cText.position.x || 0;
                 cPixiText.position.y = cText.position.y || 0;
             }

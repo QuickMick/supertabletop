@@ -2,7 +2,7 @@
  * Created by Mick on 23.05.2017.
  */
 'use strict';
-
+var InputHandler = require('./inputhandler');
 require('pixi.js');
 
 class GameTable extends PIXI.Container {
@@ -33,7 +33,7 @@ class GameTable extends PIXI.Container {
 
 
         this.interactive = true;
-
+/*
         this.on('mousedown', this._onDragStart.bind(this) )
             .on('touchstart', this._onDragStart.bind(this))
             // events for drag end
@@ -44,8 +44,9 @@ class GameTable extends PIXI.Container {
             // events for drag move
             .on('mousemove', this._onDragMove.bind(this))
             .on('touchmove', this._onDragMove.bind(this));
-
-        document.addEventListener("mousewheel", this._zoom.bind(this), false);
+*/
+        //document.addEventListener("mousewheel", this._zoom.bind(this), false);
+        InputHandler.on("mousewheel", this._zoom.bind(this), false);
     }
 
     /**
@@ -73,7 +74,7 @@ class GameTable extends PIXI.Container {
         this.tableContainer.addChild(defaultTable);
     }
 
-    _onDragStart(event) {
+  /*  _onDragStart(event) {
         // store a reference to the data
         // the reason for this is because of multitouch
         // we want to track the movement of this particular touch
@@ -116,7 +117,7 @@ class GameTable extends PIXI.Container {
            // }
             this.pos.old = {x:this.pos.new.x,y:this.pos.new.y};
         }
-    }
+    }*/
 
     get min_zoom(){
         return this._min_zoom;
@@ -163,10 +164,11 @@ class GameTable extends PIXI.Container {
 
 
     _zoom(evt) {
-        if(evt.deltaY <0 ){
+        if(evt.delta <0 ){
             this.current_zoom+=this.zoom_sensivity;
         }
-        if(evt.deltaY > 0 ){
+
+        if(evt.delta > 0 ){
             this.current_zoom-=this.zoom_sensivity;
         }
     }

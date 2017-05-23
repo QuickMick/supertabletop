@@ -8,8 +8,9 @@
   },
   "table_size":{
     "width":1500,
-    "height":1000
-},
+    "height":1000,
+    "texture":"table.png"
+  },
   "object_def":{
     "wordcard":{
       "classification": "card",

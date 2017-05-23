@@ -8,6 +8,7 @@
 var EventEmitter = require('eventemitter3');
 
 const MOUSEMOVE= "mousemove";
+const MOUSEWHEEL= "mousewheel";
 class InputHandler extends EventEmitter{
     constructor(){
         super();
@@ -43,6 +44,12 @@ class InputHandler extends EventEmitter{
         stage.interactive = true;
         stage.on('mousemove', this._onMouseMove.bind(this))
             .on('touchmove', this._onMouseMove.bind(this));
+
+        document.addEventListener("mousewheel", this._mouseWheelMove.bind(this), false);
+    }
+
+    _mouseWheelMove(evt){
+        this.emit(MOUSEWHEEL,{delta:evt.deltaY});
     }
 
     setMapping(mapping){

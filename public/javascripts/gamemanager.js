@@ -33,6 +33,7 @@ class GameManager{
     start(){
         // init the inputhandler
 
+        PIXI.SCALE_MODES.DEFAULT = PIXI.SCALE_MODES.NEAREST;
 
         // setup main gameTable container
         this.gameTable = new GameTable(

@@ -69,7 +69,15 @@ a {
   width: 40px;
   height: 40px;
 }
-
+/*
+canvas{
+  image-rendering: optimizeSpeed;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: -o-crisp-edges;
+  image-rendering: pixelated;
+  -ms-interpolation-mode: nearest-neighbor;
+}*/
 
 
 

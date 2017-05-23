@@ -233,7 +233,7 @@ console.log(gameJSON);
         }
 
 
-        this._sendToClient(clientSocket,Statics.PROTOCOL.CLIENT.USERINFO,{msg:"",data:{id:clientSocket.id,admin:this.admin == clientSocket.id}}); // true, wenn connected is admin
+        this._sendToClient(clientSocket,Statics.PROTOCOL.CLIENT.USER_INFO,{msg:"",data:{user_id:clientSocket.id,admin:this.admin == clientSocket.id}}); // true, wenn connected is admin
 
 
         this.game.entities = Object.keys(this.entities).map(function(key) {

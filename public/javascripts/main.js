@@ -8,6 +8,10 @@ var Statics = require("./../../core/statics");
 var GameManager = require('./gamemanager');
 var InputAction = require('./inputaction');
 
+var Resources = require('./../resources/resources.json');
+
+var Path = require('path');
+
 PIXI.Container.prototype.bringToFront = PIXI.Sprite.prototype.bringToFront = function() {	if (this.parent) {		var parent = this.parent;		parent.removeChild(this);		parent.addChild(this);	}};
 
 PIXI.Container.prototype.removeAll = PIXI.Sprite.prototype.removeAll = function () { while(this.children[0]) { this.removeChild(this.children[0]); } };
@@ -31,29 +35,36 @@ window.onload = function() {
     var app = new PIXI.Application(800, 600, {backgroundColor : 0x1099bb});
     screen.appendChild(app.view);
 
-    //screen.style.display = "none";
-
-
-
+    // init key mapping
     Statics.GLOBALS.KEY_MAPPING = {
         TURN:new InputAction("TURN", [70])
     };
+    require('./inputhandler').setMapping(Statics.GLOBALS.KEY_MAPPING);
 
 
     // preparing loading game resouces
     const RELATIVE_PATH = "./../";
-    for(var key in Statics.RESOURCES) {
-        if(!Statics.RESOURCES.hasOwnProperty(key)) continue;
+    for(var area_key in Resources) {
+        if(!Resources.hasOwnProperty(area_key)) continue;
+        var current_area = Resources[area_key];
+        if(!current_area.content) continue;
 
-        PIXI.loader.add({
-            name: Statics.RESOURCES[key],//Statics.RESOURCES.CURSOR,
-            url: RELATIVE_PATH + Statics.PATHS.RESOURCE_PATH + "/" + Statics.RESOURCES[key] //Statics.RESOURCES.CURSOR
-        });
+        var folder = current_area.base_folder;
+        for(var content_key in current_area.content) {
+            if (!current_area.content.hasOwnProperty(content_key)) continue;
+
+            var resource_name = current_area.content[content_key].texture;
+            var resource_path = Path.join(RELATIVE_PATH,folder,resource_name);
+
+            PIXI.loader.add({
+                name: resource_name,
+                url: resource_path
+            });
+        }
     }
 
     // load game resources and once finished, start the game
     PIXI.loader.once('complete', function(){
-
         document.getElementById("loadingscreen").style.display="none";
         screen.style.display="flex";
 

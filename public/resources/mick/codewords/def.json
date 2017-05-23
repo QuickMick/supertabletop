@@ -8,21 +8,40 @@
   },
   "object_def":{
     "wordcard":{
-      "classification":"card",
-      "type":"wordcard",
-      "width":100,
-      "height":75,
-      "stackable":true,
-      "turnable":true,
-      "top":true,
-      "back":{"texture":"back.png"},
-      "text":{
-        "position":{"x":0,"y":0},
-        "content":"testtext",
-        "size":12,
-        "color":"0x11ff3d",
-        "font":"monospace"
-      }
+      "classification": "card",
+      "type": "wordcard",
+      "width": 100,
+      "height": 75,
+      "stackable": true,
+      "turnable": true,
+      "top": true,
+      "back": {
+        "texture": "back.png"
+      },
+      "text_back": [
+        {
+          "position": {
+            "x": 0,
+            "y": 0
+          },
+          "content": "testtext",
+          "size": 12,
+          "color": "0x11ff3d",
+          "font": "monospace"
+        }
+      ],
+      "text_front": [
+        {
+          "position": {
+            "x": 0,
+            "y": 0
+          },
+          "content": "front",
+          "size": 12,
+          "color": "0x11ff3d",
+          "font": "monospace"
+        }
+      ]
     },
 
     "stone":{

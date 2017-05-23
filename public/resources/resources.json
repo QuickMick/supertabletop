@@ -1,0 +1,22 @@
+{
+  "cursors": {
+    "base_folder": "cursors",
+    "content": {
+      "default": {
+        "texture": "default.png",
+        "anchor": {
+          "x": 1,
+          "y": 0
+        }
+      }
+    }
+  },
+  "default":{
+    "base_folder":"default",
+    "content":{
+      "missing_texture_substitute":{
+        "texture":"missing.png"
+      }
+    }
+  }
+}

@@ -3,6 +3,7 @@
  */
 'use strict';
 var InputHandler = require('./inputhandler');
+var GameState = require('./gamestate');
 require('pixi.js');
 
 class GameTable extends PIXI.Container {
@@ -49,8 +50,8 @@ class GameTable extends PIXI.Container {
         InputHandler.on("mousewheel", this._zoom.bind(this), false)
             .on("mousemove",this._mouseMove.bind(this));
 
-        InputHandler.mapping.GRAB_CAMERA.on("pressed",function(){this.mouseGrabed=true;}.bind(this))
-                                        .on("released",function(){delete this.mouseGrabed;}.bind(this));
+        InputHandler.mapping.GRAB_CAMERA.on("pressed",function(){GameState.CAMERA_GRABED=true;}.bind(this))
+                                        .on("released",function(){GameState.CAMERA_GRABED=false;}.bind(this));
     }
 
     /**
@@ -59,20 +60,12 @@ class GameTable extends PIXI.Container {
      * @private
      */
     _mouseMove(evt){
-        if(!this.mouseGrabed) return;
+        console.log(GameState.CAMERA_GRABED);
+        if(!GameState.CAMERA_GRABED) return;
 
-/*
-        var dx = this.pos.old.x - this.pos.new.x;
-        var dy = this.pos.old.y - this.pos.new.y;
-*/
-console.log(this.position,evt.dx,evt.dy);
         this.position.x +=evt.dx;
         this.position.y +=evt.dy;
-
-        // if(dx >0 || dy>0) {
         this.updateCam();
-        // }
-      //  this.pos.old = {x:this.pos.new.x,y:this.pos.new.y};
     }
 
     /**
@@ -200,7 +193,6 @@ console.log(this.position,evt.dx,evt.dy);
     }
 
     updateCam(){
-
         var w = this.hitArea.width;
         var h = this.hitArea.height;
         var z = this._current_zoom;

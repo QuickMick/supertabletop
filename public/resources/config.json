@@ -6,7 +6,7 @@
   },
   "KEY_MAPPING":{
     "TURN":{"keyboard":[70],"mouse":[]},
-    "GRAB_CAMERA":{"keyboard":[],"mouse":[2]}
+    "GRAB_CAMERA":{"keyboard":[],"mouse":[0]}
   },
   "PATHS":{
     "RESOURCE_BASE":"resources",

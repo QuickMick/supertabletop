@@ -3,7 +3,7 @@
  */
 "use strict";
 require('pixi.js');
-var Statics = require("./../../core/statics");
+var GameState = require('./gamestate');
 
 var Util = require("./../../core/util");
 
@@ -75,13 +75,14 @@ class Entity extends PIXI.Sprite {
 
         // finally, display the visible surface
         this.showSurface(this.surfaceIndex);
-/*
+
+
         // setup events
             // events for drag start
-        this.on('mousedown', this.onDragStart.bind(this))
-            .on('touchstart', this.onDragStart.bind(this))
+        this.on('mousedown', this.onClick.bind(this))
+            .on('touchstart', this.onClick.bind(this));
             // events for drag end
-            .on('mouseup', this.onDragEnd.bind(this))
+        /*        .on('mouseup', this.onDragEnd.bind(this))
             .on('mouseupoutside', this.onDragEnd.bind(this))
             .on('touchend', this.onDragEnd.bind(this))
             .on('touchendoutside', this.onDragEnd.bind(this))
@@ -91,6 +92,12 @@ class Entity extends PIXI.Sprite {
             .on('mouseover', this.onOver.bind(this))
             .on('mouseout', this.onOut.bind(this));
 */
+    }
+
+    onClick(event){
+        // prevents camera from moving, when entity is clicked
+        GameState.CAMERA_GRABED=false;
+        event.stopped  = true;
     }
 
 

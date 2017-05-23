@@ -38,17 +38,25 @@ class InputHandler extends EventEmitter{
         window.addEventListener("keyup", this._keyUp.bind(this), false);
 
         //add mouse listeners
-        window.addEventListener("mousedown", this._mouseDown.bind(this), false);
-        window.addEventListener("mouseup", this._mouseUp.bind(this), false);
+    //    window.addEventListener("mousedown", this._mouseDown.bind(this), false);
+     //   window.addEventListener("mouseup", this._mouseUp.bind(this), false);
 
         app.stage.interactive = true;
 
         document.addEventListener("mousewheel", this._mouseWheelMove.bind(this), false);
 
 
-        app.stage.on('mousemove', this._onMouseMove.bind(this), false)
-            .on('touchmove', this._onMouseMove.bind(this), false);
+        app.stage
+            // mouse move
+            .on('mousemove', this._onMouseMove.bind(this), false)
+            .on('touchmove', this._onMouseMove.bind(this), false)
 
+        // mouse down
+            .on('mousedown', this._mouseDown.bind(this), false)
+            .on('rightclick', this._mouseDown.bind(this), false)
+            .on('touchstart', this._mouseDown.bind(this), false)
+            .on('touchend', this._mouseUp.bind(this), false)
+            .on('mouseup', this._mouseUp.bind(this), false);
        // app.ticker.add(this.update.bind({self:this,app:app}));
     }
 
@@ -81,14 +89,14 @@ class InputHandler extends EventEmitter{
     }
 
     _mouseDown(event){
-        this.keyState.mouse_buttons[event.button] = true;
+        this.keyState.mouse_buttons[event.data.button] = true;
       //  event.preventDefault();
         this._processKeyInteraction();
     }
 
     _mouseUp(event){
-        if(this.keyState.mouse_buttons.hasOwnProperty(event.button)) {
-            delete this.keyState.mouse_buttons[event.button];
+        if(this.keyState.mouse_buttons.hasOwnProperty(event.data.button)) {
+            delete this.keyState.mouse_buttons[event.data.button];
         }
 
         this._processKeyInteraction();

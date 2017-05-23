@@ -10,6 +10,13 @@ module.exports = {
      */
     USER_ID:null,
 
+    /**
+     * true, when the camera is moving,
+     * otherwise false.
+     *
+     */
+    CAMERA_GRABED:false
+
 
     /**
      * {Float] current zoom level

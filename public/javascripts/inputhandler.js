@@ -55,6 +55,9 @@ class InputHandler extends EventEmitter{
             .on('mousedown', this._mouseDown.bind(this), false)
             .on('rightclick', this._mouseDown.bind(this), false)
             .on('touchstart', this._mouseDown.bind(this), false)
+
+            .on('mouseupoutside', this._mouseUp.bind(this))
+            .on('touchendoutside', this._mouseUp.bind(this))
             .on('touchend', this._mouseUp.bind(this), false)
             .on('mouseup', this._mouseUp.bind(this), false);
        // app.ticker.add(this.update.bind({self:this,app:app}));

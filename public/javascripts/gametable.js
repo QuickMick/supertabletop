@@ -48,7 +48,7 @@ class GameTable extends PIXI.Container {
 */
         //document.addEventListener("mousewheel", this._zoom.bind(this), false);
         InputHandler.on("mousewheel", this._zoom.bind(this), false)
-            .on("mousemove",this._mouseMove.bind(this));
+                    .on("mousemove",this._mouseMove.bind(this));
 
         InputHandler.mapping.GRAB_CAMERA.on("pressed",function(){GameState.CAMERA_GRABED=true;}.bind(this))
                                         .on("released",function(){GameState.CAMERA_GRABED=false;}.bind(this));

@@ -16,6 +16,9 @@
     "content":{
       "missing_texture_substitute":{
         "texture":"missing.png"
+      },
+      "empty_texture":{
+        "texture":"empty.png"
       }
     }
   }

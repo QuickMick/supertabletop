@@ -7,84 +7,90 @@ var Statics = require("./../../core/statics");
 
 var Util = require("./../../core/util");
 
-var missing_texture_substitute = require("./../resources/resources.json").default.content.missing_texture_substitute;
+var DEFAULT_RESOURCES = require("./../resources/resources.json").default.content;
 
-
+//TODO: entities mit mehr als 2 seiten, da würfel au rein müssen un die 4 ode rmehr ham
 class Entity extends PIXI.Sprite {
 
     constructor(entity) {
-        if (entity.front.texture == null)
+        if(!entity.surfaces){ // ||entity.surfaces.length <=0){
             throw "cannot instatiate an entity without a texture!";
-        super(PIXI.loader.resources[missing_texture_substitute].texture);
+        }
+        // ensure, that the surfaces object is an array, if not, then convert it to an array
+        entity.surfaces = Array.isArray(entity.surfaces)?entity.surfaces:[].concat(entity.surfaces;
+
+        super(PIXI.loader.resources[DEFAULT_RESOURCES.missing_texture_substitute.texture].texture);
 
         // -------- init pixi values --------
         this.interactive = true;    // enable the bunny to be interactive... this will allow it to respond to mouse and touch events
         this.buttonMode = true;     // this button mode will mean the hand cursor appears when you roll over the bunny with your mouse
         this.anchor.set(0.5);       // center the bunny's anchor point
 
-        this.position.x = entity.position.x;
-        this.position.y = entity.position.y;
+        this.position.x = entity.position.x || 0;
+        this.position.y = entity.position.y || 0;
 
         if (entity.width)
             this.width = entity.width;
         if (entity.height)
             this.height = entity.height;
 
+        // -------- init hitArea -------------
+        if (!entity.hitArea) { // default hitArea just takes
+            this.hitArea = new PIXI.Rectangle(-this.width * this.anchor.x, -this.height * this.anchor.y, this.width, this.height);
+        } else {
+            switch (entity.hitArea.type) {
+                case "circle":
+                    this.hitArea = new PIXI.Circle(-this.width * this.anchor.x + entity.hitArea.offset.x, -this.height * this.anchor.y + entity.hitArea.offset.y, entity.hitArea.radius); //e.hitArea.width,e.hitArea.height);
+                    break;
+                case "rectangle":
+                    this.hitArea = new PIXI.Rectangle(-this.width * this.anchor.x + entity.hitArea.offset.x, -this.height * this.anchor.y + entity.hitArea.offset.y, entity.hitArea.width, entity.hitArea.height);
+                    break;
+            }
+        }
+
 
         // ------- init entity values --------
         this.ENTITY_ID = entity.id;
-        this.entity = entity;
-        this.turnable = entity.turnable;
-        this.stackable = entity.stackable;
+     //   this.entity = entity;
+        this.turnable = entity.turnable || false;
+        this.stackable = entity.stackable || false;
 
-        this.top = entity.top; // is top visible?
+        this.surfaceIndex = entity.surfaceIndex || 0; // is top visible?
 
         // ------- init surfaces -------------
-        this.surfaces = {};
-
-        // normalise textcolor of front
-        if(entity.text_front) {
-            // if text is just array, then convert it to array
-            entity.text_front =Array.isArray(entity.text_front)?entity.text_front:[].concat(entity.text_front);
-          /*  for (var i = 0; i < entity.text_front.length; i++) {
-                if (!entity.text_front[i].color)continue;
-                entity.text_front[i].color = Util.parseColor(entity.text_front[i].color);
-            }*/
-
-        }
-
-        this.surfaces.front = {
-            texture: PIXI.loader.resources[entity.front.texture].texture,
-            color:Util.parseColor(entity.front.color),
-            text:entity.text_front ||[]
-        };
-        // only add back surface, when it is existing
-
-        if(this.turnable){
-            // normalize text color of back
-            if(entity.text_back) {
-                entity.text_back =Array.isArray(entity.text_back)?entity.text_back:[].concat(entity.text_back);
-              /*  for (var i = 0; i < entity.text_back.length; i++) {
-                    if (!entity.text_back[i].color)continue;
-                    entity.text_back[i].color = Util.parseColor(entity.text_back[i].color);
-                }*/
-                // note: i did not want to create unnecessary functions just for this both calls
-            }
-            this.surfaces.back = {
-                texture: PIXI.loader.resources[entity.back.texture].texture,
-                color:Util.parseColor(entity.back.color),
-                text:entity.text_back ||[]
+        this.surfaces = [];
+        for(var i=0; i< entity.surfaces.length;i++){
+            var  curSurface = entity.surfaces[i];
+            // init surface
+            var newSurface = {
+                // if the texture is not available, take the default texture, which is already set as "this.texture"
+                texture: PIXI.loader.resources[entity.surfaces[i].texture] ? (PIXI.loader.resources[entity.surfaces[i].texture].texture || this.texture) : this.texture,
+                // normalize/convert the color of the surface
+                color: Util.parseColor(entity.front.color),
+                // if text  is no array, then convert it to an array
+                text: Array.isArray(curSurface.text)?curSurface.text:[].concat(curSurface.text)
             };
+
+            this.surfaces.push(newSurface);
         }
 
 
 
-
-
-
+        // init text
+        /* for (var j = 0; i < curSurface.text.length; j++) {
+         var cText = curSurface.text[j];
+         var font = cText.font || "monospace";
+         var size = cText.size || 12;
+         var color = Util.parseColor(cText.color);
+         newSurface.text.push({
+         font: font,
+         size: size,
+         color: color
+         });
+         }*/
 
         // create our little bunny friend..
-
+/*
         if (!this.turnable || (this.turnable && this.top)) {
             super(PIXI.loader.resources[e.front.texture].texture);
             if (entity.front.color) {
@@ -107,7 +113,7 @@ class Entity extends PIXI.Sprite {
             this.addChild(new PIXI.Text(e.text.content, {font: size + "pt " + font, fill: color}));
         }
 
-
+ */
 
 
         // make it a bit bigger, so it's easier to grab
@@ -132,18 +138,7 @@ class Entity extends PIXI.Sprite {
 
 
         // set hitarea scaled mit
-        if (!entity.hitArea) {
-            this.hitArea = new PIXI.Rectangle(-this.width * this.anchor.x, -this.height * this.anchor.y, this.width, this.height);
-        } else {
-            switch (entity.hitArea.type) {
-                case "circle":
-                    this.hitArea = new PIXI.Circle(-this.width * this.anchor.x + entity.hitArea.offset.x, -this.height * this.anchor.y + entity.hitArea.offset.y, entity.hitArea.radius); //e.hitArea.width,e.hitArea.height);
-                    break;
-                case "rectangle":
-                    this.hitArea = new PIXI.Rectangle(-this.width * this.anchor.x + entity.hitArea.offset.x, -this.height * this.anchor.y + entity.hitArea.offset.y, entity.hitArea.width, entity.hitArea.height);
-                    break;
-            }
-        }
+
     }
 
 
@@ -151,18 +146,19 @@ class Entity extends PIXI.Sprite {
      * Changes the surface which is shown
      * @param front
      */
-    showSurface(front = true){
+    showSurface(index){
         if(!front && !this.entity.turnable){
             console.log("cannot turn unturnable entity");
             return;
         }
-
-        var curSurface = front?this.surfaces.front:  this.surfaces.back;
+        this.surfaceIndex = index || 0;
+        var curSurface = this.surfaces[this.surfaceIndex];
         this.removeAll();
 
         this.texture = PIXI.loader.resources[curSurface.texture].texture;
         this.tint = curSurface.color;
 
+        // show text
         for(var i=0; i<curSurface.text.length;i++){
             var cText = curSurface.text[i];
             var font = cText.font || "monospace";

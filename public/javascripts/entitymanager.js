@@ -6,14 +6,10 @@ require('pixi.js');
 require('pixi-filters');
 require('pixi-extra-filters');
 
-var Config = require('./../resources/config.json');
-var Entity = require('./entity');
-
-var InputHandler = require('./inputhandler');
-
-var GameState = require('./gamestate');
-
 const RELATIVE_PATH = "./../";
+
+
+var EVT_ENTITYCLICKED = "entityclicked";
 
 class EntityManager extends PIXI.Container{
 
@@ -28,54 +24,27 @@ class EntityManager extends PIXI.Container{
             //ID: ENTITY(SPRITE)
         };
 
-        this.selectionFilter =new PIXI.filters.BloomFilter(); //new PIXI.filters.OutlineFilter(2, 0x99ff99);
-       // this.selectedEntities = [];
+        this.selectionFilter =new PIXI.filters.BloomFilter();
     }
 
     init(){
-        InputHandler.mapping.MOUSE_LEFT.on("released",this._releaseSelection.bind(this));
     }
 
     addEntity(entity){
         this.entities[entity.ENTITY_ID] = entity;
         this.addChild(entity);
 
-        entity.on('mousedown', this._onEntityClick.bind(this))
-            .on('touchstart', this._onEntityClick.bind(this));
+        entity.on('mousedown', this._onEntityClicked.bind(this))
+            .on('touchstart', this._onEntityClicked.bind(this));
     }
 
-    _onEntityClick(event){
+    _onEntityClicked(event){
         // no entity_id? so its propably no entity
-        if(!event.currentTarget || !event.currentTarget.ENTITY_ID) return;
+       if(!event.currentTarget || !event.currentTarget.ENTITY_ID) return;
 
         var entity = event.currentTarget;
-        GameState.SELECTED_ENTITIES.push(entity);
-        entity.filters = (entity.filters || []).concat([this.selectionFilter]);
+        this.emit(EVT_ENTITYCLICKED,{id:entity.ENTITY_ID,entity:entity});
     }
-
-    _releaseSelection(evt){
-
-        for(var i=0;i<GameState.SELECTED_ENTITIES.length;i++){
-            // create a new array, which contains every filter, except the selection filter
-            var n = [];
-            var filters = GameState.SELECTED_ENTITIES[i].filters;
-            for(var j=0; j<filters.length;j++){
-                if(filters[j] != this.selectionFilter)
-                n.push(filters[j]);
-            }
-
-            // if there are no filters anymore, just set null
-            if(n.lengh <=0){
-                GameState.SELECTED_ENTITIES[i].filters=null;
-            }else {
-                GameState.SELECTED_ENTITIES[i].filters = n;
-            }
-
-        }
-        GameState.SELECTED_ENTITIES =[];
-
-    }
-
 
     /**
      * remove and deletes an antity from the entitymanager.
@@ -95,52 +64,6 @@ class EntityManager extends PIXI.Container{
             this.removeEntity(id);
         }
     }
-
-
-
-
-/*
-
-
-
-
-    _convertServerEntity(e){
-        var cur = new Entity(e);
-
-        cur.synchronize = function (type,id) {
-            var evt = {msg:"",data:{id:e.id}};
-            switch(type){
-                case Statics.PROTOCOL.CLIENT.DRAG_START:
-                    evt.data.alpha = cur.sprite.alpha;
-                    evt.data.scale = cur.sprite.scale.x;//.get();
-                    break;
-                case Statics.PROTOCOL.CLIENT.DRAG_END:
-                    evt.data.alpha = cur.sprite.alpha;
-                    evt.data.scale = cur.sprite.scale.x;//.get();
-                    break;
-
-                case Statics.PROTOCOL.CLIENT.DRAG_MOVE:
-
-                    evt.data.x = cur.sprite.x;
-                    evt.data.y = cur.sprite.y;
-                    break;
-                case Statics.PROTOCOL.CLIENT.TURN_CARD:
-                    evt.data.top = cur.top;
-                    break;
-                default:
-                    return;
-            }
-
-            this.sendMessage(type,evt);
-
-        }.bind(this);
-
-        return cur;
-    }
-
-*/
-
-
 }
 
 module.exports= new EntityManager();

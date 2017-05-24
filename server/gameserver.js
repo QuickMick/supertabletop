@@ -12,21 +12,6 @@ var fs = require('fs');
 var Path = require('path');
 var Config = require('./../public/resources/config.json');
 
-/*
-class ServerEntity{
-    constructor(){
-        this.texture_name="";
-        this.id="";
-        this.z_index=0;
-        this.x=0;
-        this.y=0;
-        this.width=0;
-        this.height=0;
-        this.scale=1;
-        this.isStackable=false;
-    }
-}*/
-
 class GameServer{
 
     constructor(io){
@@ -61,14 +46,6 @@ class GameServer{
         for(var i=0; i< this.game.unstacked.length; i++){
 
             var c = this.game.unstacked[i];
-            /* var e = new ServerEntity();
-            e.x=c.position.x;
-            e.y=c.position.y;
-            e.width=100;
-            e.height=100;
-            e.texture_name="c1.png";*/
-
-
 
             this._addEntity(this._reviveEntity(this.game.object_def[c.type],c));
         }
@@ -81,9 +58,7 @@ class GameServer{
             return this.entities[key];
         }.bind(this));
 
-
         this.boradcast(Packages.PROTOCOL.SERVER.INIT_GAME,Packages.createEvent(Packages.SERVER_ID,this.game));
-
     }
 
 

@@ -9,6 +9,7 @@ var Statics = require("./../../core/statics");
 var GameState = require('./gamestate');
 var GameManager = require('./gamemanager');
 var InputAction = require('./inputaction');
+var ToolManager = require('./toolmanager');
 
 var Resources = require('./../resources/resources.json');
 var Config = require('./../resources/config.json');
@@ -129,12 +130,10 @@ window.onload = function() {
 
         window.addEventListener("resize", resize);
 
-
         var gameManager =  new GameManager(app);
         gameManager.start();
         app.ticker.add(gameManager.update.bind(gameManager));
        // app.ticker.add(require('./inputhandler').update);
-
 
         function resize() {
             var x = screen.getBoundingClientRect();
@@ -143,7 +142,8 @@ window.onload = function() {
                 width:app.renderer.width,
                 height:app.renderer.height
             };
-            gameManager.gameTable.updateCam();
+           // gameManager..updateCam();
+            ToolManager.currentTool().focusCamera();
         }
         resize();
 

@@ -14,6 +14,7 @@ var EntityManager = require('./entitymanager');
 var PlayerManager = require('./playermanager');
 var Synchronizer = require('./synchonizer');
 var InputHandler = require('./inputhandler');
+var ToolManager = require('./toolmanager');
 
 var RELATIVE_PATH = "./../";
 
@@ -22,7 +23,6 @@ var RELATIVE_PATH = "./../";
  * loads games, sets everything up, holds game related information
  */
 class GameManager{
-
     constructor(app){
         this.app = app;
 
@@ -46,6 +46,7 @@ class GameManager{
         InputHandler.init(this.app);
         EntityManager.init();
         PlayerManager.init();
+        ToolManager.init(InputHandler,this.gameTable,EntityManager);
 
         this.gameTable.min_zoom = Config.ZOOM.MIN;
         this.gameTable.max_zoom = Config.ZOOM.MAX;
@@ -130,7 +131,6 @@ class GameManager{
 
         }.bind(this)).load();
     }
-
 
 
     update(delta){

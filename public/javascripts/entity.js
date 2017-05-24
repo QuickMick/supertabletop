@@ -32,7 +32,6 @@ class Entity extends PIXI.Sprite {
         this.interactive = true;    // enable the bunny to be interactive... this will allow it to respond to mouse and touch events
         this.buttonMode = true;     // this button mode will mean the hand cursor appears when you roll over the bunny with your mouse
         this.anchor.set(0.5);       // center the bunny's anchor point
-
         this.position.x = entity.position.x || 0;
         this.position.y = entity.position.y || 0;
 
@@ -82,32 +81,15 @@ class Entity extends PIXI.Sprite {
 
         // finally, display the visible surface
         this.showSurface(this.surfaceIndex);
-
-
-        // setup events
-            // events for drag start
-     /*   this.on('mousedown', this.onClick.bind(this))
-            .on('touchstart', this.onClick.bind(this));*/
     }
-/*
-    onClick(event){
-        // prevents camera from moving, when entity is clicked
-        GameState.CAMERA_GRABED=false;
-        event.stopped  = true;
-        GameState.SELECTED_ENTITIES.push(this);
 
-
-        // this.filters=[new PIXI.filters.GlowFilter(renderer.width, renderer.height, 15, 2, 1, 0xFF0000, 0.5)];
-
-        this.filters = [new PIXI.filters.BloomFilter()];
-    }
-*/
 
     /**
      * Changes the surface which is shown
      * @param front
      */
     showSurface(index){
+
         this.surfaceIndex = index || 0;
         var curSurface = this.surfaces[this.surfaceIndex];
 
@@ -138,6 +120,7 @@ class Entity extends PIXI.Sprite {
             }
             this.addChild(cPixiText);
         }
+
     }
 
 

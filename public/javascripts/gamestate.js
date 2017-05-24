@@ -16,13 +16,13 @@ class GameState{
          * otherwise false.
          *
          */
-        this._camera_grabbed=false;
+     //   this._camera_grabbed=false;
 
         /**
          * Contains all selected entities, which will be
          * get affected by the user input
          */
-        this._selected_entities=[];
+      //  this._selected_entities=[];
     }
 
     /**
@@ -30,7 +30,7 @@ class GameState{
      * @returns {boolean}
      * @constructor
      */
-    get CAMERA_GRABBED(){
+  /*  get CAMERA_GRABBED(){
         if((this._selected_entities||[]).length >0) return false;
         return this._camera_grabbed;
     }
@@ -45,7 +45,7 @@ class GameState{
 
     set SELECTED_ENTITIES(v){
         this._selected_entities = v || [];
-    }
+    }*/
 
 
 }

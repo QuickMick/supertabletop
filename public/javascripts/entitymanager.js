@@ -4,7 +4,7 @@
 'use strict';
 require('pixi.js');
 require('pixi-filters');
-
+require('pixi-extra-filters');
 var Path = require('path');
 var Config = require('./../resources/config.json');
 var Entity = require('./entity');
@@ -28,7 +28,7 @@ class EntityManager extends PIXI.Container{
             //ID: ENTITY(SPRITE)
         };
 
-        this.selectionFilter = new PIXI.filters.BloomFilter();
+        this.selectionFilter =new PIXI.filters.BloomFilter(); //new PIXI.filters.OutlineFilter(2, 0x99ff99);
        // this.selectedEntities = [];
     }
 
@@ -97,13 +97,20 @@ class EntityManager extends PIXI.Container{
     _releaseSelection(evt){
 
         for(var i=0;i<GameState.SELECTED_ENTITIES.length;i++){
+            // create a new array, which contains every filter, except the selection filter
             var n = [];
             var filters = GameState.SELECTED_ENTITIES[i].filters;
             for(var j=0; j<filters.length;j++){
                 if(filters[j] != this.selectionFilter)
                 n.push(filters[j]);
             }
-            GameState.SELECTED_ENTITIES[i].filters=n;
+
+            // if there are no filters anymore, just set null
+            if(n.lengh <=0){
+                GameState.SELECTED_ENTITIES[i].filters=null;
+            }else {
+                GameState.SELECTED_ENTITIES[i].filters = n;
+            }
 
         }
         GameState.SELECTED_ENTITIES =[];

@@ -62,10 +62,37 @@ class GameManager{
 
         // initialize socket-connection/synchronizer
         Synchronizer.init(EntityManager);
+
+        this.test();
     }
+
 
     update(delta){
 
+    }
+
+    test(){
+
+        document.getCrazy = function(){
+            var count=0;
+            var filter = new PIXI.filters.ColorMatrixFilter();
+            this.stage.filters = [filter];
+
+            this.ticker.add(function(){
+                var matrix = filter.matrix;
+                count += 0.1;
+                matrix[1] = Math.sin(count) * 3;
+                matrix[2] = Math.cos(count);
+                matrix[3] = Math.cos(count) * 1.5;
+                matrix[4] = Math.sin(count / 3) * 2;
+                matrix[5] = Math.sin(count / 2);
+                matrix[6] = Math.sin(count / 4);
+            });
+        }.bind(this.app);
+
+        document.getYourShitTogether = function () {
+            this.stage.filters = null;
+        }.bind(this.app);
     }
 
 }

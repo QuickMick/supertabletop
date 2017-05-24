@@ -131,9 +131,10 @@ window.onload = function() {
 
 
         var gameManager =  new GameManager(app);
-        app.ticker.add(gameManager.update);
-       // app.ticker.add(require('./inputhandler').update);
         gameManager.start();
+        app.ticker.add(gameManager.update.bind(gameManager));
+       // app.ticker.add(require('./inputhandler').update);
+
 
         function resize() {
             var x = screen.getBoundingClientRect();
@@ -141,10 +142,11 @@ window.onload = function() {
             GameState.RENDERER_SIZE={
                 width:app.renderer.width,
                 height:app.renderer.height
-            }
+            };
             gameManager.gameTable.updateCam();
         }
         resize();
+
     }.bind(this)).load();
 };
 

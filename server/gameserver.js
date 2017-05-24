@@ -3,126 +3,91 @@
  */
 'use strict';
 
-var Statics = require('./../core/statics');
-var Packages = require('./../core/packages');
 
-var Globals = require('./globals');
-var fs = require('fs');
+var Packages = require('./../core/packages');
+var Util = require('./../core/util');
+
+const uuidV4 = require('uuid/v4');
+/*var Statics = require('./../core/statics');
+
+
+
+
 
 var Path = require('path');
-var Config = require('./../public/resources/config.json');
+var Config = require('./../public/resources/config.json');*/
+
+var EntityServerManager = require('./entityservermanager');
+var ClientManager = require('./clientmanager');
 
 class GameServer{
 
     constructor(io){
         this.io = io;
-        this.connections = {};
-
-        this.lastID=0;
-
-        this.entities={};
-
-        this.game = null;
+        this.ID = uuidV4();
+        this.entityServerManager = new EntityServerManager();
+        this.clientManager = new ClientManager();
     }
 
-    listen(){
-        this.io.on('connection', this._connect.bind(this));
+    start(){
+        this.io.on('connection', this._onConnectionReceived.bind(this));
 
-        this.loadGame("mick","codewords"); //TODO nicht statisch machen
+
+        this.entityServerManager.loadGame("mick","codewords"); //TODO nicht statisch machen und durch user triggern lassen
     }
 
-    loadGame(user,game){
-        var resource_path = Path.join(Globals.ROOT,"public",Config.PATHS.USERS_RESOURCES,user,game,Globals.GAME_DEFINITION_FILE); //path.join(global.appRoot, content_file);
-        console.log("load game: "+resource_path);
-        this.game = JSON.parse(fs.readFileSync(resource_path));
+    _onConnectionReceived(socket){
+        socket.on(Packages.PROTOCOL.CLIENT.SEND_CLIENT_SESSION, function(data){
+            //TODO check for login credentials, and if ok then connect and load clientinfo
+            var clientInfo = {
+                name:"ranz",
+                color:Util.getRandomColor()
+            };
 
-        var keys = Object.keys(this.entities);
-        if(keys.length > 0) {
-            this.boradcast(Statics.PROTOCOL.SERVER.VANISH, {msg: "", data: null});
-        }
-        this.entities={};
+            var clientAccepted = true; //TODO: check if client is accepted
 
+            if(!clientAccepted){    //TODO: appropriate reason
+                this._sendToClient(socket,Packages.PROTOCOL.SERVER.RESPONSE_CLIENT_REJECTED,Packages.createEvent(this.ID,{"reason":"your are dumb"}));
+                return;
+            }
 
-        for(var i=0; i< this.game.unstacked.length; i++){
+            // connect client to this server
+            this.clientManager.clientConnected(socket,clientInfo);
 
-            var c = this.game.unstacked[i];
+            // share info with client (that he is connected and his own info)
+            this._sendToClient(
+                socket,
+                Packages.PROTOCOL.SERVER.RESPONSE_CLIENT_ACCEPTED,
+                this.clientManager.getPrivateClientInfo(socket.id)
+            );
 
-            this._addEntity(this._reviveEntity(this.game.object_def[c.type],c));
-        }
+            // share public info of newly connected client with everyone
+            this._boradcastExceptSender(
+                socket,
+                Packages.PROTOCOL.SERVER.CLIENT_CONNECTED,
+                Packages.createEvent(
+                    this.ID,
+                    {connectedClient: this.clientManager.getPublicClientInfo(socket.id)}
+                )
+            );
 
+            this._sendToClient(
+                socket,
+                Packages.PROTOCOL.SERVER.RESPONSE_CLIENT_ACCEPTED,
+                Packages.createEvent(
+                    this.ID,
+                    {userInfo: this.clientManager.getPrivateClientInfo(socket.id)}
+                )
 
-        delete this.game.unstacked;
-        delete this.game.stacked;
+            );
 
-        this.game.entities = Object.keys(this.entities).map(function(key) {
-            return this.entities[key];
         }.bind(this));
 
-        this.boradcast(Packages.PROTOCOL.SERVER.INIT_GAME,Packages.createEvent(Packages.SERVER_ID,this.game));
-    }
 
-
-    /**
-     * Overwrites the default values from the basetype.
-     * Object.assign was not used, because it would overwrite the arrays completely.
-     * This method copies and changes array items
-     * @param basetype of the entity, contains all default values
-     * @param instance contains all specialized values, e.g. position, or unique texture
-     * @private
-     */
-    _reviveEntity(basetype,instance){
-        // load the default entity
-        let result = JSON.parse(JSON.stringify(basetype));
-
-        //but override changes
-        if(instance.overwrite) {
-            for (let key in instance.overwrite) {
-                if (!instance.overwrite.hasOwnProperty(key)) continue;
-
-                var overwrite_path = key.split(".");    // get the path of the value, which should be overwritten
-                var currentDepthObject = result;        // latest object of the path
-
-                // go down the whole path, till the path can be set
-                for(let i=0; i< overwrite_path.length;i++){
-                    var curKey = overwrite_path[i]; // current validated key
-
-                    if(i==overwrite_path.length-1){ // if last element, then set the real value
-                        currentDepthObject[curKey] = instance.overwrite[key];
-                    }else if(!result[curKey]){      // if object does not exist,
-                        currentDepthObject[curKey]={};          // then create it
-                    }
-                    currentDepthObject=currentDepthObject[curKey];  // and set as new depth object
-                }
-            }
-        }
-        return result;
-    }
-
-
-    _addEntity(entity,synchronize_w_users=false){
-        this.lastID++;
-        entity.id=this.lastID;
-
-        this.entities[this.lastID] = entity;
-
-        if(synchronize_w_users) {
-            this.boradcast(Statics.PROTOCOL.SERVER.ADD_ENTITY, {msg: "", data: entity});
-        }
-    }
-
-     getRandomColor() {
-        var letters = '0123456789ABCDEF';
-        var color = '0x';
-        for (var i = 0; i < 6; i++ ) {
-            color += letters[Math.floor(Math.random() * 16)];
-        }
-        return color;
-    }
-
-    _connect(client){
-        this._s_connected(client);
-        client.on('disconnect', function(data){
-            this._s_disconnected(client,data);
+        socket.on('disconnect', function(data){
+            this.clientManager.clientDisconnected(socket,data);
+            this._boradcastExceptSender(socket,Packages.PROTOCOL.SERVER.CLIENT_DISCONNECTED,Packages.createEvent(this.ID,{id:socket.id}));
+            //TODO: broadcast that client disconnects
         }.bind(this));
 
        // client.on('event', function(data){console.log("evt")});
@@ -184,7 +149,7 @@ class GameServer{
         }*/
 
     }
-
+/*
     _s_connected(clientSocket){
         var rc = this.getRandomColor();
         var name = "ranz";
@@ -233,15 +198,14 @@ class GameServer{
              //   this._sendToClient(this.connections[this.admin].socket,Statics.PROTOCOL.CLIENT.USERINFO,{admin:true});
                 console.log("Admin is now: "+this.admin);
             }
-
         }
     }
-
-    boradcast(type,msg){
+*/
+    _boradcast(type,msg){
         this.io.sockets.emit(type,msg);
     }
 
-    boradcastExceptSender(senderSocket,type,msg){
+    _boradcastExceptSender(senderSocket,type,msg){
         senderSocket.broadcast.emit(type,msg);
     }
 

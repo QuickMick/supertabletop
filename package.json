@@ -17,11 +17,12 @@
     "matter-js": "^0.12.0",
     "morgan": "~1.7.0",
     "pixi-display": "*",
+    "pixi-extra-filters": "*",
     "pixi-filters": "^1.0.6",
-    "pixi-extra-filters":"*",
     "pixi.js": "*",
     "serve-favicon": "~2.3.2",
     "socket.io": "*",
-    "socket.io-client": "*"
+    "socket.io-client": "*",
+    "uuid": "^3.0.1"
   }
 }

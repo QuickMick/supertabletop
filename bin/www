@@ -28,7 +28,7 @@ var server = http.createServer(app);
 
 var io = require('socket.io')(server);
 var gameServer = new GameServer(io);
-gameServer.listen();
+gameServer.start();
 
 
 

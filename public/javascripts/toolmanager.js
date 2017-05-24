@@ -10,6 +10,7 @@ class BasicTool{
         this.inputHanlder=inputHandler;
         this.gameTable = gameTable;
         this.entityManager = entityManager;
+
         /**
          * true, when the camera is moving,
          * otherwise false.
@@ -65,7 +66,6 @@ class BasicTool{
         }
         this.SELECTED_ENTITIES =[];
     }
-
 
     /**
      *

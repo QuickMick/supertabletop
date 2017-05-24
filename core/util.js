@@ -20,6 +20,21 @@ class Util{
         var color = parseInt(colorString.replace("#", "0x"));
         return !Number.isNaN(color)?color: 0xFFFFFF;
     }
+
+
+    /**
+     * Creates a random color string
+     * @returns {string}
+     */
+    getRandomColor() {
+        var letters = '0123456789ABCDEF';
+        var color = '0x';
+        for (var i = 0; i < 6; i++ ) {
+            color += letters[Math.floor(Math.random() * 16)];
+        }
+        return color;
+    }
+
 }
 
 module.exports = new Util();

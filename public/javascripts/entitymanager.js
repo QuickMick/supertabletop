@@ -5,7 +5,7 @@
 require('pixi.js');
 require('pixi-filters');
 require('pixi-extra-filters');
-var Path = require('path');
+
 var Config = require('./../resources/config.json');
 var Entity = require('./entity');
 
@@ -34,47 +34,6 @@ class EntityManager extends PIXI.Container{
 
     init(){
         InputHandler.mapping.MOUSE_LEFT.on("released",this._releaseSelection.bind(this));
-    }
-
-
-    /**
-     * Initialises a prepreperated game.
-     * during this process, every entity gets deleted,
-     * afterwards, the game related entities are created.
-     * also all resources are loaded.
-     * @param game resource from server, contains all data about entities, game info and resources
-     * @private
-     */
-    initGame(game){
-        console.log("result: " + game);
-        window.showLoadingDialog();
-        // prepare resource list
-
-        for(let i in game.resources){
-            var name = game.resources[i];
-
-            PIXI.loader.add(
-                {
-                    name:name,
-                    url: Path.join(RELATIVE_PATH,Config.PATHS.USERS_RESOURCES,game.creator,game.name,name)
-                }
-            );
-        }
-        var newEntityList = [];
-        for(let i=0; i< game.entities.length;i++) {
-            var newEntity =new Entity(game.entities[i]);
-            newEntityList.push(newEntity);
-            this.addEntity(newEntity);
-        }
-
-        window.hideLoadingDialog();
-        // once the gfx is loaded, force every entity, to show its real texture instead of the placeholder
-        PIXI.loader.once('complete', function (loader, resources) {
-            for(let i=0; i< newEntityList.length;i++) {
-                var c =newEntityList[i];
-                c.showSurface(c.surfaceIndex);
-            }
-        }.bind(this)).load();
     }
 
     addEntity(entity){

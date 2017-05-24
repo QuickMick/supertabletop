@@ -61,10 +61,14 @@ class Synchronizer{
         this._queue = {};
     }
 
-    init(entityManager){
+    init(gameManager,entityManager){
         if(!entityManager)
-            throw "entitymanager is required in order to establish a connection";
+            throw "entityManager is required in order to establish a connection";
+        if(!gameManager)
+            throw "gameManager is required in order to establish a connection";
+
         this.entityManager = entityManager;
+        this.gameManager = gameManager;
 
         if (this.socket){
             console.log("synchronizer already initialized!");
@@ -79,7 +83,7 @@ class Synchronizer{
     _initHandlers(){
         // neue Nachricht
         this.socket.on(Packages.PROTOCOL.SERVER.INIT_GAME, function (evt) {
-            this.entityManager.initGame(evt.data);
+            this.gameManager.initGame(evt.data);
         }.bind(this));
 
         this.socket.on(Packages.PROTOCOL.SERVER.USER_INFO, function (evt) {

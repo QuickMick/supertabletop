@@ -4,6 +4,8 @@
 "use strict";
 require('pixi.js');
 
+var Path = require('path');
+
 var Util = require("./../../core/util");
 
 
@@ -16,10 +18,15 @@ class Entity extends PIXI.Sprite {
         if(!entity.surfaces){ // ||entity.surfaces.length <=0){
             throw "cannot instatiate an entity without a texture!";
         }
+        super(PIXI.loader.resources[DEFAULT_RESOURCES.missing_texture_substitute.texture].texture);
+
         // ensure, that the surfaces object is an array, if not, then convert it to an array
         entity.surfaces = Array.isArray(entity.surfaces)?entity.surfaces:[].concat(entity.surfaces);
 
-        super(PIXI.loader.resources[DEFAULT_RESOURCES.missing_texture_substitute.texture].texture);
+        /**
+         * this is the prefix for every resource
+         */
+        this.game_resource_path = entity.game_resource_path;
 
         // -------- init pixi values --------
         this.interactive = true;    // enable the bunny to be interactive... this will allow it to respond to mouse and touch events
@@ -107,9 +114,10 @@ class Entity extends PIXI.Sprite {
         this.removeAll(); // remove text from old surface
 
         // set texture if available
+        var texture = Path.join(this.game_resource_path,curSurface.texture);
 
-        if(PIXI.loader.resources[curSurface.texture] && PIXI.loader.resources[curSurface.texture].texture){
-            this.texture = PIXI.loader.resources[curSurface.texture].texture;
+        if(PIXI.loader.resources[texture] && PIXI.loader.resources[texture].texture){
+            this.texture = PIXI.loader.resources[texture].texture;
         }else{
             this.texture= PIXI.loader.resources[DEFAULT_RESOURCES.missing_texture_substitute.texture].texture;
         }

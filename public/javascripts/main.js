@@ -143,7 +143,7 @@ window.onload = function() {
                 height:app.renderer.height
             };
            // gameManager..updateCam();
-            ToolManager.currentTool().focusCamera();
+            ToolManager.currentTool.focusCamera();
         }
         resize();
 

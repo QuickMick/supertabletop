@@ -75,8 +75,8 @@ class BasicTool{
     _mouseMove(evt){
         if(!this.CAMERA_GRABBED) return;
 
-        this.position.x +=evt.dx;
-        this.position.y +=evt.dy;
+        this.gameTable.position.x +=evt.dx;
+        this.gameTable.position.y +=evt.dy;
         this.focusCamera();
     }
 
@@ -140,7 +140,6 @@ class BasicTool{
             this._current_zoom = this._min_zoom;
         }
         if(old != this._current_zoom) {
-            this.scale.set(this._current_zoom);
             this.focusCamera();
         }
     }
@@ -156,9 +155,10 @@ class BasicTool{
     }
 
     focusCamera(){
+        this.gameTable.scale.set(this._current_zoom);
         var w = this.gameTable.hitArea.width;
         var h = this.gameTable.hitArea.height;
-        var z = this.gameTable._current_zoom;
+        var z = this._current_zoom;
 
         //TODO: folgendes wird warscheinlich nicht funktionieren, wenn drehen drin is
         if(w* z> this.gameTable.renderer.width) {

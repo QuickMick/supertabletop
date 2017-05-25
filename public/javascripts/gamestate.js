@@ -50,4 +50,4 @@ class GameState{
 
 }
 
-module.exports = GameState;
+//module.exports = GameState;

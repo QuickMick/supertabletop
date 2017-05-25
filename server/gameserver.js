@@ -123,7 +123,10 @@ class GameServer{
         this._sendToClient(
             socket,
             Packages.PROTOCOL.SERVER.RESPONSE_CLIENT_ACCEPTED,
-            this.clientManager.getPrivateClientInfo(socket.id)
+            Packages.createEvent(
+                this.ID,
+                {clientInfo:this.clientManager.getPrivateClientInfo(socket.id)}
+            )
         );
 
         // share public info of newly connected client with everyone

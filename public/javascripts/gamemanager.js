@@ -16,7 +16,7 @@ var Synchronizer = require('./synchonizer');
 var InputHandler = require('./inputhandler');
 var ToolManager = require('./toolmanager');
 
-var RELATIVE_PATH = "./../";
+const RELATIVE_PATH = "./../";
 
 /**
  * this class controlls the whole gameplay,
@@ -25,6 +25,8 @@ var RELATIVE_PATH = "./../";
 class GameManager{
     constructor(app){
         this.app = app;
+
+       // this.USER_ID = null;
 
         /**
          * contains the main container
@@ -66,7 +68,7 @@ class GameManager{
         );
 
         // initialize socket-connection/synchronizer
-        Synchronizer.init(this,this.entityManager);
+        this.synchronizer = new Synchronizer(this,this.entityManager);
 
         this.test();
     }

@@ -90,19 +90,6 @@ window.onload = function() {
     var app = new PIXI.Application(800, 600, {backgroundColor : 0x1099bb});
     screen.appendChild(app.view);
 
-    // load all keys located in config.json
-    var keyMapping = {};
-    for(let key in Config.KEY_MAPPING){
-        var cur = Config.KEY_MAPPING[key];
-        keyMapping[key] = new InputAction(key,cur.keyboard, cur.mouse);
-    }
-    // init key mapping
-   /* Statics.GLOBALS.KEY_MAPPING = {
-        TURN:new InputAction("TURN", [70])
-    };*/
-    require('./inputhandler').setMapping(keyMapping);
-
-
     // preparing loading game resouces
     const RELATIVE_PATH = "./../";
     for(var area_key in Resources) {
@@ -138,12 +125,12 @@ window.onload = function() {
         function resize() {
             var x = screen.getBoundingClientRect();
             app.renderer.resize(x.width,x.height);
-            GameState.RENDERER_SIZE={
+           /* GameState.RENDERER_SIZE={
                 width:app.renderer.width,
                 height:app.renderer.height
-            };
+            };*/
            // gameManager..updateCam();
-            ToolManager.currentTool.focusCamera();
+            gameManager.toolManager.currentTool.focusCamera();
         }
         resize();
 

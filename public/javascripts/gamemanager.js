@@ -42,18 +42,20 @@ class GameManager{
             this.app.renderer
         );
 
-        InputHandler.init(this.app);
-        EntityManager.init();
-        PlayerManager.init();
-        ToolManager.init(InputHandler,this.gameTable,EntityManager);
+        this.inputHandler = new InputHandler(this.app);
+        this.inputHandler.loadMapping(Config.KEY_MAPPING);
+
+        this.entityManager = new EntityManager();
+        this.playerManager = new PlayerManager;
+        this.toolManager = new ToolManager(this.inputHandler,this.gameTable,this.entityManager);
 
         this.gameTable.min_zoom = Config.ZOOM.MIN;
         this.gameTable.max_zoom = Config.ZOOM.MAX;
         this.gameTable.zoom_sensivity = Config.ZOOM.SENSIVITY;
 
         // setup container hierarchy
-        this.gameTable.addChild(EntityManager);
-        this.gameTable.addChild(PlayerManager);
+        this.gameTable.addChild(this.entityManager);
+        this.gameTable.addChild(this.playerManager);
         this.app.stage.addChild(this.gameTable);
 
         // add default table
@@ -64,7 +66,7 @@ class GameManager{
         );
 
         // initialize socket-connection/synchronizer
-        Synchronizer.init(this,EntityManager);
+        Synchronizer.init(this,this.entityManager);
 
         this.test();
     }
@@ -99,7 +101,7 @@ class GameManager{
             game.entities[i].game_resource_path = game_resource_path;
             var newEntity =new Entity(game.entities[i]);
             newEntityList.push(newEntity);
-            EntityManager.addEntity(newEntity);
+            this.entityManager.addEntity(newEntity);
         }
 
         window.hideLoadingDialog();

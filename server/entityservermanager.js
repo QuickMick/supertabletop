@@ -41,6 +41,8 @@ class EntityServerManager {
             this._addEntity(this._reviveEntity(this.game.object_def[c.type],c));
         }
 
+        //TODO: handle stacked
+
         delete this.game.unstacked;
         delete this.game.stacked;
 

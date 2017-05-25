@@ -27,9 +27,6 @@ class EntityManager extends PIXI.Container{
         this.selectionFilter =new PIXI.filters.BloomFilter();
     }
 
-    init(){
-    }
-
     addEntity(entity){
         this.entities[entity.ENTITY_ID] = entity;
         this.addChild(entity);
@@ -66,4 +63,4 @@ class EntityManager extends PIXI.Container{
     }
 }
 
-module.exports= new EntityManager();
+module.exports= EntityManager;

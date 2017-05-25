@@ -208,4 +208,4 @@ class Synchronizer{
 
 }
 
-module.exports = new Synchronizer();
+module.exports = Synchronizer;

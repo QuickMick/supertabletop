@@ -6,11 +6,12 @@
  */
 
 var EventEmitter = require('eventemitter3');
+var InputAction = require('./inputaction');
 
 const MOUSEMOVE= "mousemove";
 const MOUSEWHEEL= "mousewheel";
 class InputHandler extends EventEmitter{
-    constructor(){
+    constructor(app){
         super();
         // contains every keys, which are pressed since the last update cycle
         this.keyState = {
@@ -29,17 +30,15 @@ class InputHandler extends EventEmitter{
         };
 
         this.mapping= null;
+
+        this._init(app);
     }
 
 
-    init(app){
+    _init(app){
         //add key listeners
         window.addEventListener("keydown", this._keyDown.bind(this), false);
         window.addEventListener("keyup", this._keyUp.bind(this), false);
-
-        //add mouse listeners
-    //    window.addEventListener("mousedown", this._mouseDown.bind(this), false);
-     //   window.addEventListener("mouseup", this._mouseUp.bind(this), false);
 
         app.stage.interactive = true;
 
@@ -61,6 +60,24 @@ class InputHandler extends EventEmitter{
             .on('touchend', this._mouseUp.bind(this), false)
             .on('mouseup', this._mouseUp.bind(this), false);
        // app.ticker.add(this.update.bind({self:this,app:app}));
+    }
+
+    /**
+     * loads a keymapping from json, in expected format:
+     *   "KEY_MAPPING":{
+     *      "TURN":{"keyboard":[70],"mouse":[]},
+     *      "MOUSE_LEFT":{"keyboard":[],"mouse":[0]}
+     *    },
+     * @param KEY_MAPPING
+     */
+    loadMapping(KEY_MAPPING){
+        // load all keys located in config.json
+        var keyMapping = {};
+        for(let key in KEY_MAPPING){
+            var cur = KEY_MAPPING[key];
+            keyMapping[key] = new InputAction(key,cur.keyboard, cur.mouse);
+        }
+        this.setMapping(keyMapping);
     }
 
 /*
@@ -142,4 +159,4 @@ class InputHandler extends EventEmitter{
     }
 }
 
-module.exports = new InputHandler();
+module.exports = InputHandler;

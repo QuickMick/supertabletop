@@ -28,10 +28,6 @@ class PlayerManager extends PIXI.Container {
 
     }
 
-    init(){
-
-    }
-
     /**
      * @param @type {object} player_data {id,color,position,color,cursor_type}
      */
@@ -99,4 +95,4 @@ class PlayerManager extends PIXI.Container {
  * exports this module, implemented as singleton, because it is just needed exactly one time.
  * @type {PlayerManager}
  */
-module.exports = new PlayerManager();
+module.exports = PlayerManager;

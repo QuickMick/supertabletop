@@ -185,16 +185,14 @@ class SimpleDragTool extends BasicTool{
 }
 
 class ToolManager{
-    constructor(){
+    constructor(inputHandler,gameTable,entityManager){
         this.tools=null;
         this._selectedToolIndex = 0;
 
         this.inputHandler = null;
         this.entityManager=null;
         this.gameTable = null;
-    }
 
-    init(inputHandler,gameTable,entityManager){
         this.entityManager=entityManager;
         this.inputHandler = inputHandler;
         this.gameTable = gameTable;
@@ -211,4 +209,4 @@ class ToolManager{
 
 }
 
-module.exports = new ToolManager();
+module.exports = ToolManager;

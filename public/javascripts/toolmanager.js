@@ -1,15 +1,16 @@
 /**
  * Created by Mick on 24.05.2017.
  */
-
 'use strict';
 
+var Packages = require("./../../core/packages");
 
 class BasicTool{
-    constructor(inputHandler,gameTable,entityManager){
+    constructor(inputHandler,gameTable,entityManager,synchronizer){
         this.inputHanlder=inputHandler;
         this.gameTable = gameTable;
         this.entityManager = entityManager;
+        this.synchronizer = synchronizer;
 
         /**
          * true, when the camera is moving,
@@ -90,6 +91,11 @@ class BasicTool{
         return this._camera_grabbed;
     }
 
+    /**
+     *
+     * @param v {boolean}
+     * @constructor
+     */
     set CAMERA_GRABBED(v){
         this._camera_grabbed = v;
     }
@@ -179,25 +185,37 @@ class BasicTool{
 
 
 class SimpleDragTool extends BasicTool{
-    constructor(inputHandler,gameTable,entityManager){
-        super(inputHandler,gameTable,entityManager);
+    constructor(inputHandler,gameTable,entityManager,synchronizer){
+        super(inputHandler,gameTable,entityManager,synchronizer);
+    }
+
+
+    _mouseMove(evt) {
+        super._mouseMove(evt);
+
+        for(var i=0;i<this.SELECTED_ENTITIES.length;i++) {
+            var c = this.SELECTED_ENTITIES[i];
+            this.synchronizer.postEntityInteraction(Packages.PROTOCOL.ENTITY.DRAG, c.ENTITY_ID, {
+                position:{
+                    x:evt.dx,
+                    y:evt.dy
+                }
+            });
+        }
     }
 }
 
 class ToolManager{
-    constructor(inputHandler,gameTable,entityManager){
+    constructor(inputHandler,gameTable,entityManager,synchronizer){
         this.tools=null;
         this._selectedToolIndex = 0;
-
-        this.inputHandler = null;
-        this.entityManager=null;
-        this.gameTable = null;
 
         this.entityManager=entityManager;
         this.inputHandler = inputHandler;
         this.gameTable = gameTable;
+        this.synchronizer=synchronizer;
 
-        this.tools=[new SimpleDragTool(inputHandler,gameTable,entityManager)];
+        this.tools=[new SimpleDragTool(inputHandler,gameTable,entityManager,synchronizer)];
     }
 
     set currentTool(i){
@@ -206,7 +224,6 @@ class ToolManager{
     get currentTool(){
         return this.tools[this._selectedToolIndex];
     }
-
 }
 
 module.exports = ToolManager;

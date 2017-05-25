@@ -32,20 +32,25 @@ class GameServer{
     start(){
         this.io.on('connection', this._onConnectionReceived.bind(this));
 
-
         this.entityServerManager.loadGame("mick","codewords"); //TODO nicht statisch machen und durch user triggern lassen
     }
 
     _onConnectionReceived(socket) {
 
-            this.initClient(socket);
+        this.initClient(socket);
 
+        //removes this client from the serverclient list and broadcasts the information to all remaining clients
+        socket.on('disconnect', function (data) {
+            this.clientManager.clientDisconnected(socket, data);
+            this._boradcastExceptSender(socket, Packages.PROTOCOL.SERVER.CLIENT_DISCONNECTED, Packages.createEvent(this.ID, {id: socket.id}));
+            //TODO: broadcast that client disconnects
+        }.bind(this));
 
-            socket.on('disconnect', function (data) {
-                this.clientManager.clientDisconnected(socket, data);
-                this._boradcastExceptSender(socket, Packages.PROTOCOL.SERVER.CLIENT_DISCONNECTED, Packages.createEvent(this.ID, {id: socket.id}));
-                //TODO: broadcast that client disconnects
-            }.bind(this));
+        // server receives client entity updates in this event
+        socket.on(Packages.PROTOCOL.CLIENT.SEND_STATE, function (evt) {
+            ///TODO: update physics engine
+            this._boradcast(Packages.PROTOCOL.SERVER.UPDATE_STATE, Packages.createEvent(this.ID, evt.data));
+        }.bind(this));
 
             // client.on('event', function(data){console.log("evt")});
             /*

@@ -49,7 +49,9 @@ class GameManager{
 
         this.entityManager = new EntityManager();
         this.playerManager = new PlayerManager;
-        this.toolManager = new ToolManager(this.inputHandler,this.gameTable,this.entityManager);
+        this.synchronizer = new Synchronizer(this,this.entityManager);     // initialize socket-connection/synchronizer
+
+        this.toolManager = new ToolManager(this.inputHandler,this.gameTable,this.entityManager,this.synchronizer);
 
         this.gameTable.min_zoom = Config.ZOOM.MIN;
         this.gameTable.max_zoom = Config.ZOOM.MAX;
@@ -67,8 +69,8 @@ class GameManager{
             PIXI.loader.resources[Resources.default.content.table.texture].texture
         );
 
-        // initialize socket-connection/synchronizer
-        this.synchronizer = new Synchronizer(this,this.entityManager);
+
+
 
         this.test();
     }

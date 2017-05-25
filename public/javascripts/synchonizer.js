@@ -4,7 +4,7 @@
 'use strict';
 
 var Packages = require("./../../core/packages");
-var GameState = require("./gamestate");
+//var GameState = require("./gamestate");
 
 //var EntityManager = require("./entitymanager");
 
@@ -12,6 +12,17 @@ class Synchronizer{
 
     constructor(gameManager,entityManager){
         this.socket = null;
+
+        /**
+         *  contains all necessary client infos
+         * @type {object} like{
+         * socket,
+            id,
+            color,
+            name,
+            verification
+            }
+         */
         this.CLIENT_INFO = null;
 
         this._queue = {};
@@ -25,7 +36,7 @@ class Synchronizer{
         this.gameManager = gameManager;
 
         if (this.socket){
-            console.log("synchronizer already initialized!");
+            console.warn("synchronizer already initialized!");
             return;
         }
 
@@ -67,18 +78,23 @@ class Synchronizer{
         this._queue._sendUpdateRequired = true;
     }
 
+    /**
+     * sends game updates from client to server, if changes are detected
+     * @private
+     */
     _sendEntityUpdates(){
         // only send, when updates are available
         if(!this._queue._sendUpdateRequired) return;
 
-        delete this._queue._sendUpdateRequired;
-        this.sendMessage(Packages.PROTOCOL.CLIENT.SEND_STATE,Packages.createEvent(
-            {
-                id:GameState.USER_ID,
-                data: this._queue
-            })
-        );
+        var toSend = this._queue;
         this._queue = {};
+
+        delete toSend._sendUpdateRequired;
+        this.sendMessage(Packages.PROTOCOL.CLIENT.SEND_STATE,Packages.createEvent(
+                this.CLIENT_INFO.id,
+                toSend //{data: toSend}
+            )
+        );
     }
 
 
@@ -95,6 +111,7 @@ class Synchronizer{
 
         this.socket.on(Packages.PROTOCOL.SERVER.UPDATE_STATE, function (evt) {
            // TODO
+            console.log(evt);
         }.bind(this));
 
 

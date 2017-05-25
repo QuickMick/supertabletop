@@ -122,7 +122,7 @@ class ClientManager{
     // -------------- updates---------
 
     updateClientPosition(userID,newPosition){
-    console.log(userID,newPosition);
+        console.log(userID,newPosition);
     }
 }
 

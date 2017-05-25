@@ -4,7 +4,7 @@
 'use strict';
 
 var Packages = require("./../../core/packages");
-var EntityUpdateQueue = require('./../../core/entityupdatequeue');
+var UpdateQueue = require('./../../core/updatequeue');
 
 //var GameState = require("./gamestate");
 
@@ -33,7 +33,7 @@ class Synchronizer{
          * used to detect updates which were done by the client
          * @type {EntityUpdateQueue}
          */
-        this.entityUpdateQueue = new EntityUpdateQueue();
+        this.updateQueue = new UpdateQueue();
         //this._queue = {};
 
 
@@ -62,11 +62,11 @@ class Synchronizer{
      * @private
      */
     _sendEntityUpdates(){
-        if(!this.entityUpdateQueue.updateRequired) return;
+        if(!this.updateQueue.updateRequired) return;
 
         this.sendMessage(Packages.PROTOCOL.CLIENT.SEND_STATE,Packages.createEvent(
             this.CLIENT_INFO.id,
-            this.entityUpdateQueue.getUpdatedEntityData()
+            this.updateQueue.getUpdatedEntityData()
             )
         );
     }

@@ -9,9 +9,11 @@ var EventEmitter = require('eventemitter3');
 var InputAction = require('./inputaction');
 
 const MOUSEMOVE= "mousemove";
+const RAW_MOUSEMOVE = "rawmousemove";
 const MOUSEWHEEL= "mousewheel";
+
 class InputHandler extends EventEmitter{
-    constructor(app){
+    constructor(app,gameTable){
         super();
         // contains every keys, which are pressed since the last update cycle
         this.keyState = {
@@ -29,19 +31,28 @@ class InputHandler extends EventEmitter{
             dy:0
         };
 
+     /*   this.mouse_table = {
+            lastX:0,
+            lastY:0,
+            x:0,
+            y:0,
+            dx:0,
+            dy:0
+        };*/
+
         this.mapping= null;
 
-        this._init(app);
+        this._init(app,gameTable);
     }
 
 
-    _init(app){
+    _init(app,gameTable){
         //add key listeners
         window.addEventListener("keydown", this._keyDown.bind(this), false);
         window.addEventListener("keyup", this._keyUp.bind(this), false);
 
         app.stage.interactive = true;
-
+        gameTable.interactive = true;
         document.addEventListener("mousewheel", this._mouseWheelMove.bind(this), false);
 
         app.stage
@@ -59,6 +70,9 @@ class InputHandler extends EventEmitter{
             .on('touchend', this._mouseUp.bind(this), false)
             .on('mouseup', this._mouseUp.bind(this), false);
        // app.ticker.add(this.update.bind({self:this,app:app}));
+
+     //   gameTable.on('mousemove', this._onTableMouseMove.bind(this), false)
+        //    .on('touchmove', this._onTableMouseMove.bind(this), false)
     }
 
     /**
@@ -148,14 +162,30 @@ class InputHandler extends EventEmitter{
         this.mouse.dy = this.mouse.y - this.mouse.lastY;
 
         if(this.mouse.dx != 0 || this.mouse.dy != 0 ){
-          /*  if(this.onMouseMove){
-                this.onMouseMove();
-            }*/
-
             this.emit(MOUSEMOVE,this.mouse);
-        }
 
+            this.emit(RAW_MOUSEMOVE,evt);
+        }
     }
+
+   /* _onTableMouseMove(evt){
+        console.log(evt);
+        var m = evt.data.global;
+
+        this.mouse_table.lastX = this.mouse_table.x;
+        this.mouse_table.lastY = this.mouse_table.y;
+
+        this.mouse_table.x = m.x;
+        this.mouse_table.y = m.y;
+
+        // set the delta mouse movement
+        this.mouse_table.dx = this.mouse_table.x - this.mouse_table.lastX;
+        this.mouse_table.dy = this.mouse_table.y - this.mouse_table.lastY;
+
+        if(this.mouse_table.dx != 0 || this.mouse_table.dy != 0 ){
+            this.emit(MOUSEMOVE_TABLE,this.mouse_table);
+        }
+    }*/
 }
 
 module.exports = InputHandler;

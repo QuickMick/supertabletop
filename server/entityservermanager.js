@@ -15,8 +15,6 @@ var Engine = Matter.Engine,
     Bodies = Matter.Bodies,
     Body = Matter.Body;
 
-var EntityUpdateQueue = require("./../core/entityupdatequeue");
-
 var Config = require('./../public/resources/config.json');
 
 var Globals = require('./globals');
@@ -25,7 +23,7 @@ const DEFAULT_BODY_SIZE = 100;
 
 class EntityServerManager {
 
-    constructor(ticks=60,clientManager){
+    constructor(ticks=60,updateQueue){
 
         Body.update_original = Body.update;
         Body.update = this._bodyUpdateOverwrite.bind(this);
@@ -59,7 +57,7 @@ class EntityServerManager {
          * detected to broadcast just the changes to the clients
          * @type {EntityUpdateQueue}
          */
-        this.entityUpdateQueue = new EntityUpdateQueue();
+        this.updateQueue = updateQueue;
 
         this.game = null;
         this.engine = null;
@@ -106,7 +104,7 @@ class EntityServerManager {
         // if the body has not changed, nothing to do
         if (oldData.x == body.position.x && oldData.y == body.position.y && oldData.angle == body.angle) return;
 
-        this.entityUpdateQueue.postUpdate(Packages.PROTOCOL.ENTITY.SERVER_POSITION_UPDATE, body.ENTITY_ID, {
+        this.updateQueue.postUpdate(Packages.PROTOCOL.ENTITY.SERVER_POSITION_UPDATE, body.ENTITY_ID, {
             position:{
                 x:body.position.x,
                 y:body.position.y,

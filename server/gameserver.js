@@ -8,15 +8,8 @@ var Packages = require('./../core/packages');
 var Util = require('./../core/util');
 
 const uuidV4 = require('uuid/v4');
-/*var Statics = require('./../core/statics');
 
-
-
-
-
-var Path = require('path');
-var Config = require('./../public/resources/config.json');*/
-
+var UpdateQueue = require("./../core/updatequeue");
 var EntityServerManager = require('./entityservermanager');
 var ClientManager = require('./clientmanager');
 
@@ -26,7 +19,8 @@ class GameServer{
         this.io = io;
         this.ID = uuidV4();
         this.clientManager = new ClientManager();
-        this.entityServerManager = new EntityServerManager(60,this.clientManager);
+        this.updateQueue =  new UpdateQueue();
+        this.entityServerManager = new EntityServerManager(60,this.updateQueue);
     }
 
     start(){
@@ -42,11 +36,11 @@ class GameServer{
      * @private
      */
     _sendEntityUpdates(){
-        if(!this.entityServerManager.entityUpdateQueue.updateRequired) return;
+        if(!this.updateQueue.updateRequired) return;
 
         this._boradcast(Packages.PROTOCOL.SERVER.UPDATE_STATE,Packages.createEvent(
             this.ID,
-            this.entityServerManager.entityUpdateQueue.getUpdatedEntityData()
+            this.updateQueue.getUpdatedEntityData()
             )
         );
     }

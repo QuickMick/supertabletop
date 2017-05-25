@@ -4,7 +4,7 @@
 'use strict';
 
 
-class EntityUpdateQueue{
+class UpdateQueue{
     constructor(){
         this._queue = {_sendUpdateRequired:false};
     }
@@ -79,4 +79,4 @@ class EntityUpdateQueue{
 
 }
 
-module.exports = EntityUpdateQueue;
+module.exports = UpdateQueue;

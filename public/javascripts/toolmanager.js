@@ -31,7 +31,8 @@ class BasicTool{
         this._max_zoom = 2.5;
 
         this.inputHanlder.on("mousewheel", this._zoom.bind(this), false)
-            .on("mousemove",this._mouseMove.bind(this));
+            .on("mousemove",this._mouseMove.bind(this))
+            .on("rawmousemove",this._onRawMouseMove.bind(this));
 
         this.inputHanlder.mapping.MOUSE_LEFT.on("pressed",function(){this.CAMERA_GRABBED=true;}.bind(this))
             .on("released",function(){this.CAMERA_GRABBED=false;}.bind(this));
@@ -70,7 +71,7 @@ class BasicTool{
 
     /**
      *
-     * @param evt
+ * @param evt
      * @private
      */
     _mouseMove(evt){
@@ -79,6 +80,16 @@ class BasicTool{
         this.gameTable.position.x +=evt.dx;
         this.gameTable.position.y +=evt.dy;
         this.focusCamera();
+    }
+
+    /**
+     * used to get local stage mouse positionas via
+     *     event.data.getLocalPosition(stage)
+     * @param evt
+     * @private
+     */
+    _onRawMouseMove(evt){
+
     }
 
     /**
@@ -187,33 +198,34 @@ class BasicTool{
 class SimpleDragTool extends BasicTool{
     constructor(inputHandler,gameTable,entityManager,synchronizer){
         super(inputHandler,gameTable,entityManager,synchronizer);
-
-        this.gameTable.on('mousemove', this._onTableMouseMove.bind(this), false)
-            .on('touchmove', this._onTableMouseMove.bind(this), false)
     }
 
     /**
-     * @override
+     * @Override
      * @param evt
      * @private
      */
-    _onTableMouseMove(evt) {
-       // super._mouseMove(evt);
-console.log(evt);
-        //if(evt.x<0 || evt.y<0) return;
+    _onRawMouseMove(evt){
+        var localPos = evt.data.getLocalPosition(this.gameTable);
 
+        // return if mousepos is outside of the gametable
+        if(localPos.x < 0
+            || localPos.y < 0
+            || localPos.x > this.gameTable.width/this.current_zoom
+            || localPos.y > this.gameTable.height/this.current_zoom)
+            return;
 
-      /*  this.synchronizer.entityUpdateQueue.postUpdate(Packages.PROTOCOL.GAME_STATE.USER_MOUSE_POSITION, this.synchronizer.CLIENT_INFO.id,
+        // if something has changed, then update the server
+        this.synchronizer.updateQueue.postUpdate(Packages.PROTOCOL.GAME_STATE.USER_MOUSE_POSITION, this.synchronizer.CLIENT_INFO.id,
             {
-                position:{x:(evt.x/this.current_zoom),y:(evt.y/this.current_zoom)}
+                position:{x:(localPos.x/this.current_zoom),y:(localPos.y/this.current_zoom)}
             }
-        );*/
+        );
     }
 
     _onEntityClicked(evt){
         super._onEntityClicked(evt);
-
-        this.synchronizer.entityUpdateQueue.postUpdate(Packages.PROTOCOL.GAME_STATE.USER_DRAG_START,this.synchronizer.CLIENT_INFO.id,
+        this.synchronizer.updateQueue.postUpdate(Packages.PROTOCOL.GAME_STATE.USER_DRAG_START,this.synchronizer.CLIENT_INFO.id,
             {
                 claimedEntity:evt.entity.ENTITY_ID,
                 mode:"push"
@@ -222,18 +234,20 @@ console.log(evt);
     }
 
     _releaseSelection(evt) {
-        super._releaseSelection(evt);
+
 //this selection release
         var ids = [];
         for(var i=0; i<this.SELECTED_ENTITIES.length;i++){
             ids.push(this.SELECTED_ENTITIES[i].ENTITY_ID);
         }
 
-        this.synchronizer.entityUpdateQueue.postUpdate(Packages.PROTOCOL.GAME_STATE.USER_DRAG_END, this.synchronizer.CLIENT_INFO.id,
+        this.synchronizer.updateQueue.postUpdate(Packages.PROTOCOL.GAME_STATE.USER_DRAG_END, this.synchronizer.CLIENT_INFO.id,
             {
                 releasedEntities:ids
             }
         );
+
+        super._releaseSelection(evt);
     }
 }
 

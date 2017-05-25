@@ -42,7 +42,7 @@ class GameManager{
         // setup main gameTable container
         this.gameTable = new GameTable(this.app.renderer);
 
-        this.inputHandler = new InputHandler(this.app);
+        this.inputHandler = new InputHandler(this.app,this.gameTable);
         this.inputHandler.loadMapping(Config.KEY_MAPPING);
 
         this.entityManager = new EntityManager();

@@ -32,7 +32,23 @@ class GameServer{
     start(){
         this.io.on('connection', this._onConnectionReceived.bind(this));
 
+        setInterval(this._sendEntityUpdates.bind(this), Packages.PROTOCOL.CLIENT_UPDATE_INTERVAL);
+
         this.entityServerManager.loadGame("mick","codewords"); //TODO nicht statisch machen und durch user triggern lassen
+    }
+
+    /**
+     * Broadcasts the recent updates to all clients
+     * @private
+     */
+    _sendEntityUpdates(){
+        if(!this.entityServerManager.entityUpdateQueue.updateRequired) return;
+
+        this._boradcast(Packages.PROTOCOL.SERVER.UPDATE_STATE,Packages.createEvent(
+            this.ID,
+            this.entityServerManager.entityUpdateQueue.getUpdatedEntityData()
+            )
+        );
     }
 
     _onConnectionReceived(socket) {
@@ -48,8 +64,7 @@ class GameServer{
 
         // server receives client entity updates in this event
         socket.on(Packages.PROTOCOL.CLIENT.SEND_STATE, function (evt) {
-            ///TODO: update physics engine
-            this._boradcast(Packages.PROTOCOL.SERVER.UPDATE_STATE, Packages.createEvent(this.ID, evt.data));
+            this.entityServerManager.processPlayerUpdates(evt.data);
         }.bind(this));
 
             // client.on('event', function(data){console.log("evt")});
@@ -152,7 +167,6 @@ class GameServer{
                 this.ID,
                 {game: this.entityServerManager.getCurrentGameState()}
             )
-
         );
     }
 

@@ -64,7 +64,8 @@ module.exports =
            */
        },
         ENTITY:{
-           DRAG:"ENTITY_DRAG"
+            USER_DRAG:"ENTITY_DRAG",
+            SERVER_POSITION_UPDATE:"SERVER_POSITION_UPDATE"
         }
     }
 };

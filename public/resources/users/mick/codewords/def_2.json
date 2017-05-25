@@ -1,0 +1,134 @@
+{
+  "name":"codewords",
+  "creator":"mick",
+  "resources":["back.png","table.jpg","c1.png","c2.png","s1.png","Altenheim.png","Amulett.png","Anlage.png","Arm.png","Aufkleber.png","Auspuff.png","Auto.png","Ball.png","Bar.png","Baum.png","Bestellliste.png","Betttuch.png","Biokraftstoff.png","Blatt.png","Buch.png","Callcenter.png","Castingshow.png","Chinese.png","Clip.png","Computer.png","Dach.png","Dichtung.png","Disco.png","Dollar.png","Dorfschule.png","Eimer.png","Eisenbahn.png","Engel.png","Erdöl.png","Ergebnis.png","Fahrrad.png","Feuerlöscher.png","Film.png","Foto.png","Freiheit.png","Gehirn.png","Gehweg.png","Grundgesetz.png","Grundstück.png","Gymnasium.png","Hafen.png","Haus.png","Heimatland.png","Holz.png","Horn.png","Igel.png","Impfstoff.png","Information.png","Infusion.png","Insel.png","Jachthafen.png","Jacke.png","Jäger.png","Jobcenter.png","Jugendclub.png","Kaktus.png","Kamm.png","Kammer.png","Keller.png","Kugel.png","Leber.png","Leiste.png","Leiter.png","Liebe.png","Locher.png","Maus.png","Monat.png","Monitor.png","Musikstück.png","Muskel.png","Nabelschnur.png","Nachbar.png","Nagel.png","Nase.png","Natur.png","Nonne.png","Notunterkunft.png","Obst.png","Ochse.png","Offizier.png","Orgel.png","Osterei.png","Paket.png","Papier.png","Passwort.png","Politiker.png","Poster.png","Quader.png","Quark.png","Quecksilber.png","Quelle.png","Quastenflosser.png","Rabe.png","Radio.png","Rakete.png","Reifen.png","Rettungswagen.png","Ritter.png","Sand.png","Scanner.png","Schloss.png","Stein.png","Strauch.png","Tasche.png","Taschenrechner.png","Tastatur.png","Taste.png","Tiger.png","Tisch.png","Turnschuhe.png","Uhr.png","Ulme.png","Umschlagplatz.png","Umwelt.png","Unwetter.png","Vanille.png","Vater.png","Verdauung.png","Verkehr.png","Versicherung.png","Vogel.png","Waage.png","Waggon.png","Waschzeug.png","Wasser.png","Wort.png","Xylophon.png","Yogalehrer.png","Zahn.png","Zeichen.png","Zeitung.png","Zentrum.png"],
+  "description":{
+    "caption":"codewords instructions",
+    "text":"asdf södkf laskföl kaslöf ak"
+  },
+  "table":{
+    "width":1500,
+    "height":1000,
+    "texture":"table.jpg"
+  },
+  "object_def":{
+    "wordcard":{
+      "classification": "card",
+      "type": "wordcard",
+      "width": 100,
+      "height": 75,
+      "stackable": true,
+      "turnable": true,
+      "surfaceIndex":0,
+
+      "surfaces":[
+        {
+          "texture": "c1.png",
+          "text": [
+            {
+              "position": {
+                "x": 0,
+                "y": 0
+              },
+              "content": "surfaces.0",
+              "size": 12,
+              "color": "0x11ff3d",
+              "font": "monospace"
+            }
+          ]
+        },
+        {
+          "texture": "back.png",
+          "text": [
+            {
+              "position": {
+                "x": 0,
+                "y": 0
+              },
+              "content": "testtext",
+              "size": 12,
+              "color": "0x11ff3d",
+              "font": "monospace"
+            }
+          ]
+        }
+      ]
+    },
+
+    "stone":{
+      "classification":"token",
+      "type":"stone",
+      "width":50,
+      "height":50,
+      "stackable":false,
+      "turnable": false,
+      "surfaceIndex":0,
+
+      "surfaces":[
+        {"texture":"s1.png","color":"0x930b58"}
+        ],
+      "hitArea":{
+          "type":"circle",
+          "offset":{"x":25,"y":25},
+          "radius":25
+      },
+      "text":null
+    }
+  },
+  "stacks":[
+    {
+      "position":{"x":100,"y":100},
+      "content":[
+        {
+          "type":"wordcard",
+          "overwrite":{
+            "surfaces.0":{"texture":"c1.png","color":"0x4286f4"}
+          }
+        },
+        {
+          "type":"wordcard",
+          "overwrite":{
+            "surfaces.0":{"texture":"c2.png"}
+          }
+        }
+      ]
+
+    }
+  ],
+  "unstacked":[
+    {
+      "type":"stone",
+      "overwrite":{
+        "position":{"x":10,"y":10},
+        "surfaces.0":{"texture":"s1.png","color":"0x4286f4"}
+      }
+    },
+    {
+      "type":"wordcard",
+      "overwrite":{
+        "position":{"x":200,"y":100},
+        "surface":0,
+        "surfaces.0":{"texture":"c1.png","color":"0x4286f4"}
+      }
+    },
+    {
+      "type":"wordcard",
+      "overwrite":{
+        "position":{"x":200,"y":200},
+        "surface":false,
+        "surfaces.0":{"texture":"c2.png","color":"0x4286f4"}
+      }
+    },
+    {"type":"wordcard","overwrite":{"position":{"x":0,"y":0},"surfaces.0":{"texture":"Altenheim.png"}}},{"type":"wordcard","overwrite":{"position":{"x":5,"y":5},"surfaces.0":{"texture":"Amulett.png"}}},{"type":"wordcard","overwrite":{"position":{"x":10,"y":10},"surfaces.0":{"texture":"Anlage.png"}}},{"type":"wordcard","overwrite":{"position":{"x":15,"y":15},"surfaces.0":{"texture":"Arm.png"}}},{"type":"wordcard","overwrite":{"position":{"x":20,"y":20},"surfaces.0":{"texture":"Aufkleber.png"}}},{"type":"wordcard","overwrite":{"position":{"x":25,"y":25},"surfaces.0":{"texture":"Auspuff.png"}}},{"type":"wordcard","overwrite":{"position":{"x":30,"y":30},"surfaces.0":{"texture":"Auto.png"}}},{"type":"wordcard","overwrite":{"position":{"x":35,"y":35},"surfaces.0":{"texture":"Ball.png"}}},{"type":"wordcard","overwrite":{"position":{"x":40,"y":40},"surfaces.0":{"texture":"Bar.png"}}},{"type":"wordcard","overwrite":{"position":{"x":45,"y":45},"surfaces.0":{"texture":"Baum.png"}}},{"type":"wordcard","overwrite":{"position":{"x":50,"y":50},"surfaces.0":{"texture":"Bestellliste.png"}}},{"type":"wordcard","overwrite":{"position":{"x":55,"y":55},"surfaces.0":{"texture":"Betttuch.png"}}},{"type":"wordcard","overwrite":{"position":{"x":60,"y":60},"surfaces.0":{"texture":"Biokraftstoff.png"}}},{"type":"wordcard","overwrite":{"position":{"x":65,"y":65},"surfaces.0":{"texture":"Blatt.png"}}},{"type":"wordcard","overwrite":{"position":{"x":70,"y":70},"surfaces.0":{"texture":"Buch.png"}}},{"type":"wordcard","overwrite":{"position":{"x":75,"y":75},"surfaces.0":{"texture":"Callcenter.png"}}},{"type":"wordcard","overwrite":{"position":{"x":80,"y":80},"surfaces.0":{"texture":"Castingshow.png"}}},{"type":"wordcard","overwrite":{"position":{"x":85,"y":85},"surfaces.0":{"texture":"Chinese.png"}}},{"type":"wordcard","overwrite":{"position":{"x":90,"y":90},"surfaces.0":{"texture":"Clip.png"}}},{"type":"wordcard","overwrite":{"position":{"x":95,"y":95},"surfaces.0":{"texture":"Computer.png"}}},{"type":"wordcard","overwrite":{"position":{"x":100,"y":100},"surfaces.0":{"texture":"Dach.png"}}},{"type":"wordcard","overwrite":{"position":{"x":105,"y":105},"surfaces.0":{"texture":"Dichtung.png"}}},{"type":"wordcard","overwrite":{"position":{"x":110,"y":110},"surfaces.0":{"texture":"Disco.png"}}},{"type":"wordcard","overwrite":{"position":{"x":115,"y":115},"surfaces.0":{"texture":"Dollar.png"}}},{"type":"wordcard","overwrite":{"position":{"x":120,"y":120},"surfaces.0":{"texture":"Dorfschule.png"}}},{"type":"wordcard","overwrite":{"position":{"x":125,"y":125},"surfaces.0":{"texture":"Eimer.png"}}},{"type":"wordcard","overwrite":{"position":{"x":130,"y":130},"surfaces.0":{"texture":"Eisenbahn.png"}}},{"type":"wordcard","overwrite":{"position":{"x":135,"y":135},"surfaces.0":{"texture":"Engel.png"}}},{"type":"wordcard","overwrite":{"position":{"x":140,"y":140},"surfaces.0":{"texture":"Erdöl.png"}}},{"type":"wordcard","overwrite":{"position":{"x":145,"y":145},"surfaces.0":{"texture":"Ergebnis.png"}}},{"type":"wordcard","overwrite":{"position":{"x":150,"y":150},"surfaces.0":{"texture":"Fahrrad.png"}}},{"type":"wordcard","overwrite":{"position":{"x":155,"y":155},"surfaces.0":{"texture":"Feuerlöscher.png"}}},{"type":"wordcard","overwrite":{"position":{"x":160,"y":160},"surfaces.0":{"texture":"Film.png"}}},{"type":"wordcard","overwrite":{"position":{"x":165,"y":165},"surfaces.0":{"texture":"Foto.png"}}},{"type":"wordcard","overwrite":{"position":{"x":170,"y":170},"surfaces.0":{"texture":"Freiheit.png"}}},{"type":"wordcard","overwrite":{"position":{"x":175,"y":175},"surfaces.0":{"texture":"Gehirn.png"}}},{"type":"wordcard","overwrite":{"position":{"x":180,"y":180},"surfaces.0":{"texture":"Gehweg.png"}}},{"type":"wordcard","overwrite":{"position":{"x":185,"y":185},"surfaces.0":{"texture":"Grundgesetz.png"}}},{"type":"wordcard","overwrite":{"position":{"x":190,"y":190},"surfaces.0":{"texture":"Grundstück.png"}}},{"type":"wordcard","overwrite":{"position":{"x":195,"y":195},"surfaces.0":{"texture":"Gymnasium.png"}}},{"type":"wordcard","overwrite":{"position":{"x":200,"y":200},"surfaces.0":{"texture":"Hafen.png"}}},{"type":"wordcard","overwrite":{"position":{"x":205,"y":205},"surfaces.0":{"texture":"Haus.png"}}},{"type":"wordcard","overwrite":{"position":{"x":210,"y":210},"surfaces.0":{"texture":"Heimatland.png"}}},{"type":"wordcard","overwrite":{"position":{"x":215,"y":215},"surfaces.0":{"texture":"Holz.png"}}},{"type":"wordcard","overwrite":{"position":{"x":220,"y":220},"surfaces.0":{"texture":"Horn.png"}}},{"type":"wordcard","overwrite":{"position":{"x":225,"y":225},"surfaces.0":{"texture":"Igel.png"}}},{"type":"wordcard","overwrite":{"position":{"x":230,"y":230},"surfaces.0":{"texture":"Impfstoff.png"}}},{"type":"wordcard","overwrite":{"position":{"x":235,"y":235},"surfaces.0":{"texture":"Information.png"}}},{"type":"wordcard","overwrite":{"position":{"x":240,"y":240},"surfaces.0":{"texture":"Infusion.png"}}},{"type":"wordcard","overwrite":{"position":{"x":245,"y":245},"surfaces.0":{"texture":"Insel.png"}}},{"type":"wordcard","overwrite":{"position":{"x":250,"y":250},"surfaces.0":{"texture":"Jachthafen.png"}}},{"type":"wordcard","overwrite":{"position":{"x":255,"y":255},"surfaces.0":{"texture":"Jacke.png"}}},{"type":"wordcard","overwrite":{"position":{"x":260,"y":260},"surfaces.0":{"texture":"Jäger.png"}}},{"type":"wordcard","overwrite":{"position":{"x":265,"y":265},"surfaces.0":{"texture":"Jobcenter.png"}}},{"type":"wordcard","overwrite":{"position":{"x":270,"y":270},"surfaces.0":{"texture":"Jugendclub.png"}}},{"type":"wordcard","overwrite":{"position":{"x":275,"y":275},"surfaces.0":{"texture":"Kaktus.png"}}},{"type":"wordcard","overwrite":{"position":{"x":280,"y":280},"surfaces.0":{"texture":"Kamm.png"}}},{"type":"wordcard","overwrite":{"position":{"x":285,"y":285},"surfaces.0":{"texture":"Kammer.png"}}},{"type":"wordcard","overwrite":{"position":{"x":290,"y":290},"surfaces.0":{"texture":"Keller.png"}}},{"type":"wordcard","overwrite":{"position":{"x":295,"y":295},"surfaces.0":{"texture":"Kugel.png"}}},{"type":"wordcard","overwrite":{"position":{"x":300,"y":300},"surfaces.0":{"texture":"Leber.png"}}},{"type":"wordcard","overwrite":{"position":{"x":305,"y":305},"surfaces.0":{"texture":"Leiste.png"}}},{"type":"wordcard","overwrite":{"position":{"x":310,"y":310},"surfaces.0":{"texture":"Leiter.png"}}},{"type":"wordcard","overwrite":{"position":{"x":315,"y":315},"surfaces.0":{"texture":"Liebe.png"}}},{"type":"wordcard","overwrite":{"position":{"x":320,"y":320},"surfaces.0":{"texture":"Locher.png"}}},{"type":"wordcard","overwrite":{"position":{"x":325,"y":325},"surfaces.0":{"texture":"Maus.png"}}},{"type":"wordcard","overwrite":{"position":{"x":330,"y":330},"surfaces.0":{"texture":"Monat.png"}}},{"type":"wordcard","overwrite":{"position":{"x":335,"y":335},"surfaces.0":{"texture":"Monitor.png"}}},{"type":"wordcard","overwrite":{"position":{"x":340,"y":340},"surfaces.0":{"texture":"Musikstück.png"}}},{"type":"wordcard","overwrite":{"position":{"x":345,"y":345},"surfaces.0":{"texture":"Muskel.png"}}},{"type":"wordcard","overwrite":{"position":{"x":350,"y":350},"surfaces.0":{"texture":"Nabelschnur.png"}}},{"type":"wordcard","overwrite":{"position":{"x":355,"y":355},"surfaces.0":{"texture":"Nachbar.png"}}},{"type":"wordcard","overwrite":{"position":{"x":360,"y":360},"surfaces.0":{"texture":"Nagel.png"}}},{"type":"wordcard","overwrite":{"position":{"x":365,"y":365},"surfaces.0":{"texture":"Nase.png"}}},{"type":"wordcard","overwrite":{"position":{"x":370,"y":370},"surfaces.0":{"texture":"Natur.png"}}},{"type":"wordcard","overwrite":{"position":{"x":375,"y":375},"surfaces.0":{"texture":"Nonne.png"}}},{"type":"wordcard","overwrite":{"position":{"x":380,"y":380},"surfaces.0":{"texture":"Notunterkunft.png"}}},{"type":"wordcard","overwrite":{"position":{"x":385,"y":385},"surfaces.0":{"texture":"Obst.png"}}},{"type":"wordcard","overwrite":{"position":{"x":390,"y":390},"surfaces.0":{"texture":"Ochse.png"}}},{"type":"wordcard","overwrite":{"position":{"x":395,"y":395},"surfaces.0":{"texture":"Offizier.png"}}},{"type":"wordcard","overwrite":{"position":{"x":400,"y":400},"surfaces.0":{"texture":"Orgel.png"}}},{"type":"wordcard","overwrite":{"position":{"x":405,"y":405},"surfaces.0":{"texture":"Osterei.png"}}},{"type":"wordcard","overwrite":{"position":{"x":410,"y":410},"surfaces.0":{"texture":"Paket.png"}}},{"type":"wordcard","overwrite":{"position":{"x":415,"y":415},"surfaces.0":{"texture":"Papier.png"}}},{"type":"wordcard","overwrite":{"position":{"x":420,"y":420},"surfaces.0":{"texture":"Passwort.png"}}},{"type":"wordcard","overwrite":{"position":{"x":425,"y":425},"surfaces.0":{"texture":"Politiker.png"}}},{"type":"wordcard","overwrite":{"position":{"x":430,"y":430},"surfaces.0":{"texture":"Poster.png"}}},{"type":"wordcard","overwrite":{"position":{"x":435,"y":435},"surfaces.0":{"texture":"Quader.png"}}},{"type":"wordcard","overwrite":{"position":{"x":440,"y":440},"surfaces.0":{"texture":"Quark.png"}}},{"type":"wordcard","overwrite":{"position":{"x":445,"y":445},"surfaces.0":{"texture":"Quecksilber.png"}}},{"type":"wordcard","overwrite":{"position":{"x":450,"y":450},"surfaces.0":{"texture":"Quelle.png"}}},{"type":"wordcard","overwrite":{"position":{"x":455,"y":455},"surfaces.0":{"texture":"Quastenflosser.png"}}},{"type":"wordcard","overwrite":{"position":{"x":460,"y":460},"surfaces.0":{"texture":"Rabe.png"}}},{"type":"wordcard","overwrite":{"position":{"x":465,"y":465},"surfaces.0":{"texture":"Radio.png"}}},{"type":"wordcard","overwrite":{"position":{"x":470,"y":470},"surfaces.0":{"texture":"Rakete.png"}}},{"type":"wordcard","overwrite":{"position":{"x":475,"y":475},"surfaces.0":{"texture":"Reifen.png"}}},{"type":"wordcard","overwrite":{"position":{"x":480,"y":480},"surfaces.0":{"texture":"Rettungswagen.png"}}},{"type":"wordcard","overwrite":{"position":{"x":485,"y":485},"surfaces.0":{"texture":"Ritter.png"}}},{"type":"wordcard","overwrite":{"position":{"x":490,"y":490},"surfaces.0":{"texture":"Sand.png"}}},{"type":"wordcard","overwrite":{"position":{"x":495,"y":495},"surfaces.0":{"texture":"Scanner.png"}}},{"type":"wordcard","overwrite":{"position":{"x":500,"y":500},"surfaces.0":{"texture":"Schloss.png"}}},{"type":"wordcard","overwrite":{"position":{"x":505,"y":505},"surfaces.0":{"texture":"Stein.png"}}},{"type":"wordcard","overwrite":{"position":{"x":510,"y":510},"surfaces.0":{"texture":"Strauch.png"}}},{"type":"wordcard","overwrite":{"position":{"x":515,"y":515},"surfaces.0":{"texture":"Tasche.png"}}},{"type":"wordcard","overwrite":{"position":{"x":520,"y":520},"surfaces.0":{"texture":"Taschenrechner.png"}}},{"type":"wordcard","overwrite":{"position":{"x":525,"y":525},"surfaces.0":{"texture":"Tastatur.png"}}},{"type":"wordcard","overwrite":{"position":{"x":530,"y":530},"surfaces.0":{"texture":"Taste.png"}}},{"type":"wordcard","overwrite":{"position":{"x":535,"y":535},"surfaces.0":{"texture":"Tiger.png"}}},{"type":"wordcard","overwrite":{"position":{"x":540,"y":540},"surfaces.0":{"texture":"Tisch.png"}}},{"type":"wordcard","overwrite":{"position":{"x":545,"y":545},"surfaces.0":{"texture":"Turnschuhe.png"}}},{"type":"wordcard","overwrite":{"position":{"x":550,"y":550},"surfaces.0":{"texture":"Uhr.png"}}},{"type":"wordcard","overwrite":{"position":{"x":555,"y":555},"surfaces.0":{"texture":"Ulme.png"}}},{"type":"wordcard","overwrite":{"position":{"x":560,"y":560},"surfaces.0":{"texture":"Umschlagplatz.png"}}},{"type":"wordcard","overwrite":{"position":{"x":565,"y":565},"surfaces.0":{"texture":"Umwelt.png"}}},{"type":"wordcard","overwrite":{"position":{"x":570,"y":570},"surfaces.0":{"texture":"Unwetter.png"}}},{"type":"wordcard","overwrite":{"position":{"x":575,"y":575},"surfaces.0":{"texture":"Vanille.png"}}},{"type":"wordcard","overwrite":{"position":{"x":580,"y":580},"surfaces.0":{"texture":"Vater.png"}}},{"type":"wordcard","overwrite":{"position":{"x":585,"y":585},"surfaces.0":{"texture":"Verdauung.png"}}},{"type":"wordcard","overwrite":{"position":{"x":590,"y":590},"surfaces.0":{"texture":"Verkehr.png"}}},{"type":"wordcard","overwrite":{"position":{"x":595,"y":595},"surfaces.0":{"texture":"Versicherung.png"}}},{"type":"wordcard","overwrite":{"position":{"x":600,"y":600},"surfaces.0":{"texture":"Vogel.png"}}},{"type":"wordcard","overwrite":{"position":{"x":605,"y":605},"surfaces.0":{"texture":"Waage.png"}}},{"type":"wordcard","overwrite":{"position":{"x":610,"y":610},"surfaces.0":{"texture":"Waggon.png"}}},{"type":"wordcard","overwrite":{"position":{"x":615,"y":615},"surfaces.0":{"texture":"Waschzeug.png"}}},{"type":"wordcard","overwrite":{"position":{"x":620,"y":620},"surfaces.0":{"texture":"Wasser.png"}}},{"type":"wordcard","overwrite":{"position":{"x":625,"y":625},"surfaces.0":{"texture":"Wort.png"}}},{"type":"wordcard","overwrite":{"position":{"x":630,"y":630},"surfaces.0":{"texture":"Xylophon.png"}}},{"type":"wordcard","overwrite":{"position":{"x":635,"y":635},"surfaces.0":{"texture":"Yogalehrer.png"}}},{"type":"wordcard","overwrite":{"position":{"x":640,"y":640},"surfaces.0":{"texture":"Zahn.png"}}},{"type":"wordcard","overwrite":{"position":{"x":645,"y":645},"surfaces.0":{"texture":"Zeichen.png"}}},{"type":"wordcard","overwrite":{"position":{"x":650,"y":650},"surfaces.0":{"texture":"Zeitung.png"}}},
+
+    {
+      "type": "stone",
+      "overwrite": {
+        "position": {
+          "x": 70,
+          "y": 10
+        }
+      }
+    }
+  ]
+}

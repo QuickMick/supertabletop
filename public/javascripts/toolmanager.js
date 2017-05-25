@@ -195,12 +195,19 @@ class SimpleDragTool extends BasicTool{
 
         for(var i=0;i<this.SELECTED_ENTITIES.length;i++) {
             var c = this.SELECTED_ENTITIES[i];
-            this.synchronizer.postEntityInteraction(Packages.PROTOCOL.ENTITY.DRAG, c.ENTITY_ID, {
-                position:{
-                    x:evt.dx,
-                    y:evt.dy
+            this.synchronizer.entityUpdateQueue.postEntityInteraction(Packages.PROTOCOL.ENTITY.USER_DRAG, c.ENTITY_ID,
+                {
+                    positionDelta_x:evt.dx,
+                    add:true
                 }
-            });
+            );
+
+            this.synchronizer.entityUpdateQueue.postEntityInteraction(Packages.PROTOCOL.ENTITY.USER_DRAG, c.ENTITY_ID,
+                {
+                    positionDelta_y:evt.dy,
+                    add:true
+                }
+            );
         }
     }
 }

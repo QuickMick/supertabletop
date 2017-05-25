@@ -40,9 +40,7 @@ class GameManager{
       //  PIXI.SCALE_MODES.DEFAULT = PIXI.SCALE_MODES.NEAREST;
 
         // setup main gameTable container
-        this.gameTable = new GameTable(
-            this.app.renderer
-        );
+        this.gameTable = new GameTable(this.app.renderer);
 
         this.inputHandler = new InputHandler(this.app);
         this.inputHandler.loadMapping(Config.KEY_MAPPING);

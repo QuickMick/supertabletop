@@ -4,9 +4,13 @@
 'use strict';
 
 var Packages = require("./../../core/packages");
+var EntityUpdateQueue = require('./../../core/entityupdatequeue');
+
 //var GameState = require("./gamestate");
 
 //var EntityManager = require("./entitymanager");
+
+
 
 class Synchronizer{
 
@@ -25,7 +29,13 @@ class Synchronizer{
          */
         this.CLIENT_INFO = null;
 
-        this._queue = {};
+        /**
+         * used to detect updates which were done by the client
+         * @type {EntityUpdateQueue}
+         */
+        this.entityUpdateQueue = new EntityUpdateQueue();
+        //this._queue = {};
+
 
         if(!entityManager)
             throw "entityManager is required in order to establish a connection";
@@ -47,55 +57,37 @@ class Synchronizer{
         setInterval(this._sendEntityUpdates.bind(this), Packages.PROTOCOL.CLIENT_UPDATE_INTERVAL);
     }
 
-
-    postEntityInteraction(type,entity_id,updatedData){
-        if(!entity_id || !updatedData){
-           console.log("cannot post update without sufficient data!");
-           return;
-        }
-
-        if(!this._queue[type]){
-           this._queue[type] = {};
-        }
-
-        if(!this._queue[type][entity_id]){
-           this._queue[type][entity_id]={};
-        }
-
-        // merge update data to current queue
-        for(var key in updatedData){
-            if(!updatedData.hasOwnProperty(key))continue;
-
-            // if data field looks like {add:true,value:3} then add,
-            if(updatedData[key].add) {
-                this._queue[type][entity_id][key] = this._queue[type][entity_id][key] || 0;
-                this._queue[type][entity_id][key] += updatedData[key].value;
-            }else{ // otherwise just replace
-                this._queue[type][entity_id][key] = updatedData[key];
-            }
-        }
-
-        this._queue._sendUpdateRequired = true;
-    }
-
     /**
      * sends game updates from client to server, if changes are detected
      * @private
      */
     _sendEntityUpdates(){
-        // only send, when updates are available
-        if(!this._queue._sendUpdateRequired) return;
+        if(!this.entityUpdateQueue.updateRequired) return;
 
-        var toSend = this._queue;
-        this._queue = {};
-
-        delete toSend._sendUpdateRequired;
         this.sendMessage(Packages.PROTOCOL.CLIENT.SEND_STATE,Packages.createEvent(
-                this.CLIENT_INFO.id,
-                toSend //{data: toSend}
+            this.CLIENT_INFO.id,
+            this.entityUpdateQueue.getUpdatedEntityData()
             )
         );
     }
+
+    processServerUpdates(updateData){
+        for(var type in updateData){
+            if(!updateData.hasOwnProperty(type)) continue;
+
+            switch (type){
+                case Packages.PROTOCOL.ENTITY.SERVER_POSITION_UPDATE:
+                    for(var entityID in updateData[type]){
+                        var cpos = updateData[type][entityID].position;
+
+                        this.entityManager.entities[entityID].position.x = cpos.x;
+                        this.entityManager.entities[entityID].position.y = cpos.y;
+                    }
+                    break;
+            }
+        }
+    }
+
 
 
     _initHandlers(){
@@ -110,13 +102,8 @@ class Synchronizer{
         }.bind(this));
 
         this.socket.on(Packages.PROTOCOL.SERVER.UPDATE_STATE, function (evt) {
-           // TODO
-            console.log(evt);
+            this.processServerUpdates(evt.data);
         }.bind(this));
-
-
-
-
 
         /*
 

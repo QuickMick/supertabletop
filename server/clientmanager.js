@@ -118,6 +118,12 @@ class ClientManager{
             }
         }
     }
+
+    // -------------- updates---------
+
+    updateClientPosition(userID,newPosition){
+    console.log(userID,newPosition);
+    }
 }
 
 module.exports =  ClientManager;

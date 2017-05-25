@@ -63,9 +63,12 @@ module.exports =
            VANISH: "VANISH",
            */
        },
-        ENTITY:{
-            USER_DRAG:"ENTITY_DRAG",
-            SERVER_POSITION_UPDATE:"SERVER_POSITION_UPDATE"
+        GAME_STATE: {
+                USER_DRAG_START: "ENTITY_DRAG_START",
+                USER_DRAG_END: "ENTITY_DRAG_END",
+                USER_MOUSE_POSITION: "USER_MOUSE_POSITION",
+
+                SERVER_POSITION_UPDATE: "SERVER_POSITION_UPDATE"
         }
     }
 };

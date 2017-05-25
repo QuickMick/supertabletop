@@ -187,28 +187,53 @@ class BasicTool{
 class SimpleDragTool extends BasicTool{
     constructor(inputHandler,gameTable,entityManager,synchronizer){
         super(inputHandler,gameTable,entityManager,synchronizer);
+
+        this.gameTable.on('mousemove', this._onTableMouseMove.bind(this), false)
+            .on('touchmove', this._onTableMouseMove.bind(this), false)
     }
 
+    /**
+     * @override
+     * @param evt
+     * @private
+     */
+    _onTableMouseMove(evt) {
+       // super._mouseMove(evt);
+console.log(evt);
+        //if(evt.x<0 || evt.y<0) return;
 
-    _mouseMove(evt) {
-        super._mouseMove(evt);
 
-        for(var i=0;i<this.SELECTED_ENTITIES.length;i++) {
-            var c = this.SELECTED_ENTITIES[i];
-            this.synchronizer.entityUpdateQueue.postEntityInteraction(Packages.PROTOCOL.ENTITY.USER_DRAG, c.ENTITY_ID,
-                {
-                    positionDelta_x:evt.dx,
-                    add:true
-                }
-            );
+      /*  this.synchronizer.entityUpdateQueue.postUpdate(Packages.PROTOCOL.GAME_STATE.USER_MOUSE_POSITION, this.synchronizer.CLIENT_INFO.id,
+            {
+                position:{x:(evt.x/this.current_zoom),y:(evt.y/this.current_zoom)}
+            }
+        );*/
+    }
 
-            this.synchronizer.entityUpdateQueue.postEntityInteraction(Packages.PROTOCOL.ENTITY.USER_DRAG, c.ENTITY_ID,
-                {
-                    positionDelta_y:evt.dy,
-                    add:true
-                }
-            );
+    _onEntityClicked(evt){
+        super._onEntityClicked(evt);
+
+        this.synchronizer.entityUpdateQueue.postUpdate(Packages.PROTOCOL.GAME_STATE.USER_DRAG_START,this.synchronizer.CLIENT_INFO.id,
+            {
+                claimedEntity:evt.entity.ENTITY_ID,
+                mode:"push"
+            }
+        );
+    }
+
+    _releaseSelection(evt) {
+        super._releaseSelection(evt);
+//this selection release
+        var ids = [];
+        for(var i=0; i<this.SELECTED_ENTITIES.length;i++){
+            ids.push(this.SELECTED_ENTITIES[i].ENTITY_ID);
         }
+
+        this.synchronizer.entityUpdateQueue.postUpdate(Packages.PROTOCOL.GAME_STATE.USER_DRAG_END, this.synchronizer.CLIENT_INFO.id,
+            {
+                releasedEntities:ids
+            }
+        );
     }
 }
 

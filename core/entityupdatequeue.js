@@ -15,34 +15,45 @@ class EntityUpdateQueue{
      * if the updated data object contains the filed "add", then all values get added to each other, if possible
      * e.g. if position.dx is already posted, the netxt position.dx gets added to the previeous value,
      * resulting in the value which is finaly sent do the server.
-     * @param type
-     * @param entity_id
-     * @param updatedData
+     * @param type of the change
+     * @param id affeced item/entity/player
+     * @param data changed data
      */
-    postEntityInteraction(type,entity_id,updatedData){
-        if(!entity_id || !updatedData){
+    postUpdate(type, id, data){
+        if(!id || !data){
             console.log("cannot post update without sufficient data!");
             return;
         }
 
-        if(!this._queue[type]){
-            this._queue[type] = {};
-        }
+        var array = [].concat(data);
+        for(var i=0;i<array.length;i++) {
+            var updatedData = array[i];
+            if (!this._queue[type]) {
+                this._queue[type] = {};
+            }
 
-        if(!this._queue[type][entity_id]){
-            this._queue[type][entity_id]={};
-        }
+            if (!this._queue[type][id]) {
+                this._queue[type][id] = {};
+            }
 
-        // merge update data to current queue
-        for(var key in updatedData){
-            if(!updatedData.hasOwnProperty(key))continue;
+            // merge update data to current queue
+            for (var key in updatedData) {
+                if (!updatedData.hasOwnProperty(key) || key == "mode")continue;
 
-            // if data field looks like {add:true,value:3} then add,
-            if(updatedData[key].add) {
-                this._queue[type][entity_id][key] = this._queue[type][entity_id][key] || 0;
-                this._queue[type][entity_id][key] += updatedData[key].value;
-            }else{ // otherwise just replace
-                this._queue[type][entity_id][key] = updatedData[key];
+                if(updatedData.mode){
+                    switch(updatedData.mode){
+                        case "add":                // if data field looks like {add:true,value:3} then add,
+                            if(!this._queue[type][id][key]) this._queue[type][id][key]= 0;
+                            this._queue[type][id][key] += updatedData[key];
+                            break;
+                        case "push":
+                            if(!this._queue[type][id][key]) this._queue[type][id][key] = [];
+                            this._queue[type][id][key] = this._queue[type][id][key].concat(updatedData[key]);
+                            break;
+                    }
+                } else { // otherwise just replace
+                    this._queue[type][id][key] = updatedData[key];
+                }
             }
         }
         this._queue._sendUpdateRequired = true;

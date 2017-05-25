@@ -25,7 +25,7 @@ const DEFAULT_BODY_SIZE = 100;
 
 class EntityServerManager {
 
-    constructor(ticks=60){
+    constructor(ticks=60,clientManager){
 
         Body.update_original = Body.update;
         Body.update = this._bodyUpdateOverwrite.bind(this);
@@ -106,7 +106,7 @@ class EntityServerManager {
         // if the body has not changed, nothing to do
         if (oldData.x == body.position.x && oldData.y == body.position.y && oldData.angle == body.angle) return;
 
-        this.entityUpdateQueue.postEntityInteraction(Packages.PROTOCOL.ENTITY.SERVER_POSITION_UPDATE, body.ENTITY_ID, {
+        this.entityUpdateQueue.postUpdate(Packages.PROTOCOL.ENTITY.SERVER_POSITION_UPDATE, body.ENTITY_ID, {
             position:{
                 x:body.position.x,
                 y:body.position.y,
@@ -254,13 +254,14 @@ class EntityServerManager {
         Body.setVelocity(this.bodies[id], {x:(x || this.bodies[id].velocity.x),y:(y || this.bodies[id].velocity.y)});
     }
 
-    processPlayerUpdates(updateData){
+  /*  processPlayerUpdates(updateData){
         for(var type in updateData){
             if(!updateData.hasOwnProperty(type)) continue;
 
             switch (type){
-                case Packages.PROTOCOL.ENTITY.USER_DRAG:
-                    for(var entityID in updateData[type]){
+                case Packages.PROTOCOL.GAME_STATE.USER_DRAG_START:
+
+                   for(var entityID in updateData[type]){
                         var cpos_x = updateData[type][entityID].positionDelta_x;
                         var cpos_y = updateData[type][entityID].positionDelta_y;
                         this.updateEntityPosition(entityID,cpos_x,cpos_y);
@@ -268,7 +269,15 @@ class EntityServerManager {
                 break;
             }
         }
-    }
+    }*/
+
+  dragStart(userID,claimedEntityID){
+        //TODO:
+  }
+
+  dragEnd(userID,claimedEntityID){
+    //TODO:
+  }
 }
 
 module.exports = EntityServerManager;

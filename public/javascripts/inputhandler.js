@@ -44,7 +44,6 @@ class InputHandler extends EventEmitter{
 
         document.addEventListener("mousewheel", this._mouseWheelMove.bind(this), false);
 
-
         app.stage
             // mouse move
             .on('mousemove', this._onMouseMove.bind(this), false)

@@ -25,8 +25,8 @@ class GameServer{
     constructor(io){
         this.io = io;
         this.ID = uuidV4();
-        this.entityServerManager = new EntityServerManager();
         this.clientManager = new ClientManager();
+        this.entityServerManager = new EntityServerManager(60,this.clientManager);
     }
 
     start(){
@@ -64,67 +64,30 @@ class GameServer{
 
         // server receives client entity updates in this event
         socket.on(Packages.PROTOCOL.CLIENT.SEND_STATE, function (evt) {
-            this.entityServerManager.processPlayerUpdates(evt.data);
+         //   this.entityServerManager.processPlayerUpdates(evt.data);
+
+            this._processUpdates(evt.data);
         }.bind(this));
+    }
 
-            // client.on('event', function(data){console.log("evt")});
-            /*
-             client.on(Statics.PROTOCOL.CLIENT.DRAG_START,
-             function(data){
-
-             if(this.entities[data.data.id].grabbedBy) return;
-
-             this.entities[data.data.id].alpha = data.data.alpha;
-             this.entities[data.data.id].scale = data.data.scale;
-             this.entities[data.data.id].grabbedBy = client.id;
-             data.data.grabbedBy = client.id;
-             this.boradcastExceptSender(client,Statics.PROTOCOL.CLIENT.DRAG_START,data);
-             }.bind(this)
-             );
-
-             client.on(Statics.PROTOCOL.CLIENT.DRAG_END,
-             function(data){
-             if(this.entities[data.data.id].grabbedBy != client.id) return;
-             this.entities[data.data.id].alpha = data.data.alpha;
-             this.entities[data.data.id].scale = data.data.scale;
-             this.entities[data.data.id].grabbedBy = undefined;
-             this.boradcastExceptSender(client,Statics.PROTOCOL.CLIENT.DRAG_END,data);
-             }.bind(this)
-             );
-
-             client.on(Statics.PROTOCOL.CLIENT.DRAG_MOVE,
-             function(data){
-             if(this.entities[data.data.id].grabbedBy != client.id) return;
-             this.entities[data.data.id].position.x = data.data.x;
-             this.entities[data.data.id].position.y = data.data.y;
-             this.boradcastExceptSender(client,Statics.PROTOCOL.CLIENT.DRAG_MOVE,data);
-             }.bind(this)
-             );
-
-             client.on(Statics.PROTOCOL.CLIENT.TURN_CARD,
-             function(data){
-             if(this.entities[data.data.id].grabbedBy && this.entities[data.data.id].grabbedBy != client.id) return;
-             this.entities[data.data.id].top = data.data.top;
-             this.boradcastExceptSender(client,Statics.PROTOCOL.CLIENT.TURN_CARD,data);
-             }.bind(this)
-             );
-
-
-             client.on(Statics.PROTOCOL.CLIENT.CLIENT_MOUSE_MOVE,
-             function(data){
-             data.data.id = client.id;
-             this.boradcastExceptSender(client,Statics.PROTOCOL.CLIENT.CLIENT_MOUSE_MOVE,data);
-             }.bind(this)
-             );
-             */
-
-            /*
-             for (var k in this.entities) {
-             if (!this.entities.hasOwnProperty(k))
-             continue;
-             this._sendToClient(client,Statics.PROTOCOL.SERVER.ADD_ENTITY,{msg:"",data:this.entities[k]});
-             }*/
-
+    _processUpdates(data){
+        console.log(data);
+        for(var type in data){
+            if(!data.hasOwnProperty(type)) continue;
+            for(var id in data[type]) {
+                switch (type) {
+                    case Packages.PROTOCOL.GAME_STATE.USER_DRAG_START:
+                        this.entityServerManager.dragStart(id, data[type][id].claimedEntity);
+                        break;
+                    case Packages.PROTOCOL.GAME_STATE.USER_DRAG_END:
+                        this.entityServerManager.dragEnd(id, data[type][id].releasedEntity);
+                        break;
+                    case Packages.PROTOCOL.GAME_STATE.USER_MOUSE_POSITION:
+                        this.clientManager.updateClientPosition(id,data[type][id].position);
+                        break;
+                }
+            }
+        }
     }
 
 

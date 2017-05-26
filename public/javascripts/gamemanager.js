@@ -89,8 +89,17 @@ class GameManager{
         window.showLoadingDialog();
         // prepare resource list
         var game_resource_path = Path.join(game.creator,game.name);
+
+        // reset the loader, but keep the resoruces,
+        // this is necassary, to prevent errors, if the loader is currently running
+        var res = PIXI.loader.resources;
+        PIXI.loader.reset();
+        PIXI.loader.resources = res;
+
         for(let i in game.resources){
             var name = game.resources[i];
+            // do not load resource again, if already existing
+            if(PIXI.loader.resources[name]) continue;
             PIXI.loader.add(
                 {
                     name:Path.join(game_resource_path,name),
@@ -116,42 +125,37 @@ class GameManager{
         );
 
         window.hideLoadingDialog();
-        if(game.resources.length <=0)return; //TODO: fix loaders, use one for one game
+      //  if(game.resources.length <=0)return; //TODO: fix loaders, use one for one game
         // once the gfx is loaded, force every entity, to show its real texture instead of the placeholder
-    //    if(game.resources.length >0 ) {
-            PIXI.loader/*.on('load',function (a,b,d) {
-             console.log(a,b,d);
-             }
-             )*/.once('complete', function (loader, resources) {
+        PIXI.loader.once('complete', function (loader, resources) {
 
-                 // once all textures are loaded, then set table with real texture
+             // once all textures are loaded, then set table with real texture
+            this.gameTable.setTable(
+                game.table.width,
+                game.table.height,
+                PIXI.loader.resources[game.table.texture].texture
+            );
+
+            // set the loaded grafix to the entities
+            for (let i = 0; i < newEntityList.length; i++) {
+                var c = newEntityList[i];
+                c.showSurface(c.surfaceIndex);
+            }
+
+            // if table is given in the game.json, then set it as new table
+            var table_texture = Path.join(game_resource_path, game.table.texture);
+            if (game.table && game.table.width
+                && game.table.height && game.table.texture
+                && PIXI.loader.resources[table_texture]
+                && PIXI.loader.resources[table_texture].texture) {
                 this.gameTable.setTable(
                     game.table.width,
                     game.table.height,
-                    PIXI.loader.resources[game.table.texture].texture
+                    PIXI.loader.resources[table_texture].texture
                 );
+            }
 
-                // set the loaded grafix to the entities
-                for (let i = 0; i < newEntityList.length; i++) {
-                    var c = newEntityList[i];
-                    c.showSurface(c.surfaceIndex);
-                }
-
-                // if table is given in the game.json, then set it as new table
-                var table_texture = Path.join(game_resource_path, game.table.texture);
-                if (game.table && game.table.width
-                    && game.table.height && game.table.texture
-                    && PIXI.loader.resources[table_texture]
-                    && PIXI.loader.resources[table_texture].texture) {
-                    this.gameTable.setTable(
-                        game.table.width,
-                        game.table.height,
-                        PIXI.loader.resources[table_texture].texture
-                    );
-                }
-
-            }.bind(this)).load();
-      //  }
+        }.bind(this)).load();
     }
 
 

@@ -10,6 +10,8 @@ var Matter = require('matter-js');
 
 var Packages = require('./../core/packages');
 
+var DefaultGame = require('./../public/resources/default_game.json');
+
 var Engine = Matter.Engine,
     World = Matter.World,
     Bodies = Matter.Bodies,
@@ -70,14 +72,12 @@ class EntityServerManager {
         setInterval(function() {
             Engine.update(this.engine, 1000 / this.ticks);
         }.bind(this), 1000 / this.ticks);
-
-
     }
 
     _resetGame(){
         this.bodies={};
         this.entities={};
-        this.game = null;
+        this.game = Object.assign({},DefaultGame);
         this.engine = Engine.create();
         this.engine.world.gravity.y = 0;
     }

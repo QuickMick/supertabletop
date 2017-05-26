@@ -21,11 +21,8 @@
         "texture":"empty.png"
       },
       "table":{
-        "texture":"table.jpg",
-        "width":1500,
-        "height":1000
+        "texture":"table.jpg"
       }
     }
   }
-
 }

@@ -65,19 +65,27 @@ class GameServer{
     }
 
     _processUpdates(data){
-        console.log(data);
         for(var type in data){
             if(!data.hasOwnProperty(type)) continue;
             for(var id in data[type]) {
+                if(!data[type].hasOwnProperty(id)) continue;
+
                 switch (type) {
                     case Packages.PROTOCOL.GAME_STATE.USER_DRAG_START:
                         this.entityServerManager.dragStart(id, data[type][id].claimedEntity);
                         break;
                     case Packages.PROTOCOL.GAME_STATE.USER_DRAG_END:
-                        this.entityServerManager.dragEnd(id, data[type][id].releasedEntity);
+                        this.entityServerManager.dragEnd(id, data[type][id].releasedEntities);
                         break;
                     case Packages.PROTOCOL.GAME_STATE.USER_MOUSE_POSITION:
-                        this.clientManager.updateClientPosition(id,data[type][id].position);
+                        var changed = this.clientManager.updateClientPosition(id,data[type][id].position);
+                        if(changed) {
+                            this.updateQueue.postUpdate(
+                                Packages.PROTOCOL.GAME_STATE.SERVER_CLIENT_POSITION_UPDATE,
+                                id,
+                                data[type][id].position
+                            );
+                        }
                         break;
                 }
             }
@@ -90,6 +98,7 @@ class GameServer{
         // TODO: load clientinfo from database
         var clientInfo = {
             name:"ranz",
+            cursor:"default",
             color:Util.getRandomColor()
         };
 
@@ -102,9 +111,22 @@ class GameServer{
             Packages.PROTOCOL.SERVER.RESPONSE_CLIENT_ACCEPTED,
             Packages.createEvent(
                 this.ID,
-                {clientInfo:this.clientManager.getPrivateClientInfo(socket.id)}
+                this.clientManager.getPrivateClientInfo(socket.id)
             )
         );
+
+        // share info about all other players with newly connected client
+        var alreadyKnownClients = this.clientManager.getAllPublicClientinfo(socket.id);
+        if(alreadyKnownClients && alreadyKnownClients.length >0) {
+            this._sendToClient(
+                socket,
+                Packages.PROTOCOL.SERVER.CLIENT_CONNECTED,
+                Packages.createEvent(
+                    this.ID,
+                    this.clientManager.getAllPublicClientinfo(socket.id)
+                )
+            );
+        }
 
         // share public info of newly connected client with everyone
         this._boradcastExceptSender(
@@ -112,7 +134,7 @@ class GameServer{
             Packages.PROTOCOL.SERVER.CLIENT_CONNECTED,
             Packages.createEvent(
                 this.ID,
-                {connectedClient: this.clientManager.getPublicClientInfo(socket.id)}
+                [this.clientManager.getPublicClientInfo(socket.id)]
             )
         );
 
@@ -122,7 +144,7 @@ class GameServer{
             Packages.PROTOCOL.SERVER.INIT_GAME,
             Packages.createEvent(
                 this.ID,
-                {game: this.entityServerManager.getCurrentGameState()}
+                this.entityServerManager.getCurrentGameState()
             )
         );
     }

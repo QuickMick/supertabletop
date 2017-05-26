@@ -5,7 +5,7 @@
 require('pixi.js');
 var Util = require("./../../core/util");
 
-var CursorLibrary = require('./../resources/resources.json').cursors;
+var CursorLibrary = require('./../resources/resources.json').cursors.content;
 var ColorLibrary = require('./../resources/colors.json');
 
 /**
@@ -29,32 +29,36 @@ class PlayerManager extends PIXI.Container {
     }
 
     /**
-     * @param @type {object} player_data {id,color,position,color,cursor_type}
+     * @param @type {aarray} player_data [{id,color,position,color,cursor_type}]
      */
-    addPlayer(player_data) {
-        // load cursor from library and create sprite
-        var cursor = CursorLibrary[cursor_type] || CursorLibrary["default"];
-        this.players[player_data.id] = new PIXI.Sprite(PIXI.loader.resources[cursor.texture].texture);
+    addPlayer(players) {
+        players = [].concat(players);
+        for(var i=0; i<players.length;i++) {
+            var player_data = players[i];
+            // load cursor from library and create sprite
+            var cursor = CursorLibrary[player_data.cursor] || CursorLibrary["default"];
+            this.players[player_data.id] = new PIXI.Sprite(PIXI.loader.resources[cursor.texture].texture);
 
-        // set the anchor of the the cursor, depending on the texture defined in the json file
-        this.players[player_data.id].anchor.x = cursor.anchor.x || 0;
-        this.players[player_data.id].anchor.y = cursor.anchor.y || 0;
+            // set the anchor of the the cursor, depending on the texture defined in the json file
+            this.players[player_data.id].anchor.x = cursor.anchor.x || 0;
+            this.players[player_data.id].anchor.y = cursor.anchor.y || 0;
 
-        //set the initial position of the player
-        if (player_data.position) {
-            this.players[player_data.id].position.x = player_data.x || 0;
-            this.players[player_data.id].position.y = player_data.y || 0;
+            //set the initial position of the player
+            if (player_data.position) {
+                this.players[player_data.id].position.x = player_data.x || 0;
+                this.players[player_data.id].position.y = player_data.y || 0;
+            }
+
+            // set color if available otherwise take default color defined in json
+            if (player_data.color) {
+                /* var color = parseInt(player_data.color.replace("#", "0x"));
+                 color = !Number.isNaN(color)?color: parseInt(ColorLibrary.default_cursor);*/
+                this.players[player_data.id].tint = Util.parseColor(player_data.color);
+            }
+
+            // finaly add the cursor to this container
+            this.addChild(this.players[player_data.id]);
         }
-
-        // set color if available otherwise take default color defined in json
-        if (player_data.color) {
-           /* var color = parseInt(player_data.color.replace("#", "0x"));
-            color = !Number.isNaN(color)?color: parseInt(ColorLibrary.default_cursor);*/
-            this.players[player_data.id].tint = Util.parseColor(player_data.color);
-        }
-
-        // finaly add the cursor to this container
-        this.addChild(this.players[player_data.id]);
     };
 
     /**

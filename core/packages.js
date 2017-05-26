@@ -68,7 +68,12 @@ module.exports =
                 USER_DRAG_END: "ENTITY_DRAG_END",
                 USER_MOUSE_POSITION: "USER_MOUSE_POSITION",
 
-                SERVER_POSITION_UPDATE: "SERVER_POSITION_UPDATE"
+            /**
+             * aka mouse position update
+             */
+            SERVER_CLIENT_POSITION_UPDATE:"SERVER_CLIENT_POSITION_UPDATE",
+
+            SERVER_ENTITY_POSITION_UPDATE: "SERVER_ENTITY_POSITION_UPDATE"
         }
     }
 };

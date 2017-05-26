@@ -9,7 +9,7 @@ class ClientManager{
 
     constructor(){
         this.clients = {
-            //ID:socked;
+            //ID:{socked:socked,position:pos,usw};
         };
 
         this.admin=null;
@@ -26,6 +26,8 @@ class ClientManager{
             id:socket.id,
             color:clientInfo.color,
             name:clientInfo.name,
+            cursor:clientInfo.cursor,
+            position:{x:0,y:0},
             verification:uuidV4() //clientInfo.verification
         };
     }
@@ -39,7 +41,8 @@ class ClientManager{
         return {
             id:id,
             name:cur.name,
-            color:this.clients[id].color,
+            color:cur.color,
+            cursor:cur.cursor,
             vertification:cur.verification,
             admin:this.isAdmin(id,cur.verification)
         };
@@ -57,6 +60,21 @@ class ClientManager{
             color:this.clients[id].color,
             admin:this.isAdmin(id,cur.verification)
         };
+    }
+
+    /**
+     * returns all public info about all clients.
+     * used to collect all info about players, when a new client connetcs
+     * @param except = usually, this is the newly connected sender.
+     * @returns {Array} info about all already connected clients
+     */
+    getAllPublicClientinfo(except){
+        var result = [];
+        for(var key in this.clients){
+            if(!this.clients.hasOwnProperty(key) || (except && key == except)) continue;
+            result.push(this.getPublicClientInfo(key));
+        }
+        return result;
     }
 
     /**
@@ -121,8 +139,31 @@ class ClientManager{
 
     // -------------- updates---------
 
+    /**
+     *
+     * @param userID
+     * @param newPosition
+     * @returns {boolean} true, if positon has changed, false if not;
+     */
     updateClientPosition(userID,newPosition){
-        console.log(userID,newPosition);
+        var cur = this.clients[userID];
+        if(!cur) {
+            console.warn("User ",userID," does not exist");
+            return false;
+        }
+
+        if(!newPosition){
+            console.warn("no position to update passed for id ",userID);
+            return false;
+        }
+
+        if(cur.position.x == newPosition.x && cur.position.y == newPosition.y)
+            return false;
+
+        cur.position.x = newPosition.x;
+        cur.position.y = newPosition.y;
+
+        return true;
     }
 }
 

@@ -103,7 +103,6 @@ window.onload = function() {
 
             var resource_name = current_area.content[content_key].texture;
             var resource_path = Path.join(Config.PATHS.RESOURCE_BASE,folder,resource_name);
-
             PIXI.loader.add({
                 name: resource_name,
                 url: resource_path
@@ -113,27 +112,23 @@ window.onload = function() {
 
     // load game resources and once finished, start the game
     PIXI.loader.once('complete', function(){
-        window.hideLoadingDialog();
 
-        window.addEventListener("resize", resize);
+        setTimeout(function () {
+            window.hideLoadingDialog();
 
-        var gameManager =  new GameManager(app);
-        gameManager.start();
-        app.ticker.add(gameManager.update.bind(gameManager));
-       // app.ticker.add(require('./inputhandler').update);
+            var gameManager =  new GameManager(app);
+            gameManager.start();
+            app.ticker.add(gameManager.update.bind(gameManager));
+           // app.ticker.add(require('./inputhandler').update);
 
-        function resize() {
-            var x = screen.getBoundingClientRect();
-            app.renderer.resize(x.width,x.height);
-           /* GameState.RENDERER_SIZE={
-                width:app.renderer.width,
-                height:app.renderer.height
-            };*/
-           // gameManager..updateCam();
-            gameManager.toolManager.currentTool.focusCamera();
-        }
-        resize();
-
+            function resize() {
+                var x = screen.getBoundingClientRect();
+                app.renderer.resize(x.width,x.height);
+                gameManager.toolManager.currentTool.focusCamera();//.bind(gameManager.toolManager.currentTool))();
+            }
+            resize();
+            window.addEventListener("resize", resize);
+        },100);
     }.bind(this)).load();
 };
 

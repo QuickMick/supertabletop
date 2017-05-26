@@ -14,7 +14,7 @@ var UpdateQueue = require('./../../core/updatequeue');
 
 class Synchronizer{
 
-    constructor(gameManager,entityManager){
+    constructor(gameManager,entityManager,playerManager){
         this.socket = null;
 
         /**
@@ -36,7 +36,6 @@ class Synchronizer{
         this.updateQueue = new UpdateQueue();
         //this._queue = {};
 
-
         if(!entityManager)
             throw "entityManager is required in order to establish a connection";
         if(!gameManager)
@@ -44,6 +43,7 @@ class Synchronizer{
 
         this.entityManager = entityManager;
         this.gameManager = gameManager;
+        this.playerManager = playerManager;
 
         if (this.socket){
             console.warn("synchronizer already initialized!");
@@ -76,7 +76,7 @@ class Synchronizer{
             if(!updateData.hasOwnProperty(type)) continue;
 
             switch (type){
-                case Packages.PROTOCOL.ENTITY.SERVER_POSITION_UPDATE:
+                case Packages.PROTOCOL.GAME_STATE.SERVER_ENTITY_POSITION_UPDATE:
                     for(var entityID in updateData[type]){
                         var cpos = updateData[type][entityID].position;
 
@@ -84,25 +84,39 @@ class Synchronizer{
                         this.entityManager.entities[entityID].position.y = cpos.y;
                     }
                     break;
+
+                // ouse moves
+                case Packages.PROTOCOL.GAME_STATE.SERVER_CLIENT_POSITION_UPDATE:
+                    for(var clientID in updateData[type]){
+                        if(!updateData[type].hasOwnProperty(clientID) ||clientID == this.CLIENT_INFO.id) continue;
+                        var cpos = updateData[type][clientID];
+                        this.playerManager.players[clientID].position.x = cpos.x;//+this.gameManager.gameTable.position.x;
+                        this.playerManager.players[clientID].position.y = cpos.y;//+this.gameManager.gameTable.position.y;
+                    }
+                    break;
             }
         }
     }
 
-
-
     _initHandlers(){
         // get clientdata of this client
         this.socket.on(Packages.PROTOCOL.SERVER.RESPONSE_CLIENT_ACCEPTED, function(evt) {
-            this.CLIENT_INFO = evt.data.clientInfo;
+            this.CLIENT_INFO = evt.data;
         }.bind(this));
 
         // receive data about the dame (after initialisation, or gamechange
         this.socket.on(Packages.PROTOCOL.SERVER.INIT_GAME, function (evt) {
-            this.gameManager.initGame(evt.data.game);
+            this.gameManager.initGame(evt.data);
         }.bind(this));
 
+        // receive game updates
         this.socket.on(Packages.PROTOCOL.SERVER.UPDATE_STATE, function (evt) {
             this.processServerUpdates(evt.data);
+        }.bind(this));
+
+        // another player connected
+        this.socket.on(Packages.PROTOCOL.SERVER.CLIENT_CONNECTED, function (evt) {
+            this.playerManager.addPlayer(evt.data)
         }.bind(this));
 
         /*

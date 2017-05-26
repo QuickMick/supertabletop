@@ -209,11 +209,11 @@ class SimpleDragTool extends BasicTool{
         var localPos = evt.data.getLocalPosition(this.gameTable);
 
         // return if mousepos is outside of the gametable
-        if(localPos.x < 0
+       /* if(localPos.x < 0
             || localPos.y < 0
             || localPos.x > this.gameTable.width/this.current_zoom
             || localPos.y > this.gameTable.height/this.current_zoom)
-            return;
+            return;*/
 
         // if something has changed, then update the server
         this.synchronizer.updateQueue.postUpdate(Packages.PROTOCOL.GAME_STATE.USER_MOUSE_POSITION, this.synchronizer.CLIENT_INFO.id,

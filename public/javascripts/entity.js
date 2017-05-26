@@ -67,9 +67,8 @@ class Entity extends PIXI.Sprite {
             var  curSurface = entity.surfaces[i];
             // init surface
             var newSurface = {
-                // if the texture is not available, take the default texture, which is already set as "this.texture"
-                // the texture itselfe is a function, which returns the texture, or the missing texture if not possible TODO: geht des?
-                texture: entity.surfaces[i].texture || PIXI.loader.resources[DEFAULT_RESOURCES.empty_texture],//PIXI.loader.resources[entity.surfaces[i].texture] ? PIXI.loader.resources[entity.surfaces[i].texture].texture : PIXI.loader.resources[DEFAULT_RESOURCES.missing_texture_substitute.texture].texture,// function(){ PIXI.loader.resources[entity.surfaces[i].texture] ? PIXI.loader.resources[entity.surfaces[i].texture].texture : PIXI.loader.resources[DEFAULT_RESOURCES.missing_texture_substitute.texture].texture;} ,
+                // set the texture
+                texture: entity.surfaces[i].texture,// || PIXI.loader.resources[DEFAULT_RESOURCES.empty_texture],//PIXI.loader.resources[entity.surfaces[i].texture] ? PIXI.loader.resources[entity.surfaces[i].texture].texture : PIXI.loader.resources[DEFAULT_RESOURCES.missing_texture_substitute.texture].texture,// function(){ PIXI.loader.resources[entity.surfaces[i].texture] ? PIXI.loader.resources[entity.surfaces[i].texture].texture : PIXI.loader.resources[DEFAULT_RESOURCES.missing_texture_substitute.texture].texture;} ,
                 // normalize/convert the color of the surface
                 color: Util.parseColor(entity.surfaces[i].color),
                 // if text  is no array, then convert it to an array, if text is undefined, put empty array instead
@@ -98,10 +97,13 @@ class Entity extends PIXI.Sprite {
         // set texture if available
         var texture = Path.join(this.game_resource_path,curSurface.texture);
 
-        if(PIXI.loader.resources[texture] && PIXI.loader.resources[texture].texture){
-            this.texture = PIXI.loader.resources[texture].texture;
-        }else{
+        if(!texture || texture == ""){
+            this.texture = PIXI.loader.resources[DEFAULT_RESOURCES.empty_texture].texture;
+
+        }else if( !PIXI.loader.resources[texture] || !PIXI.loader.resources[texture].texture){
             this.texture= PIXI.loader.resources[DEFAULT_RESOURCES.missing_texture_substitute.texture].texture;
+        }else{
+            this.texture= PIXI.loader.resources[texture].texture;
         }
 
         this.tint = curSurface.color;

@@ -132,11 +132,6 @@ class EntityServerManager {
 
         var keys = Object.keys(this.entities);
 
-       // this.entities={};
-       // this.bodies={};
-
-
-
         // create entities for unstacked entities
         for(var i=0; i< this.game.unstacked.length; i++){
             var c = this.game.unstacked[i];
@@ -152,8 +147,6 @@ class EntityServerManager {
         this.game.entities = Object.keys(this.entities).map(function(key) {
             return this.entities[key];
         }.bind(this));
-
-        //this.boradcast(Packages.PROTOCOL.SERVER.INIT_GAME,Packages.createEvent(Packages.SERVER_ID,this.game));
     }
 
     getCurrentGameState(){

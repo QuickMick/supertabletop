@@ -17,7 +17,8 @@ class UpdateQueue{
      * resulting in the value which is finaly sent do the server.
      * @param type of the change
      * @param id affeced item/entity/player
-     * @param data changed data
+     * @param data changed data {data1:asd, data2:4,_mode= push(if item should be pushed to existing array, or add
+     *          if data should be added to existing value  --> creates empty data fist in both cases if not existing}
      */
     postUpdate(type, id, data){
         if(!id || !data){
@@ -38,10 +39,11 @@ class UpdateQueue{
 
             // merge update data to current queue
             for (var key in updatedData) {
-                if (!updatedData.hasOwnProperty(key) || key == "mode")continue;
+                // continue, if key==__mode, because this is just used to define how the data is pushed
+                if (!updatedData.hasOwnProperty(key) || key == "_mode") continue;
 
-                if(updatedData.mode){
-                    switch(updatedData.mode){
+                if(updatedData._mode){
+                    switch(updatedData._mode){
                         case "add":                // if data field looks like {add:true,value:3} then add,
                             if(!this._queue[type][id][key]) this._queue[type][id][key]= 0;
                             this._queue[type][id][key] += updatedData[key];
@@ -64,9 +66,9 @@ class UpdateQueue{
     }
 
     /**
-     * get data which has changed
+     * get data which has changed since the last call, every changes will be deleted in this instance
      */
-    getUpdatedEntityData(){
+    popUpdatedEntityData(){
         // only send, when updates are available
         if(!this._queue._sendUpdateRequired) return null;
 

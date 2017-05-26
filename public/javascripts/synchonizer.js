@@ -66,7 +66,7 @@ class Synchronizer{
 
         this.sendMessage(Packages.PROTOCOL.CLIENT.SEND_STATE,Packages.createEvent(
             this.CLIENT_INFO.id,
-            this.updateQueue.getUpdatedEntityData()
+            this.updateQueue.popUpdatedEntityData()
             )
         );
     }

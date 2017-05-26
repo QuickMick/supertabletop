@@ -218,7 +218,7 @@ class SimpleDragTool extends BasicTool{
         // if something has changed, then update the server
         this.synchronizer.updateQueue.postUpdate(Packages.PROTOCOL.GAME_STATE.USER_MOUSE_POSITION, this.synchronizer.CLIENT_INFO.id,
             {
-                position:{x:(localPos.x/this.current_zoom),y:(localPos.y/this.current_zoom)}
+                position:{x:(localPos.x),y:(localPos.y)}
             }
         );
     }
@@ -228,14 +228,14 @@ class SimpleDragTool extends BasicTool{
         this.synchronizer.updateQueue.postUpdate(Packages.PROTOCOL.GAME_STATE.USER_DRAG_START,this.synchronizer.CLIENT_INFO.id,
             {
                 claimedEntity:evt.entity.ENTITY_ID,
-                mode:"push"
+                _mode:"push"
             }
         );
     }
 
     _releaseSelection(evt) {
 
-//this selection release
+        //this selection release
         var ids = [];
         for(var i=0; i<this.SELECTED_ENTITIES.length;i++){
             ids.push(this.SELECTED_ENTITIES[i].ENTITY_ID);

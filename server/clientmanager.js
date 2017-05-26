@@ -32,6 +32,13 @@ class ClientManager{
         };
     }
 
+    doesClientExist(id){
+        if(!id || id.length <=0 || !this.clients[id]){
+            return false;
+        }
+        return true;
+    }
+
     getPrivateClientInfo(id){
         if(!id || id.length <=0){
             console.warn("id does not exist");
@@ -85,9 +92,22 @@ class ClientManager{
     getSocket(id){
         if(!id || id.length <=0){
             console.warn("id does not exist");
-            return;
+            return null;
         }
         return this.clients[id].socket;
+    }
+
+    /**
+     * Maps an id to the corresponding mouse position
+     * @param id of the client
+     * @returns {Position}
+     */
+    getPosition(id){
+        if(!id || id.length <=0){
+            console.warn("id does not exist");
+            return null;
+        }
+        return this.clients[id].position || {x:0,y:0};
     }
 
     /**

@@ -20,7 +20,7 @@ class GameServer{
         this.ID = uuidV4();
         this.clientManager = new ClientManager();
         this.updateQueue =  new UpdateQueue();
-        this.entityServerManager = new EntityServerManager(60,this.updateQueue);
+        this.entityServerManager = new EntityServerManager(60,this.updateQueue,this.clientManager);
     }
 
     start(){
@@ -72,10 +72,10 @@ class GameServer{
 
                 switch (type) {
                     case Packages.PROTOCOL.GAME_STATE.USER_DRAG_START:
-                        this.entityServerManager.dragStart(id, data[type][id].claimedEntity);
+                        this.entityServerManager.claimEntity(id, data[type][id].claimedEntity);
                         break;
                     case Packages.PROTOCOL.GAME_STATE.USER_DRAG_END:
-                        this.entityServerManager.dragEnd(id, data[type][id].releasedEntities);
+                        this.entityServerManager.releaseEntities(id, data[type][id].releasedEntities);
                         break;
                     case Packages.PROTOCOL.GAME_STATE.USER_MOUSE_POSITION:
                         var changed = this.clientManager.updateClientPosition(id,data[type][id].position);

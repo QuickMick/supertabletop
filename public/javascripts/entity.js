@@ -3,11 +3,8 @@
  */
 "use strict";
 require('pixi.js');
-
 var Path = require('path');
-
 var Util = require("./../../core/util");
-
 
 var DEFAULT_RESOURCES = require("./../resources/resources.json").default.content;
 
@@ -73,7 +70,12 @@ class Entity extends PIXI.Sprite {
         this.showSurface(this.surfaceIndex);
     }
 
-
+    /**
+     * defines the hitarea of the entity.
+     * it is called at the initialization process and during surface turning,
+     * in order to prevent wrong hitareas
+     * @private
+     */
     _setHitarea(){
         var entity = this.rawData;
         if (entity.width)
@@ -117,10 +119,16 @@ class Entity extends PIXI.Sprite {
 
     /**
      * Changes the surface which is shown
-     * @param front
+     * @param index of the side
      */
     showSurface(index) {
         this.surfaceIndex = index || 0;
+
+        // check if the surfaceIndex is inside the possible range (number of surfaces)
+        // if not, then force it to be inside of the range
+        if(this.surfaceIndex <= 0) this.surfaceIndex = 0;
+        if(this.surfaceIndex >= this.surfaces.length) this.surfaceIndex = this.surfaces.length-1;
+
         var curSurface = this.surfaces[this.surfaceIndex];
 
         this.removeAll(); // remove text from old surface

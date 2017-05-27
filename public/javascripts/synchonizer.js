@@ -81,7 +81,6 @@ class Synchronizer{
             if(!updateData.hasOwnProperty(type)) continue;
 
             var updates = updateData[type];
-
             switch (type){
                 // entity position or rotation has updated
                 case Packages.PROTOCOL.GAME_STATE.ENTITY.SERVER_ENTITY_TRANSFORMATION_UPDATE:
@@ -91,10 +90,13 @@ class Synchronizer{
                 case Packages.PROTOCOL.GAME_STATE.CLIENT.SERVER_CLIENT_POSITION_UPDATE:
                     this.playerManager.batchUpdatePlayerPosition(updates);
                     break;
-
                 // an entity gets deleted by an player or by the server
                 case Packages.PROTOCOL.GAME_STATE.ENTITY.SERVER_ENTITY_DELETED:
                     this.entityManager.removeEntity(Object.keys(updates));
+                    break;
+                // the state of an entiy changes
+                case Packages.PROTOCOL.GAME_STATE.ENTITY.STATE_CHANGE:
+                    console.log(updates);
                     break;
             }
         }

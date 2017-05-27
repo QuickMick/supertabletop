@@ -99,7 +99,7 @@ module.exports =
 
                 STATES:{
                     ENTITY_SELECTED:"ENTITY_SELECTED",
-                    ENTITY_DRAGGED:"ENTITY_DRAGGED"
+                    ENTITY_DEFAULT_STATE:"ENTITY_DEFAULT_STATE"
                 }
             },
             CLIENT:{

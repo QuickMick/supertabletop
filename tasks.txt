@@ -1,8 +1,6 @@
 
 ####################################################  ISSUES  ##########################################################
 -isSensor bei drag an un aus is noch n bissl buggy
--pixi interactive hitare
-
 
 
 #####################################################  TODOS  ##########################################################
@@ -12,12 +10,15 @@
 
 - table boundaries
 
+-show selection of other players
+
 functions:
 -turn card
 -rotate card
 -rotate view
 -snap points
 -stacks
+
 
 
 

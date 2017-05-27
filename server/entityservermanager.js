@@ -232,6 +232,7 @@ class EntityServerManager {
         this.lastID++; //increment id
         entity.id=this.lastID;
         this.entities[this.lastID] = entity;
+        this.entities[this.lastID].state = this._createDefaultEntityState();
 
         // if there is no hitarea defined, use entity size or default value of DEFAULT_BODY_SIZE
         if(!entity.hitArea){
@@ -318,8 +319,9 @@ class EntityServerManager {
             return;
         }
 
-        if(!claimedEntityIDs){
-            console.warn("nothing to claime passed");
+        if(!claimedEntityIDs || claimedEntityIDs.length <=0){
+            console.warn("nothing to claim passed");
+            return;
         }
 
         // if passed value is no array, then converte it to one
@@ -362,6 +364,12 @@ class EntityServerManager {
             this.constraints[userID][claimedEntityID] = constraint;
             World.add(this.engine.world, constraint);            // finally add the constraint to the world
 
+            // post, that the entity is now claimed by a user
+            this._postStateChange(
+                claimedEntityID,
+                userID,
+                Packages.PROTOCOL.GAME_STATE.ENTITY.STATES.ENTITY_SELECTED
+            );
         }
     }
 
@@ -371,7 +379,6 @@ class EntityServerManager {
      * @param claimedEntityIDs {Array}
      */
     releaseEntities(userID, claimedEntityIDs){
-
         if(!this.clientManager.doesClientExist(userID)){
             console.warn("user does not exist");
             return;
@@ -382,44 +389,80 @@ class EntityServerManager {
 
         claimedEntityIDs = [].concat(claimedEntityIDs);
         for(var i=0; i<claimedEntityIDs.length;i++){
-            var curEntity = claimedEntityIDs[i];
+            var curEntityID = claimedEntityIDs[i];
 
             // check if there is a constraint
-            if(!this.constraints[userID] || !this.constraints[userID][curEntity]){
-                console.log("constraint does not exists fot user ",userID," and entity ",curEntity);
+            if(!this.constraints[userID] || !this.constraints[userID][curEntityID]){
+                console.log("constraint does not exists fot user ",userID," and entity ",curEntityID);
                 return;
             }
 
-            this.bodies[curEntity].isSensor = false;
-            this.bodies[curEntity].frictionAir = GameConfig.ENTITY_FRICTION;
+            this.bodies[curEntityID].isSensor = false;
+            this.bodies[curEntityID].frictionAir = GameConfig.ENTITY_FRICTION;
+
+            this._postStateChange(curEntityID);
 
             // if constraint exist, delete it
-            World.remove(this.engine.world,this.constraints[userID][curEntity]);
-            delete this.constraints[userID][curEntity];
+            World.remove(this.engine.world,this.constraints[userID][curEntityID]);
+            delete this.constraints[userID][curEntityID];
         }
     }
 
     /**
-     * posts state changes
-     * @param userID
+     * posts state changes,
+     * if just an entity id is passed,
+     * the entity will be set to the default state.
      * @param entityID
+     * @param userID
      * @param state new state of the entity
      * @param data {object}
      * @private
      */
-    _postStateChange(userID,entityID,state,data){
-        var result = Object.assign({
-            userID:userID,
-            state:state,
-        },data);
+    _postStateChange(entityID,userID,state,data){
+        if(!entityID){
+            console.warn("no entityID for statechange was passed");
+            return;
+        }
 
-        this.entities.state = result;
+        if(!this.entities[entityID]){
+            console.warn("entiy",entityID,"does not exist, no states can be changed");
+            return;
+        }
+
+        var result = this._createDefaultEntityState();
+
+        // if there is all data available, do the state change,
+        // otherwise the entity is set to default state
+        if(userID && state){
+            if (!userID || userID.length <= 0) {
+                console.warn("no user which causes the statechange was passed for entity", entityID);
+            }
+            data = data || {};  // if null, create empty object
+            data.state = state;
+            // assign passed data to dataset, which is posted
+            result = Object.assign(result, data);
+            result.userID= userID;
+        }
+
+        this.entities[entityID].state = result;
 
         this.updateQueue.postUpdate(
-            Packages.PROTOCOL.GAME_STATE.ENTITY.SERVER_ENTITY_TRANSFORMATION_UPDATE,
+            Packages.PROTOCOL.GAME_STATE.ENTITY.STATE_CHANGE,
             entityID,
             result
         );
+    }
+
+    /**
+     * creates an default state for an entity
+     * @returns {{state: string, timestamp: number}}
+     * @private
+     */
+    _createDefaultEntityState(){
+        return {
+            state:Packages.PROTOCOL.GAME_STATE.ENTITY.STATES.ENTITY_DEFAULT_STATE,
+            timestamp:new Date().getTime()
+        };
     }
 }
 

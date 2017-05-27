@@ -3,8 +3,8 @@
  */
 'use strict';
 require('pixi.js');
-require('pixi-filters');
-require('pixi-extra-filters');
+
+var Packages = require('./../../core/packages');
 
 const RELATIVE_PATH = "./../";
 
@@ -23,8 +23,6 @@ class EntityManager extends PIXI.Container{
         this.entities = {
             //ID: ENTITY(SPRITE)
         };
-
-        this.selectionFilter =new PIXI.filters.BloomFilter();
     }
 
     addEntity(entity){
@@ -126,35 +124,6 @@ class EntityManager extends PIXI.Container{
         // change rotation, if available
         cur.rotation = transformation.angle || cur.rotation;
     }
-
-    batchUpdateEntityStateChange(data){
-        if(!data){
-            console.warn("no update data passed");
-            return;
-        }
-        for(var entityID in data){
-            if(!data.hasOwnProperty(entityID))continue;
-            this.updateEntityStateChange(entityID,data[entityID]);
-        }
-    }
-
-    updateEntityStateChange(entityID,stateUpdate){
-        if(!entityID){
-            console.warn("entity id is necessary to update enitty");
-            return;
-        }
-        if(!this.entities[entityID]){
-            console.warn("entity",entityID,"does not exist!");
-            return;
-        }
-
-        if(!stateUpdate){
-            console.warn("no state update  for entity",entityID,"was passed");
-            return;
-        }
-        //TODO
-    }
-
 }
 
 module.exports= EntityManager;

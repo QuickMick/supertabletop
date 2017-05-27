@@ -15,7 +15,7 @@ var UpdateQueue = require('./../../core/updatequeue');
  * Receives all data from the server and changed data from the client and distributes it.
  */
 class Synchronizer{
-    constructor(gameManager,entityManager,playerManager){
+    constructor(gameManager){
         this.socket = null;
 
         /**
@@ -35,21 +35,32 @@ class Synchronizer{
          * @type {EntityUpdateQueue}
          */
         this.updateQueue = new UpdateQueue();
-        //this._queue = {};
 
-        if(!entityManager)
-            throw "entityManager is required in order to establish a connection";
-        if(!gameManager)
-            throw "gameManager is required in order to establish a connection";
+        /**
+         * socket to connect to the server
+         * @type {null}
+         */
+        this.socket = null;
 
-        this.entityManager = entityManager;
         this.gameManager = gameManager;
-        this.playerManager = playerManager;
 
+        // following files are set in the init method
+        this.entityManager = null;
+        this.toolManager = null;
+        this.playerManager = null;
+
+
+    }
+
+    init(){
         if (this.socket){
             console.warn("synchronizer already initialized!");
             return;
         }
+
+        this.entityManager = this.gameManager.entityManager;
+        this.playerManager = this.gameManager.playerManager;
+        this.toolManager = this.gameManager.toolManager;
 
         this.socket = require('socket.io-client').connect();
         this._initHandlers();
@@ -96,7 +107,7 @@ class Synchronizer{
                     break;
                 // the state of an entiy changes
                 case Packages.PROTOCOL.GAME_STATE.ENTITY.STATE_CHANGE:
-                    this.entityManager.batchUpdateEntityStateChange(updates);
+                    this.toolManager.batchUpdateEntityStateChange(updates);
                     break;
             }
         }

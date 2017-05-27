@@ -47,7 +47,7 @@ class Entity extends PIXI.Sprite {
         // -------- init pixi values --------
         this.interactive = true;    // enable the bunny to be interactive... this will allow it to respond to mouse and touch events
         this.buttonMode = true;     // this button mode will mean the hand cursor appears when you roll over the bunny with your mouse
-        this.boundsPadding = 0;
+        this.boundsPadding = 50;
 
         this.position.x = entity.position.x || 0;
         this.position.y = entity.position.y || 0;
@@ -133,10 +133,13 @@ class Entity extends PIXI.Sprite {
 
     /**
      * Changes the surface which is shown
+     * if the value is bigger or smaller than the number of surface,
+     * it is forced to fit at the boundarys (e.g. 0 or max value)
+     * if no surfaceside passed, the surface just gets re-initialized.
      * @param index of the side
      */
     showSurface(index) {
-        this.surfaceIndex = index || 0;
+        this.surfaceIndex = index || this.surfaceIndex || 0;
 
         // check if the surfaceIndex is inside the possible range (number of surfaces)
         // if not, then force it to be inside of the range
@@ -177,6 +180,26 @@ class Entity extends PIXI.Sprite {
         }
 
         this._setHitarea();
+    }
+
+
+    addFilter(filter){
+        this.filters = (this.filters || []).concat([filter]);
+    }
+
+    removeFilter(filter) {
+        // create a new array, which contains every filter, except the selection filter
+        var n = [];
+        var filters = this.filters;
+        for (var j = 0; j < filters.length; j++) {
+            if (filters[j] != filter) {
+                n.push(filters[j]);
+            }
+        }
+
+        // if there are no filters anymore, just set null
+        this.filters = (n.length <= 0) ? null:n;
+
     }
 }
 

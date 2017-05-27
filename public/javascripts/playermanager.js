@@ -38,7 +38,7 @@ class PlayerManager extends PIXI.Container {
             // load cursor from library and create sprite
             var cursor = CursorLibrary[player_data.cursor] || CursorLibrary["default"];
             this.players[player_data.id] = new PIXI.Sprite(PIXI.loader.resources[cursor.texture].texture);
-
+            this.players[player_data.id].rawPlayerData = player_data;
             // set the anchor of the the cursor, depending on the texture defined in the json file
             this.players[player_data.id].anchor.x = cursor.anchor.x || 0;
             this.players[player_data.id].anchor.y = cursor.anchor.y || 0;

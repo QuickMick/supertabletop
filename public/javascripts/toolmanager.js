@@ -2,14 +2,20 @@
  * Created by Mick on 24.05.2017.
  */
 'use strict';
+require('pixi-filters');
+require('pixi-extra-filters');
 
-var Packages = require("./../../core/packages");
+var Packages = require('./../../core/packages');
+
+var OutlineFilter = require('./filters/outlinefilter');
+
 
 class BasicTool{
-    constructor(inputHandler,gameTable,entityManager,synchronizer){
+    constructor(inputHandler,gameTable,entityManager,playerManager,synchronizer){
         this.inputHanlder=inputHandler;
         this.gameTable = gameTable;
         this.entityManager = entityManager;
+        this.playerManager=playerManager;
         this.synchronizer = synchronizer;
 
         /**
@@ -45,27 +51,10 @@ class BasicTool{
     }
 
     _onEntityClicked(evt){
-        this.SELECTED_ENTITIES.push(evt.entity);
-      //   evt.entity.filters = (evt.entity.filters || []).concat([this.selectionFilter]);
+     //   this.SELECTED_ENTITIES.push(evt.entity);
     }
 
     _releaseSelection(evt){
-      /*  for(var i=0;i<this.SELECTED_ENTITIES.length;i++){
-            // create a new array, which contains every filter, except the selection filter
-            var n = [];
-            var filters = this.SELECTED_ENTITIES[i].filters;
-            for(var j=0; j<filters.length;j++){
-                if(filters[j] != this.selectionFilter)
-                    n.push(filters[j]);
-            }
-
-            // if there are no filters anymore, just set null
-            if(n.lengh <=0){
-                this.SELECTED_ENTITIES[i].filters=null;
-            }else {
-                this.SELECTED_ENTITIES[i].filters = n;
-            }
-        }*/
         this.SELECTED_ENTITIES =[];
     }
 
@@ -196,8 +185,8 @@ class BasicTool{
 
 
 class SimpleDragTool extends BasicTool{
-    constructor(inputHandler,gameTable,entityManager,synchronizer){
-        super(inputHandler,gameTable,entityManager,synchronizer);
+    constructor(inputHandler,gameTable,entityManager,playerManager, synchronizer){
+        super(inputHandler,gameTable,entityManager,playerManager,synchronizer);
     }
 
     /**
@@ -263,16 +252,23 @@ class SimpleDragTool extends BasicTool{
 }
 
 class ToolManager{
-    constructor(inputHandler,gameTable,entityManager,synchronizer){
+    constructor(inputHandler,gameTable,entityManager,playerManager,synchronizer){
         this.tools=null;
         this._selectedToolIndex = 0;
 
         this.entityManager=entityManager;
+        this.playerManager=playerManager;
         this.inputHandler = inputHandler;
         this.gameTable = gameTable;
         this.synchronizer=synchronizer;
 
-        this.tools=[new SimpleDragTool(inputHandler,gameTable,entityManager,synchronizer)];
+
+
+        /**
+         * filter which is used to display a selection
+         * @type {PIXI.filters.BloomFilter}
+         */
+        this.tools=[new SimpleDragTool(inputHandler,gameTable,entityManager,playerManager,synchronizer)];
     }
 
     set currentTool(i){
@@ -280,6 +276,90 @@ class ToolManager{
     }
     get currentTool(){
         return this.tools[this._selectedToolIndex];
+    }
+
+
+    batchUpdateEntityStateChange(data){
+        if(!data){
+            console.warn("no update data passed");
+            return;
+        }
+        for(var entityID in data){
+            if(!data.hasOwnProperty(entityID))continue;
+            this.updateEntityStateChange(entityID,data[entityID]);
+        }
+    }
+
+    updateEntityStateChange(entityID,stateUpdate){
+        if(!entityID){
+            console.warn("entity id is necessary to update enitty");
+            return;
+        }
+
+        var curEntity = this.entityManager.entities[entityID];
+
+        if(!curEntity){
+            console.warn("entity",entityID,"does not exist!");
+            return;
+        }
+
+        if(!stateUpdate){
+            console.warn("no state update  for entity",entityID,"was passed");
+            return;
+        }
+
+        // skip update, it the current state update is newer then the received one
+        if(curEntity.state.timestamp > stateUpdate.timestamp){
+            return;
+        }
+
+        switch (stateUpdate.state){
+            case Packages.PROTOCOL.GAME_STATE.ENTITY.STATES.ENTITY_SELECTED:
+
+                if(!stateUpdate.userID){
+                    console.warn("invalide entity seleciton, no user id available - update rejected");
+                    return;
+                }
+
+                // the passed id is the human player, then add the entity
+                // to his selection
+                if(this.synchronizer.CLIENT_INFO.id == stateUpdate.userID){
+                    this.currentTool.SELECTED_ENTITIES.push(curEntity);
+                }
+
+                // add the filter, so that it is visible,
+                // to everyone, that an entity is selected
+                var selectionFilter = new OutlineFilter(
+                    curEntity.width,
+                    curEntity.height,
+                    1,
+                    this.playerManager.players[stateUpdate.userID].rawPlayerData.color || 0xFFFFFF
+                );
+
+                curEntity.addFilter(selectionFilter);
+
+                // save the filter, so it can get removed later
+                curEntity.tmpSelectionFilter= selectionFilter;
+
+                // and also bring the entity to the front
+                curEntity.bringToFront();
+                break;
+
+            default:
+            case Packages.PROTOCOL.GAME_STATE.ENTITY.STATES.ENTITY_DEFAULT_STATE:
+                // if enttiy was selected, unselect it
+                if(curEntity.state.state == Packages.PROTOCOL.GAME_STATE.ENTITY.STATES.ENTITY_SELECTED) {
+
+                    // check if there is a filter available and remove it from the entity, if it was selected previously
+                    if(curEntity.tmpSelectionFilter) {
+                        curEntity.removeFilter(curEntity.tmpSelectionFilter);
+                        delete curEntity.tmpSelectionFilter;
+                    }
+                }
+                break;
+        }
+
+        curEntity.state = stateUpdate;
     }
 }
 

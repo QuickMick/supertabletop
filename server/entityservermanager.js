@@ -355,6 +355,7 @@ class EntityServerManager {
 
             this.bodies[claimedEntityID].frictionAir = GameConfig.GRABBED_ENTITY_FRICTION;
             this.bodies[claimedEntityID].isSensor = true;       //this means->"no" collision with normal entities
+        //    console.log("claim sensor",this.bodies[claimedEntityID].isSensor,claimedEntityID);
             // save the constraint
             if (!this.constraints[userID]) {
                 this.constraints[userID] = {};
@@ -399,7 +400,7 @@ class EntityServerManager {
 
             this.bodies[curEntityID].isSensor = false;
             this.bodies[curEntityID].frictionAir = GameConfig.ENTITY_FRICTION;
-
+           // console.log("releas sensor",this.bodies[curEntityID].isSensor,curEntityID);
             this._postStateChange(curEntityID);
 
             // if constraint exist, delete it

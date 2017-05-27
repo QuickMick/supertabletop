@@ -48,9 +48,7 @@ class GameManager{
 
         this.entityManager = new EntityManager();
         this.playerManager = new PlayerManager;
-        this.synchronizer = new Synchronizer(this,this.entityManager,this.playerManager);     // initialize socket-connection/synchronizer
-
-
+        this.synchronizer = new Synchronizer(this);     // initialize socket-connection/synchronizer
 
         this.gameTable.min_zoom = Config.ZOOM.MIN;
         this.gameTable.max_zoom = Config.ZOOM.MAX;
@@ -61,7 +59,10 @@ class GameManager{
         this.gameTable.addChild(this.playerManager);
         this.app.stage.addChild(this.gameTable);
 
-        this.toolManager = new ToolManager(this.inputHandler,this.gameTable,this.entityManager,this.synchronizer);
+        this.toolManager = new ToolManager(this.inputHandler,this.gameTable,this.entityManager,this.playerManager,this.synchronizer);
+
+        this.synchronizer.init();
+
         // add default table
       /*  this.gameTable.setTable(
             Resources.default.content.table.width,
@@ -70,10 +71,9 @@ class GameManager{
         );
 */
       // init game with default game
-      this.initGame(Object.assign({},DefaultGame));
+        this.initGame(Object.assign({},DefaultGame));
 
-
-        this.test();
+        this.initEasterEggs();
     }
 
     /**
@@ -163,7 +163,7 @@ class GameManager{
 
     }
 
-    test(){
+    initEasterEggs(){
         document.getCrazy = function(){
             var count=0;
             var filter = new PIXI.filters.ColorMatrixFilter();

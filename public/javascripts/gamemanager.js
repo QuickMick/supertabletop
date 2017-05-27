@@ -109,6 +109,12 @@ class GameManager{
 
         // create entities
         var newEntityList = [];
+
+        // sort entities, so that the one which was changed last is on top
+        game.entities.sort(function(a, b) {
+            return a.state.timestamp - b.state.timestamp
+        });
+
         for(let i=0; i< game.entities.length;i++) {
             game.entities[i].game_resource_path = game_resource_path;
             var newEntity =new Entity(game.entities[i]);

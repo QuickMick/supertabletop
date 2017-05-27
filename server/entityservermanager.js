@@ -137,8 +137,6 @@ class EntityServerManager {
             updateRequired=true;
         }
 
-
-       // if (oldData.x == body.position.x && oldData.y == body.position.y && oldData.angle == body.angle) return;
         // if the body has not changed, nothing to do, nothing to send
         if(!updateRequired) return;
 
@@ -172,7 +170,7 @@ class EntityServerManager {
         for(var i=0; i< this.game.unstacked.length; i++){
             var c = this.game.unstacked[i];
 
-            this._addEntity(this._reviveEntity(this.game.object_def[c.type],c));
+            this.addEntity(this._reviveEntity(this.game.object_def[c.type],c));
         }
 
         //TODO: handle stacked, currently just unstacked entities are handled
@@ -230,7 +228,7 @@ class EntityServerManager {
      * @param entity
      * @private
      */
-    _addEntity(entity){
+    addEntity(entity){
         this.lastID++; //increment id
         entity.id=this.lastID;
         this.entities[this.lastID] = entity;
@@ -251,9 +249,15 @@ class EntityServerManager {
         if (!entity.position) entity.position = {x: 0, y: 0};
         if (!entity.hitArea.offset) entity.hitArea.offset = {x: 0, y: 0};
 
+        // if an value is missing, replace it with zero
+        entity.position.x = entity.position.x || 0;
+        entity.position.y = entity.position.y || 0;
+        entity.hitArea.offset.x = entity.hitArea.offset.x || 0;
+        entity.hitArea.offset.y = entity.hitArea.offset.y || 0;
+
         //shorten the paths and calculate initial body position
-        var x = (entity.position.x || 0) + (entity.hitArea.offset.x || 0);
-        var y = (entity.position.y || 0) + (entity.hitArea.offset.y || 0);
+        var x = entity.position.x + entity.hitArea.offset.x;
+        var y = entity.position.y + entity.hitArea.offset.y;
 
         switch (entity.hitArea.type) {
             case "circle":
@@ -277,12 +281,12 @@ class EntityServerManager {
         World.add(this.engine.world,body);
     }
 
-/*
-    updateEntityPosition(id,x,y){
-        Body.setVelocity(this.bodies[id], {x:(x || this.bodies[id].velocity.x),y:(y || this.bodies[id].velocity.y)});
-    }*/
-
-    _removeEntity(id){
+    /**
+     * removes an entity and postes it to the update que
+     * @param id of the entity, which should be removed
+     * @private
+     */
+    removeEntity(id){
 
         if(!id || !id.length ||  id.length <0 || !this.entities[id]){
             console.warn("entity does not exist or no id passed :",id);
@@ -348,17 +352,15 @@ class EntityServerManager {
             });
 
             this.bodies[claimedEntityID].frictionAir = GameConfig.GRABBED_ENTITY_FRICTION;
-            this.bodies[claimedEntityID].isSensor = true;   //this means->"no" collision with normal entities
+            this.bodies[claimedEntityID].isSensor = true;       //this means->"no" collision with normal entities
             // save the constraint
             if (!this.constraints[userID]) {
                 this.constraints[userID] = {};
             }
 
-
             constraint.ENTITY_ID = claimedEntityID;
             this.constraints[userID][claimedEntityID] = constraint;
-            World.add(this.engine.world, constraint);
-            // finally add the constraint to the world
+            World.add(this.engine.world, constraint);            // finally add the constraint to the world
 
         }
     }

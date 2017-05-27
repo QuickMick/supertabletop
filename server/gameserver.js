@@ -41,7 +41,7 @@ class GameServer{
 
         this._boradcast(Packages.PROTOCOL.SERVER.UPDATE_STATE,Packages.createEvent(
             this.ID,
-            this.updateQueue.popUpdatedEntityData()
+            this.updateQueue.popUpdatedData()
             )
         );
     }

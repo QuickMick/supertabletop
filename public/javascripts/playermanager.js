@@ -58,7 +58,7 @@ class PlayerManager extends PIXI.Container {
 
             // finaly add the cursor to this container
             this.addChild(this.players[player_data.id]);
-            console.log(player_data.id,"connected");
+            console.info(player_data.id,"connected");
         }
     };
 
@@ -95,7 +95,6 @@ class PlayerManager extends PIXI.Container {
             return;
         }
 
-
         if (!this.players[id]) {
             console.warn("player does not exist - id:", id);
             return;
@@ -104,7 +103,7 @@ class PlayerManager extends PIXI.Container {
         this.removeChild(this.players[id]);
         delete this.players[id];
 
-        console.log(id,"disconnected");
+        console.info(id,"disconnected");
     }
 
     /**

@@ -69,7 +69,7 @@
         ],
       "hitArea":{
           "type":"circle",
-          "offset":{"x":25,"y":25},
+          "offset":{"x":0,"y":0},
           "radius":25
       },
       "text":null

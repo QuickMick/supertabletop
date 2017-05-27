@@ -3,12 +3,16 @@
  */
 'use strict';
 
-
+/**
+ * used to post updates,
+ * so that you do not need to send every change at once.
+ * you post it to the update queue and send it in an accumulated format every interval (use setInverval and popUpdatedData)
+ * to post data use postUpdate
+ */
 class UpdateQueue{
     constructor(){
         this._queue = {_sendUpdateRequired:false};
     }
-
 
     /**
      * posts data which should be updated on the server
@@ -68,7 +72,7 @@ class UpdateQueue{
     /**
      * get data which has changed since the last call, every changes will be deleted in this instance
      */
-    popUpdatedEntityData(){
+    popUpdatedData(){
         // only send, when updates are available
         if(!this._queue._sendUpdateRequired) return null;
 

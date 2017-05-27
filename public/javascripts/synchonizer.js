@@ -11,9 +11,10 @@ var UpdateQueue = require('./../../core/updatequeue');
 //var EntityManager = require("./entitymanager");
 
 
-
+/**
+ * Receives all data from the server and changed data from the client and distributes it.
+ */
 class Synchronizer{
-
     constructor(gameManager,entityManager,playerManager){
         this.socket = null;
 
@@ -66,7 +67,7 @@ class Synchronizer{
 
         this.sendMessage(Packages.PROTOCOL.CLIENT.SEND_STATE,Packages.createEvent(
             this.CLIENT_INFO.id,
-            this.updateQueue.popUpdatedEntityData()
+            this.updateQueue.popUpdatedData()
             )
         );
     }
@@ -99,6 +100,12 @@ class Synchronizer{
         }
     }
 
+    /**
+     * init all socket handlers,
+     * if data was sent by the server, this method (to be more exact, the handlers initialized in this method),
+     * receives and processes/distributes it.
+     * @private
+     */
     _initHandlers(){
         // get clientdata of this client
         this.socket.on(Packages.PROTOCOL.SERVER.RESPONSE_CLIENT_ACCEPTED, function(evt) {
@@ -127,110 +134,7 @@ class Synchronizer{
         this.socket.on(Packages.PROTOCOL.SERVER.CLIENT_DISCONNECTED, function (evt) {
             this.playerManager.removePlayer(evt.data.id)
         }.bind(this));
-
-
-
-        /*
-
-                this.entities[data.data.id].sprite.alpha = data.data.alpha;
-                // this.entities[data.data.id].sprite.scale.set(data.data.scale);
-
-                this.entities[data.data.id].sprite.oldScale= {x:this.entities[data.data.id].sprite.scale.x,y:this.entities[data.data.id].sprite.scale.y};
-                var scaleFactor = 1.1;
-                var hitArea = this.entities[data.data.id].sprite.hitArea;
-                this.entities[data.data.id].sprite.hitArea = null;
-                this.entities[data.data.id].sprite.scale.x *= scaleFactor;
-                this.entities[data.data.id].sprite.scale.y *= scaleFactor;
-                this.entities[data.data.id].sprite.hitArea = hitArea;
-                this.entities[data.data.id].sprite.grabbedBy = data.data.grabbedBy;
-
-                this.entities[data.data.id].sprite.bringToFront();
-            }.bind(this)
-        );
-
-        this.socket.on(Statics.PROTOCOL.CLIENT.DRAG_END,
-            function(data){
-                this.entities[data.data.id].sprite.alpha = data.data.alpha;
-                var hitArea = this.entities[data.data.id].sprite.hitArea;
-                this.entities[data.data.id].sprite.hitArea = null;
-                this.entities[data.data.id].sprite.scale.x = this.entities[data.data.id].sprite.oldScale.x;
-                this.entities[data.data.id].sprite.scale.y = this.entities[data.data.id].sprite.oldScale.y;
-                this.entities[data.data.id].sprite.hitArea = hitArea;
-                this.entities[data.data.id].sprite.oldScale = undefined;
-                this.entities[data.data.id].sprite.grabbedBy = undefined;
-            }.bind(this)
-        );
-
-        this.socket.on(Statics.PROTOCOL.CLIENT.DRAG_MOVE,
-            function(data){
-                this.entities[data.data.id].sprite.x = data.data.x;
-                this.entities[data.data.id].sprite.y = data.data.y;
-            }.bind(this)
-        );
-
-
-        this.socket.on(Statics.PROTOCOL.SERVER.CLIENT_CONNECTED,
-            function(data){
-                this.players[data.data.id] = data.data;
-
-                this.players[data.data.id].sprite = new PIXI.Sprite(this.player_texture);
-
-                this.players[data.data.id].sprite.anchor.x=1;
-                this.players[data.data.id].sprite.tint = data.data.color;
-                this.context.players.addChild(this.players[data.data.id].sprite);
-
-            }.bind(this)
-        );
-
-        this.socket.on(Statics.PROTOCOL.SERVER.CLIENT_DISCONNECTED,
-            function(data){
-
-                if (this.players[data.data.id].sprite.parent){
-                    this.players[data.data.id].sprite.parent.removeChild(this.players[data.data.id].sprite);
-                }
-
-                delete this.players[data.data.id];
-
-            }.bind(this)
-        );
-
-        this.socket.on(Statics.PROTOCOL.CLIENT.CLIENT_MOUSE_MOVE,
-            function(data){
-
-                if (!this.players[data.data.id].sprite.parent){
-                    return;
-                }
-
-                this.players[data.data.id].sprite.position.x = data.data.x;
-                this.players[data.data.id].sprite.position.y = data.data.y;
-            }.bind(this)
-        );
-
-        this.socket.on(Statics.PROTOCOL.CLIENT.TURN_CARD,
-            function(data){
-                console.log("ssdfsd");
-                if (!this.entities[data.data.id].sprite.parent){
-                    return;
-                }
-
-                this.entities[data.data.id].top = !data.data.top;
-
-                this.entities[data.data.id].turn(true);//.bind(this.entities[data.data.id]);
-
-            }.bind(this)
-        );
-
-        this.socket.on(Statics.PROTOCOL.SERVER.VANISH,
-            function(data){
-
-                this.context.world.removeAll();
-                this.entities = {};
-
-            }.bind(this)
-        );
-*/
     }
-
 
     sendMessage(type,msg){
         this.socket.emit(type,msg);

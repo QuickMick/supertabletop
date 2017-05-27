@@ -124,7 +124,9 @@ window.onload = function() {
             function resize() {
                 var x = screen.getBoundingClientRect();
                 app.renderer.resize(x.width,x.height);
+               // app.stage.interactionManager.resolution = app.renderer.resolution;
                 gameManager.toolManager.currentTool.focusCamera();//.bind(gameManager.toolManager.currentTool))();
+
             }
             resize();
             window.addEventListener("resize", resize);

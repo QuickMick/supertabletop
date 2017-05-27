@@ -82,6 +82,7 @@ class Synchronizer{
 
                         this.entityManager.entities[entityID].position.x = cpos.x;
                         this.entityManager.entities[entityID].position.y = cpos.y;
+                        this.entityManager.entities[entityID].rotation = updateData[type][entityID].angle;
                     }
                     break;
 

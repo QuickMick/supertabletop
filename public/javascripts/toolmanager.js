@@ -243,7 +243,8 @@ class SimpleDragTool extends BasicTool{
 
         this.synchronizer.updateQueue.postUpdate(Packages.PROTOCOL.GAME_STATE.USER_DRAG_END, this.synchronizer.CLIENT_INFO.id,
             {
-                releasedEntities:ids
+                releasedEntities:ids,
+                _mode:"push"
             }
         );
 

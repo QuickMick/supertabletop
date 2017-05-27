@@ -3,4 +3,9 @@
  * TODO: should be on db
  */
 module.exports = {};
-module.exports.GAME_DEFINITION_FILE="def.json";
+
+/**
+ * root directory is set in app.js
+ * @type {string}
+ */
+module.exports.ROOT="";

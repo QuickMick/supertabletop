@@ -9,7 +9,11 @@ var fs = require('fs');
 var Matter = require('matter-js');
 var Constraint = Matter.Constraint;
 
+
+
 var Packages = require('./../core/packages');
+
+var GameConfig = require('./gameconfig.json');
 
 var DefaultGame = require('./../public/resources/default_game.json');
 
@@ -121,8 +125,8 @@ class EntityServerManager {
             position:{
                 x:body.position.x,
                 y:body.position.y,
-                angle:body.angle
-            }
+            },
+            angle:body.angle
         });
 
         this.entities[body.ENTITY_ID].position.x = body.position.x;
@@ -136,7 +140,7 @@ class EntityServerManager {
      * @param game
      */
     loadGame(user,game){
-        var resource_path = Path.join(Globals.ROOT,"public",Config.PATHS.USERS_RESOURCES,user,game,Globals.GAME_DEFINITION_FILE); //path.join(global.appRoot, content_file);
+        var resource_path = Path.join(Globals.ROOT,"public",Config.PATHS.USERS_RESOURCES,user,game,GameConfig.GAME_DEFINITION_FILE); //path.join(global.appRoot, content_file);
         console.log("load game: "+resource_path);
 
         this._resetGame();
@@ -246,6 +250,12 @@ class EntityServerManager {
       //  body.entityData=entity;
         body.ENTITY_ID = entity.id;
 
+       /* body.inertia = 100;
+        body.mass = 100;*/
+       body.frictionAir = GameConfig.ENTITY_FRICTION;
+   //     Body.setInertia(body, 1);
+
+
         this.bodies[entity.id] = body;
         World.add(this.engine.world,body);
     }
@@ -259,37 +269,57 @@ class EntityServerManager {
         //TODO delete entity method
     }
 
-    claimEntity(userID, claimedEntityID){
+    claimEntity(userID, claimedEntityIDs){
         if(!this.clientManager.doesClientExist(userID)){
             console.warn("user does not exist");
             return;
         }
 
-        if(this.constraints[userID] && this.constraints[userID][claimedEntityID]){
-            console.log("constraint already exists fot user ",userID," and entity ",claimedEntityID);
-            return;
+        if(!claimedEntityIDs){
+            console.warn("nothing to claime passed");
         }
 
-        if(!this.bodies[claimedEntityID]){
-            console.warn("claimed entity ",claimedEntityID," does not exist!");
-        }
+        claimedEntityIDs = [].concat(claimedEntityIDs);
 
-        // create the constraint
-        var cPos = this.clientManager.getPosition(userID);
-        var constraint = Constraint.create({ pointA: cPos, bodyB: this.bodies[claimedEntityID], pointB: { x: 0, y: 0 } },
-            {
-                stiffness: 10
+        for(var i =0; i<claimedEntityIDs.length; i++) {
+            var claimedEntityID = claimedEntityIDs[i];
+
+            if (this.constraints[userID] && this.constraints[userID][claimedEntityID]) {
+                console.log("constraint already exists fot user ", userID, " and entity ", claimedEntityID);
+                return;
+            }
+
+            if (!this.bodies[claimedEntityID]) {
+                console.warn("claimed entity ", claimedEntityID, " does not exist!");
+            }
+
+            // create the constraint
+            var cPos = this.clientManager.getPosition(userID);
+
+            var constraint = Constraint.create({
+                label: userID,
+                pointA: cPos,
+                bodyB: this.bodies[claimedEntityID],
+                pointB: {x: 0, y: 0},
+                length: 0.01,
+                stiffness: 0.1,
+                angularStiffness: 1
             });
 
-        // save the constraint
-        if(!this.constraints[userID]) {
-            this.constraints[userID] = {};
-        }
-        constraint.ENTITY_ID = claimedEntityID;
-        this.constraints[userID][claimedEntityID] = constraint;
+            this.bodies[claimedEntityID].frictionAir = GameConfig.GRABBED_ENTITY_FRICTION;
 
-        // finally add the constraint to the world
-        World.add(this.engine.world,constraint);
+            // save the constraint
+            if (!this.constraints[userID]) {
+                this.constraints[userID] = {};
+            }
+
+
+            constraint.ENTITY_ID = claimedEntityID;
+            this.constraints[userID][claimedEntityID] = constraint;
+
+            // finally add the constraint to the world
+            World.add(this.engine.world, constraint);
+        }
     }
 
     /**
@@ -298,13 +328,17 @@ class EntityServerManager {
      * @param claimedEntityIDs {Array}
      */
     releaseEntities(userID, claimedEntityIDs){
+
         if(!this.clientManager.doesClientExist(userID)){
             console.warn("user does not exist");
             return;
         }
+        if(!claimedEntityIDs){
+            console.warn("nothing to claime passed");
+        }
 
         claimedEntityIDs = [].concat(claimedEntityIDs);
-        for(var i=0; i<claimedEntityIDs;i++){
+        for(var i=0; i<claimedEntityIDs.length;i++){
             var curEntity = claimedEntityIDs[i];
 
             // check if there is a constraint
@@ -312,7 +346,7 @@ class EntityServerManager {
                 console.log("constraint does not exists fot user ",userID," and entity ",curEntity);
                 return;
             }
-
+            this.bodies[curEntity].frictionAir = GameConfig.ENTITY_FRICTION;
             // if constraint exist, delete it
             World.remove(this.engine.world,this.constraints[userID][curEntity]);
             delete this.constraints[userID][curEntity];

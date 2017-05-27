@@ -201,12 +201,22 @@ class SimpleDragTool extends BasicTool{
     }
 
     /**
+     * called, when mouse moves
      * @Override
      * @param evt
      * @private
      */
     _onRawMouseMove(evt){
+        // get local position of the table, so kartesien cordinates {0,0} are the left upper corner of the table
         var localPos = evt.data.getLocalPosition(this.gameTable);
+
+        // if nothing has changed, then updating the server is not necessary
+        if(this._oldLocalPos
+            && this._oldLocalPos.x == localPos.y
+            && this._oldLocalPos.y == localPos.y){
+            return;
+        }
+        this._oldLocalPos=localPos;
 
         // return if mousepos is outside of the gametable
        /* if(localPos.x < 0

@@ -83,11 +83,24 @@ module.exports =
                 SERVER_ENTITY_TRANSFORMATION_UPDATE: "SERVER_ENTITY_TRANSFORMATION_UPDATE",
 
                 /**
+                 * is posted by server, when an entity is deleted,
+                 * data just contains the deleted entities id
+                 */
+                SERVER_ENTITY_DELETED: "ENTITY_DELETED",
+
+                /**
                  * is posted by server, when the state of the entity changes
                  * e.g. it gets dragged, then the entity is in the dragged state,
-                 * and it can be shown in a different way
+                 * and it can be shown in a different way.
+                 * the data of this event contains the time, when it was changed,
+                 * so just the newest update should be used
                  */
-                STATE_CHANGE:"STATE_CHANGE"
+                STATE_CHANGE:"STATE_CHANGE",
+
+                STATES:{
+                    ENTITY_SELECTED:"ENTITY_SELECTED",
+                    ENTITY_DRAGGED:"ENTITY_DRAGGED"
+                }
             },
             CLIENT:{
                 /**

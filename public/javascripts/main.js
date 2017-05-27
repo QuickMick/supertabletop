@@ -114,7 +114,7 @@ window.onload = function() {
     PIXI.loader.once('complete', function(){
 
         setTimeout(function () {
-            window.hideLoadingDialog();
+            //window.hideLoadingDialog();
 
             var gameManager =  new GameManager(app);
             gameManager.start();

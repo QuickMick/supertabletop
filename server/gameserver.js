@@ -32,7 +32,8 @@ class GameServer{
     }
 
     /**
-     * Broadcasts the recent updates to all clients
+     * Broadcasts the recent updates to all clients,
+     * is called in an regular interval
      * @private
      */
     _sendEntityUpdates(){
@@ -45,6 +46,12 @@ class GameServer{
         );
     }
 
+    /**
+     * is called once for every client who connects,
+     * everything necessary for the gameplay / client is initialized here
+     * @param socket of the connected client
+     * @private
+     */
     _onConnectionReceived(socket) {
 
         this.initClient(socket);
@@ -52,18 +59,27 @@ class GameServer{
         //removes this client from the serverclient list and broadcasts the information to all remaining clients
         socket.on('disconnect', function (data) {
             this.clientManager.clientDisconnected(socket, data);
-            this._boradcastExceptSender(socket, Packages.PROTOCOL.SERVER.CLIENT_DISCONNECTED, Packages.createEvent(this.ID, {id: socket.id}));
-            //TODO: broadcast that client disconnects
+            this._boradcastExceptSender(
+                socket,
+                Packages.PROTOCOL.SERVER.CLIENT_DISCONNECTED,
+                Packages.createEvent(
+                    this.ID,
+                    {id: socket.id}
+                )
+            );
         }.bind(this));
 
         // server receives client entity updates in this event
         socket.on(Packages.PROTOCOL.CLIENT.SEND_STATE, function (evt) {
-         //   this.entityServerManager.processPlayerUpdates(evt.data);
-
             this._processUpdates(evt.data);
         }.bind(this));
     }
 
+    /**
+     * process the posted updates of all players
+     * @param data
+     * @private
+     */
     _processUpdates(data){
         for(var type in data){
             if(!data.hasOwnProperty(type)) continue;
@@ -71,14 +87,18 @@ class GameServer{
                 if(!data[type].hasOwnProperty(id)) continue;
 
                 switch (type) {
+                    // an user claimes an entity
                     case Packages.PROTOCOL.GAME_STATE.ENTITY.USER_DRAG_START:
                         this.entityServerManager.claimEntity(id, data[type][id].claimedEntity);
                         break;
+                    // an user releases an entity
                     case Packages.PROTOCOL.GAME_STATE.ENTITY.USER_DRAG_END:
                         this.entityServerManager.releaseEntities(id, data[type][id].releasedEntities);
                         break;
+                    // an user moves his mouse
                     case Packages.PROTOCOL.GAME_STATE.CLIENT.USER_MOUSE_POSITION:
                         var changed = this.clientManager.updateClientPosition(id,data[type][id].position);
+                        // distribute the new position to every other users
                         if(changed) {
                             this.updateQueue.postUpdate(
                                 Packages.PROTOCOL.GAME_STATE.CLIENT.SERVER_CLIENT_POSITION_UPDATE,
@@ -92,7 +112,11 @@ class GameServer{
         }
     }
 
-
+    /**
+     * a new client enters the server,
+     * distribute the information about the client to itself and to every other player
+     * @param socket
+     */
     initClient(socket){
 
         // TODO: load clientinfo from database

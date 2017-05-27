@@ -58,8 +58,14 @@ class PlayerManager extends PIXI.Container {
 
             // finaly add the cursor to this container
             this.addChild(this.players[player_data.id]);
+            console.log(player_data.id,"connected");
         }
     };
+
+    initCurrentPlayer(data){
+        this.addPlayer(data);
+        this.players[data.id].isCurrentPlayer = true;
+    }
 
     /**
      * changes the displayed image of the player
@@ -84,13 +90,64 @@ class PlayerManager extends PIXI.Container {
      * @param @type{String} id of the player
      */
     removePlayer(id) {
+        if(!id || !id.length || id.length <=0){
+            console.warn("no player id passed");
+            return;
+        }
+
+
         if (!this.players[id]) {
-            console.error("player does not exist - id:", id);
+            console.warn("player does not exist - id:", id);
             return;
         }
 
         this.removeChild(this.players[id]);
         delete this.players[id];
+
+        console.log(id,"disconnected");
+    }
+
+    /**
+     * updates the player positions.
+     * the passed data should be an object in the format {entityID:{<updated data<}}
+     * calls updatePlayerPosition for every element in the object
+     * @param data {object}
+     */
+    batchUpdatePlayerPosition(data){
+        for(var clientID in data) {
+            if(!data.hasOwnProperty(clientID)) continue;
+            this.updatePlayerPosition(clientID,data[clientID]);
+        }
+    }
+
+    /**
+     * Updates the position of an player,
+     * if the updateposition is the player of this current session,
+     * then the update has no impact
+     * @param playerID id of the player whos position updates
+     * @param data update data {x:0,y:0};
+     */
+    updatePlayerPosition(playerID, data){
+        if(!playerID || !playerID.length || playerID.length <=0){
+            console.warn("no player id passed");
+            return;
+        }
+
+        // do not update, if id refers to the human player
+        if(this.players[playerID].isCurrentPlayer){
+           // console.warn("cannot update human player");
+            return;
+        }
+
+        if(!data){
+            console.warn("no updated data passed for id",playerID);
+            return;
+        }
+
+        var cur = this.players[playerID].position;
+        // if no data is passed, do not change
+        cur.x = data.x || cur.x;
+        cur.y = data.y || cur.y;
     }
 
 }

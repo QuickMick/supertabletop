@@ -44,13 +44,18 @@ class EntityManager extends PIXI.Container{
     }
 
     /**
-     * remove and deletes an antity from the entitymanager.
-     * @param id of the entity, which should get deleted
+     * remove and deletes an antity from the entitymanager/ game.
+     * @param id of the entity, which should get deleted, also arrays of ids are accepted
      */
-    removeEntity(id){
-        var c = this.entities[id];
-        this.removeChild(c);
-        delete this.entities[c];
+    removeEntity(ids){
+        ids = [].concat(ids);
+
+        for(var i=0; i<ids.length;i++) {
+            var id = ids[i];
+            var c = this.entities[id];
+            this.removeChild(c);
+            delete this.entities[c];
+        }
     }
 
     /**
@@ -60,6 +65,51 @@ class EntityManager extends PIXI.Container{
         for(let id in this.entities){
             this.removeEntity(id);
         }
+    }
+
+    /**
+     * updates the entities transformation,
+     * the passed data should be an object in the format {entityID:{<updated data<}}
+     * calls updateEntityTransformation for every elemnt in the object
+     * @param data {object}
+     */
+    batchUpdateEntityTransformation(data){
+        if(!data){
+            console.warn("no update data passed");
+            return;
+        }
+        for(var entityID in data){
+            if(!data.hasOwnProperty(entityID))continue;
+            this.updateEntityTransformation(entityID,data[entityID]);
+        }
+    }
+
+    /**
+     * used to update an entities position and rotation(angle)
+     * @param entityID id of the entity, of which the transformation should be changed
+     * @param transformation the changed data of the entity related to the id
+     */
+    updateEntityTransformation(entityID,transformation){
+        if(!entityID || !entityID.length || entityID.length <=0){
+            console.warn("entity id is necessary to update enitty");
+            return;
+        }
+
+        if(!transformation){
+            console.warn("no transformation data for entity",entityID,"was passed");
+            return;
+        }
+
+        var cur = this.entities[entityID];
+
+        // just change the available values, e.g. sometimes,
+        // just angle is sent, when just the angle is changes
+        if(transformation.position) {
+            cur.position.x = transformation.position.x || cur.position.x;
+            cur.position.y = transformation.position.y || cur.position.y;
+        }
+        // change rotation, if available
+        cur.rotation = transformation.angle || cur.rotation;
     }
 }
 

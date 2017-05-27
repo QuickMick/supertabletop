@@ -71,34 +71,29 @@ class Synchronizer{
         );
     }
 
+    /**
+     * processes the batched updates, received from the server
+     * @param updateData
+     */
     processServerUpdates(updateData){
         for(var type in updateData){
             if(!updateData.hasOwnProperty(type)) continue;
 
-            switch (type){
-                case Packages.PROTOCOL.GAME_STATE.ENTITY.SERVER_ENTITY_TRANSFORMATION_UPDATE:
-                    for(var entityID in updateData[type]){
-                        var cpos = updateData[type][entityID].position;
-                        var cur = this.entityManager.entities[entityID];
+            var updates = updateData[type];
 
-                        // just change the available values, e.g. sometimes,
-                        // just angle is sent, when just the angle is changes
-                        if(cpos) {
-                            cur.position.x = cpos.x || cur.position.x;
-                            cur.position.y = cpos.y || cur.position.y;
-                        }
-                        cur.rotation = updateData[type][entityID].angle || cur.rotation;
-                    }
+            switch (type){
+                // entity position or rotation has updated
+                case Packages.PROTOCOL.GAME_STATE.ENTITY.SERVER_ENTITY_TRANSFORMATION_UPDATE:
+                    this.entityManager.batchUpdateEntityTransformation(updates);
+                    break;
+                // mouse of other players moves
+                case Packages.PROTOCOL.GAME_STATE.CLIENT.SERVER_CLIENT_POSITION_UPDATE:
+                    this.playerManager.batchUpdatePlayerPosition(updates);
                     break;
 
-                // ouse moves
-                case Packages.PROTOCOL.GAME_STATE.CLIENT.SERVER_CLIENT_POSITION_UPDATE:
-                    for(var clientID in updateData[type]){
-                        if(!updateData[type].hasOwnProperty(clientID) ||clientID == this.CLIENT_INFO.id) continue;
-                        var cpos = updateData[type][clientID];
-                        this.playerManager.players[clientID].position.x = cpos.x;//+this.gameManager.gameTable.position.x;
-                        this.playerManager.players[clientID].position.y = cpos.y;//+this.gameManager.gameTable.position.y;
-                    }
+                // an entity gets deleted by an player or by the server
+                case Packages.PROTOCOL.GAME_STATE.ENTITY.SERVER_ENTITY_DELETED:
+                    this.entityManager.removeEntity(Object.keys(updates));
                     break;
             }
         }
@@ -108,6 +103,9 @@ class Synchronizer{
         // get clientdata of this client
         this.socket.on(Packages.PROTOCOL.SERVER.RESPONSE_CLIENT_ACCEPTED, function(evt) {
             this.CLIENT_INFO = evt.data;
+            console.log("Clientdata received");
+            this.playerManager.initCurrentPlayer(evt.data);
+            window.hideLoadingDialog();
         }.bind(this));
 
         // receive data about the dame (after initialisation, or gamechange
@@ -124,6 +122,13 @@ class Synchronizer{
         this.socket.on(Packages.PROTOCOL.SERVER.CLIENT_CONNECTED, function (evt) {
             this.playerManager.addPlayer(evt.data)
         }.bind(this));
+
+        // an client disconnects
+        this.socket.on(Packages.PROTOCOL.SERVER.CLIENT_DISCONNECTED, function (evt) {
+            this.playerManager.removePlayer(evt.data.id)
+        }.bind(this));
+
+
 
         /*
 

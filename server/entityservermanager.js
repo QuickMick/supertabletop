@@ -266,16 +266,14 @@ class EntityServerManager {
                 console.warn("entity has no hirarea - collisions will not affect it");
                 return;
         }
-      //  body.entityData=entity;
-        body.ENTITY_ID = entity.id;
 
-       /* body.inertia = 100;
-        body.mass = 100;*/
-       body.frictionAir = GameConfig.ENTITY_FRICTION;
-   //     Body.setInertia(body, 1);
+        body.ENTITY_ID = entity.id;
+        body.frictionAir = GameConfig.ENTITY_FRICTION;
 
 
         this.bodies[entity.id] = body;
+        //this.bodies[entity.id].entityData = this.entities[this.lastID];
+
         World.add(this.engine.world,body);
     }
 
@@ -302,6 +300,12 @@ class EntityServerManager {
             World.add(this.engine.world, this.bodies[id]);
             delete this.bodies[id];
         }
+
+        this.updateQueue.postUpdate(
+            Packages.PROTOCOL.GAME_STATE.ENTITY.SERVER_ENTITY_DELETED,
+            id,
+            {}
+        );
     }
 
     claimEntity(userID, claimedEntityIDs){
@@ -314,8 +318,10 @@ class EntityServerManager {
             console.warn("nothing to claime passed");
         }
 
+        // if passed value is no array, then converte it to one
         claimedEntityIDs = [].concat(claimedEntityIDs);
 
+        // iterated the claimed ids
         for(var i =0; i<claimedEntityIDs.length; i++) {
             var claimedEntityID = claimedEntityIDs[i];
 
@@ -389,6 +395,29 @@ class EntityServerManager {
             World.remove(this.engine.world,this.constraints[userID][curEntity]);
             delete this.constraints[userID][curEntity];
         }
+    }
+
+    /**
+     * posts state changes
+     * @param userID
+     * @param entityID
+     * @param state new state of the entity
+     * @param data {object}
+     * @private
+     */
+    _postStateChange(userID,entityID,state,data){
+        var result = Object.assign({
+            userID:userID,
+            state:state,
+        },data);
+
+        this.entities.state = result;
+
+        this.updateQueue.postUpdate(
+            Packages.PROTOCOL.GAME_STATE.ENTITY.SERVER_ENTITY_TRANSFORMATION_UPDATE,
+            entityID,
+            result
+        );
     }
 }
 

@@ -96,7 +96,7 @@ class Synchronizer{
                     break;
                 // the state of an entiy changes
                 case Packages.PROTOCOL.GAME_STATE.ENTITY.STATE_CHANGE:
-                    console.log(updates);
+                    this.entityManager.batchUpdateEntityStateChange(updates);
                     break;
             }
         }

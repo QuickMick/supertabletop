@@ -41,16 +41,16 @@ class BasicTool{
 
         this.entityManager.on("entityclicked",this._onEntityClicked.bind(this));
 
-        this.selectionFilter =new PIXI.filters.BloomFilter();
+      //  this.selectionFilter =new PIXI.filters.BloomFilter();
     }
 
     _onEntityClicked(evt){
         this.SELECTED_ENTITIES.push(evt.entity);
-         evt.entity.filters = (evt.entity.filters || []).concat([this.selectionFilter]);
+      //   evt.entity.filters = (evt.entity.filters || []).concat([this.selectionFilter]);
     }
 
     _releaseSelection(evt){
-        for(var i=0;i<this.SELECTED_ENTITIES.length;i++){
+      /*  for(var i=0;i<this.SELECTED_ENTITIES.length;i++){
             // create a new array, which contains every filter, except the selection filter
             var n = [];
             var filters = this.SELECTED_ENTITIES[i].filters;
@@ -65,7 +65,7 @@ class BasicTool{
             }else {
                 this.SELECTED_ENTITIES[i].filters = n;
             }
-        }
+        }*/
         this.SELECTED_ENTITIES =[];
     }
 

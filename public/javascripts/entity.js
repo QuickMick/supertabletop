@@ -18,9 +18,23 @@ class Entity extends PIXI.Sprite {
         super(PIXI.loader.resources[DEFAULT_RESOURCES.missing_texture_substitute.texture].texture);
 
         /**
+         * contains the state of the entits,
+         * states are definide in package.js.
+         * it is initialized with an default state.
+         * it has a timestamp.
+         * used e.g. to handle the selection of different players
+         * @type {any}
+         */
+        this.state = entity.state;
+        delete entity.state;    // not needed anymore, it is set to raw data,
+                                // where state would never change but the state is dynamical
+
+        /**
          * the raw data which was used to initialize the entity
          */
         this.rawData = entity;
+
+
 
         // ensure, that the surfaces object is an array, if not, then convert it to an array
         entity.surfaces = Array.isArray(entity.surfaces) ? entity.surfaces : [].concat(entity.surfaces);

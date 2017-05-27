@@ -63,6 +63,11 @@ class PlayerManager extends PIXI.Container {
     };
 
     initCurrentPlayer(data){
+        if(!data){
+            console.error("cannot init player without data");
+            return;
+        }
+
         this.addPlayer(data);
         this.players[data.id].isCurrentPlayer = true;
     }
@@ -72,17 +77,27 @@ class PlayerManager extends PIXI.Container {
      * @param id of the player
      * @param cursor_type new cursortype
      */
-    changeCursor(id,cursor_type){
+    changeCursor(playerID,cursor_type){
+        if(!playerID || !playerID.length || playerID.length <=0){
+            console.warn("no player id passed");
+            return;
+        }
+
+        if(!this.players[playerID]){
+            console.warn("player",playerID,"does not exist! cursor cannot get updated");
+            return;
+        }
+
         var cursor = CursorLibrary[cursor_type];
         if(!cursor){
             console.error("cursor not found: ",cursor_type);
             return;
         }
-        this.players[id].texture = PIXI.loader.resources[cursor.texture].texture;
+        this.players[playerID].texture = PIXI.loader.resources[cursor.texture].texture;
 
         // set the anchor of the the cursor, depending on the texture defined in the json file
-        this.players[id].anchor.x = cursor.anchor.x || 0;
-        this.players[id].anchor.y = cursor.anchor.y || 0;
+        this.players[playerID].anchor.x = cursor.anchor.x || 0;
+        this.players[playerID].anchor.y = cursor.anchor.y || 0;
     }
 
     /**
@@ -129,6 +144,11 @@ class PlayerManager extends PIXI.Container {
     updatePlayerPosition(playerID, data){
         if(!playerID || !playerID.length || playerID.length <=0){
             console.warn("no player id passed");
+            return;
+        }
+
+        if(!this.players[playerID]){
+            console.warn("player",playerID,"does not exist! position cannot get updated");
             return;
         }
 

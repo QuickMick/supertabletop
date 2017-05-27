@@ -28,6 +28,10 @@ class EntityManager extends PIXI.Container{
     }
 
     addEntity(entity){
+        if(!entity){
+            console.warn("no entity to add was passed");
+        }
+
         this.entities[entity.ENTITY_ID] = entity;
         this.addChild(entity);
 
@@ -52,9 +56,15 @@ class EntityManager extends PIXI.Container{
 
         for(var i=0; i<ids.length;i++) {
             var id = ids[i];
+
+            if(!id || this.entities[id]){
+                console.log("entity",id,"does not exist");
+                continue;
+            }
+
             var c = this.entities[id];
             this.removeChild(c);
-            delete this.entities[c];
+            delete this.entities[id];
         }
     }
 
@@ -90,8 +100,13 @@ class EntityManager extends PIXI.Container{
      * @param transformation the changed data of the entity related to the id
      */
     updateEntityTransformation(entityID,transformation){
-        if(!entityID || !entityID.length || entityID.length <=0){
+        if(!entityID){
             console.warn("entity id is necessary to update enitty");
+            return;
+        }
+
+        if(!this.entities[entityID]){
+            console.warn("entity",entityID,"does not exist!");
             return;
         }
 
@@ -111,6 +126,35 @@ class EntityManager extends PIXI.Container{
         // change rotation, if available
         cur.rotation = transformation.angle || cur.rotation;
     }
+
+    batchUpdateEntityStateChange(data){
+        if(!data){
+            console.warn("no update data passed");
+            return;
+        }
+        for(var entityID in data){
+            if(!data.hasOwnProperty(entityID))continue;
+            this.updateEntityStateChange(entityID,data[entityID]);
+        }
+    }
+
+    updateEntityStateChange(entityID,stateUpdate){
+        if(!entityID){
+            console.warn("entity id is necessary to update enitty");
+            return;
+        }
+        if(!this.entities[entityID]){
+            console.warn("entity",entityID,"does not exist!");
+            return;
+        }
+
+        if(!stateUpdate){
+            console.warn("no state update  for entity",entityID,"was passed");
+            return;
+        }
+        //TODO
+    }
+
 }
 
 module.exports= EntityManager;

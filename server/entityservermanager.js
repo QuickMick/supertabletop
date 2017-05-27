@@ -5,11 +5,10 @@
 
 var Path = require('path');
 var fs = require('fs');
+var EventEmitter3 = require('eventemitter3');
 
 var Matter = require('matter-js');
 var Constraint = Matter.Constraint;
-
-
 
 var Packages = require('./../core/packages');
 
@@ -28,10 +27,12 @@ var Globals = require('./globals');
 
 const DEFAULT_BODY_SIZE = 100;
 
-class EntityServerManager {
+const EVT_BEFORE_UPDATE = 'beforeUpdate';
+
+class EntityServerManager extends EventEmitter3 {
 
     constructor(ticks=60,updateQueue,clientManager){
-
+        super();
         Body.update_original = Body.update;
         Body.update = this._bodyUpdateOverwrite.bind(this);
 
@@ -96,7 +97,16 @@ class EntityServerManager {
         this.constraints={};
         this.game = Object.assign({},DefaultGame);
         this.engine = Engine.create();
-        this.engine.world.gravity.y = 0;
+
+        // no gravity, because topdown
+        this.engine.world.gravity.y = this.engine.world.gravity.x= 0;
+
+        // add before update event, so that all received updates from the clients
+        // can be executed before an engine-step
+        Matter.Events.on(this.engine,
+        'beforeUpdate', function () {
+           this.emit(EVT_BEFORE_UPDATE);
+        }.bind(this));
     }
 
     /**

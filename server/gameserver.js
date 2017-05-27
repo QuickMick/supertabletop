@@ -21,14 +21,33 @@ class GameServer{
         this.clientManager = new ClientManager();
         this.updateQueue =  new UpdateQueue();
         this.entityServerManager = new EntityServerManager(60,this.updateQueue,this.clientManager);
+        this.entityServerManager.on('beforeUpdate',this._processReceivedUpdateQueue.bind(this));
+
+        /**
+         * all updates, which are received by the clients are stored in this array
+         * and processed, before a physic engines step
+         * @type {Array}
+         */
+        this.receivedUpdateQueue = [];
     }
 
     start(){
         this.io.on('connection', this._onConnectionReceived.bind(this));
-
         setInterval(this._sendEntityUpdates.bind(this), Packages.PROTOCOL.CLIENT_UPDATE_INTERVAL);
 
         this.entityServerManager.loadGame("mick","codewords"); //TODO nicht statisch machen und durch user triggern lassen
+    }
+
+    /**
+     * processes the received updates
+     * @private
+     */
+    _processReceivedUpdateQueue(){
+        var currentQueue = this.receivedUpdateQueue;
+        this.receivedUpdateQueue = [];
+        for(var i=0; i< currentQueue.length;i++){
+            this._processUpdates(currentQueue[i]);
+        }
     }
 
     /**
@@ -54,7 +73,7 @@ class GameServer{
      */
     _onConnectionReceived(socket) {
 
-        this.initClient(socket);
+        this._initClient(socket);
 
         //removes this client from the serverclient list and broadcasts the information to all remaining clients
         socket.on('disconnect', function (data) {
@@ -71,7 +90,8 @@ class GameServer{
 
         // server receives client entity updates in this event
         socket.on(Packages.PROTOCOL.CLIENT.SEND_STATE, function (evt) {
-            this._processUpdates(evt.data);
+            // the received updates are processes everytime before the engine is processed.
+            this.receivedUpdateQueue.push(evt.data);
         }.bind(this));
     }
 
@@ -122,7 +142,7 @@ class GameServer{
      * distribute the information about the client to itself and to every other player
      * @param socket
      */
-    initClient(socket){
+    _initClient(socket){
 
         // TODO: load clientinfo from database
         var clientInfo = {

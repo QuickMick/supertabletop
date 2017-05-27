@@ -266,7 +266,23 @@ class EntityServerManager {
     }*/
 
     _removeEntity(id){
-        //TODO delete entity method
+
+        if(!id || !id.length ||  id.length <0 || !this.entities[id]){
+            console.warn("entity does not exist or no id passed :",id);
+            return;
+        }
+
+        delete this.entities[id];
+
+        if(this.constraints[id]) {
+            World.add(this.engine.world, this.constraints[id]);
+            delete this.constraints[id];
+        }
+
+        if(this.bodies[id]){
+            World.add(this.engine.world, this.bodies[id]);
+            delete this.bodies[id];
+        }
     }
 
     claimEntity(userID, claimedEntityIDs){
@@ -316,9 +332,9 @@ class EntityServerManager {
 
             constraint.ENTITY_ID = claimedEntityID;
             this.constraints[userID][claimedEntityID] = constraint;
-
-            // finally add the constraint to the world
             World.add(this.engine.world, constraint);
+            // finally add the constraint to the world
+
         }
     }
 

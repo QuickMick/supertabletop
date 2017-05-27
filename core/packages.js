@@ -68,14 +68,17 @@ module.exports =
                 /**
                  * is posted by client, when entity gets dragged
                  */
-                USER_DRAG_START: "ENTITY_DRAG_START",
+                USER_CLAIM_ENTITY: "ENTITY_DRAG_START",
 
                 /**
                  * is posted by client, when entity is not dragged anymore
                  */
-                USER_DRAG_END: "ENTITY_DRAG_END",
+                USER_RELEASE_ENTITY: "ENTITY_DRAG_END",
 
-
+                /**
+                 * is posted by client, when he rotates an entity
+                 */
+                USER_ROTATE_ENTITY: "USER_ROTATE_ENTITY",
 
                 /**
                  * is posted by server, when an entity moves or rotates
@@ -87,6 +90,12 @@ module.exports =
                  * data just contains the deleted entities id
                  */
                 SERVER_ENTITY_DELETED: "ENTITY_DELETED",
+
+
+                /**
+                 * reject a user aciton, e.g. claim
+                 */
+                SERVER_REJECT_ACTION:"SERVER_REJECT_ACTION",
 
                 /**
                  * is posted by server, when the state of the entity changes

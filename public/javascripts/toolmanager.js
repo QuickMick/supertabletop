@@ -2,8 +2,6 @@
  * Created by Mick on 24.05.2017.
  */
 'use strict';
-require('pixi-filters');
-require('pixi-extra-filters');
 
 var Packages = require('./../../core/packages');
 
@@ -48,6 +46,9 @@ class BasicTool{
         this.entityManager.on("entityclicked",this._onEntityClicked.bind(this));
 
       //  this.selectionFilter =new PIXI.filters.BloomFilter();
+    }
+    update(delta){
+
     }
 
     _onEntityClicked(evt){
@@ -106,6 +107,12 @@ class BasicTool{
 
     set SELECTED_ENTITIES(v){
         this._selected_entities = v || [];
+    }
+
+    get SELECTED_ENTITY_IDS(){
+        return this.SELECTED_ENTITIES.map(function(obj){
+            return obj.ENTITY_ID;
+        });
     }
 
     get min_zoom(){
@@ -224,7 +231,17 @@ class SimpleDragTool extends BasicTool{
 
     _onEntityClicked(evt){
         super._onEntityClicked(evt);
-        this.synchronizer.updateQueue.postUpdate(Packages.PROTOCOL.GAME_STATE.ENTITY.USER_DRAG_START,this.synchronizer.CLIENT_INFO.id,
+
+        if(!this.entityManager.entities[evt.entity.ENTITY_ID]){
+            console.log("cannot claim entity which does not exist");
+            return;
+        }
+        if(this.entityManager.entities[evt.entity.ENTITY_ID].state.state ==Packages.PROTOCOL.GAME_STATE.ENTITY.STATES.ENTITY_SELECTED){
+            console.log("entity already claimed");
+            return;
+        }
+
+        this.synchronizer.updateQueue.postUpdate(Packages.PROTOCOL.GAME_STATE.ENTITY.USER_CLAIM_ENTITY,this.synchronizer.CLIENT_INFO.id,
             {
                 claimedEntity:evt.entity.ENTITY_ID,
                 _mode:"push"
@@ -233,14 +250,14 @@ class SimpleDragTool extends BasicTool{
     }
 
     _releaseSelection(evt) {
-
         //this selection release
-        var ids = [];
+        var ids = this.SELECTED_ENTITY_IDS;
+            /*[];
         for(var i=0; i<this.SELECTED_ENTITIES.length;i++){
             ids.push(this.SELECTED_ENTITIES[i].ENTITY_ID);
-        }
+        }*/
 
-        this.synchronizer.updateQueue.postUpdate(Packages.PROTOCOL.GAME_STATE.ENTITY.USER_DRAG_END, this.synchronizer.CLIENT_INFO.id,
+        this.synchronizer.updateQueue.postUpdate(Packages.PROTOCOL.GAME_STATE.ENTITY.USER_RELEASE_ENTITY, this.synchronizer.CLIENT_INFO.id,
             {
                 releasedEntities:ids,
                 _mode:"push"
@@ -248,6 +265,39 @@ class SimpleDragTool extends BasicTool{
         );
 
         super._releaseSelection(evt);
+    }
+
+
+    update(delta){
+        super.update(delta);
+        var ids = this.SELECTED_ENTITY_IDS;
+        // if there is no selection, there is nothing to do
+        if(ids.length <=0) return;
+
+        var rotationAmount = 0;
+        if(this.inputHanlder.mapping.ROTATE_RIGHT.isDown){
+            rotationAmount += 1*delta;
+        }else if(this.inputHanlder.mapping.ROTATE_LEFT.isDown){
+            rotationAmount += -1*delta;
+        }
+
+        if(rotationAmount != 0){
+            // add the rotation amount
+            this.synchronizer.updateQueue.postUpdate(Packages.PROTOCOL.GAME_STATE.ENTITY.USER_ROTATE_ENTITY, this.synchronizer.CLIENT_INFO.id,
+                {
+                    rotationAmount:rotationAmount,
+                    _mode:"add"
+                }
+            );
+            // and add the affected entities
+            this.synchronizer.updateQueue.postUpdate(Packages.PROTOCOL.GAME_STATE.ENTITY.USER_ROTATE_ENTITY, this.synchronizer.CLIENT_INFO.id,
+                {
+                    rotatedEntities:ids,
+                    _mode:"pushAvoidDuplicates"
+                }
+            );
+        }
+
     }
 }
 
@@ -278,10 +328,9 @@ class ToolManager{
         return this.tools[this._selectedToolIndex];
     }
 
-
     batchUpdateEntityStateChange(data){
         if(!data){
-            console.warn("no update data passed");
+            console.warn("statechange: no update data passed");
             return;
         }
         for(var entityID in data){
@@ -325,6 +374,7 @@ class ToolManager{
                 // to his selection
                 if(this.synchronizer.CLIENT_INFO.id == stateUpdate.userID){
                     this.currentTool.SELECTED_ENTITIES.push(curEntity);
+                    curEntity.alpha = 0.8;
                 }
 
                 // add the filter, so that it is visible,
@@ -349,7 +399,7 @@ class ToolManager{
             case Packages.PROTOCOL.GAME_STATE.ENTITY.STATES.ENTITY_DEFAULT_STATE:
                 // if enttiy was selected, unselect it
                 if(curEntity.state.state == Packages.PROTOCOL.GAME_STATE.ENTITY.STATES.ENTITY_SELECTED) {
-
+                    curEntity.alpha = 1;
                     // check if there is a filter available and remove it from the entity, if it was selected previously
                     if(curEntity.tmpSelectionFilter) {
                         curEntity.removeFilter(curEntity.tmpSelectionFilter);
@@ -360,6 +410,10 @@ class ToolManager{
         }
 
         curEntity.state = stateUpdate;
+    }
+
+    update(delta){
+        this.currentTool.update(delta);
     }
 }
 

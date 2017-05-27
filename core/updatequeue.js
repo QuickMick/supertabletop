@@ -22,7 +22,8 @@ class UpdateQueue{
      * @param type of the change
      * @param id affeced item/entity/player
      * @param data changed data {data1:asd, data2:4,_mode= push(if item should be pushed to existing array, or add
-     *          if data should be added to existing value  --> creates empty data fist in both cases if not existing}
+     *          if data should be added to existing value  --> creates empty data fist in both cases if not existing,
+     *          or pushAvoidDuplicates, pushes values to the array and avoids duplicate values}
      */
     postUpdate(type, id, data){
         if(!id || !data){
@@ -56,6 +57,14 @@ class UpdateQueue{
                             if(!this._queue[type][id][key]) this._queue[type][id][key] = [];
                             this._queue[type][id][key] = this._queue[type][id][key].concat(updatedData[key]);
                             break;
+                        case "pushAvoidDuplicates":
+                            if(!this._queue[type][id][key]) this._queue[type][id][key] = [];
+                            // convert the concatinated array to a set, to avoid duplicates, then convert back to array
+                            this._queue[type][id][key] = [...new Set(this._queue[type][id][key].concat(updatedData[key]))];
+                            break;
+                        default:
+                            console.error("mode",updatedData._mode,"does not exist!");
+                            return;
                     }
                 } else { // otherwise just replace
                     this._queue[type][id][key] = updatedData[key];
@@ -70,6 +79,12 @@ class UpdateQueue{
     }
 
     /**
+     * removes all posted updates
+     */
+    flush(){
+        this._queue = {_sendUpdateRequired:false};
+    }
+    /**
      * get data which has changed since the last call, every changes will be deleted in this instance
      */
     popUpdatedData(){
@@ -77,8 +92,9 @@ class UpdateQueue{
         if(!this._queue._sendUpdateRequired) return null;
 
         var toSend = this._queue;
-        this._queue = {_sendUpdateRequired:false};
         delete toSend._sendUpdateRequired;
+
+        this.flush();
 
         return toSend;
     }

@@ -1,6 +1,7 @@
 
 ####################################################  ISSUES  ##########################################################
 -isSensor bei drag an un aus is noch n bissl buggy
+-outlinefilter bei drehung buggy
 
 
 #####################################################  TODOS  ##########################################################
@@ -10,7 +11,8 @@
 
 - table boundaries
 
--show selection of other players
+- claim rejected -> remove entity from user selection
+    - prevent user from modifing card which he has not claimed
 
 functions:
 -turn card

@@ -88,12 +88,17 @@ class GameServer{
 
                 switch (type) {
                     // an user claimes an entity
-                    case Packages.PROTOCOL.GAME_STATE.ENTITY.USER_DRAG_START:
+                    case Packages.PROTOCOL.GAME_STATE.ENTITY.USER_CLAIM_ENTITY:
                         this.entityServerManager.claimEntity(id, data[type][id].claimedEntity);
                         break;
                     // an user releases an entity
-                    case Packages.PROTOCOL.GAME_STATE.ENTITY.USER_DRAG_END:
+                    case Packages.PROTOCOL.GAME_STATE.ENTITY.USER_RELEASE_ENTITY:
                         this.entityServerManager.releaseEntities(id, data[type][id].releasedEntities);
+                        break;
+
+                    // an user wants to rotate an entity
+                    case Packages.PROTOCOL.GAME_STATE.ENTITY.USER_ROTATE_ENTITY:
+                        this.entityServerManager.batchRotateEntities(id, data[type][id]);
                         break;
                     // an user moves his mouse
                     case Packages.PROTOCOL.GAME_STATE.CLIENT.USER_MOUSE_POSITION:

@@ -28,7 +28,7 @@ class Synchronizer{
             verification
             }
          */
-        this.CLIENT_INFO = null;
+        this.CLIENT_INFO = {};
 
         /**
          * used to detect updates which were done by the client
@@ -48,8 +48,6 @@ class Synchronizer{
         this.entityManager = null;
         this.toolManager = null;
         this.playerManager = null;
-
-
     }
 
     init(){
@@ -64,23 +62,67 @@ class Synchronizer{
 
         this.socket = require('socket.io-client').connect();
         this._initHandlers();
-
-        //this intervall sends the entityupdates.
-        setInterval(this._sendEntityUpdates.bind(this), Packages.PROTOCOL.CLIENT_UPDATE_INTERVAL);
     }
 
     /**
-     * sends game updates from client to server, if changes are detected
+     * sends game updates from client to server, if changes are detected,
+     * is started as soon as client_info is received
      * @private
      */
-    _sendEntityUpdates(){
-        if(!this.updateQueue.updateRequired) return;
+    _startUpdating(){
+        //this interval sends the entityupdates.
+        this.updateQueue.flush();
+        setInterval(function(){
+            if(!this.updateQueue.updateRequired) return;
 
-        this.sendMessage(Packages.PROTOCOL.CLIENT.SEND_STATE,Packages.createEvent(
-            this.CLIENT_INFO.id,
-            this.updateQueue.popUpdatedData()
-            )
-        );
+            this.sendMessage(Packages.PROTOCOL.CLIENT.SEND_STATE,Packages.createEvent(
+                this.CLIENT_INFO.id,
+                this.updateQueue.popUpdatedData()
+                )
+            );
+        }.bind(this),
+        Packages.PROTOCOL.CLIENT_UPDATE_INTERVAL);
+    }
+
+    /**
+     * init all socket handlers,
+     * if data was sent by the server, this method (to be more exact, the handlers initialized in this method),
+     * receives and processes/distributes it.
+     * @private
+     */
+    _initHandlers(){
+        // get clientdata of this client
+        this.socket.on(Packages.PROTOCOL.SERVER.RESPONSE_CLIENT_ACCEPTED, function(evt) {
+            this.CLIENT_INFO = evt.data;
+            console.log("Clientdata received");
+            this.playerManager.initCurrentPlayer(evt.data);
+            this._startUpdating();
+            window.hideLoadingDialog();
+        }.bind(this));
+
+        // receive data about the dame (after initialisation, or gamechange
+        this.socket.on(Packages.PROTOCOL.SERVER.INIT_GAME, function (evt) {
+            this.gameManager.initGame(evt.data);
+        }.bind(this));
+
+        // receive game updates
+        this.socket.on(Packages.PROTOCOL.SERVER.UPDATE_STATE, function (evt) {
+            this.processServerUpdates(evt.data);
+        }.bind(this));
+
+        // another player connected
+        this.socket.on(Packages.PROTOCOL.SERVER.CLIENT_CONNECTED, function (evt) {
+            this.playerManager.addPlayer(evt.data)
+        }.bind(this));
+
+        // an client disconnects
+        this.socket.on(Packages.PROTOCOL.SERVER.CLIENT_DISCONNECTED, function (evt) {
+            this.playerManager.removePlayer(evt.data.id)
+        }.bind(this));
+    }
+
+    sendMessage(type,msg){
+        this.socket.emit(type,msg);
     }
 
     /**
@@ -109,48 +151,37 @@ class Synchronizer{
                 case Packages.PROTOCOL.GAME_STATE.ENTITY.STATE_CHANGE:
                     this.toolManager.batchUpdateEntityStateChange(updates);
                     break;
+                // a users Action was rejected
+                case Packages.PROTOCOL.GAME_STATE.ENTITY.SERVER_REJECT_ACTION:
+                    this._batchHandleRejections(updates);
+                    break;
             }
         }
     }
 
     /**
-     * init all socket handlers,
-     * if data was sent by the server, this method (to be more exact, the handlers initialized in this method),
-     * receives and processes/distributes it.
+     * is called when something needs to be reverted
+     * @param data
      * @private
      */
-    _initHandlers(){
-        // get clientdata of this client
-        this.socket.on(Packages.PROTOCOL.SERVER.RESPONSE_CLIENT_ACCEPTED, function(evt) {
-            this.CLIENT_INFO = evt.data;
-            console.log("Clientdata received");
-            this.playerManager.initCurrentPlayer(evt.data);
-            window.hideLoadingDialog();
-        }.bind(this));
-
-        // receive data about the dame (after initialisation, or gamechange
-        this.socket.on(Packages.PROTOCOL.SERVER.INIT_GAME, function (evt) {
-            this.gameManager.initGame(evt.data);
-        }.bind(this));
-
-        // receive game updates
-        this.socket.on(Packages.PROTOCOL.SERVER.UPDATE_STATE, function (evt) {
-            this.processServerUpdates(evt.data);
-        }.bind(this));
-
-        // another player connected
-        this.socket.on(Packages.PROTOCOL.SERVER.CLIENT_CONNECTED, function (evt) {
-            this.playerManager.addPlayer(evt.data)
-        }.bind(this));
-
-        // an client disconnects
-        this.socket.on(Packages.PROTOCOL.SERVER.CLIENT_DISCONNECTED, function (evt) {
-            this.playerManager.removePlayer(evt.data.id)
-        }.bind(this));
+    _batchHandleRejections(data){
+        if(!data){
+            console.warn("rejections: no update data passed");
+            return;
+        }
+        for(var userID in data){
+            if(!data.hasOwnProperty(userID))continue;
+            var rejected =data[userID].rejected;
+            for(var i=0; i< rejected.length;i++){
+                var action = rejected[i].action;
+                var entityID = rejected[i].entity;
+                this._handleRejection(userID,action,entityID);
+            }
+        }
     }
 
-    sendMessage(type,msg){
-        this.socket.emit(type,msg);
+    _handleRejection(userID,action,entityID){
+      //TODO: implemetn if necessary
     }
 
 }

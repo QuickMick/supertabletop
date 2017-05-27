@@ -224,6 +224,18 @@ class EntityServerManager {
     }
 
     /**
+     * creates an default state for an entity
+     * @returns {{state: string, timestamp: number}}
+     * @private
+     */
+    _createDefaultEntityState(){
+        return {
+            state:Packages.PROTOCOL.GAME_STATE.ENTITY.STATES.ENTITY_DEFAULT_STATE,
+            timestamp:new Date().getTime()
+        };
+    }
+
+    /**
      * adds an entity to the entitymanager and creates
      * @param entity
      * @private
@@ -275,7 +287,7 @@ class EntityServerManager {
         body.ENTITY_ID = entity.id;
         body.frictionAir = GameConfig.ENTITY_FRICTION;
 
-
+        body.claimedBy = entity.claimedBy = "";
         this.bodies[entity.id] = body;
         //this.bodies[entity.id].entityData = this.entities[this.lastID];
 
@@ -333,11 +345,13 @@ class EntityServerManager {
 
             if (this.constraints[userID] && this.constraints[userID][claimedEntityID]) {
                 console.log("constraint already exists fot user ", userID, " and entity ", claimedEntityID);
+               // this._rejectAction(userID,claimedEntityID,Packages.PROTOCOL.GAME_STATE.ENTITY.USER_CLAIM_ENTITY);
                 return;
             }
 
             if (!this.bodies[claimedEntityID]) {
                 console.warn("claimed entity ", claimedEntityID, " does not exist!");
+                return;
             }
 
             // create the constraint
@@ -361,6 +375,9 @@ class EntityServerManager {
                 this.constraints[userID] = {};
             }
 
+            // set the claimedBy value to the userID, so we know that the entity is claimed by whom.
+            this.entities[claimedEntityID].claimedBy = this.bodies[claimedEntityID].claimedBy = userID;
+
             constraint.ENTITY_ID = claimedEntityID;
             this.constraints[userID][claimedEntityID] = constraint;
             World.add(this.engine.world, constraint);            // finally add the constraint to the world
@@ -372,6 +389,24 @@ class EntityServerManager {
                 Packages.PROTOCOL.GAME_STATE.ENTITY.STATES.ENTITY_SELECTED
             );
         }
+    }
+
+    /**
+     * call to send info to the clients, that a action was rejected by the server
+     * @param userID
+     * @param entityID
+     * @param action
+     * @private
+     */
+    _rejectAction(userID,entityID,action){
+           this.updateQueue.postUpdate(
+            Packages.PROTOCOL.GAME_STATE.ENTITY.SERVER_REJECT_ACTION,
+            userID,
+           {
+               rejected:{action:action,entity:entityID},
+               _mode:"pushAvoidDuplicates"
+           }
+        );
     }
 
     /**
@@ -398,6 +433,9 @@ class EntityServerManager {
                 return;
             }
 
+            // remove the claim value
+            this.entities[curEntityID].claimedBy = this.bodies[curEntityID].claimedBy = "";
+
             this.bodies[curEntityID].isSensor = false;
             this.bodies[curEntityID].frictionAir = GameConfig.ENTITY_FRICTION;
            // console.log("releas sensor",this.bodies[curEntityID].isSensor,curEntityID);
@@ -407,6 +445,50 @@ class EntityServerManager {
             World.remove(this.engine.world,this.constraints[userID][curEntityID]);
             delete this.constraints[userID][curEntityID];
         }
+    }
+
+    batchRotateEntities(userID, data){
+        for(var i =0; i<data.rotatedEntities.length;i++){
+
+            this.rotateEntity(userID,data.rotatedEntities[i],data.rotationAmount);
+        }
+    }
+
+    /**
+     * roates an entity by an user, about an certain amount.
+     * if the user has no rights to rotate the entity (if he has not claimed it)
+     * then the rotation is aported/skiped
+     * @param userID
+     * @param entityID
+     * @param rotationAmount
+     */
+    rotateEntity(userID,entityID,rotationAmount){
+        if(!rotationAmount){
+            return; // nothing to do, when rotation amount does not exist or equals 0
+        }
+
+        if(!userID || userID.length <=0){
+            console.log("rotation: no userID passed!");
+            return;
+        }
+
+        if(!entityID){
+            console.log("rotation: no entity id passed!",entityID);
+            return;
+        }
+
+        if(!this.bodies[entityID]){
+            console.log("rotation: entity",entityID,"does not exist!");
+            return;
+        }
+
+        if(this.bodies[entityID].claimedBy != userID){
+            console.log("rotation: entity",entityID,"not claimed by user",userID,"rotation aborted");
+            return;
+        }
+
+        // multiply the passed value by the rotation speed
+        Body.setAngularVelocity(this.bodies[entityID],rotationAmount*GameConfig.ROTATION_SPEED);
     }
 
     /**
@@ -454,17 +536,6 @@ class EntityServerManager {
         );
     }
 
-    /**
-     * creates an default state for an entity
-     * @returns {{state: string, timestamp: number}}
-     * @private
-     */
-    _createDefaultEntityState(){
-        return {
-            state:Packages.PROTOCOL.GAME_STATE.ENTITY.STATES.ENTITY_DEFAULT_STATE,
-            timestamp:new Date().getTime()
-        };
-    }
 }
 
 module.exports = EntityServerManager;

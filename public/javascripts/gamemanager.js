@@ -60,7 +60,6 @@ class GameManager{
         this.app.stage.addChild(this.gameTable);
 
         this.toolManager = new ToolManager(this.inputHandler,this.gameTable,this.entityManager,this.playerManager,this.synchronizer);
-
         this.synchronizer.init();
 
         // add default table
@@ -160,7 +159,8 @@ class GameManager{
 
 
     update(delta){
-
+        console.log(delta);
+        this.toolManager.update(delta);
     }
 
     initEasterEggs(){

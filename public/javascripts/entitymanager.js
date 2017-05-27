@@ -3,11 +3,11 @@
  */
 'use strict';
 require('pixi.js');
-
+/*
 var Packages = require('./../../core/packages');
 
 const RELATIVE_PATH = "./../";
-
+*/
 
 var EVT_ENTITYCLICKED = "entityclicked";
 

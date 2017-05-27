@@ -85,7 +85,7 @@ class GameManager{
      * @private
      */
     initGame(game){
-        console.log("result: " + game);
+        console.log("load game",game.name,"by",game.creator);
         window.showLoadingDialog();
         // prepare resource list
         var game_resource_path = Path.join(game.creator,game.name);

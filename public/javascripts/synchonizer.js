@@ -76,18 +76,23 @@ class Synchronizer{
             if(!updateData.hasOwnProperty(type)) continue;
 
             switch (type){
-                case Packages.PROTOCOL.GAME_STATE.SERVER_ENTITY_POSITION_UPDATE:
+                case Packages.PROTOCOL.GAME_STATE.ENTITY.SERVER_ENTITY_TRANSFORMATION_UPDATE:
                     for(var entityID in updateData[type]){
                         var cpos = updateData[type][entityID].position;
+                        var cur = this.entityManager.entities[entityID];
 
-                        this.entityManager.entities[entityID].position.x = cpos.x;
-                        this.entityManager.entities[entityID].position.y = cpos.y;
-                        this.entityManager.entities[entityID].rotation = updateData[type][entityID].angle;
+                        // just change the available values, e.g. sometimes,
+                        // just angle is sent, when just the angle is changes
+                        if(cpos) {
+                            cur.position.x = cpos.x || cur.position.x;
+                            cur.position.y = cpos.y || cur.position.y;
+                        }
+                        cur.rotation = updateData[type][entityID].angle || cur.rotation;
                     }
                     break;
 
                 // ouse moves
-                case Packages.PROTOCOL.GAME_STATE.SERVER_CLIENT_POSITION_UPDATE:
+                case Packages.PROTOCOL.GAME_STATE.CLIENT.SERVER_CLIENT_POSITION_UPDATE:
                     for(var clientID in updateData[type]){
                         if(!updateData[type].hasOwnProperty(clientID) ||clientID == this.CLIENT_INFO.id) continue;
                         var cpos = updateData[type][clientID];

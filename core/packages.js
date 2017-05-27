@@ -64,16 +64,50 @@ module.exports =
            */
        },
         GAME_STATE: {
+            ENTITY: {
+                /**
+                 * is posted by client, when entity gets dragged
+                 */
                 USER_DRAG_START: "ENTITY_DRAG_START",
+
+                /**
+                 * is posted by client, when entity is not dragged anymore
+                 */
                 USER_DRAG_END: "ENTITY_DRAG_END",
+
+
+
+                /**
+                 * is posted by server, when an entity moves or rotates
+                 */
+                SERVER_ENTITY_TRANSFORMATION_UPDATE: "SERVER_ENTITY_TRANSFORMATION_UPDATE",
+
+                /**
+                 * is posted by server, when the state of the entity changes
+                 * e.g. it gets dragged, then the entity is in the dragged state,
+                 * and it can be shown in a different way
+                 */
+                STATE_CHANGE:"STATE_CHANGE"
+            },
+            CLIENT:{
+                /**
+                 * is posted by client, when he moves the mouse
+                 */
                 USER_MOUSE_POSITION: "USER_MOUSE_POSITION",
+
+                /**
+                 * is posted by server, if any of the clients moves the mouse
+                 */
+                SERVER_CLIENT_POSITION_UPDATE:"SERVER_CLIENT_POSITION_UPDATE"
+            }
+
 
             /**
              * aka mouse position update
              */
-            SERVER_CLIENT_POSITION_UPDATE:"SERVER_CLIENT_POSITION_UPDATE",
 
-            SERVER_ENTITY_POSITION_UPDATE: "SERVER_ENTITY_POSITION_UPDATE"
+
+
         }
     }
 };

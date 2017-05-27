@@ -71,17 +71,17 @@ class GameServer{
                 if(!data[type].hasOwnProperty(id)) continue;
 
                 switch (type) {
-                    case Packages.PROTOCOL.GAME_STATE.USER_DRAG_START:
+                    case Packages.PROTOCOL.GAME_STATE.ENTITY.USER_DRAG_START:
                         this.entityServerManager.claimEntity(id, data[type][id].claimedEntity);
                         break;
-                    case Packages.PROTOCOL.GAME_STATE.USER_DRAG_END:
+                    case Packages.PROTOCOL.GAME_STATE.ENTITY.USER_DRAG_END:
                         this.entityServerManager.releaseEntities(id, data[type][id].releasedEntities);
                         break;
-                    case Packages.PROTOCOL.GAME_STATE.USER_MOUSE_POSITION:
+                    case Packages.PROTOCOL.GAME_STATE.CLIENT.USER_MOUSE_POSITION:
                         var changed = this.clientManager.updateClientPosition(id,data[type][id].position);
                         if(changed) {
                             this.updateQueue.postUpdate(
-                                Packages.PROTOCOL.GAME_STATE.SERVER_CLIENT_POSITION_UPDATE,
+                                Packages.PROTOCOL.GAME_STATE.CLIENT.SERVER_CLIENT_POSITION_UPDATE,
                                 id,
                                 data[type][id].position
                             );

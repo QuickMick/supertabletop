@@ -118,16 +118,35 @@ class EntityServerManager {
         Body.update_original(body, deltaTime, timeScale, correction);//.bind(Body);
         //after update
 
-        // if the body has not changed, nothing to do
-        if (oldData.x == body.position.x && oldData.y == body.position.y && oldData.angle == body.angle) return;
+        var updateRequired = false;
+        var data ={};
 
-        this.updateQueue.postUpdate(Packages.PROTOCOL.GAME_STATE.SERVER_ENTITY_POSITION_UPDATE, body.ENTITY_ID, {
-            position:{
-                x:body.position.x,
-                y:body.position.y,
-            },
-            angle:body.angle
-        });
+        // send just the changed values
+        if (oldData.x != body.position.x){
+            data.position = data.position || {};
+            data.position.x = body.position.x;
+            updateRequired=true;
+        }
+        if(oldData.y != body.position.y ){
+            data.position = data.position || {};
+            data.position.y = body.position.y;
+            updateRequired=true;
+        }
+        if(oldData.angle != body.angle){
+            data.angle = body.angle;
+            updateRequired=true;
+        }
+
+
+       // if (oldData.x == body.position.x && oldData.y == body.position.y && oldData.angle == body.angle) return;
+        // if the body has not changed, nothing to do, nothing to send
+        if(!updateRequired) return;
+
+        this.updateQueue.postUpdate(
+            Packages.PROTOCOL.GAME_STATE.ENTITY.SERVER_ENTITY_TRANSFORMATION_UPDATE,
+            body.ENTITY_ID,
+            data
+        );
 
         this.entities[body.ENTITY_ID].position.x = body.position.x;
         this.entities[body.ENTITY_ID].position.y = body.position.y;

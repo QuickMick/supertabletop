@@ -216,7 +216,7 @@ class SimpleDragTool extends BasicTool{
             return;*/
 
         // if something has changed, then update the server
-        this.synchronizer.updateQueue.postUpdate(Packages.PROTOCOL.GAME_STATE.USER_MOUSE_POSITION, this.synchronizer.CLIENT_INFO.id,
+        this.synchronizer.updateQueue.postUpdate(Packages.PROTOCOL.GAME_STATE.CLIENT.USER_MOUSE_POSITION, this.synchronizer.CLIENT_INFO.id,
             {
                 position:{x:(localPos.x),y:(localPos.y)}
             }
@@ -225,7 +225,7 @@ class SimpleDragTool extends BasicTool{
 
     _onEntityClicked(evt){
         super._onEntityClicked(evt);
-        this.synchronizer.updateQueue.postUpdate(Packages.PROTOCOL.GAME_STATE.USER_DRAG_START,this.synchronizer.CLIENT_INFO.id,
+        this.synchronizer.updateQueue.postUpdate(Packages.PROTOCOL.GAME_STATE.ENTITY.USER_DRAG_START,this.synchronizer.CLIENT_INFO.id,
             {
                 claimedEntity:evt.entity.ENTITY_ID,
                 _mode:"push"
@@ -241,7 +241,7 @@ class SimpleDragTool extends BasicTool{
             ids.push(this.SELECTED_ENTITIES[i].ENTITY_ID);
         }
 
-        this.synchronizer.updateQueue.postUpdate(Packages.PROTOCOL.GAME_STATE.USER_DRAG_END, this.synchronizer.CLIENT_INFO.id,
+        this.synchronizer.updateQueue.postUpdate(Packages.PROTOCOL.GAME_STATE.ENTITY.USER_DRAG_END, this.synchronizer.CLIENT_INFO.id,
             {
                 releasedEntities:ids,
                 _mode:"push"

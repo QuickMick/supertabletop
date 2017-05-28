@@ -4,6 +4,7 @@
 "use strict";
 require('pixi.js');
 var Path = require('path');
+var EventEmitter3 = require('eventemitter3');
 
 var Config = require('./../resources/config.json');
 var DefaultGame = require('./../resources/default_game.json');
@@ -23,11 +24,10 @@ const RELATIVE_PATH = "./../";
  * this class controlls the whole gameplay,
  * loads games, sets everything up, holds game related information
  */
-class GameManager{
+class GameManager extends EventEmitter3{
     constructor(app){
+        super();
         this.app = app;
-
-       // this.USER_ID = null;
 
         /**
          * contains the main container
@@ -59,17 +59,10 @@ class GameManager{
         this.gameTable.addChild(this.playerManager);
         this.app.stage.addChild(this.gameTable);
 
-        this.toolManager = new ToolManager(this.inputHandler,this.gameTable,this.entityManager,this.playerManager,this.synchronizer);
+        this.toolManager = new ToolManager(this);
         this.synchronizer.init();
 
-        // add default table
-      /*  this.gameTable.setTable(
-            Resources.default.content.table.width,
-            Resources.default.content.table.height,
-            PIXI.loader.resources[Resources.default.content.table.texture].texture
-        );
-*/
-      // init game with default game
+        // init game with default game
         this.initGame(Object.assign({},DefaultGame));
 
         this.initEasterEggs();
@@ -85,7 +78,10 @@ class GameManager{
      */
     initGame(game){
         console.log("load game",game.name,"by",game.creator);
+
+        // show loading screen
         window.showLoadingDialog();
+
         // prepare resource list
         var game_resource_path = Path.join(game.creator,game.name);
 
@@ -115,6 +111,7 @@ class GameManager{
             return a.state.timestamp - b.state.timestamp
         });
 
+        // create entities based on the loaded data and add them to the gamemanager
         for(let i=0; i< game.entities.length;i++) {
             game.entities[i].game_resource_path = game_resource_path;
             var newEntity =new Entity(game.entities[i]);
@@ -124,16 +121,16 @@ class GameManager{
 
         // set first table with default texture
         this.gameTable.setTable(
-           game.table.width,
-           game.table.height,
+            game.table.width,
+            game.table.height,
             PIXI.loader.resources[Resources.default.content.table.texture].texture
         );
 
+        // gamedata is available, hide loading screen
         window.hideLoadingDialog();
-      //  if(game.resources.length <=0)return; //TODO: fix loaders, use one for one game
+
         // once the gfx is loaded, force every entity, to show its real texture instead of the placeholder
         PIXI.loader.once('complete', function (loader, resources) {
-
              // once all textures are loaded, then set table with real texture
             this.gameTable.setTable(
                 game.table.width,
@@ -159,13 +156,10 @@ class GameManager{
                     PIXI.loader.resources[table_texture].texture
                 );
             }
-
         }.bind(this)).load();
     }
 
-
     update(delta){
-        console.log(delta);
         this.toolManager.update(delta);
     }
 

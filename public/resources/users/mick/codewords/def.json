@@ -108,7 +108,8 @@
       "type":"wordcard",
       "overwrite":{
         "position":{"x":200,"y":200},
-        "surface":false,
+        "rotation":1.5708,
+        "surface":0,
         "surfaces.0":{"texture":"c2.png","color":"0x4286f4"}
       }
     },

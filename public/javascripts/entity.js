@@ -51,6 +51,7 @@ class Entity extends PIXI.Sprite {
 
         this.position.x = entity.position.x || 0;
         this.position.y = entity.position.y || 0;
+        this.rotation = entity.rotation || 0;
 
         this.anchor.set(0.5);
 

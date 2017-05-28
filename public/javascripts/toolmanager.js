@@ -302,23 +302,22 @@ class SimpleDragTool extends BasicTool{
 }
 
 class ToolManager{
-    constructor(inputHandler,gameTable,entityManager,playerManager,synchronizer){
+    constructor(gameManager){
         this.tools=null;
         this._selectedToolIndex = 0;
 
-        this.entityManager=entityManager;
-        this.playerManager=playerManager;
-        this.inputHandler = inputHandler;
-        this.gameTable = gameTable;
-        this.synchronizer=synchronizer;
-
-
+        this.gameManager = gameManager;
+        this.entityManager = this.gameManager.entityManager;
+        this.playerManager = this.gameManager.playerManager;
+        this.inputHandler = this.gameManager.inputHandler;
+        this.gameTable = this.gameManager.gameTable;
+        this.synchronizer = this.gameManager.synchronizer;
 
         /**
          * filter which is used to display a selection
          * @type {PIXI.filters.BloomFilter}
          */
-        this.tools=[new SimpleDragTool(inputHandler,gameTable,entityManager,playerManager,synchronizer)];
+        this.tools = [new SimpleDragTool(this.gameManager.inputHandler, this.gameManager.gameTable, this.gameManager.entityManager, this.gameManager.playerManager, this.gameManager.synchronizer)];
     }
 
     set currentTool(i){
@@ -380,11 +379,16 @@ class ToolManager{
                 // add the filter, so that it is visible,
                 // to everyone, that an entity is selected
                 var selectionFilter = new OutlineFilter(
-                    curEntity.width,
-                    curEntity.height,
-                    1,
+                    this.gameManager.app.renderer.width,
+                    this.gameManager.app.renderer.height,
+                    10,
                     this.playerManager.players[stateUpdate.userID].rawPlayerData.color || 0xFFFFFF
                 );
+
+               /* this.gameManager.on('resize',function (evt) {
+                    selectionFilter.viewWidth = evt.width;
+                    selectionFilter.viewHeight = evt.height;
+                });*/
 
                 curEntity.addFilter(selectionFilter);
 

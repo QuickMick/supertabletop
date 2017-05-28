@@ -190,9 +190,7 @@ class EntityServerManager extends EventEmitter3 {
 
         this.game.entities = Object.keys(this.entities).map(function(key) {
             return this.entities[key];
-        }.bind(this));/*.sort(function(a, b) {
-            return a.state.timestamp - b.state.timestamp
-        });*/
+        }.bind(this));
     }
 
     getCurrentGameState(){
@@ -277,6 +275,8 @@ class EntityServerManager extends EventEmitter3 {
         // if an value is missing, replace it with zero
         entity.position.x = entity.position.x || 0;
         entity.position.y = entity.position.y || 0;
+        entity.rotation = entity.rotation || 0;
+
         entity.hitArea.offset.x = entity.hitArea.offset.x || 0;
         entity.hitArea.offset.y = entity.hitArea.offset.y || 0;
 
@@ -302,8 +302,9 @@ class EntityServerManager extends EventEmitter3 {
         body.claimedBy = entity.claimedBy = "";
         this.bodies[entity.id] = body;
         //this.bodies[entity.id].entityData = this.entities[this.lastID];
-
+        Body.rotate(body,entity.rotation);
         World.add(this.engine.world,body);
+
     }
 
     /**

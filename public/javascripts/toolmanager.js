@@ -322,7 +322,19 @@ class SimpleDragTool extends BasicTool{
             position:{x:(localPos.x),y:(localPos.y)},
         };
 
-        // if there is a selection, check if an entity should snap to a point
+        data = this._checkForEntitySnaps(data, localPos);
+        data = this._updateEntitySnaps(data, localPos);
+
+
+        // if something has changed, then update the server
+        this.synchronizer.updateQueue.postUpdate(
+            Packages.PROTOCOL.GAME_STATE.CLIENT.USER_POSITION_CHANGE,
+            this.synchronizer.CLIENT_INFO.id,
+            data
+        );
+    }
+
+    _checkForEntitySnaps(data, localPos){
         var selectedEntities = this.selectedEntities;
         if(selectedEntities.length > 0) {
             for(var j=0;j<selectedEntities.length;j++) {
@@ -369,7 +381,10 @@ class SimpleDragTool extends BasicTool{
                 }
             }
         }
+        return data;
+    }
 
+    _updateEntitySnaps(data,localPos){
         // check if the entity should lose snapoint focus
         // and also update the relative position
         for(var entityID in this._currentSnaps) {
@@ -414,12 +429,7 @@ class SimpleDragTool extends BasicTool{
             }
         }
 
-        // if something has changed, then update the server
-        this.synchronizer.updateQueue.postUpdate(
-            Packages.PROTOCOL.GAME_STATE.CLIENT.USER_POSITION_CHANGE,
-            this.synchronizer.CLIENT_INFO.id,
-            data
-        );
+        return data;
     }
 
     _onEntityClicked(evt){

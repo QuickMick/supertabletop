@@ -2,7 +2,6 @@
  * Created by Mick on 24.05.2017.
  */
 'use strict';
-
 var Path = require('path');
 var fs = require('fs');
 var EventEmitter3 = require('eventemitter3');
@@ -21,6 +20,15 @@ var Engine = Matter.Engine,
     Bodies = Matter.Bodies,
     Body = Matter.Body;
 
+/*
+ Detector.canCollide = function(filterA, filterB) {
+ if (filterA.group === filterB.group && filterA.group !== 0)
+ return filterA.group > 0;
+
+ return (filterA.mask & filterB.category) !== 0 && (filterB.mask & filterA.category) !== 0;
+ };
+ */
+
 var Config = require('./../public/resources/config.json');
 
 var Globals = require('./globals');
@@ -28,6 +36,18 @@ var Globals = require('./globals');
 const DEFAULT_BODY_SIZE = 100;
 
 const EVT_BEFORE_UPDATE = 'beforeUpdate';
+
+const CLAIMED_COLLISION_CATEGORY = 0x0002;
+
+const DEFAULT_COLLISION_CATEGORY = 0x0001;
+
+const DEFAULT_FILTER = {
+    group:DEFAULT_COLLISION_CATEGORY
+};
+
+const CLAIMED_FILTER = {
+    group:CLAIMED_COLLISION_CATEGORY
+};
 
 class EntityServerManager extends EventEmitter3 {
 
@@ -303,6 +323,9 @@ class EntityServerManager extends EventEmitter3 {
         this.bodies[entity.id] = body;
         //this.bodies[entity.id].entityData = this.entities[this.lastID];
         Body.rotate(body,entity.rotation);
+
+        body.collisionFilter=DEFAULT_FILTER;
+
         World.add(this.engine.world,body);
 
     }
@@ -313,7 +336,6 @@ class EntityServerManager extends EventEmitter3 {
      * @private
      */
     removeEntity(id){
-
         if(!id || !id.length ||  id.length <0 || !this.entities[id]){
             console.warn("entity does not exist or no id passed :",id);
             return;
@@ -326,8 +348,6 @@ class EntityServerManager extends EventEmitter3 {
             World.add(this.engine.world, this.constraints[id]);
             delete this.constraints[id];
         }
-
-
 
         if(this.bodies[id]){
             World.add(this.engine.world, this.bodies[id]);
@@ -384,8 +404,11 @@ class EntityServerManager extends EventEmitter3 {
             });
 
             this.bodies[claimedEntityID].frictionAir = GameConfig.GRABBED_ENTITY_FRICTION;
-            this.bodies[claimedEntityID].isSensor = true;       //this means->"no" collision with normal entities
-        //    console.log("claim sensor",this.bodies[claimedEntityID].isSensor,claimedEntityID);
+
+           // this.bodies[claimedEntityID].isSensor = true;       //this means->"no" collision with normal entities
+            this.bodies[claimedEntityID].collisionFilter=CLAIMED_FILTER;
+
+            //    console.log("claim sensor",this.bodies[claimedEntityID].isSensor,claimedEntityID);
             // save the constraint
             // an user can create several constraints
             if (!this.constraints[userID]) {
@@ -477,7 +500,9 @@ class EntityServerManager extends EventEmitter3 {
             // remove the claim value
             this.entities[curEntityID].claimedBy = this.bodies[curEntityID].claimedBy = "";
 
-            this.bodies[curEntityID].isSensor = false;
+           // this.bodies[curEntityID].isSensor = false;
+            this.bodies[curEntityID].collisionFilter=DEFAULT_FILTER;
+
             this.bodies[curEntityID].frictionAir = GameConfig.ENTITY_FRICTION;
            // console.log("releas sensor",this.bodies[curEntityID].isSensor,curEntityID);
             this._postStateChange(curEntityID);

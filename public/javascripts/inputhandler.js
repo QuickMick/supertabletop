@@ -64,7 +64,7 @@ class InputHandler extends EventEmitter{
             .on('mousedown', this._mouseDown.bind(this), false)
             .on('rightclick', this._mouseDown.bind(this), false)
             .on('touchstart', this._mouseDown.bind(this), false)
-
+            //TODO: mousedown wird nicht auserhalb von der stage getriggert
             .on('mouseupoutside', this._mouseUp.bind(this))
             .on('touchendoutside', this._mouseUp.bind(this))
             .on('touchend', this._mouseUp.bind(this), false)
@@ -163,7 +163,6 @@ class InputHandler extends EventEmitter{
 
         if(this.mouse.dx != 0 || this.mouse.dy != 0 ){
             this.emit(MOUSEMOVE,this.mouse);
-
             this.emit(RAW_MOUSEMOVE,evt);
         }
     }

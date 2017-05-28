@@ -34,12 +34,20 @@ class BasicTool{
         this._min_zoom = 0.4;
         this._max_zoom = 2.5;
 
+        this._camera_grab_block=false;
+
         this.inputHanlder.on("mousewheel", this._zoom.bind(this), false)
             .on("mousemove",this._mouseMove.bind(this))
             .on("rawmousemove",this._onRawMouseMove.bind(this));
 
-        this.inputHanlder.mapping.MOUSE_LEFT.on("pressed",function(){this.CAMERA_GRABBED=true;}.bind(this))
-            .on("released",function(){this.CAMERA_GRABBED=false;}.bind(this));
+        this.inputHanlder.mapping.MOUSE_LEFT.on("pressed", function () {
+            this.CAMERA_GRABBED = true;
+            console.log("x");
+        }.bind(this))
+            .on("released", function () {
+                this._camera_grab_block=false;
+                this.CAMERA_GRABBED = false;
+            }.bind(this));
 
         this.inputHanlder.mapping.MOUSE_LEFT.on("released",this._releaseSelection.bind(this));
 
@@ -53,6 +61,7 @@ class BasicTool{
 
     _onEntityClicked(evt){
      //   this.SELECTED_ENTITIES.push(evt.entity);
+        this._camera_grab_block=true;
     }
 
     _releaseSelection(evt){
@@ -66,7 +75,6 @@ class BasicTool{
      */
     _mouseMove(evt){
         if(!this.CAMERA_GRABBED) return;
-
         this.gameTable.position.x +=evt.dx;
         this.gameTable.position.y +=evt.dy;
         this.focusCamera();
@@ -88,6 +96,7 @@ class BasicTool{
      * @constructor
      */
     get CAMERA_GRABBED(){
+        if(this._camera_grab_block) return false;
         if((this._selected_entities||[]).length >0) return false;
         return this._camera_grabbed;
     }
@@ -158,6 +167,8 @@ class BasicTool{
     }
 
     _zoom(evt) {
+        var previousZoom = this.current_zoom;
+
         if(evt.delta <0 ){
             this.current_zoom+=this.zoom_sensivity;
         }
@@ -165,6 +176,11 @@ class BasicTool{
         if(evt.delta > 0 ){
             this.current_zoom-=this.zoom_sensivity;
         }
+/*
+        var p = 1-(previousZoom/this.current_zoom);
+        console.log(p);
+        this.gameTable.position.x -= this.gameTable.width*p;
+        this.gameTable.position.y -= this.gameTable.height*p;*/
     }
 
     focusCamera(){
@@ -173,20 +189,25 @@ class BasicTool{
         var h = this.gameTable.hitArea.height;
         var z = this._current_zoom;
 
+        var x = this.gameTable.position.x-this.gameTable.pivot.x;
+        var y = this.gameTable.position.y-this.gameTable.pivot.y;
+
+
+
         //TODO: folgendes wird warscheinlich nicht funktionieren, wenn drehen drin is
-        if(w* z> this.gameTable.renderer.width) {
-            if (this.gameTable.position.x < this.gameTable.renderer.width - w*z) this.gameTable.position.x = this.gameTable.renderer.width - w*z;
-            if (this.gameTable.position.x > 0) this.gameTable.position.x = 0;
+     /*  if(w* z> this.gameTable.renderer.width) {
+            if (x < this.gameTable.renderer.width - w*z) this.gameTable.position.x = this.gameTable.renderer.width - w*z+this.gameTable.pivot.x;
+            if (x > 0) this.gameTable.position.x = this.gameTable.pivot.x;
         }else{
-            this.gameTable.position.x = this.gameTable.renderer.width/2 - (w*z)/2;
+            this.gameTable.position.x = this.gameTable.renderer.width/2 - (w*z)/2 +this.gameTable.pivot.x;
         }
 
         if(h*z > this.gameTable.renderer.height) {
-            if (this.gameTable.position.y < this.gameTable.renderer.height - h*z) this.gameTable.position.y = this.gameTable.renderer.height - h*z;
-            if (this.gameTable.position.y > 0) this.gameTable.position.y = 0;
+            if (y < this.gameTable.renderer.height - h*z) this.gameTable.position.y = this.gameTable.renderer.height - h*z+this.gameTable.pivot.y;
+            if (y > 0) this.gameTable.position.y = +this.gameTable.pivot.y;
         }else{
-            this.gameTable.position.y = this.gameTable.renderer.height/2 - (h*z)/2;
-        }
+            this.gameTable.position.y = this.gameTable.renderer.height/2 - (h*z)/2 +this.gameTable.pivot.y;
+        }*/
     }
 }
 
@@ -203,6 +224,7 @@ class SimpleDragTool extends BasicTool{
      * @private
      */
     _onRawMouseMove(evt){
+        super._onRawMouseMove(evt);
         // get local position of the table, so kartesien cordinates {0,0} are the left upper corner of the table
         var localPos = evt.data.getLocalPosition(this.gameTable);
 
@@ -270,10 +292,8 @@ class SimpleDragTool extends BasicTool{
 
     update(delta){
         super.update(delta);
-        var ids = this.SELECTED_ENTITY_IDS;
-        // if there is no selection, there is nothing to do
-        if(ids.length <=0) return;
 
+        // check for rotation
         var rotationAmount = 0;
         if(this.inputHanlder.mapping.ROTATE_RIGHT.isDown){
             rotationAmount += 1*delta;
@@ -281,21 +301,29 @@ class SimpleDragTool extends BasicTool{
             rotationAmount += -1*delta;
         }
 
-        if(rotationAmount != 0){
+        if (rotationAmount == 0){
+            return; // if there is no rotation, then there is nothing to do.
+        }
+
+        var ids = this.SELECTED_ENTITY_IDS;
+
+        if(ids.length >0) { // if there is a selection, rotate the selection
             // add the rotation amount
             this.synchronizer.updateQueue.postUpdate(Packages.PROTOCOL.GAME_STATE.ENTITY.USER_ROTATE_ENTITY, this.synchronizer.CLIENT_INFO.id,
                 {
-                    rotationAmount:rotationAmount,
-                    _mode:"add"
+                    rotationAmount: rotationAmount,
+                    _mode: "add"
                 }
             );
             // and add the affected entities
             this.synchronizer.updateQueue.postUpdate(Packages.PROTOCOL.GAME_STATE.ENTITY.USER_ROTATE_ENTITY, this.synchronizer.CLIENT_INFO.id,
                 {
-                    rotatedEntities:ids,
-                    _mode:"pushAvoidDuplicates"
+                    rotatedEntities: ids,
+                    _mode: "pushAvoidDuplicates"
                 }
             );
+        }else{ // else rotate just the camera
+            this.gameTable.rotation += (rotationAmount/10)*delta;
         }
 
     }

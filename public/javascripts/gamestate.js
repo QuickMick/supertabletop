@@ -30,20 +30,20 @@ class GameState{
      * @returns {boolean}
      * @constructor
      */
-  /*  get CAMERA_GRABBED(){
+  /*  get isCameraGrabbed(){
         if((this._selected_entities||[]).length >0) return false;
         return this._camera_grabbed;
     }
 
-    set CAMERA_GRABBED(v){
+    set isCameraGrabbed(v){
         this._camera_grabbed = v;
     }
 
-    get SELECTED_ENTITIES(){
+    get selectedEntities(){
         return this._selected_entities;
     }
 
-    set SELECTED_ENTITIES(v){
+    set selectedEntities(v){
         this._selected_entities = v || [];
     }*/
 

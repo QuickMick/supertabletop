@@ -56,11 +56,11 @@ class BasicTool{
             .on("rawmousemove",this._onRawMouseMove.bind(this));
 
         this.inputHanlder.mapping.MOUSE_LEFT.on("pressed", function () {
-            this.CAMERA_GRABBED = true;
+            this.isCameraGrabbed = true;
         }.bind(this))
             .on("released", function () {
                 this._camera_grab_block=false;
-                this.CAMERA_GRABBED = false;
+                this.isCameraGrabbed = false;
             }.bind(this));
 
         this.inputHanlder.mapping.MOUSE_LEFT.on("released",this._releaseSelection.bind(this));
@@ -76,7 +76,7 @@ class BasicTool{
     }
 
     _turnSelectedEntities(evt){
-        var ids= this.SELECTED_ENTITY_IDS;
+        var ids= this.selectedEntityIDs;
         this.synchronizer.updateQueue.postUpdate(Packages.PROTOCOL.GAME_STATE.ENTITY.USER_TURN_ENTITY,
             this.synchronizer.CLIENT_INFO.id,
             {
@@ -95,12 +95,13 @@ class BasicTool{
     }
 
     _onEntityClicked(evt){
-     //   this.SELECTED_ENTITIES.push(evt.entity);
+     //   this.selectedEntities.push(evt.entity);
         this._camera_grab_block=true;
     }
 
     _releaseSelection(evt){
-        this.SELECTED_ENTITIES =[];
+        var cur = this.selectedEntities;
+        this._selected_entities =[];
     }
 
     /**
@@ -109,7 +110,7 @@ class BasicTool{
      * @private
      */
     _mouseMove(evt){
-        if(!this.CAMERA_GRABBED) return;
+        if(!this.isCameraGrabbed) return;
         this.gameTable.position.x +=evt.dx;
         this.gameTable.position.y +=evt.dy;
         this.focusCamera();
@@ -130,7 +131,7 @@ class BasicTool{
      * @returns {boolean}
      * @constructor
      */
-    get CAMERA_GRABBED(){
+    get isCameraGrabbed(){
         if(this._camera_grab_block) return false;
         if((this._selected_entities||[]).length >0) return false;
         return this._camera_grabbed;
@@ -141,20 +142,39 @@ class BasicTool{
      * @param v {boolean}
      * @constructor
      */
-    set CAMERA_GRABBED(v){
+    set isCameraGrabbed(v){
         this._camera_grabbed = v;
     }
 
-    get SELECTED_ENTITIES(){
+    get selectedEntities(){
         return this._selected_entities;
     }
 
-    set SELECTED_ENTITIES(v){
+   /* set selectedEntities(v){
         this._selected_entities = v || [];
+    }*/
+
+    /**
+     * adds an entity to the current selection of the tool
+     * @param entity entity value
+     */
+    addEntityToSelection(entity){
+       if(!entity) return;
+       // avoid duplicates by using a set
+       this._selected_entities =[...new Set((this._selected_entities || []).concat(entity))];
+   }
+
+    /**
+     * removes an specific entity from the selection
+     * @param entity
+     */
+    removeEntityFromSelection(entity){
+        if(!entity) return;
+        this._selected_entities = this._selected_entities.removeByValue(entity);
     }
 
-    get SELECTED_ENTITY_IDS(){
-        return this.SELECTED_ENTITIES.map(function(obj){
+    get selectedEntityIDs(){
+        return this.selectedEntities.map(function(obj){
             return obj.ENTITY_ID;
         });
     }
@@ -250,7 +270,35 @@ class BasicTool{
 class SimpleDragTool extends BasicTool{
     constructor(toolManager){
         super(toolManager);
+
+        /**
+         * if an entity is currently snapped, it is stored here
+         * @type {{{<entityID>:{lastEntityPosition:{x,y (last unsnapped position}},mouse:{x,y (where the snap took place)},snapPoint:{snappoint itselfe),entity:<the entity itself>}}
+         * @private
+         */
+        this._currentSnaps = {};
     }
+
+    /**
+     * @Override
+     * @param evt
+     * @private
+     */
+    _releaseSelection(evt){
+        super._releaseSelection(evt);
+        this._currentSnaps = {};
+        this._snapBlock = new Set();
+    }
+
+    /**
+     * @Override
+     * @param entity
+     */
+    removeEntityFromSelection(entity){
+        super.removeEntityFromSelection(entity);
+        this._currentSnaps = this._currentSnaps.removeByValue(entity.ENTITY_ID);
+    }
+
 
     /**
      * called, when mouse moves
@@ -276,36 +324,89 @@ class SimpleDragTool extends BasicTool{
             position:{x:(localPos.x),y:(localPos.y)},
         };
 
-        // if there is a selection,
-        var selectedEntities = this.SELECTED_ENTITIES;
+        // if there is a selection, check if an entity should snap to a point
+        var selectedEntities = this.selectedEntities;
         if(selectedEntities.length > 0) {
             for(var j=0;j<selectedEntities.length;j++) {
-                var curEntity = selectedEntities[j];
-                var ePos = curEntity.position;
+                var entityID = selectedEntities[j].ENTITY_ID;
+                var ePos = selectedEntities[j].position;
                 // check if an entity is inside of a snappoint range, if yes, put the relative position,
                 // so that the entity snaps to this point.
                 for (var i = 0; i < this.toolManager.snapPoints.length; i++) {
-                    var curPoint = this.toolManager.snapPoints[i];
-                    var pPos = curPoint.position;
+                    var curSnapPoint = this.toolManager.snapPoints[i];
+                    var pPos = curSnapPoint.position;
 
-                    // calculate the distance to the snap point
-                    var dist = Util.getVectorDistance(ePos.x, ePos.y, pPos.x, pPos.y);
+                    // if entity is not snaped, then it not in the _currentSnaps array
+                    // check if it should snap now
+                    if(!this._currentSnaps[entityID]){
+                        // calculate the distance to the snap point
+                        var dist = Util.getVectorDistance(ePos.x, ePos.y, pPos.x, pPos.y);
 
-                    // check if the position is smaller or equals the radius of the snappoint
-                    if (dist > curPoint.radius) continue; // otherwise, do not send relative positions
+                        // check if the position is smaller or equals the radius of the snappoint
+                        if (dist > curSnapPoint.radius) continue; // otherwise, do not send relative positions
 
-                    // if this statement is true, then set the relative position to the snappoint,
-                    // and pass the entity id. the entitys position will use the relative position
-                    // summed up with the mouse position
+                        // if this statement is true, then mark the entity as snappeed
+                        // by saving back the last known position where it was not sapped
+                        this._currentSnaps[entityID] = {
+                            lastEntityPosition: {x: ePos.x, y: ePos.y},
+                            mouse: {x: localPos.x, y: localPos.y},
+                            entity:selectedEntities[j],
+                            snapPoint:curSnapPoint
+                        };
+                        // set the relative position to the snappoint,
+                        // and pass the entity id. the entitys position will use the relative position
+                        // summed up with the mouse position
 
-                    // be sure, the relativePosition object
-                    data.relativePositions = data.relativePositions || {};
+                        // be sure, the relativePosition object exists
+                        data.relativePositions = data.relativePositions || {};
 
-                    data.relativePositions[curEntity.ENTITY_ID] = {
-                        x:pPos.x-localPos.x,
-                        y:pPos.y-localPos.y
-                    };
+                        data.relativePositions[entityID] = {
+                            x:pPos.x-localPos.x,
+                            y:pPos.y-localPos.y
+                        };
+                    }
                 }
+            }
+        }
+
+        // check if the entity should lose snapoint focus
+        // and also update the relative position
+        for(var entityID in this._currentSnaps) {
+            if(!this._currentSnaps.hasOwnProperty(entityID)) continue;
+
+            var storedSnap = this._currentSnaps[entityID];
+            var snapPoint = storedSnap.snapPoint;
+            var curEntityPos = storedSnap.entity.position;
+
+            var x = localPos.x-storedSnap.mouse.x + storedSnap.lastEntityPosition.x;
+            var y = localPos.y-storedSnap.mouse.y + storedSnap.lastEntityPosition.y;
+
+            var oldDist = Util.getVectorDistance(x, y, snapPoint.position.x, snapPoint.position.y);
+
+            // if snap should be deleted, delte it
+            if (oldDist > snapPoint.radius) {
+                // release the snap by deleting all related values
+                if (data.relativePositions) {
+                    delete data.relativePositions[entityID];
+                }
+                // block the snap, til it is outside of the snap range
+                storedSnap.blocked = true;
+            }
+
+            // calculate the current snapstate, to update the relative position, or the release of the snap
+            var currentDist = Util.getVectorDistance(curEntityPos.x, curEntityPos.y, snapPoint.position.x, snapPoint.position.y);
+
+            if (currentDist <= snapPoint.radius && !storedSnap.blocked) {
+                // if snap is not blocked, update the relative position
+                data.relativePositions = data.relativePositions || {};  // be sure, the relativePosition object exists
+                data.relativePositions[entityID] = {
+                    x: snapPoint.position.x - localPos.x,
+                    y: snapPoint.position.y - localPos.y
+                };
+            }
+
+            if (currentDist > snapPoint.radius){            // if the snap is not in range anymore, delete it
+                delete this._currentSnaps[entityID];
             }
         }
 
@@ -339,10 +440,10 @@ class SimpleDragTool extends BasicTool{
 
     _releaseSelection(evt) {
         //this selection release
-        var ids = this.SELECTED_ENTITY_IDS;
+        var ids = this.selectedEntityIDs;
             /*[];
-        for(var i=0; i<this.SELECTED_ENTITIES.length;i++){
-            ids.push(this.SELECTED_ENTITIES[i].ENTITY_ID);
+        for(var i=0; i<this.selectedEntities.length;i++){
+            ids.push(this.selectedEntities[i].ENTITY_ID);
         }*/
 
         this.synchronizer.updateQueue.postUpdate(Packages.PROTOCOL.GAME_STATE.ENTITY.USER_RELEASE_ENTITY, this.synchronizer.CLIENT_INFO.id,
@@ -371,7 +472,7 @@ class SimpleDragTool extends BasicTool{
             return; // if there is no rotation, then there is nothing to do.
         }
 
-        var ids = this.SELECTED_ENTITY_IDS;
+        var ids = this.selectedEntityIDs;
 
         if(ids.length >0) { // if there is a selection, rotate the selection
             // add the rotation amount
@@ -472,7 +573,7 @@ class ToolManager{
                 // the passed id is the human player, then add the entity
                 // to his selection
                 if(this.synchronizer.CLIENT_INFO.id == stateUpdate.userID){
-                    this.currentTool.SELECTED_ENTITIES.push(curEntity);
+                    this.currentTool.addEntityToSelection(curEntity);
                     curEntity.alpha = 0.8;
                 }
 

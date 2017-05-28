@@ -272,9 +272,9 @@ class EntityServerManager extends EventEmitter3 {
      */
     addEntity(entity){
         this.lastID++; //increment id
-        entity.id=this.lastID;
-        this.entities[this.lastID] = entity;
-        this.entities[this.lastID].state = this._createDefaultEntityState();
+        entity.id="e"+this.lastID;
+        this.entities[entity.id] = entity;
+        this.entities[entity.id].state = this._createDefaultEntityState();
 
         // if there is no hitarea defined, use entity size or default value of DEFAULT_BODY_SIZE
         if(!entity.hitArea){
@@ -396,8 +396,6 @@ class EntityServerManager extends EventEmitter3 {
             }
 
             // create the constraint
-
-
             var constraint = Constraint.create({
                 label: userID,
                 userID: userID,
@@ -616,7 +614,7 @@ class EntityServerManager extends EventEmitter3 {
         }
 
         if(this.entities[entityID].claimedBy != userID){
-            console.log("setRelativeConstraintPosition: entity",entityID,"not claimed by user",userID,"rotation aborted");
+           // console.log("setRelativeConstraintPosition: entity",entityID,"not claimed by user",userID,"- aborted");
             return;
         }
 

@@ -5,6 +5,7 @@
 require('pixi.js');
 var Path = require('path');
 var EventEmitter3 = require('eventemitter3');
+const uuidV4 = require('uuid/v4');
 
 var Config = require('./../resources/config.json');
 var DefaultGame = require('./../resources/default_game.json');
@@ -104,7 +105,12 @@ class GameManager extends EventEmitter3{
         }
 
         // set the snappoints to the toolmanager
-        this.toolManager.snapPoints = game.snappoints || [];
+        this.toolManager.snapZones = game.snapzones || [];
+
+        // generate uniq ids for the snapzones
+        for(var i=0;i<this.toolManager.snapZones.length;i++){
+            this.toolManager.snapZones[i].id = "sz"+i; //uuidV4();
+        }
 
         // create entities
         var newEntityList = [];

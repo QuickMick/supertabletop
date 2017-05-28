@@ -35,6 +35,20 @@ class Util{
         return color;
     }
 
+    /**
+     * calculates the vector distance between two points
+     * @param x1
+     * @param y1
+     * @param x2
+     * @param y2
+     * @returns {number} the distance
+     */
+    getVectorDistance(x1,y1,x2,y2){
+        var a = x1 - x2;
+        var b = y1 - y2;
+        return Math.sqrt( a*a + b*b );
+    }
+
 }
 
 module.exports = new Util();

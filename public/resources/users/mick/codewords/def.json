@@ -78,6 +78,12 @@
       "text":null
     }
   },
+  "snappoints":[
+    {
+      "position":{"x":150,"y":150},
+      "radius":320
+    }
+  ],
   "stacks":[
     {
       "position":{"x":100,"y":100},

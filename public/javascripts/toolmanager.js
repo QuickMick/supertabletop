@@ -4,17 +4,19 @@
 'use strict';
 
 var Packages = require('./../../core/packages');
+var Util = require('./../../core/util');
 
 var OutlineFilter = require('./filters/outlinefilter');
 
 
 class BasicTool{
-    constructor(inputHandler,gameTable,entityManager,playerManager,synchronizer){
-        this.inputHanlder=inputHandler;
-        this.gameTable = gameTable;
-        this.entityManager = entityManager;
-        this.playerManager=playerManager;
-        this.synchronizer = synchronizer;
+    constructor(toolManager){
+        this.toolManager = toolManager;
+        this.inputHanlder = this.toolManager.inputHandler;
+        this.gameTable = this.toolManager.gameTable;
+        this.entityManager = this.toolManager.entityManager;
+        this.playerManager = this.toolManager.playerManager;
+        this.synchronizer = this.toolManager.synchronizer;
 
         /**
          * true, when the camera is moving,
@@ -246,8 +248,8 @@ class BasicTool{
 
 
 class SimpleDragTool extends BasicTool{
-    constructor(inputHandler,gameTable,entityManager,playerManager, synchronizer){
-        super(inputHandler,gameTable,entityManager,playerManager,synchronizer);
+    constructor(toolManager){
+        super(toolManager);
     }
 
     /**
@@ -269,12 +271,27 @@ class SimpleDragTool extends BasicTool{
         }
         this._oldLocalPos=localPos;
 
-        // return if mousepos is outside of the gametable
-       /* if(localPos.x < 0
-            || localPos.y < 0
-            || localPos.x > this.gameTable.width/this.current_zoom
-            || localPos.y > this.gameTable.height/this.current_zoom)
-            return;*/
+
+        // if there is a selection,
+        if(this.SELECTED_ENTITIES.length > 0) {
+            //check if the user is inside of a snappoint, if yes, snap the mouse position to the snappoint instead.
+            for (var i = 0; i < this.toolManager.snapPoints.length; i++) {
+                var curPoint = this.toolManager.snapPoints[i];
+                var pPos = curPoint.position;
+                // calculate the distance to the snap point
+                var dist = Util.getVectorDistance(localPos.x, localPos.y, pPos.x, pPos.y);
+
+                // check if the mouse position is smaller or equals the radius of the snappoint
+                if (dist < curPoint.radius) {
+                    // if this statement is true, then the snap points position is passed to the server instead of the
+                    // real position
+                    localPos.x = pPos.x;
+                    localPos.y = pPos.y;
+                    break;
+                }
+            }
+        }
+
 
         // if something has changed, then update the server
         this.synchronizer.updateQueue.postUpdate(Packages.PROTOCOL.GAME_STATE.CLIENT.USER_MOUSE_POSITION, this.synchronizer.CLIENT_INFO.id,
@@ -367,6 +384,12 @@ class ToolManager{
         this.tools=null;
         this._selectedToolIndex = 0;
 
+        /**
+         * Points to which the mouse snaps
+         * @type {Array}
+         */
+        this.snapPoints= [];
+
         this.gameManager = gameManager;
         this.entityManager = this.gameManager.entityManager;
         this.playerManager = this.gameManager.playerManager;
@@ -378,7 +401,7 @@ class ToolManager{
          * filter which is used to display a selection
          * @type {PIXI.filters.BloomFilter}
          */
-        this.tools = [new SimpleDragTool(this.gameManager.inputHandler, this.gameManager.gameTable, this.gameManager.entityManager, this.gameManager.playerManager, this.gameManager.synchronizer)];
+        this.tools = [new SimpleDragTool(this)];
     }
 
     set currentTool(i){

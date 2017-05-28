@@ -103,6 +103,9 @@ class GameManager extends EventEmitter3{
             );
         }
 
+        // set the snappoints to the toolmanager
+        this.toolManager.snapPoints = game.snappoints || [];
+
         // create entities
         var newEntityList = [];
 

@@ -34,7 +34,20 @@ class BasicTool{
         this._min_zoom = 0.4;
         this._max_zoom = 2.5;
 
+        /**
+         * used to block cameramovement, when an entity was clicked,
+         * is released, when the key was released - see: this._initInputListeners
+         * @type {boolean}
+         * @private
+         */
         this._camera_grab_block=false;
+
+        this._initInputListeners();
+
+      //  this.selectionFilter =new PIXI.filters.BloomFilter();
+    }
+
+    _initInputListeners(){
 
         this.inputHanlder.on("mousewheel", this._zoom.bind(this), false)
             .on("mousemove",this._mouseMove.bind(this))
@@ -42,7 +55,6 @@ class BasicTool{
 
         this.inputHanlder.mapping.MOUSE_LEFT.on("pressed", function () {
             this.CAMERA_GRABBED = true;
-            console.log("x");
         }.bind(this))
             .on("released", function () {
                 this._camera_grab_block=false;
@@ -53,9 +65,30 @@ class BasicTool{
 
         this.entityManager.on("entityclicked",this._onEntityClicked.bind(this));
 
-      //  this.selectionFilter =new PIXI.filters.BloomFilter();
+        this.inputHanlder.mapping.TURN.on("pressed",this._turnSelectedEntities.bind(this));
     }
+
+
     update(delta){
+
+    }
+
+    _turnSelectedEntities(evt){
+        var ids= this.SELECTED_ENTITY_IDS;
+        this.synchronizer.updateQueue.postUpdate(Packages.PROTOCOL.GAME_STATE.ENTITY.USER_TURN_ENTITY,
+            this.synchronizer.CLIENT_INFO.id,
+            {
+                turnedEntities: ids,
+                _mode: "pushAvoidDuplicates"
+            }
+        );
+        this.synchronizer.updateQueue.postUpdate(Packages.PROTOCOL.GAME_STATE.ENTITY.USER_TURN_ENTITY,
+            this.synchronizer.CLIENT_INFO.id,
+            {
+                surface: "next",
+            }
+        );
+
 
     }
 

@@ -1,6 +1,7 @@
 /**
  * Created by Mick on 28.05.2017.
  */
+"use strict";
 
 if (!Array.prototype.indexOf) {
     Array.prototype.indexOf = function(searchElement, fromIndex) {
@@ -37,4 +38,63 @@ Array.prototype.removeByValue = function() {
         }
     }
     return this;
+};
+
+
+Number.prototype.between = function (min, max) {
+    return this > min && this < max;
+};
+
+Number.prototype.inRange = function (min, max) {
+    return this >= min && this <= max;
+};
+
+/**
+ * forces a number to be in a range
+ * @param min bottem boundary of the range
+ * @param max upper boundary of the range
+ * @returns {number} which is in the range, including the boundaries
+ */
+Number.prototype.forceRange = function (min, max) {
+    if(this <= min)return min;
+    if(this >= max)return max;
+
+    return this;
+};
+/*
+Number.prototype.nextRangeElement = function (min, max) {
+    var cur = this+1;
+    if(cur < min)return max;
+    if(cur > max)return min;
+    return this;
+};
+
+Number.prototype.previousRangeElement = function (min, max) {
+    var cur = this-1;
+    if(cur < min)return max;
+    if(cur > max)return min;
+    return this;
+};*/
+
+/**
+ * if the number is smaller than the range, then the highes number is returned,
+ * if it is higher, the smallest number is returned
+ * @param min
+ * @param max
+ * @returns {*}
+ */
+Number.prototype.torusRange = function (min, max) {
+    if(this < min)return max;
+    if(this > max)return min;
+    return this;
+};
+
+/**
+ * returns a random int between (including) max and min
+ * @param max highes possible random number
+ * @param min lowest possible random number (is 0 by default)
+ * @returns {number} the random number
+ */
+Math.randomInRange = function(max,min=0){
+    return Math.floor(Math.random() * (max - min + 1) + min)
 };

@@ -121,6 +121,10 @@ class GameServer{
                     case Packages.PROTOCOL.GAME_STATE.ENTITY.USER_ROTATE_ENTITY:
                         this.entityServerManager.batchRotateEntities(id, data[type][id]);
                         break;
+                    // am user wants to turn an entity
+                    case Packages.PROTOCOL.GAME_STATE.ENTITY.USER_TURN_ENTITY:
+                        this.entityServerManager.batchTurnEntities(id, data[type][id]);
+                        break;
                     // an user moves his mouse
                     case Packages.PROTOCOL.GAME_STATE.CLIENT.USER_MOUSE_POSITION:
                         var changed = this.clientManager.updateClientPosition(id,data[type][id].position);

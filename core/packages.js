@@ -77,6 +77,7 @@ module.exports =
 
                 /**
                  * is posted by client, when he rotates an entity
+                 * {rotatedEntites:[<list of entity ids>], rotationAmount:<amount of rotation>}
                  */
                 USER_ROTATE_ENTITY: "USER_ROTATE_ENTITY",
 
@@ -91,6 +92,17 @@ module.exports =
                  */
                 SERVER_ENTITY_DELETED: "ENTITY_DELETED",
 
+                /**
+                 * a user warns to turn a card,
+                 * userID and entity in the package
+                 * {turnedEntities:[<ids of entities>],surface:<index, or "next", "previous" or "random">}
+                 */
+                USER_TURN_ENTITY: "USER_TURN_ENTITY",
+
+                /**
+                 * server turns card.
+                 */
+                SERVER_TURN_ENTITY:"SERVER_TURN_ENTITY",
 
                 /**
                  * reject a user aciton, e.g. claim

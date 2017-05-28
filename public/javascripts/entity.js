@@ -139,8 +139,9 @@ class Entity extends PIXI.Sprite {
      * if no surfaceside passed, the surface just gets re-initialized.
      * @param index of the side
      */
-    showSurface(index) {
-        this.surfaceIndex = index || this.surfaceIndex || 0;
+    showSurface(index=0) {
+
+        this.surfaceIndex = index;//(!index && index != 0) ? (this.surfaceIndex || 0) : index;
 
         // check if the surfaceIndex is inside the possible range (number of surfaces)
         // if not, then force it to be inside of the range
@@ -168,10 +169,24 @@ class Entity extends PIXI.Sprite {
         // show text
         for (var i = 0; i < curSurface.text.length; i++) {
             var cText = curSurface.text[i];
-            var font = cText.font || "monospace";
-            var size = cText.size || 12;
+            var font = cText.fontFamily || "monospace";
+            var size = cText.fontSize || 12;
+            var align = cText.align || "left";
+            var weight = cText.fontWeight || "normal";
+            var letterSpacing = cText.letterSpacing || 0;
             var color = Util.parseColor(cText.color);
-            var cPixiText = new PIXI.Text(cText.content, {font: size + "pt " + font, fill: color});
+            //var cPixiText = new PIXI.Text(cText.content, {font: size + "pt " + font, fill: color});
+
+            // see http://pixijs.download/dev/docs/PIXI.TextStyle.html
+            var cPixiText = new PIXI.Text(cText.content || "no text",{
+                fontSize : size,
+                fontFamily: font,
+                fill : color,
+                align : align,
+                fontWeight:weight,
+                letterSpacing:letterSpacing
+            });
+
 
             if (cText.position) {    // set offset ofs the text
                 cPixiText.position.x = cText.position.x || 0;

@@ -496,7 +496,6 @@ class EntityServerManager extends EventEmitter3 {
                 continue;
             }
 
-
             // remove the claim value
             this.entities[curEntityID].claimedBy = this.bodies[curEntityID].claimedBy = "";
 
@@ -504,7 +503,9 @@ class EntityServerManager extends EventEmitter3 {
             this.bodies[curEntityID].collisionFilter=DEFAULT_FILTER;
 
             this.bodies[curEntityID].frictionAir = GameConfig.ENTITY_FRICTION;
-           // console.log("releas sensor",this.bodies[curEntityID].isSensor,curEntityID);
+
+            // release the entity by just posting the id in state change,
+            // default state will be generated
             this._postStateChange(curEntityID);
 
             // if constraint exist, delete it
@@ -514,12 +515,92 @@ class EntityServerManager extends EventEmitter3 {
     }
 
     /**
+     * turn all entities to the passed side
+     * @param userID user who wnats to turn the entity
+     * @param data the entities to turn looks like:
+     *  {turnedEntities:[<ids of entities>],surface:<index, or "next", "previous" or "random">}
+     */
+    batchTurnEntities(userID,data){
+        if(!data || !data.turnedEntities){
+            console.log("batchTurnEntities: no data passed for user",userID);
+            return;
+        }
+
+        for(var i =0; i<data.turnedEntities.length;i++){
+            this.turnEntity(userID,data.turnedEntities[i],data.surface);
+        }
+    }
+
+    /**
+     * turns the surface of an entity
+     * @param userID user who wants to turn the entitie
+     * @param surface accepts the actual index of the surface, "next", "previous" or "random".
+     */
+    turnEntity(userID,entityID,surface){
+
+        var curEntity = this.entities[entityID];
+
+        if(!userID || userID.length <=0){
+            console.log("turnEntity: no userID passed");
+            return;
+        }
+
+        if(!this.clientManager.doesClientExist(userID)){
+            console.log("turnEntity: user",userID,"does not exist");
+            return;
+        }
+
+        if(curEntity.state.userID != userID){
+            console.log("turnEntity: entity not claimed by user",userID);
+            return;
+        }
+
+        if (typeof surface == "number") {   // if the passed variable is an index
+            // apply the new surface, but check, that the new index is inside the valid range
+            // the valid range is the number of available surfaces for this object
+            curEntity.surfaceIndex = (surface).forceRange(0,curEntity.surfaces.length-1);
+        }else if (typeof surface == "string"){
+            var curSurfaceIndex = curEntity.surfaceIndex;
+
+            switch (surface){
+                case "next":
+                    curEntity.surfaceIndex = (curSurfaceIndex+1).torusRange(0,curEntity.surfaces.length-1);
+                    break;
+                case "previous":
+                    curEntity.surfaceIndex = (curSurfaceIndex-1).torusRange(0,curEntity.surfaces.length-1);
+                    break;
+                case "random":
+                    curEntity.surfaceIndex= Math.randomInRange(curEntity.surfaces.length-1);
+                    break;
+                default:
+                    console.log("turnEntity: invalid option passed",surface);
+                    return;
+            }
+        }else{
+            console.log("turnEntity: invalid option passed, not a number nor a string",surface);
+            return;
+        }
+
+        this.updateQueue.postUpdate(
+            Packages.PROTOCOL.GAME_STATE.ENTITY.SERVER_TURN_ENTITY,
+            entityID,
+            {surfaceIndex:curEntity.surfaceIndex}
+        );
+    }
+
+
+    /**
      * rotate all entitys by an amout and by an user
      * @param userID user who wants to rotate
      * @param data should look like:
-     *  {rotatedEntites:list of entity ids, rotationAmount:amount of rotation}
+     *  {rotatedEntites:[<list of entity ids>], rotationAmount:<amount of rotation>}
      */
     batchRotateEntities(userID, data){
+        if(!data || !data.rotatedEntities){
+            console.log("batchRotation: no data passed for user",userID);
+            return;
+        }
+
         for(var i =0; i<data.rotatedEntities.length;i++){
             this.rotateEntity(userID,data.rotatedEntities[i],data.rotationAmount);
         }
@@ -543,6 +624,10 @@ class EntityServerManager extends EventEmitter3 {
             return;
         }
 
+        if(!this.clientManager.doesClientExist(userID)){
+            console.log("user does not exist!",userID);
+        }
+
         if(!entityID){
             console.log("rotation: no entity id passed!",entityID);
             return;
@@ -560,6 +645,9 @@ class EntityServerManager extends EventEmitter3 {
 
         // multiply the passed value by the rotation speed
         Body.setAngularVelocity(this.bodies[entityID],rotationAmount*GameConfig.ROTATION_SPEED);
+
+        // changes will be postet in the engine.update overrite method,
+        // because the changes are done during the enigne step
     }
 
     /**

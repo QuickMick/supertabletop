@@ -46,9 +46,12 @@
                 "y": 0
               },
               "content": "testtext",
-              "size": 12,
+              "fontSize": 12,
               "color": "0x11ff3d",
-              "font": "monospace"
+              "fontFamily": "monospace",
+              "align":"center",
+              "fontWeight":"bold",
+              "letterSpacing":1
             }
           ]
         }

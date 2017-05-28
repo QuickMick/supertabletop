@@ -124,6 +124,47 @@ class EntityManager extends PIXI.Container{
         // change rotation, if available
         cur.rotation = transformation.angle || cur.rotation;
     }
+
+    /**
+     * turns multiple entities at once.
+     * used by the synchronizer, input datao looks like
+     * @param data {entityID:{surfaceIndex:<number>}}
+     */
+    batchTurnEntities(data) {
+        if(!data){
+            console.warn("batchTurnEntities:no update data passed");
+            return;
+        }
+        for(var entityID in data){
+            if(!data.hasOwnProperty(entityID))continue;
+            this.turnEntity(entityID,data[entityID].surfaceIndex);
+        }
+    }
+
+    /**
+     * turns an entity
+     * @param entityID id of entity which should be turned
+     * @param surfaceIndex {number} index of the surface, should be in the valid range,
+     *  otherwise the maximum or the minimum surface is displayed
+     */
+    turnEntity(entityID,surfaceIndex){
+        if(!entityID){
+            console.warn("turnEntity: entity id is necessary to update enitty");
+            return;
+        }
+
+        if(!this.entities[entityID]){
+            console.warn("turnEntity: entity",entityID,"does not exist!");
+            return;
+        }
+
+        if(!surfaceIndex && surfaceIndex !==0 ){// if surface does not exist
+            console.warn("turnEntity: no surface data for entity",entityID,"was passed");
+            return;
+        }
+
+        this.entities[entityID].showSurface(surfaceIndex);
+    }
 }
 
 module.exports= EntityManager;

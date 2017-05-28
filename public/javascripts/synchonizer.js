@@ -143,9 +143,13 @@ class Synchronizer{
                 case Packages.PROTOCOL.GAME_STATE.CLIENT.SERVER_CLIENT_POSITION_UPDATE:
                     this.playerManager.batchUpdatePlayerPosition(updates);
                     break;
-                // an entity gets deleted by an player or by the server
+                // an entity gets deleted by a player or by the server
                 case Packages.PROTOCOL.GAME_STATE.ENTITY.SERVER_ENTITY_DELETED:
-                    this.entityManager.removeEntity(Object.keys(updates));
+                    this.entityManager.removeEntity(Object.keys(updates));//just the entityIDs are passed
+                    break;
+                // an entity was turned by a player or by the server
+                case Packages.PROTOCOL.GAME_STATE.ENTITY.SERVER_TURN_ENTITY:
+                    this.entityManager.batchTurnEntities(updates);
                     break;
                 // the state of an entiy changes
                 case Packages.PROTOCOL.GAME_STATE.ENTITY.STATE_CHANGE:

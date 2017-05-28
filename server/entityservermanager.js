@@ -449,7 +449,7 @@ class EntityServerManager extends EventEmitter3 {
      */
     releaseEntities(userID, claimedEntityIDs){
         if(!this.clientManager.doesClientExist(userID)){
-            console.warn("user does not exist");
+            console.warn("releaseEntities: user does not exist");
             return;
         }
         if(!claimedEntityIDs){

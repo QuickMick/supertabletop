@@ -126,8 +126,17 @@ module.exports =
             CLIENT:{
                 /**
                  * is posted by client, when he moves the mouse
+                 * the package contains the new cursor position,
+                 * and sometimes relative positions for entities,
+                 * this is used for selections or snappoints
+                 *
+                 * {position:{x:0:y:0],relativePositions:{<entity_id>:{x:0,y:0}}
+                 *
+                 * the contrains for entities will be calculated based on the position,
+                 * if a relative position is available for an entity,
+                 * it will be summed up to get the final position
                  */
-                USER_MOUSE_POSITION: "USER_MOUSE_POSITION",
+                USER_POSITION_CHANGE: "USER_POSITION_CHANGE",
 
                 /**
                  * is posted by server, if any of the clients moves the mouse

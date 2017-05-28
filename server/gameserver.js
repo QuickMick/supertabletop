@@ -126,8 +126,9 @@ class GameServer{
                         this.entityServerManager.batchTurnEntities(id, data[type][id]);
                         break;
                     // an user moves his mouse
-                    case Packages.PROTOCOL.GAME_STATE.CLIENT.USER_MOUSE_POSITION:
+                    case Packages.PROTOCOL.GAME_STATE.CLIENT.USER_POSITION_CHANGE:
                         var changed = this.clientManager.updateClientPosition(id,data[type][id].position);
+                        this.entityServerManager.batchSetRelativeConstraintPosition(id,data[type][id].relativePositions);
                         // distribute the new position to every other users
                         if(changed) {
                             this.updateQueue.postUpdate(

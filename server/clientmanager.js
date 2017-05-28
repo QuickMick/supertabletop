@@ -162,7 +162,7 @@ class ClientManager{
     /**
      *
      * @param userID
-     * @param newPosition
+     * @param newPosition {object} looks like {position:{x:0:y:0]}
      * @returns {boolean} true, if positon has changed, false if not;
      */
     updateClientPosition(userID,newPosition){
@@ -177,11 +177,12 @@ class ClientManager{
             return false;
         }
 
-        if(cur.position.x == newPosition.x && cur.position.y == newPosition.y)
+        if(cur.position.x == newPosition.x && cur.position.y == newPosition.y) {
             return false;
+        }
 
-        cur.position.x = newPosition.x;
-        cur.position.y = newPosition.y;
+        cur.position.x = newPosition.x || 0;
+        cur.position.y = newPosition.y || 0;
 
         return true;
     }

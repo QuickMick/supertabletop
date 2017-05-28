@@ -83,6 +83,9 @@ class EntityServerManager extends EventEmitter3 {
 
         /**
          * contains all contstraings, created by user input
+         * this.constraints[userID][claimedEntityID] = constraint
+         * an constraint is always referenced to an user,
+         * this is used to handle the mouse movement
          * @type {Constraint}
          */
         this.constraints = null;
@@ -102,9 +105,6 @@ class EntityServerManager extends EventEmitter3 {
         this.engine = null;
 
         this._resetGame();
-        //this.engine = Engine.create();
-
-       // this._queue = {};
 
         setInterval(function() {
             Engine.update(this.engine, 1000 / this.ticks);
@@ -337,10 +337,11 @@ class EntityServerManager extends EventEmitter3 {
      */
     removeEntity(id){
         if(!id || !id.length ||  id.length <0 || !this.entities[id]){
-            console.warn("entity does not exist or no id passed :",id);
+            console.warn("removeEntity: entity does not exist or no id passed :",id);
             return;
         }
 
+        // remove form game instanz
         this.game.entities.removeByValue(this.entities[id]);
         delete this.entities[id];
 
@@ -375,6 +376,10 @@ class EntityServerManager extends EventEmitter3 {
         // if passed value is no array, then converte it to one
         claimedEntityIDs = [].concat(claimedEntityIDs);
 
+        // needs to be in a local variable,
+        // to be able to pass it to the getter of the constraint
+        var clientManager = this.clientManager;
+
         // iterated the claimed ids
         for(var i =0; i<claimedEntityIDs.length; i++) {
             var claimedEntityID = claimedEntityIDs[i];
@@ -391,11 +396,24 @@ class EntityServerManager extends EventEmitter3 {
             }
 
             // create the constraint
-            var cPos = this.clientManager.getPosition(userID);
+
 
             var constraint = Constraint.create({
                 label: userID,
-                pointA: cPos,
+                userID: userID,
+                entityID: this.bodies[claimedEntityID].ENTITY_ID,
+                get pointA() {
+                    var cPos = clientManager.getPosition(this.userID);
+                  //  console.log(this.userID,cPos,this.relativePosition);
+                    var result = {x: cPos.x, y: cPos.y};
+
+                    if (this.relativePosition) {
+                        result.x += this.relativePosition.x;
+                        result.y += this.relativePosition.y;
+                    }
+
+                    return result;
+                },
                 bodyB: this.bodies[claimedEntityID],
                 pointB: {x: 0, y: 0},
                 length: 0.01,
@@ -514,6 +532,111 @@ class EntityServerManager extends EventEmitter3 {
         }
     }
 
+
+    /**
+     * sets the relative position for all passed entites by a user,
+     *
+     * if no data is passed, all realtiva positions of all claimed entities are deleted
+     *
+     * @param userID id who sets the positions
+     * @param relativePositions {object} looks like {<entity_id>:{x:0,y:0}}
+     */
+    batchSetRelativeConstraintPosition(userID,relativePositions){
+        if(!relativePositions){
+            this.cleanRelativConstraintPositions(userID);
+            return;
+        }
+
+        for(var entityID in relativePositions){
+            if(!relativePositions.hasOwnProperty(entityID)) continue;
+
+            var rPos = relativePositions[entityID];
+            this.setRelativeConstraintPosition(userID,entityID,rPos);
+        }
+    }
+
+    /**
+     * checks if user has contraints,
+     * if yes, all relative positions are deleted
+     * @param userID to check
+     */
+    cleanRelativConstraintPositions(userID){
+        if(!userID){
+            console.log("setRelativeConstraintPosition: no userID passed");
+            return;
+        }
+
+        if(!this.clientManager.doesClientExist(userID)){
+            console.log("setRelativeConstraintPosition: user",userID,"does not exist");
+            return;
+        }
+
+        if(!this.constraints[userID]){  // no constrains exist for this user
+            return;
+        }
+
+        var cCur = this.constraints[userID];
+        // iterate all constraints
+        for(var entityID in cCur){
+            if(!cCur.hasOwnProperty(entityID)) continue;
+            var constraint = cCur[entityID];
+            delete constraint.relativePosition; // remove the relative position
+        }
+    }
+
+    /**
+     * sets the relative position of a constraint.
+     * it is usesd e.g. to implement snap points or multiselection,
+     * the final point of the contraint is caluculated by using the
+     * client position summed up with the relative position.
+     *
+     * @param userID contraint of user
+     * @param entityID contraint for entity
+     * @param rPos the relative position
+     */
+    setRelativeConstraintPosition(userID,entityID,rPos){
+        if(!userID){
+            console.log("setRelativeConstraintPosition: no userID passed");
+            return;
+        }
+
+        if(!this.clientManager.doesClientExist(userID)){
+            console.log("setRelativeConstraintPosition: user",userID,"does not exist");
+            return;
+        }
+
+        if(!entityID){
+            console.log("setRelativeConstraintPosition: no entity id passed!",entityID);
+            return;
+        }
+
+        if(!this.entities[entityID]){
+            console.log("setRelativeConstraintPosition: entity",entityID,"does not exist!");
+            return;
+        }
+
+        if(this.entities[entityID].claimedBy != userID){
+            console.log("setRelativeConstraintPosition: entity",entityID,"not claimed by user",userID,"rotation aborted");
+            return;
+        }
+
+        if(!this.constraints[userID] || !this.constraints[userID][entityID]){
+            console.log("setRelativeConstraintPosition: no constrain exist for user:",userID," and entity",entityID);
+            return;
+        }
+
+        if(!rPos){
+            console.log("setRelativeConstraintPosition:no relative data for entity",entityID,"and user",userID,"passed");
+            return;
+        }
+
+        // set the relative position
+        this.constraints[userID][entityID].relativePosition = {
+            x:rPos.x||0,
+            y:rPos.y||0
+        };
+    }
+
     /**
      * turn all entities to the passed side
      * @param userID user who wnats to turn the entity
@@ -537,7 +660,6 @@ class EntityServerManager extends EventEmitter3 {
      * @param surface accepts the actual index of the surface, "next", "previous" or "random".
      */
     turnEntity(userID,entityID,surface){
-
         var curEntity = this.entities[entityID];
 
         if(!userID || userID.length <=0){
@@ -550,10 +672,16 @@ class EntityServerManager extends EventEmitter3 {
             return;
         }
 
-        if(curEntity.state.userID != userID){
+        if(curEntity.claimedBy != userID){
             console.log("turnEntity: entity not claimed by user",userID);
             return;
         }
+
+        if(!curEntity.turnable){
+            console.log("turnEntity: entity",entityID,"is not turnable, tried by user",userID);
+            return;
+        }
+
 
         if (typeof surface == "number") {   // if the passed variable is an index
             // apply the new surface, but check, that the new index is inside the valid range

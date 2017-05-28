@@ -271,33 +271,49 @@ class SimpleDragTool extends BasicTool{
         }
         this._oldLocalPos=localPos;
 
+        // crate data which will be send to the server
+        var data = {
+            position:{x:(localPos.x),y:(localPos.y)},
+        };
 
         // if there is a selection,
-        if(this.SELECTED_ENTITIES.length > 0) {
-            //check if the user is inside of a snappoint, if yes, snap the mouse position to the snappoint instead.
-            for (var i = 0; i < this.toolManager.snapPoints.length; i++) {
-                var curPoint = this.toolManager.snapPoints[i];
-                var pPos = curPoint.position;
-                // calculate the distance to the snap point
-                var dist = Util.getVectorDistance(localPos.x, localPos.y, pPos.x, pPos.y);
+        var selectedEntities = this.SELECTED_ENTITIES;
+        if(selectedEntities.length > 0) {
+            for(var j=0;j<selectedEntities.length;j++) {
+                var curEntity = selectedEntities[j];
+                var ePos = curEntity.position;
+                // check if an entity is inside of a snappoint range, if yes, put the relative position,
+                // so that the entity snaps to this point.
+                for (var i = 0; i < this.toolManager.snapPoints.length; i++) {
+                    var curPoint = this.toolManager.snapPoints[i];
+                    var pPos = curPoint.position;
 
-                // check if the mouse position is smaller or equals the radius of the snappoint
-                if (dist < curPoint.radius) {
-                    // if this statement is true, then the snap points position is passed to the server instead of the
-                    // real position
-                    localPos.x = pPos.x;
-                    localPos.y = pPos.y;
-                    break;
+                    // calculate the distance to the snap point
+                    var dist = Util.getVectorDistance(ePos.x, ePos.y, pPos.x, pPos.y);
+
+                    // check if the position is smaller or equals the radius of the snappoint
+                    if (dist > curPoint.radius) continue; // otherwise, do not send relative positions
+
+                    // if this statement is true, then set the relative position to the snappoint,
+                    // and pass the entity id. the entitys position will use the relative position
+                    // summed up with the mouse position
+
+                    // be sure, the relativePosition object
+                    data.relativePositions = data.relativePositions || {};
+
+                    data.relativePositions[curEntity.ENTITY_ID] = {
+                        x:pPos.x-localPos.x,
+                        y:pPos.y-localPos.y
+                    };
                 }
             }
         }
 
-
         // if something has changed, then update the server
-        this.synchronizer.updateQueue.postUpdate(Packages.PROTOCOL.GAME_STATE.CLIENT.USER_MOUSE_POSITION, this.synchronizer.CLIENT_INFO.id,
-            {
-                position:{x:(localPos.x),y:(localPos.y)}
-            }
+        this.synchronizer.updateQueue.postUpdate(
+            Packages.PROTOCOL.GAME_STATE.CLIENT.USER_POSITION_CHANGE,
+            this.synchronizer.CLIENT_INFO.id,
+            data
         );
     }
 

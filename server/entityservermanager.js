@@ -438,6 +438,7 @@ class EntityServerManager extends EventEmitter3 {
     releaseAllContraintsForUser(userID){
         if(!this.constraints[userID]){
             console.log(userID,"has no constraints");
+            return;
         }
         this.releaseEntities(userID,Object.keys(this.constraints[userID]));
     }
@@ -454,6 +455,7 @@ class EntityServerManager extends EventEmitter3 {
         }
         if(!claimedEntityIDs){
             console.warn("nothing to claime passed");
+            return;
         }
 
         claimedEntityIDs = [].concat(claimedEntityIDs);
@@ -486,9 +488,14 @@ class EntityServerManager extends EventEmitter3 {
         }
     }
 
+    /**
+     * rotate all entitys by an amout and by an user
+     * @param userID user who wants to rotate
+     * @param data should look like:
+     *  {rotatedEntites:list of entity ids, rotationAmount:amount of rotation}
+     */
     batchRotateEntities(userID, data){
         for(var i =0; i<data.rotatedEntities.length;i++){
-
             this.rotateEntity(userID,data.rotatedEntities[i],data.rotationAmount);
         }
     }

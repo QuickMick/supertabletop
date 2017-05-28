@@ -319,12 +319,15 @@ class EntityServerManager extends EventEmitter3 {
             return;
         }
 
+        this.game.entities.removeByValue(this.entities[id]);
         delete this.entities[id];
 
         if(this.constraints[id]) {
             World.add(this.engine.world, this.constraints[id]);
             delete this.constraints[id];
         }
+
+
 
         if(this.bodies[id]){
             World.add(this.engine.world, this.bodies[id]);
@@ -384,6 +387,7 @@ class EntityServerManager extends EventEmitter3 {
             this.bodies[claimedEntityID].isSensor = true;       //this means->"no" collision with normal entities
         //    console.log("claim sensor",this.bodies[claimedEntityID].isSensor,claimedEntityID);
             // save the constraint
+            // an user can create several constraints
             if (!this.constraints[userID]) {
                 this.constraints[userID] = {};
             }
@@ -391,9 +395,14 @@ class EntityServerManager extends EventEmitter3 {
             // set the claimedBy value to the userID, so we know that the entity is claimed by whom.
             this.entities[claimedEntityID].claimedBy = this.bodies[claimedEntityID].claimedBy = userID;
 
+            //mark identifier (entity id)
             constraint.ENTITY_ID = claimedEntityID;
+
+            // cache the constraint
             this.constraints[userID][claimedEntityID] = constraint;
-            World.add(this.engine.world, constraint);            // finally add the constraint to the world
+
+            // finally add the constraint to the world
+            World.add(this.engine.world, constraint);
 
             // post, that the entity is now claimed by a user
             this._postStateChange(
@@ -423,6 +432,17 @@ class EntityServerManager extends EventEmitter3 {
     }
 
     /**
+     * releases all constraints for a user, e.g. when he disconnects
+     * @param userID
+     */
+    releaseAllContraintsForUser(userID){
+        if(!this.constraints[userID]){
+            console.log(userID,"has no constraints");
+        }
+        this.releaseEntities(userID,Object.keys(this.constraints[userID]));
+    }
+
+    /**
      *
      * @param userID
      * @param claimedEntityIDs {Array}
@@ -441,10 +461,16 @@ class EntityServerManager extends EventEmitter3 {
             var curEntityID = claimedEntityIDs[i];
 
             // check if there is a constraint
-            if(!this.constraints[userID] || !this.constraints[userID][curEntityID]){
-                console.log("constraint does not exists fot user ",userID," and entity ",curEntityID);
+            if(!this.constraints[userID]){
+                console.log("no constraints does not exists fot user ",userID," and entity ",curEntityID);
                 return;
             }
+
+            if(!this.constraints[userID][curEntityID]){
+                console.log("constraint does not exists fot user ",userID," and entity ",curEntityID);
+                continue;
+            }
+
 
             // remove the claim value
             this.entities[curEntityID].claimedBy = this.bodies[curEntityID].claimedBy = "";

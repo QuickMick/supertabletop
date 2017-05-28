@@ -78,6 +78,7 @@ class GameServer{
         //removes this client from the serverclient list and broadcasts the information to all remaining clients
         socket.on('disconnect', function (data) {
             this.clientManager.clientDisconnected(socket, data);
+            this.entityServerManager.releaseAllContraintsForUser(socket.id);
             this._boradcastExceptSender(
                 socket,
                 Packages.PROTOCOL.SERVER.CLIENT_DISCONNECTED,

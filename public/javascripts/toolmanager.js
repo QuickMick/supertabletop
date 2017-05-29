@@ -506,7 +506,7 @@ class SimpleDragTool extends BasicTool{
                 }
             );
         }else{ // else rotate just the camera
-            this.gameTable.rotation += (rotationAmount/10)*delta;
+            this.gameTable.rotation += rotationAmount*delta;
         }
 
     }

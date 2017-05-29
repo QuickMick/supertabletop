@@ -171,11 +171,10 @@ class GameManager extends EventEmitter3{
     }
 
     update(delta){
-
         var elapsed =this.app.ticker.elapsedMS;
-
-        this.toolManager.update(delta);   //TODO: pass real delta time - weis net was passiert wenn ichs mach
-        this.lerpManager.update(elapsed);
+        var d = elapsed/1000;
+        this.toolManager.update(d);   //TODO: pass real delta time - weis net was passiert wenn ichs mach
+        this.lerpManager.update(d);
     }
 
     initEasterEggs(){

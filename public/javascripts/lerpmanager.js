@@ -134,6 +134,9 @@ class LerpManager {
     }*/
 
     update(delta){
+        // convert timestep back to time, since last frame
+        var deltaTime = delta*1000;
+
         for(var objectID in this._queue){
             if(!this._queue.hasOwnProperty(objectID)) continue;
             var objectLerps = this._queue[objectID];
@@ -142,7 +145,7 @@ class LerpManager {
                 if (!objectLerps.hasOwnProperty(label)) continue;
                 var cur = objectLerps[label];
 
-                cur.intervallProgress += delta;
+                cur.intervallProgress += deltaTime;
                 var percent = cur.intervallProgress / cur.interval;
 
                 // perform the lerp

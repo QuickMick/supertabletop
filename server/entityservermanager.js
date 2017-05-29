@@ -426,8 +426,8 @@ class EntityServerManager extends EventEmitter3 {
 
             this.bodies[claimedEntityID].frictionAir = GameConfig.GRABBED_ENTITY_FRICTION;
 
-           // this.bodies[claimedEntityID].isSensor = true;       //this means->"no" collision with normal entities
-            this.bodies[claimedEntityID].collisionFilter=CLAIMED_FILTER;
+            this.bodies[claimedEntityID].isSensor = true;       //this means->"no" collision with normal entities
+           // this.bodies[claimedEntityID].collisionFilter=CLAIMED_FILTER;
 
             //    console.log("claim sensor",this.bodies[claimedEntityID].isSensor,claimedEntityID);
             // save the constraint
@@ -520,8 +520,8 @@ class EntityServerManager extends EventEmitter3 {
             // remove the claim value
             this.entities[curEntityID].claimedBy = this.bodies[curEntityID].claimedBy = "";
 
-           // this.bodies[curEntityID].isSensor = false;
-            this.bodies[curEntityID].collisionFilter=DEFAULT_FILTER;
+            this.bodies[curEntityID].isSensor = false;
+            //this.bodies[curEntityID].collisionFilter=DEFAULT_FILTER;
 
             this.bodies[curEntityID].frictionAir = GameConfig.ENTITY_FRICTION;
 

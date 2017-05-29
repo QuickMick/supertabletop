@@ -2,7 +2,7 @@
  * Created by Mick on 28.05.2017.
  */
 "use strict";
-
+/*
 if (!Array.prototype.indexOf) {
     Array.prototype.indexOf = function(searchElement, fromIndex) {
         var k;
@@ -27,8 +27,8 @@ if (!Array.prototype.indexOf) {
         }
         return -1;
     };
-}
-
+*/
+/*
 Array.prototype.removeByValue = function() {
     var what, a = arguments, L = a.length, ax;
     while (L && this.length) {
@@ -38,7 +38,7 @@ Array.prototype.removeByValue = function() {
         }
     }
     return this;
-};
+};*/
 
 /*
 Number.prototype.between = function (min, max) {

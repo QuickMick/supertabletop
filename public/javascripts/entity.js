@@ -82,6 +82,10 @@ class Entity extends PIXI.Sprite {
 
         // finally, display the visible surface
         this.showSurface(this.surfaceIndex);
+
+        // give user mouseover feedback
+        this._applyMouseoverEffect();
+        this.showMouseoverEffect = true;
     }
 
     /**
@@ -215,6 +219,44 @@ class Entity extends PIXI.Sprite {
         // if there are no filters anymore, just set null
         this.filters = (n.length <= 0) ? null:n;
 
+    }
+
+    /**
+     * adds the mouseover effect to the entity
+     * @private
+     */
+    _applyMouseoverEffect(){
+        if(this._hasMouseOverApplied) return;
+        this._hasMouseOverApplied = true;
+        this.on('mouseover', function () {
+            if(!this.showMouseoverEffect) return;
+            var factor = 1.1;
+            this._backupMouseover = {
+                x:this.scale.x,
+                y:this.scale.y,
+                tmpX:this.scale.x*factor,
+                tmpY:this.scale.y*factor,
+                tint:this.tint,
+                tmpTint:0xfff7c4
+            };
+
+            this.tint = this._backupMouseover.tmpTint;
+            this.scale.set(this._backupMouseover.tmpX,this._backupMouseover.tmpY);
+        }.bind(this), false)
+            .on('mouseout', function () {
+
+                if(!this._backupMouseover) return;
+
+                // if some values we modified in the mouseover have changed, do not override the changes
+                if(this.scale.x == this._backupMouseover.tmpX && this.scale.y == this._backupMouseover.tmpY)
+                    this.scale.set(this._backupMouseover.x,this._backupMouseover.y);
+
+                if(this.tint == this._backupMouseover.tmpTint)
+                    this.tint = this._backupMouseover.tint;
+
+                delete this._backupMouseover;
+
+            }.bind(this), false)
     }
 }
 

@@ -130,6 +130,18 @@ class Util{
         xhr.send();
     }*/
 
+    static removeByValue(array) {
+    var what, a = arguments, L = a.length, ax;
+    while (L>1 && array.length) {
+        what = a[--L];
+        while ((ax = array.indexOf(what)) !== -1) {
+            array.splice(ax, 1);
+        }
+    }
+    return array || [];
+};
+
+
 
     /**
      * performs linaar interpolation

@@ -103,7 +103,13 @@ class BasicTool{
     }
 
     _releaseSelection(evt){
-        this._selected_entities = [];
+       // this._selected_entities = [];
+        var i = this._selected_entities.length;
+        if(i<=0)return; // no elements --> nothing to release
+        // remove every element one by one, so that the remove function is called
+        while (i--) {
+            this.removeEntityFromSelection(this._selected_entities[i]);
+        }
     }
 
     /**
@@ -163,6 +169,9 @@ class BasicTool{
     addEntityToSelection(entity){
        if(!entity) return;
        // avoid duplicates by using a set
+
+        entity._backupShowMouseoverEffect = entity.showMouseoverEffect;
+        entity.showMouseoverEffect = false;
        this._selected_entities =[...new Set((this._selected_entities || []).concat(entity))];
    }
 
@@ -172,7 +181,9 @@ class BasicTool{
      */
     removeEntityFromSelection(entity){
         if(!entity) return;
-        this._selected_entities = this._selected_entities.removeByValue(entity);
+        entity.showMouseoverEffect = entity._backupShowMouseoverEffect;
+        delete entity._backupShowMouseoverEffect;
+        this._selected_entities = Util.removeByValue(this._selected_entities,entity);
     }
 
     get selectedEntityIDs(){
@@ -297,7 +308,7 @@ class SimpleDragTool extends BasicTool{
      */
     removeEntityFromSelection(entity){
         super.removeEntityFromSelection(entity);
-        this._currentSnaps = this._currentSnaps.removeByValue(entity.ENTITY_ID);
+        this._currentSnaps = Util.removeByValue(this._currentSnaps,entity.ENTITY_ID);
     }
 
 

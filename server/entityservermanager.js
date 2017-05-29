@@ -347,7 +347,7 @@ class EntityServerManager extends EventEmitter3 {
         }
 
         // remove form game instanz
-        this.game.entities.removeByValue(this.entities[id]);
+        this.game.entities = Util.removeByValue(this.game.entities,this.entities[id]);
         delete this.entities[id];
 
         if(this.constraints[id]) {

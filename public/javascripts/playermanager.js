@@ -18,7 +18,7 @@ var ColorLibrary = require('./../resources/colors.json');
  */
 class PlayerManager extends PIXI.Container {
 
-    constructor() {
+    constructor(inputHandler,gameTable) {
         super();
         /**
          * Contains all players
@@ -26,12 +26,34 @@ class PlayerManager extends PIXI.Container {
          */
         this.players = {};
 
+        /**
+         * holds the player reference of the current player,
+         * it is also available in the players hashmap
+         * @type {pbject}
+         */
+    /*    this.currentPlayer = null;
+
+        this.gameTable = gameTable;
+        inputHandler.on("rawmousemove",this._processPlayerInput.bind(this));*/
     }
 
     /**
+     * updates the players position
+     * @param evt
+     * @private
+     */
+   /* _processPlayerInput(evt){
+        if(!this.currentPlayer) return;
+        var localPos = evt.data.getLocalPosition(this.gameTable);
+
+        this.currentPlayer.position.x = localPos.x;
+        this.currentPlayer.position.y = localPos.y;
+    }
+*/
+    /**
      * @param @type {aarray} player_data [{id,color,position,color,cursor_type}]
      */
-    addPlayer(players) {
+    addPlayers(players) {
         players = [].concat(players);
         for(var i=0; i<players.length;i++) {
             var player_data = players[i];
@@ -60,17 +82,46 @@ class PlayerManager extends PIXI.Container {
             this.addChild(this.players[player_data.id]);
             console.info(player_data.id,"connected");
         }
-    };
+    }
 
     initCurrentPlayer(data){
         if(!data){
             console.error("cannot init player without data");
             return;
         }
-
-        this.addPlayer(data);
+        this.players[data.id] = data;
+       // this.addPlayers(data);
         this.players[data.id].isCurrentPlayer = true;
+      //  this.currentPlayer = this.players[data.id];
+
+        var cursor = CursorLibrary[data.cursor] || CursorLibrary["default"];
+        this._toDataURL(PIXI.loader.resources[cursor.texture].data.currentSrc,function (dUrl) {
+            console.log(dUrl);
+            var screen = document.getElementById("stage");
+            var anchor_x = PIXI.loader.resources[cursor.texture].texture.width * (cursor.anchor.x || 0);
+            var anchor_y = PIXI.loader.resources[cursor.texture].texture.height * (cursor.anchor.y || 0);
+            screen.style.cursor = "url('"+dUrl+"') "+anchor_x+" "+anchor_y+", auto";
+        });
     }
+
+
+
+    _toDataURL(url, callback) {
+        var xhr = new XMLHttpRequest();
+        xhr.onload = function() {
+            var reader = new FileReader();
+            reader.onloadend = function() {
+                callback(reader.result);
+            };
+            reader.readAsDataURL(xhr.response);
+        };
+        xhr.open('GET', url);
+        xhr.responseType = 'blob';
+        xhr.send();
+    }
+
+
+
 
     /**
      * changes the displayed image of the player

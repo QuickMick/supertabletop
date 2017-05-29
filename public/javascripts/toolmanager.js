@@ -3,8 +3,10 @@
  */
 'use strict';
 
+const Config = require('./../resources/config.json');
 var Packages = require('./../../core/packages');
 var Util = require('./../../core/util');
+
 
 var OutlineFilter = require('./filters/outlinefilter');
 
@@ -474,8 +476,10 @@ class SimpleDragTool extends BasicTool{
 
     update(delta){
         super.update(delta);
+        this._processRotationInput(delta);
+    }
 
-        // ---------------- UPDATE ROTATION --------------------------
+    _processRotationInput(delta){
         // check for rotation
         var rotationAmount = 0;
         if(this.inputHanlder.mapping.ROTATE_RIGHT.isDown){
@@ -506,9 +510,8 @@ class SimpleDragTool extends BasicTool{
                 }
             );
         }else{ // else rotate just the camera
-            this.gameTable.rotation += rotationAmount*delta;
+            this.gameTable.rotation += rotationAmount*Config.TABLE_ROTATION_SPEED*delta;
         }
-
     }
 }
 

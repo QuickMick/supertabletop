@@ -117,7 +117,6 @@ class EntityManager extends PIXI.Container{
             console.warn("no transformation data for entity",entityID,"was passed");
             return;
         }
-console.log(timeSinceLastUpdate);
         var cur = this.entities[entityID];
 
         // sometimes, just the angle is sent, position stays same

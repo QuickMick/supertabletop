@@ -148,7 +148,6 @@ class InputHandler extends EventEmitter{
     }
 
     _onMouseMove(evt) {
-
         var m = evt.data.global;
 
         this.mouse.lastX = this.mouse.x;

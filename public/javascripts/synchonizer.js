@@ -129,7 +129,7 @@ class Synchronizer{
 
         // another player connected
         this.socket.on(Packages.PROTOCOL.SERVER.CLIENT_CONNECTED, function (evt) {
-            this.playerManager.addPlayer(evt.data)
+            this.playerManager.addPlayers(evt.data);
         }.bind(this));
 
         // an client disconnects

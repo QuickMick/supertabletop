@@ -4,6 +4,7 @@
     "MIN": 0.3,
     "SENSIVITY": 0.1
   },
+  "TABLE_ROTATION_SPEED":10,
   "KEY_MAPPING":{
     "TURN":{"keyboard":[70],"mouse":[]},
     "MOUSE_LEFT":{"keyboard":[],"mouse":[0]},

@@ -50,12 +50,12 @@ class GameManager extends EventEmitter3{
 
         this.lerpManager = new LerpManager();
         this.entityManager = new EntityManager(this.lerpManager);
-        this.playerManager = new PlayerManager;
+        this.playerManager = new PlayerManager(this.inputHandler,this.gameTable);
         this.synchronizer = new Synchronizer(this);     // initialize socket-connection/synchronizer
 
-        this.gameTable.min_zoom = Config.ZOOM.MIN;
+       /* this.gameTable.min_zoom = Config.ZOOM.MIN;
         this.gameTable.max_zoom = Config.ZOOM.MAX;
-        this.gameTable.zoom_sensivity = Config.ZOOM.SENSIVITY;
+        this.gameTable.zoom_sensivity = Config.ZOOM.SENSIVITY;*/
 
         // setup container hierarchy
         this.gameTable.addChild(this.entityManager);

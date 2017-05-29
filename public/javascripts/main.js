@@ -30,7 +30,7 @@ else if (window.mozRequestAnimationFrame)
 else if (window.webkitRequestAnimationFrame)
     window.requestAnimationFrame=window.webkitRequestAnimationFrame;
 
-Number.prototype.round = function (decimal=0) {
+/*Number.prototype.round = function (decimal=0) {
     var x;
     switch(decimal){
         case 0: x=1; break;
@@ -40,7 +40,7 @@ Number.prototype.round = function (decimal=0) {
         default: x= Math.pow(10,decimal); break;
     }
     return (Math.round(this * x)/x)
-};
+};*/
 
 
 window.showLoadingDialog=function(){

@@ -40,7 +40,7 @@ Array.prototype.removeByValue = function() {
     return this;
 };
 
-
+/*
 Number.prototype.between = function (min, max) {
     return this > min && this < max;
 };
@@ -60,7 +60,7 @@ Number.prototype.round = function (decimal=0) {
     }
     return (Math.round(this * x)/x)
 };
-
+*/
 
 /**
  * forces a number to be in a range
@@ -68,12 +68,12 @@ Number.prototype.round = function (decimal=0) {
  * @param max upper boundary of the range
  * @returns {number} which is in the range, including the boundaries
  */
-Number.prototype.forceRange = function (min, max) {
+/*Number.prototype.forceRange = function (min, max) {
     if(this <= min)return min;
     if(this >= max)return max;
 
     return this;
-};
+};*/
 /*
 Number.prototype.nextRangeElement = function (min, max) {
     var cur = this+1;
@@ -96,11 +96,11 @@ Number.prototype.previousRangeElement = function (min, max) {
  * @param max
  * @returns {*}
  */
-Number.prototype.torusRange = function (min, max) {
+/*Number.prototype.torusRange = function (min, max) {
     if(this < min)return max;
     if(this > max)return min;
     return this;
-};
+};*/
 
 /**
  * returns a random int between (including) max and min
@@ -108,6 +108,6 @@ Number.prototype.torusRange = function (min, max) {
  * @param min lowest possible random number (is 0 by default)
  * @returns {number} the random number
  */
-Math.randomInRange = function(max,min=0){
+/*Math.randomInRange = function(max,min=0){
     return Math.floor(Math.random() * (max - min + 1) + min)
-};
+};*/

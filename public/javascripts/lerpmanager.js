@@ -122,17 +122,6 @@ class LerpManager {
         return start + (diff * t);
     }
 
-    static lerp(v0,v1,t){
-        return (1 - t) * v0 + t * v1;
-    }
-
-   /* static lerpPosition(p0, p1, t) {
-        return {
-            x: LerpManager.lerpInRange(p0.x || 0, p1.x || 0, t),
-            y: LerpManager.lerpInRange(p0.y || 0, p1.y || 0, t)
-        };
-    }*/
-
     update(delta){
         // convert timestep back to time, since last frame
         var deltaTime = delta*1000;

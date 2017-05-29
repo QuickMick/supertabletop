@@ -10,6 +10,7 @@ var Matter = require('matter-js');
 var Constraint = Matter.Constraint;
 
 var Packages = require('./../core/packages');
+var Util = require('./../core/util');
 
 var GameConfig = require('./gameconfig.json');
 
@@ -156,17 +157,17 @@ class EntityServerManager extends EventEmitter3 {
 
         // send just the changed values, values are rounded,
         // because it is not necessary to send 0.0001 changes
-        if (oldData.x.round(SEND_PERCISION_POSITION) != body.position.x.round(SEND_PERCISION_POSITION)){
+        if (Util.round(oldData.x,SEND_PERCISION_POSITION) != Util.round(body.position.x,SEND_PERCISION_POSITION)){
             data.position = data.position || {};
             data.position.x = body.position.x;
             updateRequired=true;
         }
-        if(oldData.y.round(SEND_PERCISION_POSITION) != body.position.y.round(SEND_PERCISION_POSITION) ){
+        if(Util.round(oldData.y,SEND_PERCISION_POSITION) != Util.round(body.position.y,SEND_PERCISION_POSITION) ){
             data.position = data.position || {};
             data.position.y = body.position.y;
             updateRequired=true;
         }
-        if(oldData.angle.round(SEND_PERCISION_ROTATION) != body.angle.round(SEND_PERCISION_ROTATION)){
+        if(Util.round(oldData.angle,SEND_PERCISION_ROTATION) != Util.round(body.angle,SEND_PERCISION_ROTATION)){
             data.angle = body.angle;
             updateRequired=true;
         }
@@ -694,13 +695,13 @@ class EntityServerManager extends EventEmitter3 {
 
             switch (surface){
                 case "next":
-                    curEntity.surfaceIndex = (curSurfaceIndex+1).torusRange(0,curEntity.surfaces.length-1);
+                    curEntity.surfaceIndex = Util.torusRange((curSurfaceIndex+1),0,(curEntity.surfaces.length-1));
                     break;
                 case "previous":
-                    curEntity.surfaceIndex = (curSurfaceIndex-1).torusRange(0,curEntity.surfaces.length-1);
+                    curEntity.surfaceIndex = Util.torusRange((curSurfaceIndex-1),0,(curEntity.surfaces.length-1));
                     break;
                 case "random":
-                    curEntity.surfaceIndex= Math.randomInRange(curEntity.surfaces.length-1);
+                    curEntity.surfaceIndex= Util.randomInRange(curEntity.surfaces.length-1);
                     break;
                 default:
                     console.log("turnEntity: invalid option passed",surface);

@@ -314,8 +314,8 @@ class SimpleDragTool extends BasicTool{
 
         // if nothing has changed, then updating the server is not necessary
         if(this._oldLocalPos
-            && this._oldLocalPos.x.round(SEND_PERCISION_POSITION) == localPos.y.round(SEND_PERCISION_POSITION)
-            && this._oldLocalPos.y.round(SEND_PERCISION_POSITION) == localPos.y.round(SEND_PERCISION_POSITION)){
+            && Util.round(this._oldLocalPos.x,SEND_PERCISION_POSITION) == Util.round(localPos.y,SEND_PERCISION_POSITION)
+            && Util.round(this._oldLocalPos.y,SEND_PERCISION_POSITION) == Util.round(localPos.y,SEND_PERCISION_POSITION)){
             return;
         }
         this._oldLocalPos=localPos;

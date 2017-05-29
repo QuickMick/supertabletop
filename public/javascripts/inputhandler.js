@@ -59,8 +59,8 @@ class InputHandler extends EventEmitter{
 
         app.renderer.view.addEventListener("mousedown", this._mouseDown.bind(this),true);
         app.renderer.view.addEventListener("mouseup", this._mouseUp.bind(this),true);
-        app.renderer.view.addEventListener("touchstart", this._mouseDown, false);
-        app.renderer.view.addEventListener("touchend", this._mouseUp, false);
+        app.renderer.view.addEventListener("touchstart", this._mouseDown.bind(this), false);
+        app.renderer.view.addEventListener("touchend", this._mouseUp.bind(this), false);
 
         app.stage
         // mouse move
@@ -130,19 +130,41 @@ class InputHandler extends EventEmitter{
     }
 
     _mouseDown(event){
-        var btn = event.button;// || event.data.button;
+
+        var btn = this._normalizeMouseKeyCode(event);
+        if(btn < 0) return; // unknown input
+
         this.keyState.mouse_buttons[btn] = true;
       //  event.preventDefault();
         this._processKeyInteraction();
     }
 
     _mouseUp(event){
-        var btn = event.button;// || event.data.button;
+        var btn = this._normalizeMouseKeyCode(event);
+        if(btn < 0) return; // unknown input
+
         if(this.keyState.mouse_buttons.hasOwnProperty(btn)) {
             delete this.keyState.mouse_buttons[btn];
         }
         this._processKeyInteraction();
      //   event.preventDefault();
+    }
+
+    /**
+     * takes different mouseup/down event and returns the keycode
+     * @param event
+     * @returns {*}
+     * @private
+     */
+    _normalizeMouseKeyCode(event){
+        if(event.button || event.button == 0){
+            return event.button;
+        }else if(event.changedTouches && event.changedTouches.length > 0){
+            return 0;
+        }else if(event.data &&(event.data .button || event.data .button != 0)) {
+            return event.data.button;
+        }
+        return -1;
     }
 
     _processKeyInteraction(){
@@ -174,25 +196,6 @@ class InputHandler extends EventEmitter{
             this.emit(RAW_MOUSEMOVE,evt);
         }
     }
-
-   /* _onTableMouseMove(evt){
-        console.log(evt);
-        var m = evt.data.global;
-
-        this.mouse_table.lastX = this.mouse_table.x;
-        this.mouse_table.lastY = this.mouse_table.y;
-
-        this.mouse_table.x = m.x;
-        this.mouse_table.y = m.y;
-
-        // set the delta mouse movement
-        this.mouse_table.dx = this.mouse_table.x - this.mouse_table.lastX;
-        this.mouse_table.dy = this.mouse_table.y - this.mouse_table.lastY;
-
-        if(this.mouse_table.dx != 0 || this.mouse_table.dy != 0 ){
-            this.emit(MOUSEMOVE_TABLE,this.mouse_table);
-        }
-    }*/
 }
 
 module.exports = InputHandler;

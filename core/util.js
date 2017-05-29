@@ -107,7 +107,7 @@ class Util{
      * @param url
      * @param callback
      */
-    loadDataBase64(url, callback) {
+    /*loadDataBase64(url, callback) {
         if(!url){
             console.log("loadDataURL: no url passed!");
             return;
@@ -128,7 +128,7 @@ class Util{
         xhr.open('GET', url);
         xhr.responseType = 'blob';
         xhr.send();
-    }
+    }*/
 
 
     /**

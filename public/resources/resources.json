@@ -8,7 +8,15 @@
           "x": 1,
           "y": 0
         }
+      },
+      "default_hover": {
+        "texture": "default_hover.png",
+        "anchor": {
+          "x": 1,
+          "y": 0
+        }
       }
+
     }
   },
   "default":{

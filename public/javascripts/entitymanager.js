@@ -14,8 +14,9 @@ var EVT_ENTITYCLICKED = "entityclicked";
 
 class EntityManager extends PIXI.Container{
 
-    constructor(lerpManager){
+    constructor(lerpManager,cursorManager){
         super();
+        this.cursorManager = cursorManager;
 
         this.lerpManager = lerpManager;
 

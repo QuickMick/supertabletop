@@ -19,6 +19,7 @@ var PlayerManager = require('./playermanager');
 var Synchronizer = require('./synchonizer');
 var InputHandler = require('./inputhandler');
 var ToolManager = require('./toolmanager');
+var CursorManager = require('./cursormanager');
 
 const RELATIVE_PATH = "./../";
 
@@ -44,13 +45,13 @@ class GameManager extends EventEmitter3{
 
         // setup main gameTable container
         this.gameTable = new GameTable(this.app.renderer);
-
+        this.cursorManager = new CursorManager(this.app);
         this.inputHandler = new InputHandler(this.app,this.gameTable);
         this.inputHandler.loadMapping(Config.KEY_MAPPING);
 
         this.lerpManager = new LerpManager();
-        this.entityManager = new EntityManager(this.lerpManager);
-        this.playerManager = new PlayerManager(this.lerpManager,this.inputHandler,this.gameTable);
+        this.entityManager = new EntityManager(this.lerpManager,this.cursorManager);
+        this.playerManager = new PlayerManager(this.lerpManager,this.cursorManager,this.inputHandler,this.gameTable);
         this.synchronizer = new Synchronizer(this);     // initialize socket-connection/synchronizer
 
        /* this.gameTable.min_zoom = Config.ZOOM.MIN;

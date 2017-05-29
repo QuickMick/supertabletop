@@ -46,8 +46,7 @@ class Entity extends PIXI.Sprite {
 
         // -------- init pixi values --------
         this.interactive = true;    // enable the bunny to be interactive... this will allow it to respond to mouse and touch events
-        this.buttonMode = true;     // this button mode will mean the hand cursor appears when you roll over the bunny with your mouse
-        this.boundsPadding = 50;
+       // this.buttonMode = true;     // this button mode will mean the hand cursor appears when you roll over the bunny with your mouse
 
         this.position.x = entity.position.x || 0;
         this.position.y = entity.position.y || 0;

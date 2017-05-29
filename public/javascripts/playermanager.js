@@ -19,10 +19,11 @@ var ColorLibrary = require('./../resources/colors.json');
  */
 class PlayerManager extends PIXI.Container {
 
-    constructor(lerpManager, inputHandler,gameTable) {
+    constructor(lerpManager, cursorManager, inputHandler,gameTable) {
         super();
 
         this.lerpManager = lerpManager;
+        this.cursorManager = cursorManager;
 
         /**
          * Contains all players
@@ -93,41 +94,15 @@ class PlayerManager extends PIXI.Container {
             console.error("cannot init player without data");
             return;
         }
-        this.players[data.id] ={rawPlayerData:data};
-       // this.addPlayers(data);
-        this.players[data.id].isCurrentPlayer = true;
-      //  this.currentPlayer = this.players[data.id];
-
-        var cursor = CursorLibrary[data.cursor] || CursorLibrary["default"];
-        this._toDataURL(PIXI.loader.resources[cursor.texture].data.currentSrc,function (dUrl) {
-            var screen = document.getElementById("stage");
-            var anchor_x = PIXI.loader.resources[cursor.texture].texture.width * (cursor.anchor.x || 0);
-            var anchor_y = PIXI.loader.resources[cursor.texture].texture.height * (cursor.anchor.y || 0);
-            screen.style.cursor = "url('"+dUrl+"') "+anchor_x+" "+anchor_y+", auto";
-        });
-    }
-
-
-
-    _toDataURL(url, callback) {
-        var xhr = new XMLHttpRequest();
-        xhr.onload = function() {
-            var reader = new FileReader();
-            reader.onloadend = function() {
-                callback(reader.result);
-            };
-            reader.readAsDataURL(xhr.response);
+        this.players[data.id] ={
+            rawPlayerData:data,
+            isCurrentPlayer: true
         };
-        xhr.open('GET', url);
-        xhr.responseType = 'blob';
-        xhr.send();
+        this.cursorManager.setCursor(data.cursor);
     }
-
-
-
 
     /**
-     * changes the displayed image of the player
+     * changes the displayed image of a player
      * @param id of the player
      * @param cursor_type new cursortype
      */
@@ -142,6 +117,13 @@ class PlayerManager extends PIXI.Container {
             return;
         }
 
+        // if the passed player is the current human player
+        if(this.players[playerID].isCurrentPlayer){
+            this.cursorManager.setCursor(cursor_type);
+            return;
+        }
+
+        // followed code is just used, when the passed player is a remote player
         var cursor = CursorLibrary[cursor_type];
         if(!cursor){
             console.error("cursor not found: ",cursor_type);

@@ -15,6 +15,8 @@ const MOUSEWHEEL= "mousewheel";
 class InputHandler extends EventEmitter{
     constructor(app,gameTable){
         super();
+
+        this.app = app;
         // contains every keys, which are pressed since the last update cycle
         this.keyState = {
             keyboard_keys:{},
@@ -52,23 +54,29 @@ class InputHandler extends EventEmitter{
         window.addEventListener("keyup", this._keyUp.bind(this), false);
 
         app.stage.interactive = true;
-        gameTable.interactive = true;
+      //  gameTable.interactive = true;
         document.addEventListener("mousewheel", this._mouseWheelMove.bind(this), false);
 
-        app.stage
-            // mouse move
-            .on('mousemove', this._onMouseMove.bind(this), false)
-            .on('touchmove', this._onMouseMove.bind(this), false)
+        app.renderer.view.addEventListener("mousedown", this._mouseDown.bind(this),true);
+        app.renderer.view.addEventListener("mouseup", this._mouseUp.bind(this),true);
+        app.renderer.view.addEventListener("touchstart", this._mouseDown, false);
+        app.renderer.view.addEventListener("touchend", this._mouseUp, false);
 
+        app.stage
+        // mouse move
+            .on('mousemove', this._onMouseMove.bind(this), false)
+            .on('touchmove', this._onMouseMove.bind(this), false);
+/*
         // mouse down
-            .on('mousedown', this._mouseDown.bind(this), false)
-            .on('rightclick', this._mouseDown.bind(this), false)
+            //.on('mousedown', this._mouseDown.bind(this), false)
+          //  .on('rightclick', this._mouseDown.bind(this), false)
             .on('touchstart', this._mouseDown.bind(this), false)
             //TODO: mousedown wird nicht auserhalb von der stage getriggert
-            .on('mouseupoutside', this._mouseUp.bind(this))
+         //   .on('mouseupoutside', this._mouseUp.bind(this))
             .on('touchendoutside', this._mouseUp.bind(this))
-            .on('touchend', this._mouseUp.bind(this), false)
-            .on('mouseup', this._mouseUp.bind(this), false);
+
+          //  .on('mouseup', this._mouseUp.bind(this), false)
+            .on('touchend', this._mouseUp.bind(this), false);*/
        // app.ticker.add(this.update.bind({self:this,app:app}));
 
      //   gameTable.on('mousemove', this._onTableMouseMove.bind(this), false)
@@ -122,16 +130,17 @@ class InputHandler extends EventEmitter{
     }
 
     _mouseDown(event){
-        this.keyState.mouse_buttons[event.data.button] = true;
+        var btn = event.button;// || event.data.button;
+        this.keyState.mouse_buttons[btn] = true;
       //  event.preventDefault();
         this._processKeyInteraction();
     }
 
     _mouseUp(event){
-        if(this.keyState.mouse_buttons.hasOwnProperty(event.data.button)) {
-            delete this.keyState.mouse_buttons[event.data.button];
+        var btn = event.button;// || event.data.button;
+        if(this.keyState.mouse_buttons.hasOwnProperty(btn)) {
+            delete this.keyState.mouse_buttons[btn];
         }
-
         this._processKeyInteraction();
      //   event.preventDefault();
     }

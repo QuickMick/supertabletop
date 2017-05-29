@@ -1,0 +1,20 @@
+html
+    head
+        title= title
+        link(rel='stylesheet', href='/stylesheets/style.css')
+        link(rel='stylesheet', href='/stylesheets/editor.css')
+    body
+        div#main
+            div#header
+                h1= title
+            div#content
+                div#controls-container
+                    h2 put controls in here
+                div#stage
+            div#loading-overlay
+                div.loading-content
+                    div.spinner
+                        div.dot1
+                        div.dot2
+
+            script(src='/js/editor.js')

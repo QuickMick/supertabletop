@@ -89,14 +89,13 @@ class PlayerManager extends PIXI.Container {
             console.error("cannot init player without data");
             return;
         }
-        this.players[data.id] = data;
+        this.players[data.id] ={rawPlayerData:data};
        // this.addPlayers(data);
         this.players[data.id].isCurrentPlayer = true;
       //  this.currentPlayer = this.players[data.id];
 
         var cursor = CursorLibrary[data.cursor] || CursorLibrary["default"];
         this._toDataURL(PIXI.loader.resources[cursor.texture].data.currentSrc,function (dUrl) {
-            console.log(dUrl);
             var screen = document.getElementById("stage");
             var anchor_x = PIXI.loader.resources[cursor.texture].texture.width * (cursor.anchor.x || 0);
             var anchor_y = PIXI.loader.resources[cursor.texture].texture.height * (cursor.anchor.y || 0);

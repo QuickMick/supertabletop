@@ -1,4 +1,4 @@
 .idea/
 node_modules
 public/javascripts/bundle.js
-public/js/bundle.js
+public/js/

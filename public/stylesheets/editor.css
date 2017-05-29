@@ -1,0 +1,21 @@
+#content{
+    display: flex;
+    flex-direction: row;
+    height: 100%;
+}
+#controls-container{
+    display: flex;
+   /* flex-grow: 0.3;*/
+    background-color: red;
+    min-width: 200px;
+    border:0;
+    margin: 0;
+    padding: 10px;
+}
+
+#stage{
+    width: 100%;
+
+    flex-grow: 1;
+    display: flex;
+}

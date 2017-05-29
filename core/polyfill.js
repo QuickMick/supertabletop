@@ -49,7 +49,7 @@ Number.prototype.inRange = function (min, max) {
     return this >= min && this <= max;
 };
 
-Number.prototype.round = function (decimal) {
+Number.prototype.round = function (decimal=0) {
     var x;
     switch(decimal){
         case 0: x=1; break;

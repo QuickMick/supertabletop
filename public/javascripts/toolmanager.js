@@ -8,6 +8,7 @@ var Util = require('./../../core/util');
 
 var OutlineFilter = require('./filters/outlinefilter');
 
+const SEND_PERCISION_POSITION = 3;
 
 class BasicTool{
     constructor(toolManager){
@@ -311,8 +312,8 @@ class SimpleDragTool extends BasicTool{
 
         // if nothing has changed, then updating the server is not necessary
         if(this._oldLocalPos
-            && this._oldLocalPos.x == localPos.y
-            && this._oldLocalPos.y == localPos.y){
+            && this._oldLocalPos.x.round(SEND_PERCISION_POSITION) == localPos.y.round(SEND_PERCISION_POSITION)
+            && this._oldLocalPos.y.round(SEND_PERCISION_POSITION) == localPos.y.round(SEND_PERCISION_POSITION)){
             return;
         }
         this._oldLocalPos=localPos;
@@ -324,7 +325,6 @@ class SimpleDragTool extends BasicTool{
 
         data = this._checkForEntitySnaps(data, localPos);
         data = this._updateEntitySnaps(data, localPos);
-
 
         // if something has changed, then update the server
         this.synchronizer.updateQueue.postUpdate(

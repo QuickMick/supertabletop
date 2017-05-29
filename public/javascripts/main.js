@@ -3,7 +3,7 @@
  */
 "use strict";
 require('pixi.js');
-//require('./../../core/polyfill');
+
 
 var Statics = require("./../../core/statics");
 
@@ -29,6 +29,18 @@ else if (window.mozRequestAnimationFrame)
     window.requestAnimationFrame=window.mozRequestAnimationFrame;
 else if (window.webkitRequestAnimationFrame)
     window.requestAnimationFrame=window.webkitRequestAnimationFrame;
+
+Number.prototype.round = function (decimal=0) {
+    var x;
+    switch(decimal){
+        case 0: x=1; break;
+        case 1: x=10; break;
+        case 2: x=100; break;
+        case 3: x=1000; break;
+        default: x= Math.pow(10,decimal); break;
+    }
+    return (Math.round(this * x)/x)
+};
 
 
 window.showLoadingDialog=function(){

@@ -51,11 +51,17 @@ class Synchronizer{
         this.playerManager = null;
 
         /**
-         * contains the time in unix, when the last gamestate update
-         * was processed
+         * contains the timestamp of the last received gameState update
          * @type {number}
          */
-        this.lastGameStateUpdate = 0;
+        this.lastGameStateUpdateEventTimeStamp = 0;
+
+        /**
+         * contains the last time when the gameState updates was processed
+         * @type {number}
+         */
+        this.lastGameStateUpdateTimeStamp = 0;
+
     }
 
     init(){
@@ -114,9 +120,11 @@ class Synchronizer{
 
         // receive game updates
         this.socket.on(Packages.PROTOCOL.SERVER.UPDATE_STATE, function (evt) {
-            if(evt.timeStamp < this.lastGameStateUpdate) return;    // if update is old, do not apply it
-            this.processServerUpdates(evt.data);
-            this.lastGameStateUpdate = evt.timeStamp;
+            if(evt.timeStamp < this.lastGameStateUpdateEventTimeStamp) return;    // if update is old, do not apply it
+            var currentTime = new Date().getTime();
+            this.processServerUpdates(evt.data,currentTime-this.lastGameStateUpdateTimeStamp);
+            this.lastGameStateUpdateEventTimeStamp = evt.timeStamp;
+            this.lastGameStateUpdateTimeStamp = currentTime;
         }.bind(this));
 
         // another player connected
@@ -137,8 +145,9 @@ class Synchronizer{
     /**
      * processes the batched updates, received from the server
      * @param updateData
+     * @param timeSinceLastUpdate the time since the last update was received from the server
      */
-    processServerUpdates(updateData){
+    processServerUpdates(updateData,timeSinceLastUpdate){
         for(var type in updateData){
             if(!updateData.hasOwnProperty(type)) continue;
 
@@ -146,7 +155,7 @@ class Synchronizer{
             switch (type){
                 // entity position or rotation has updated
                 case Packages.PROTOCOL.GAME_STATE.ENTITY.SERVER_ENTITY_TRANSFORMATION_UPDATE:
-                    this.entityManager.batchUpdateEntityTransformation(updates);
+                    this.entityManager.batchUpdateEntityTransformation(updates,timeSinceLastUpdate);
                     break;
                 // mouse of other players moves
                 case Packages.PROTOCOL.GAME_STATE.CLIENT.SERVER_CLIENT_POSITION_UPDATE:

@@ -41,8 +41,8 @@ class LerpManager {
         if((!lerpOperation.value && lerpOperation.value !==0)
             || (!lerpOperation.start && lerpOperation.start !==0)
             || (!lerpOperation.end && lerpOperation.end !==0)
-            || !lerpOperation.type
-            || !lerpOperation.interval){
+            || (!lerpOperation.interval && lerpOperation.interval !==0)
+            || !lerpOperation.type){
           console.log("pushLerp: insufficient data passed, lerp cannot be performed!",lerpOperation);
           return;
         }
@@ -109,7 +109,8 @@ class LerpManager {
      */
     static lerpInRange(start, end, t,minDiff=0) {
         var diff = end - start;
-        if(diff < minDiff)
+
+        if(Math.abs(diff) < minDiff)
             return end;
 
         if(t>1) //upper boundary reached
@@ -118,7 +119,7 @@ class LerpManager {
             return start;
 
         //perform lerp
-        return start + diff * t;
+        return start + (diff * t);
     }
 
     static lerp(v0,v1,t){

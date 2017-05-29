@@ -85,14 +85,14 @@ class EntityManager extends PIXI.Container{
      * calls updateEntityTransformation for every elemnt in the object
      * @param data {object}
      */
-    batchUpdateEntityTransformation(data){
+    batchUpdateEntityTransformation(data,timeSinceLastUpdate = 0){
         if(!data){
             console.warn("no update data passed");
             return;
         }
         for(var entityID in data){
             if(!data.hasOwnProperty(entityID))continue;
-            this.updateEntityTransformation(entityID,data[entityID]);
+            this.updateEntityTransformation(entityID,data[entityID],timeSinceLastUpdate);
         }
     }
 
@@ -100,8 +100,9 @@ class EntityManager extends PIXI.Container{
      * used to update an entities position and rotation(angle)
      * @param entityID id of the entity, of which the transformation should be changed
      * @param transformation the changed data of the entity related to the id
+     * @param timeSinceLastUpdate is the time since the last update and used as LERP intervall
      */
-    updateEntityTransformation(entityID,transformation){
+    updateEntityTransformation(entityID,transformation,timeSinceLastUpdate=0){
         if(!entityID){
             console.warn("entity id is necessary to update enitty");
             return;
@@ -116,7 +117,7 @@ class EntityManager extends PIXI.Container{
             console.warn("no transformation data for entity",entityID,"was passed");
             return;
         }
-
+console.log(timeSinceLastUpdate);
         var cur = this.entities[entityID];
 
         // sometimes, just the angle is sent, position stays same
@@ -139,7 +140,7 @@ class EntityManager extends PIXI.Container{
                     start: {x: cur.position.x, y: cur.position.y},
                     end: {x: transformation.position.x, y: transformation.position.y},
                     type: "position",
-                    interval: Ticks.SERVER_UPDATE_INTERVAL,
+                    interval: timeSinceLastUpdate, //Ticks.SERVER_UPDATE_INTERVAL,
                     minDiff:1
                 });
             }
@@ -160,7 +161,7 @@ class EntityManager extends PIXI.Container{
                 start: cur.rotation,
                 end: transformation.angle,
                 type: "value",
-                interval: Ticks.SERVER_UPDATE_INTERVAL,
+                interval: timeSinceLastUpdate, //Ticks.SERVER_UPDATE_INTERVAL,
                 minDiff:0.01
             });
         }

@@ -4,6 +4,7 @@
 'use strict';
 require('pixi.js');
 var Util = require("./../../core/util");
+const Ticks = require('./../../core/ticks.json');
 
 var CursorLibrary = require('./../resources/resources.json').cursors.content;
 var ColorLibrary = require('./../resources/colors.json');
@@ -18,8 +19,11 @@ var ColorLibrary = require('./../resources/colors.json');
  */
 class PlayerManager extends PIXI.Container {
 
-    constructor(inputHandler,gameTable) {
+    constructor(lerpManager, inputHandler,gameTable) {
         super();
+
+        this.lerpManager = lerpManager;
+
         /**
          * Contains all players
          * @type {object} --> id:sprite
@@ -177,10 +181,10 @@ class PlayerManager extends PIXI.Container {
      * calls updatePlayerPosition for every element in the object
      * @param data {object}
      */
-    batchUpdatePlayerPosition(data){
+    batchUpdatePlayerPosition(data,timeSinceLastUpdate=0){
         for(var clientID in data) {
             if(!data.hasOwnProperty(clientID)) continue;
-            this.updatePlayerPosition(clientID,data[clientID]);
+            this.updatePlayerPosition(clientID,data[clientID],timeSinceLastUpdate);
         }
     }
 
@@ -191,7 +195,7 @@ class PlayerManager extends PIXI.Container {
      * @param playerID id of the player whos position updates
      * @param data update data {x:0,y:0};
      */
-    updatePlayerPosition(playerID, data){
+    updatePlayerPosition(playerID, data,timeSinceLastUpdate=0){
         if(!playerID || !playerID.length || playerID.length <=0){
             console.warn("no player id passed");
             return;
@@ -215,8 +219,33 @@ class PlayerManager extends PIXI.Container {
 
         var cur = this.players[playerID].position;
         // if no data is passed, do not change
-        cur.x = data.x || cur.x;
-        cur.y = data.y || cur.y;
+        /*cur.x = data.x || cur.x;
+        cur.y = data.y || cur.y;*/
+
+        var nPos = {
+            x: data.x || cur.x,
+            y: data.y || cur.y
+        };
+
+        if(cur.x == nPos.x && cur.y == nPos.y){
+            return; // nothing to to, if nothing has changed
+        }
+
+        this.lerpManager.push(playerID,"position",{
+            get value() {
+                return cur
+            },
+            set value(v){
+                cur.x = v.x || 0;
+                cur.y = v.y || 0;
+            },
+            start: {x: cur.x, y: cur.y},
+            end: nPos,
+            type: "position",
+            interval: Math.min(timeSinceLastUpdate,Ticks.MAX_DELAY), //Ticks.SERVER_UPDATE_INTERVAL,
+            minDiff:1
+        });
+
     }
 
 }

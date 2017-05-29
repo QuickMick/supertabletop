@@ -134,7 +134,8 @@ class EntityManager extends PIXI.Container{
                         return cur.position
                     },
                     set value(v){
-                        cur.position = v;
+                        cur.position.x = v.x || 0;
+                        cur.position.y = v.y || 0;
                     },
                     start: {x: cur.position.x, y: cur.position.y},
                     end: {x: transformation.position.x, y: transformation.position.y},

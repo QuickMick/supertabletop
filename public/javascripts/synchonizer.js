@@ -159,7 +159,7 @@ class Synchronizer{
                     break;
                 // mouse of other players moves
                 case Packages.PROTOCOL.GAME_STATE.CLIENT.SERVER_CLIENT_POSITION_UPDATE:
-                    this.playerManager.batchUpdatePlayerPosition(updates);
+                    this.playerManager.batchUpdatePlayerPosition(updates,timeSinceLastUpdate);
                     break;
                 // an entity gets deleted by a player or by the server
                 case Packages.PROTOCOL.GAME_STATE.ENTITY.SERVER_ENTITY_DELETED:

@@ -107,7 +107,7 @@ class GameServer{
             for(var id in data[type]) {
                 if(!data[type].hasOwnProperty(id)) continue;
 
-                switch (type) {
+                switch (type) { // claim and release entiy is updaated first, becuase the other functions need the claim
                     // an user claimes an entity
                     case Packages.PROTOCOL.GAME_STATE.ENTITY.USER_CLAIM_ENTITY:
                         this.entityServerManager.claimEntity(id, data[type][id].claimedEntity);

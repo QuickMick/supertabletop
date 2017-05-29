@@ -73,8 +73,8 @@ class Util{
      * @returns {*}
      */
     static torusRange(val,min, max) {
-        if(this < min)return max;
-        if(this > max)return min;
+        if(val < min)return max;
+        if(val > max)return min;
         return val;
     }
 
@@ -95,8 +95,8 @@ class Util{
      * @returns {number} which is in the range, including the boundaries
      */
     static forceRange(val, min, max) {
-        if(this <= min)return min;
-        if(this >= max)return max;
+        if(val <= min)return min;
+        if(val >= max)return max;
 
         return val;
     }

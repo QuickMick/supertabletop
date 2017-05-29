@@ -131,6 +131,11 @@ class EntityServerManager extends EventEmitter3 {
         'beforeUpdate', function () {
            this.emit(EVT_BEFORE_UPDATE);
         }.bind(this));
+
+        // sets the listeners, which are needed for stacking and so on
+        Matter.Events.on(this.engine,'collisionActive',this._collisionActive.bind(this));
+        Matter.Events.on(this.engine,'collisionEnd',this._collisionEnd.bind(this));
+        Matter.Events.on(this.engine,'collisionStart',this._collisionActive.bind(this));
     }
 
     /**
@@ -332,6 +337,15 @@ class EntityServerManager extends EventEmitter3 {
         body.collisionFilter=DEFAULT_FILTER;
 
         World.add(this.engine.world,body);
+
+    }
+
+    /**
+     * creates a stack of entities
+     * @param stack
+     */
+    addStack(stack){
+
 
     }
 
@@ -824,6 +838,91 @@ class EntityServerManager extends EventEmitter3 {
             entityID,
             result
         );
+    }
+
+
+    /**
+     *
+         Event Payload:
+
+         event Object
+
+         An event object
+         pairs
+
+         List of affected pairs
+         timestamp Number
+
+         The engine.timing.timestamp of the event
+         source
+
+         The source object of the event
+         name
+
+         The name of the event
+
+
+     * @param evt
+     * @private
+     */
+    _collisionStart(evt){
+
+    }
+
+    /**
+     *
+     Event Payload:
+
+     event Object
+
+     An event object
+     pairs
+
+     List of affected pairs
+     timestamp Number
+
+     The engine.timing.timestamp of the event
+     source
+
+     The source object of the event
+     name
+
+     The name of the event
+
+
+     * @param evt
+     * @private
+     */
+    _collisionEnd(evt){
+
+    }
+
+    /**
+     *
+     Event Payload:
+
+     event Object
+
+     An event object
+     pairs
+
+     List of affected pairs
+     timestamp Number
+
+     The engine.timing.timestamp of the event
+     source
+
+     The source object of the event
+     name
+
+     The name of the event
+
+
+     * @param evt
+     * @private
+     */
+    _collisionActive(evt){
+
     }
 
 }

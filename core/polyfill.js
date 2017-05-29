@@ -49,6 +49,19 @@ Number.prototype.inRange = function (min, max) {
     return this >= min && this <= max;
 };
 
+Number.prototype.round = function (decimal) {
+    var x;
+    switch(decimal){
+        case 0: x=1; break;
+        case 1: x=10; break;
+        case 2: x=100; break;
+        case 3: x=1000; break;
+        default: x= Math.pow(10,decimal); break;
+    }
+    return (Math.round(this * x)/x)
+};
+
+
 /**
  * forces a number to be in a range
  * @param min bottem boundary of the range

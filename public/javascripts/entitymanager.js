@@ -9,12 +9,16 @@ var Packages = require('./../../core/packages');
 const RELATIVE_PATH = "./../";
 */
 
+const Ticks = require('./../../core/ticks.json');
 var EVT_ENTITYCLICKED = "entityclicked";
 
 class EntityManager extends PIXI.Container{
 
-    constructor(){
+    constructor(lerpManager){
         super();
+
+        this.lerpManager = lerpManager;
+
         /**
          * Contains a mapping from entity ID to the entity itself,
          * additionally, the entities are added to the children list of this container
@@ -115,14 +119,62 @@ class EntityManager extends PIXI.Container{
 
         var cur = this.entities[entityID];
 
+        // sometimes, just the angle is sent, position stays same
+        if(transformation.position) {
+            // be sure, that all necessary values are available
+            transformation.position.x = transformation.position.x || cur.position.x;
+            transformation.position.y = transformation.position.y || cur.position.y;
+
+            // if position has changed, lerp position
+            if (transformation.position.x != cur.position.x
+                || transformation.position.y != cur.position.y) {
+
+                this.lerpManager.push(entityID,"position",{
+                    get value() {
+                        return cur.position
+                    },
+                    set value(v){
+                        cur.position = v;
+                    },
+                    start: {x: cur.position.x, y: cur.position.y},
+                    end: {x: transformation.position.x, y: transformation.position.y},
+                    type: "position",
+                    interval: Ticks.SERVER_UPDATE_INTERVAL,
+                    minDiff:1
+                });
+            }
+        }
+
+        // if angle(rotation) value exists, and it does not equal the current
+        // entities value, then lerp it
+        if((transformation.angle || transformation.angle === 0)
+            && cur.rotation != transformation.angle){
+
+            this.lerpManager.push(entityID,"rotation",{
+                get value() {
+                    return cur.rotation
+                },
+                set value(v){
+                  cur.rotation = v;
+                },
+                start: cur.rotation,
+                end: transformation.angle,
+                type: "value",
+                interval: Ticks.SERVER_UPDATE_INTERVAL,
+                minDiff:0.01
+            });
+        }
+
+
         // just change the available values, e.g. sometimes,
         // just angle is sent, when just the angle is changes
-        if(transformation.position) {
+      /*  if(transformation.position) {
             cur.position.x = transformation.position.x || cur.position.x;
             cur.position.y = transformation.position.y || cur.position.y;
         }
         // change rotation, if available
         cur.rotation = transformation.angle || cur.rotation;
+*/
     }
 
     /**

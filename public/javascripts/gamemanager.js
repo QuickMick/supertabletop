@@ -13,6 +13,7 @@ var Resources = require('./../resources/resources.json');
 var Entity = require('./entity');
 var GameTable = require('./gametable');
 
+var LerpManager = require('./lerpmanager');
 var EntityManager = require('./entitymanager');
 var PlayerManager = require('./playermanager');
 var Synchronizer = require('./synchonizer');
@@ -47,7 +48,8 @@ class GameManager extends EventEmitter3{
         this.inputHandler = new InputHandler(this.app,this.gameTable);
         this.inputHandler.loadMapping(Config.KEY_MAPPING);
 
-        this.entityManager = new EntityManager();
+        this.lerpManager = new LerpManager();
+        this.entityManager = new EntityManager(this.lerpManager);
         this.playerManager = new PlayerManager;
         this.synchronizer = new Synchronizer(this);     // initialize socket-connection/synchronizer
 
@@ -169,7 +171,11 @@ class GameManager extends EventEmitter3{
     }
 
     update(delta){
-        this.toolManager.update(delta);
+
+        var elapsed =this.app.ticker.elapsedMS;
+
+        this.toolManager.update(delta);   //TODO: pass real delta time - weis net was passiert wenn ichs mach
+        this.lerpManager.update(elapsed);
     }
 
     initEasterEggs(){

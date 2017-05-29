@@ -3,7 +3,7 @@
  */
 'use strict';
 
-
+const Ticks = require('./../core/ticks.json');
 var Packages = require('./../core/packages');
 var Util = require('./../core/util');
 
@@ -33,7 +33,7 @@ class GameServer{
 
     start(){
         this.io.on('connection', this._onConnectionReceived.bind(this));
-        setInterval(this._sendEntityUpdates.bind(this), Packages.PROTOCOL.CLIENT_UPDATE_INTERVAL);
+        setInterval(this._sendEntityUpdates.bind(this), Ticks.SERVER_UPDATE_INTERVAL);
 
         this.entityServerManager.loadGame("mick","codewords"); //TODO nicht statisch machen und durch user triggern lassen
     }

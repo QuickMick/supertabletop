@@ -49,6 +49,9 @@ const CLAIMED_FILTER = {
     group:CLAIMED_COLLISION_CATEGORY
 };
 
+const SEND_PERCISION_POSITION = 3;
+const SEND_PERCISION_ROTATION = 4;
+
 class EntityServerManager extends EventEmitter3 {
 
     constructor(ticks=60,updateQueue,clientManager){
@@ -151,18 +154,19 @@ class EntityServerManager extends EventEmitter3 {
         var updateRequired = false;
         var data ={};
 
-        // send just the changed values
-        if (oldData.x != body.position.x){
+        // send just the changed values, values are rounded,
+        // because it is not necessary to send 0.0001 changes
+        if (oldData.x.round(SEND_PERCISION_POSITION) != body.position.x.round(SEND_PERCISION_POSITION)){
             data.position = data.position || {};
             data.position.x = body.position.x;
             updateRequired=true;
         }
-        if(oldData.y != body.position.y ){
+        if(oldData.y.round(SEND_PERCISION_POSITION) != body.position.y.round(SEND_PERCISION_POSITION) ){
             data.position = data.position || {};
             data.position.y = body.position.y;
             updateRequired=true;
         }
-        if(oldData.angle != body.angle){
+        if(oldData.angle.round(SEND_PERCISION_ROTATION) != body.angle.round(SEND_PERCISION_ROTATION)){
             data.angle = body.angle;
             updateRequired=true;
         }
@@ -178,7 +182,7 @@ class EntityServerManager extends EventEmitter3 {
 
         this.entities[body.ENTITY_ID].position.x = body.position.x;
         this.entities[body.ENTITY_ID].position.y = body.position.y;
-        this.entities[body.ENTITY_ID].angle = body.angle;
+        this.entities[body.ENTITY_ID].rotation = body.angle;
     }
 
     /**

@@ -8,10 +8,8 @@ module.exports =
     createEvent:function (id,data) {
         if(!data)
             console.warn("sending event to ",id," without data");
-        return {senderID:id,data:data || {}};
+        return {senderID:id,data:data || {},timeStamp:new Date().getTime()};
     },
-    CLIENT_UPDATE_INTERVAL: 100,
-    //SERVER_ID: "SERVER",
     PROTOCOL: {
        CLIENT: {
            /**

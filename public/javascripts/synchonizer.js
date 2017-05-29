@@ -3,6 +3,7 @@
  */
 'use strict';
 
+const Ticks = require('./../../core/ticks.json');
 var Packages = require("./../../core/packages");
 var UpdateQueue = require('./../../core/updatequeue');
 
@@ -48,6 +49,13 @@ class Synchronizer{
         this.entityManager = null;
         this.toolManager = null;
         this.playerManager = null;
+
+        /**
+         * contains the time in unix, when the last gamestate update
+         * was processed
+         * @type {number}
+         */
+        this.lastGameStateUpdate = 0;
     }
 
     init(){
@@ -80,8 +88,7 @@ class Synchronizer{
                 this.updateQueue.popUpdatedData()
                 )
             );
-        }.bind(this),
-        Packages.PROTOCOL.CLIENT_UPDATE_INTERVAL);
+        }.bind(this),Ticks.CLIENT_UPDATE_INTERVAL);
     }
 
     /**
@@ -107,7 +114,9 @@ class Synchronizer{
 
         // receive game updates
         this.socket.on(Packages.PROTOCOL.SERVER.UPDATE_STATE, function (evt) {
+            if(evt.timeStamp < this.lastGameStateUpdate) return;    // if update is old, do not apply it
             this.processServerUpdates(evt.data);
+            this.lastGameStateUpdate = evt.timeStamp;
         }.bind(this));
 
         // another player connected

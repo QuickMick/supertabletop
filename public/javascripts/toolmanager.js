@@ -421,7 +421,8 @@ class SimpleDragTool extends BasicTool{
                 };
             }
 
-            if (currentDist > snapZone.radius){            // if the snap is not in range anymore, delete it
+            // if the snap is not in range anymore, delete it
+            if (currentDist > snapZone.radius){
                 delete this._currentSnaps[entityID];
                 if (data.relativePositions) {
                     delete data.relativePositions[entityID];

@@ -140,7 +140,7 @@ console.log(timeSinceLastUpdate);
                     start: {x: cur.position.x, y: cur.position.y},
                     end: {x: transformation.position.x, y: transformation.position.y},
                     type: "position",
-                    interval: timeSinceLastUpdate, //Ticks.SERVER_UPDATE_INTERVAL,
+                    interval: Math.min(timeSinceLastUpdate,Ticks.MAX_DELAY), //Ticks.SERVER_UPDATE_INTERVAL,
                     minDiff:1
                 });
             }
@@ -161,7 +161,7 @@ console.log(timeSinceLastUpdate);
                 start: cur.rotation,
                 end: transformation.angle,
                 type: "value",
-                interval: timeSinceLastUpdate, //Ticks.SERVER_UPDATE_INTERVAL,
+                interval: Math.min(timeSinceLastUpdate,Ticks.MAX_DELAY), //Ticks.SERVER_UPDATE_INTERVAL,
                 minDiff:0.01
             });
         }

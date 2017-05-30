@@ -367,9 +367,10 @@ class EntityServerManager extends EventEmitter3 {
     /**
      * removes an entity and postes it to the update que
      * @param id of the entity, which should be removed
+     * @param send {boolean} if this is true, the info will be broadcasted to all clients
      * @private
      */
-    removeEntity(id){
+    removeEntity(id,send){
         if(!id || !id.length ||  id.length <0 || !this.entities[id]){
             console.warn("removeEntity: entity does not exist or no id passed :",id);
             return;
@@ -389,11 +390,13 @@ class EntityServerManager extends EventEmitter3 {
             delete this.bodies[id];
         }
 
-        this.updateQueue.postUpdate(
-            Packages.PROTOCOL.GAME_STATE.ENTITY.SERVER_ENTITY_DELETED,
-            id,
-            {}
-        );
+        if(send) {
+            this.updateQueue.postUpdate(
+                Packages.PROTOCOL.GAME_STATE.ENTITY.SERVER_ENTITY_DELETED,
+                id,
+                {}
+            );
+        }
     }
 
     claimEntity(userID, claimedEntityIDs){
@@ -839,55 +842,58 @@ class EntityServerManager extends EventEmitter3 {
         delete sourceEntity.position;               // delete unnecessary states
         delete sourceEntity.rotation;               // they will be recreated later
         delete sourceEntity.state;                  // when the entity gets unstacked
+        delete sourceEntity.id;                     // it will receive a new id, when unstacked
 
-        var targetStack = this._createStackFromEntity(targetEntity);
-
-        // if the target entiy was not a stack, delete unnecessary values
-        // and add it to the new stack
-        if(!targetEntity.isStack){
-            delete targetEntity.position;
-            delete targetEntity.rotation;
-            delete targetEntity.state;
-            targetStack.concat(targetEntity);
-        }
+        var targetStack = this._convertEntityToStack(targetEntity);
 
         // merge the source entity/stack with the new stack
-        if(sourceEntity.isStack){
-            targetStack.concat(sourceEntity.content);
-        }else{
-            targetStack.concat(sourceEntity);
-        }
+        // if the source entity was a stack, take its content, otherwise concat the entity itself to the new stack
+        targetStack.content = targetStack.content.concat(
+            (sourceEntity.isStack && sourceEntity.content)
+                ? sourceEntity.content
+                : sourceEntity);
 
         // first, release the source entity, because it will be deleted on the client
         this.releaseEntities(userID,this.bodies[sourceID].claimedBy);
 
-        this.removeEntity(targetID);    // remove the stack, so the new stack is update at the clients
-        this.removeEntity(sourceID);    // remove the entity, because it is now also in the stack
+        this.removeEntity(sourceID,true);    // remove the entity, because it is now also in the stack
 
         // finaly add the new stack to the entity manager, and send it (done with the addEntity function)
         this.addEntity(targetStack,true);
     }
 
-
     /**
+     * creates a new stack, based on position and rotation of the passed entity,
+     * if the entity is a stack, its content is also used, otherwise the passed entity is added as content.
+     * Basically it converts the passed entity to a stack at the same position of the entity.
+     *
      * NOTE: first element of the stack is always on the bottom,
      *      last element is always on the top
      *
      * @param targetEntity
+     * @param sendDeleteMessage {boolean} default:true, if it is true, the delete signal of the old entity will be broadcasted to the clients
      * @returns {{position: {x: *, y: *}, rotation: *, type: *, classification: *, isStackable: boolean, isTurnable: boolean, surfaceIndex: number, content: Array, surfaces}}
      * @private
      */
-    _createStackFromEntity(targetEntity){
+    _convertEntityToStack(targetEntity, sendDeleteMessage=true){
         if(!targetEntity){
             console.log("_createStackFromEntity: no entity passed!");
             return null;
         }
-
-        if(targetEntity.isStack){
-           // console.log("_createStackFromEntity: entity",targetEntity.ENTITY_ID,"is already a stack");
-           // return targetEntity;
+        var content = [];
+        if(targetEntity.isStack){ // if entity was already a stack, adapt the content
+            content = content.concat(targetEntity.content || []);
+        }else{ // else add the entity itselfe as content
+            var c = Object.assign({},targetEntity); // copy entity and remove unnecessary data
+            delete c.content;   // just to be sure
+            delete c.rotation;  // needs no rotation, because it is inside of the stack
+            delete c.position;  // same for position
+            delete c.state;     // needs also no state
+            delete c.id;        // id will be recreated, once its unstacked
+            content = content.concat(c);
         }
-
+        this.removeEntity(targetEntity.id,sendDeleteMessage);     // remove the entity from the game, because it is now in the stack
+                                                // this will als broadcasted to all clients
         return {
             isStack:true,
             position:{x:targetEntity.position.x,y:targetEntity.position.y},
@@ -899,7 +905,7 @@ class EntityServerManager extends EventEmitter3 {
             isStackable:true,
             isTurnable:true,
             surfaceIndex:0,
-            content:targetEntity.content || [],
+            content:content,
             /**
              * returns the top site of the top object
              * and the complementary site of the bottom object
@@ -922,16 +928,6 @@ class EntityServerManager extends EventEmitter3 {
 
         };
     }
-
-    /**
-     * get the main characteristic of an entity,
-     * aka the surfaces, type, classification,
-     * @param entityID
-     * @private
-     */
-  /*  _getEntityCharacteristic(entityID){
-
-    }*/
 
     /**
      * rotate all entitys by an amout and by an user

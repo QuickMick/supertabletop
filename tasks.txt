@@ -4,6 +4,7 @@
 -outlinefilter bei drehung buggy
 -circle shape/hitzone
 -bild anfangs leicht verzerrt
+TODO: remove constraint, when removing entity
 
 #####################################################  TODOS  ##########################################################
 - table boundaries

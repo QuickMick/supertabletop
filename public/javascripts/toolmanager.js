@@ -105,7 +105,6 @@ class BasicTool{
     }
 
     _releaseSelection(evt){
-       // this._selected_entities = [];
         var i = this._selected_entities.length;
         if(i<=0)return; // no elements --> nothing to release
         // remove every element one by one, so that the remove function is called
@@ -296,17 +295,6 @@ class SimpleDragTool extends BasicTool{
 
     /**
      * @Override
-     * @param evt
-     * @private
-     */
-    _releaseSelection(evt){ //TODO: wird iwie net aufgerufn
-        this._checkStacking(this._selected_entities);
-        super._releaseSelection(evt);
-        this._currentSnaps = {};
-    }
-
-    /**
-     * @Override
      * @param entity
      */
     removeEntityFromSelection(entity){
@@ -469,13 +457,12 @@ class SimpleDragTool extends BasicTool{
     }
 
     _releaseSelection(evt) {
+
+        this._checkStacking(this._selected_entities);
+        this._currentSnaps = {};
+
         //this selection release
         var ids = this.selectedEntityIDs;
-            /*[];
-        for(var i=0; i<this.selectedEntities.length;i++){
-            ids.push(this.selectedEntities[i].ENTITY_ID);
-        }*/
-
         this.synchronizer.updateQueue.postUpdate(Packages.PROTOCOL.GAME_STATE.ENTITY.USER_RELEASE_ENTITY, this.synchronizer.CLIENT_INFO.id,
             {
                 releasedEntities:ids,
@@ -572,8 +559,9 @@ class SimpleDragTool extends BasicTool{
                     stackPairs: {
                         sourceID: selectedEntity.ENTITY_ID,
                         targetID: target.ENTITY_ID,
-                        _mode: "push"
-                    }
+
+                    },
+                    _mode: "push"
                 }
             );
         }

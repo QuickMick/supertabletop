@@ -371,22 +371,23 @@ class EntityServerManager extends EventEmitter3 {
      * @private
      */
     removeEntity(id,send){
-        if(!id || !id.length ||  id.length <0 || !this.entities[id]){
+        if(!id || !this.entities[id]){
             console.warn("removeEntity: entity does not exist or no id passed :",id);
             return;
+        }
+
+        // remove claims, if the entity is claimed by a user
+        if(this.entities[id].claimedBy){
+            this.releaseEntities(this.entities[id].claimedBy,id);
         }
 
         // remove form game instanz
         this.game.entities = Util.removeByValue(this.game.entities,this.entities[id]);
         delete this.entities[id];
 
-        if(this.constraints[id]) {
-            World.add(this.engine.world, this.constraints[id]);
-            delete this.constraints[id];
-        }
 
         if(this.bodies[id]){
-            World.add(this.engine.world, this.bodies[id]);
+            World.remove(this.engine.world, this.bodies[id]);
             delete this.bodies[id];
         }
 
@@ -530,7 +531,7 @@ class EntityServerManager extends EventEmitter3 {
             return;
         }
         if(!claimedEntityIDs){
-            console.warn("nothing to claime passed");
+            console.warn("releaseEntities: nothing to release passed");
             return;
         }
 
@@ -540,12 +541,22 @@ class EntityServerManager extends EventEmitter3 {
 
             // check if there is a constraint
             if(!this.constraints[userID]){
-                console.log("no constraints does not exists fot user ",userID," and entity ",curEntityID);
+                console.log("releaseEntities: no constraints does not exists fot user ",userID," and entity ",curEntityID);
                 return;
             }
 
             if(!this.constraints[userID][curEntityID]){
-                console.log("constraint does not exists fot user ",userID," and entity ",curEntityID);
+                console.log("releaseEntities: constraint does not exists fot user ",userID," and entity ",curEntityID);
+                continue;
+            }
+
+            if(!this.bodies[curEntityID]){
+                console.warn("releaseEntities: body of entitiy",curEntityID,"does not exist");
+                continue;
+            }
+
+            if(!this.entities[curEntityID]){
+                console.warn("releaseEntities: entitiy",curEntityID,"does not exist");
                 continue;
             }
 
@@ -854,7 +865,7 @@ class EntityServerManager extends EventEmitter3 {
                 : sourceEntity);
 
         // first, release the source entity, because it will be deleted on the client
-        this.releaseEntities(userID,this.bodies[sourceID].claimedBy);
+        this.releaseEntities(userID,sourceID);
 
         this.removeEntity(sourceID,true);    // remove the entity, because it is now also in the stack
 

@@ -247,15 +247,15 @@ class EntityManager extends PIXI.Container{
 
         // be sure except list is an array, or null
         if(exceptList) {
-            exceptList = [].concat(exceptList);
+            exceptList = [].concat(exceptList); // no set because i do not know how bable would translate it
         }
 
-        for(let id in this.entities){
+        for(var id in this.entities){
             if(!this.entities.hasOwnProperty(id)) continue;
             var curEntity = this.entities[id];
 
             // if entity is in the except list, do not consider it
-            if(exceptList && exceptList.indexOf(curEntity)) continue;
+            if(exceptList && exceptList.indexOf(curEntity) >= 0) continue;
 
             // check every entity, which is not the passed entity,
             // and check if the distance is under the threshold

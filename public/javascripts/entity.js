@@ -58,8 +58,8 @@ class Entity extends PIXI.Sprite {
 
         // ------- init entity values --------
         this.ENTITY_ID = entity.id;
-        this.turnable = entity.turnable || false;
-        this.stackable = entity.stackable || false;
+        this.isTurnable = entity.isTurnable || false;
+        this.isStackable = entity.isStackable || false;
 
         this.surfaceIndex = entity.surfaceIndex || 0; // is top visible?
 
@@ -143,7 +143,6 @@ class Entity extends PIXI.Sprite {
      * @param index of the side
      */
     showSurface(index=0) {
-
         this.surfaceIndex = index;//(!index && index != 0) ? (this.surfaceIndex || 0) : index;
 
         // check if the surfaceIndex is inside the possible range (number of surfaces)
@@ -190,7 +189,6 @@ class Entity extends PIXI.Sprite {
                 letterSpacing:letterSpacing
             });
 
-
             if (cText.position) {    // set offset ofs the text
                 cPixiText.position.x = cText.position.x || 0;
                 cPixiText.position.y = cText.position.y || 0;
@@ -218,7 +216,6 @@ class Entity extends PIXI.Sprite {
 
         // if there are no filters anymore, just set null
         this.filters = (n.length <= 0) ? null:n;
-
     }
 
     /**

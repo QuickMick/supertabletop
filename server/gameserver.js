@@ -72,7 +72,6 @@ class GameServer{
      * @private
      */
     _onConnectionReceived(socket) {
-
         this._initClient(socket);
 
         //removes this client from the serverclient list and broadcasts the information to all remaining clients
@@ -112,11 +111,15 @@ class GameServer{
                     case Packages.PROTOCOL.GAME_STATE.ENTITY.USER_CLAIM_ENTITY:
                         this.entityServerManager.claimEntity(id, data[type][id].claimedEntity);
                         break;
+                    // user wants to stack two entities
+                    // has to be before releasing, because releasing signal just is send after stacking signal
+                    case Packages.PROTOCOL.GAME_STATE.ENTITY.USER_STACK_ENTITY:
+                        this.entityServerManager.batchStackEntities(id, data[type][id]);
+                        break;
                     // an user releases an entity
                     case Packages.PROTOCOL.GAME_STATE.ENTITY.USER_RELEASE_ENTITY:
                         this.entityServerManager.releaseEntities(id, data[type][id].releasedEntities);
                         break;
-
                     // an user wants to rotate an entity
                     case Packages.PROTOCOL.GAME_STATE.ENTITY.USER_ROTATE_ENTITY:
                         this.entityServerManager.batchRotateEntities(id, data[type][id]);

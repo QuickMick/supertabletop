@@ -17,8 +17,8 @@
       "type": "wordcard",
       "width": 100,
       "height": 75,
-      "stackable": true,
-      "turnable": true,
+      "isStackable": true,
+      "isTurnable": true,
       "surfaceIndex":0,
 
       "surfaces":[
@@ -63,8 +63,8 @@
       "type":"stone",
       "width":50,
       "height":50,
-      "stackable":false,
-      "turnable": false,
+      "isStackable":false,
+      "isTurnable": false,
       "surfaceIndex":0,
 
       "surfaces":[
@@ -109,7 +109,7 @@
       "type":"wordcard",
       "overwrite":{
         "position":{"x":200,"y":100},
-        "surface":0,
+        "surfaceIndex":0,
         "surfaces.0":{"texture":"c1.png","color":"0x4286f4"}
       }
     },
@@ -118,7 +118,7 @@
       "overwrite":{
         "position":{"x":200,"y":200},
         "rotation":1.5708,
-        "surface":0,
+        "surfaceIndex":1,
         "surfaces.0":{"texture":"c2.png","color":"0x4286f4"}
       }
     },

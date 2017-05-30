@@ -80,6 +80,8 @@ class BasicTool{
 
     _turnSelectedEntities(evt){
         var ids= this.selectedEntityIDs;
+        //TODO: remove ids for entities, which are not turnable
+
         this.synchronizer.updateQueue.postUpdate(Packages.PROTOCOL.GAME_STATE.ENTITY.USER_TURN_ENTITY,
             this.synchronizer.CLIENT_INFO.id,
             {
@@ -298,8 +300,11 @@ class SimpleDragTool extends BasicTool{
      * @private
      */
     _releaseSelection(evt){
+        this._checkStacking(this._selected_entities);
         super._releaseSelection(evt);
         this._currentSnaps = {};
+
+
     }
 
     /**
@@ -310,7 +315,6 @@ class SimpleDragTool extends BasicTool{
         super.removeEntityFromSelection(entity);
         this._currentSnaps = Util.removeByValue(this._currentSnaps,entity.ENTITY_ID);
     }
-
 
     /**
      * called, when mouse moves
@@ -484,7 +488,6 @@ class SimpleDragTool extends BasicTool{
         super._releaseSelection(evt);
     }
 
-
     update(delta){
         super.update(delta);
         this._processRotationInput(delta);
@@ -522,6 +525,59 @@ class SimpleDragTool extends BasicTool{
             );
         }else{ // else rotate just the camera
             this.gameTable.rotation += rotationAmount*Config.TABLE_ROTATION_SPEED*delta;
+        }
+    }
+
+    /**
+     * checks of a stacking is possible,
+     * if yes, post a stack request.
+     * this method should be called at the release of a selection (by the user)
+     * when the mouse up event was sent.
+     *
+     * @param entities selected entities
+     * @private
+     */
+    _checkStacking(entities){
+        entities = [].concat(entities);
+        for (var i = 0; i < entities.length; i++) {
+            var selectedEntity = entities[i];
+
+            // nothing to do, if entity is not stackable
+            if(!selectedEntity.isStackable) continue;
+
+            // if there is an entity in range
+            var targets = this.entityManager.getEntitiesInRange(
+                selectedEntity.position,
+                Config.STACKING_THRESHOLD,
+                false,
+                [selectedEntity]
+            );
+
+            // if nothing is in range, continue
+            if (targets.length <= 0) continue;
+
+            var target=null;
+            // check if there is another entity in range, which is stackable and from the same type,
+            // take the first
+            for(var j=0; j<targets.length;j++){
+                if(targets[i].isStackable && selectedEntity.type == targets[i].type ){
+                    target = targets[i];
+                    break;
+                }
+            }
+
+            if(!target) continue; // if no stackable with same type is in range, continue
+
+            //if something passed, send the stack impulse
+            this.synchronizer.updateQueue.postUpdate(Packages.PROTOCOL.GAME_STATE.ENTITY.USER_STACK_ENTITY, this.synchronizer.CLIENT_INFO.id,
+                {
+                    stackPairs: {
+                        sourceID: selectedEntity.ENTITY_ID,
+                        targetID: target.ENTITY_ID,
+                        _mode: "push"
+                    }
+                }
+            );
         }
     }
 }

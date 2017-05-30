@@ -15,7 +15,10 @@ functions:
 -rotate view
 -touch support --> evlt hammerjs benutzen https://www.npmjs.com/package/hammerjs
 -stacks
+-polygon shapes
 
+-hide card with button
+-hide zones
 
 
 

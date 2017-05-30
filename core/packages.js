@@ -98,6 +98,19 @@ module.exports =
                 USER_TURN_ENTITY: "USER_TURN_ENTITY",
 
                 /**
+                 * user wants to stack two entities,
+                 * the ids of the entities are in the package
+                 * looks like
+                 * {
+                 *  stackPairs: {
+                 *      sourceID: selectedEntity.ENTITY_ID,
+                 *      targetID: target.ENTITY_ID,
+                 *      }
+                 *  }
+                 */
+                USER_STACK_ENTITY: "USER_STACK_ENTITY",
+
+                /**
                  * server turns card.
                  */
                 SERVER_TURN_ENTITY:"SERVER_TURN_ENTITY",

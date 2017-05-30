@@ -9,6 +9,8 @@ var Packages = require('./../../core/packages');
 const RELATIVE_PATH = "./../";
 */
 
+var Util = require('./../../core/util');
+
 const Ticks = require('./../../core/ticks.json');
 var EVT_ENTITYCLICKED = "entityclicked";
 
@@ -76,6 +78,7 @@ class EntityManager extends PIXI.Container{
      */
     vanish(){
         for(let id in this.entities){
+            if(!this.entities.hasOwnProperty(id)) continue;
             this.removeEntity(id);
         }
     }
@@ -103,7 +106,7 @@ class EntityManager extends PIXI.Container{
      * @param transformation the changed data of the entity related to the id
      * @param timeSinceLastUpdate is the time since the last update and used as LERP intervall
      */
-    updateEntityTransformation(entityID,transformation,timeSinceLastUpdate=0){
+    updateEntityTransformation(entityID,transformation,timeSinceLastUpdate=0,force){
         if(!entityID){
             console.warn("entity id is necessary to update enitty");
             return;
@@ -120,63 +123,64 @@ class EntityManager extends PIXI.Container{
         }
         var cur = this.entities[entityID];
 
-        // sometimes, just the angle is sent, position stays same
-        if(transformation.position) {
-            // be sure, that all necessary values are available
-            transformation.position.x = transformation.position.x || cur.position.x;
-            transformation.position.y = transformation.position.y || cur.position.y;
+        if(!force) {
+            // sometimes, just the angle is sent, position stays same
+            if(transformation.position) {
+                // be sure, that all necessary values are available
+                transformation.position.x = transformation.position.x || cur.position.x;
+                transformation.position.y = transformation.position.y || cur.position.y;
 
-            // if position has changed, lerp position
-            if (transformation.position.x != cur.position.x
-                || transformation.position.y != cur.position.y) {
+                // if position has changed, lerp position
+                if (transformation.position.x != cur.position.x
+                    || transformation.position.y != cur.position.y) {
 
-                this.lerpManager.push(entityID,"position",{
+                    this.lerpManager.push(entityID,"position",{
+                        get value() {
+                            return cur.position
+                        },
+                        set value(v){
+                            cur.position.x = v.x || 0;
+                            cur.position.y = v.y || 0;
+                        },
+                        start: {x: cur.position.x, y: cur.position.y},
+                        end: {x: transformation.position.x, y: transformation.position.y},
+                        type: "position",
+                        interval: Math.min(timeSinceLastUpdate,Ticks.MAX_DELAY), //Ticks.SERVER_UPDATE_INTERVAL,
+                        minDiff:1
+                    });
+                }
+            }
+
+            // if angle(rotation) value exists, and it does not equal the current
+            // entities value, then lerp it
+            if ((transformation.angle || transformation.angle === 0)
+                && cur.rotation != transformation.angle) {
+
+                this.lerpManager.push(entityID, "rotation", {
                     get value() {
-                        return cur.position
+                        return cur.rotation
                     },
-                    set value(v){
-                        cur.position.x = v.x || 0;
-                        cur.position.y = v.y || 0;
+                    set value(v) {
+                        cur.rotation = v;
                     },
-                    start: {x: cur.position.x, y: cur.position.y},
-                    end: {x: transformation.position.x, y: transformation.position.y},
-                    type: "position",
-                    interval: Math.min(timeSinceLastUpdate,Ticks.MAX_DELAY), //Ticks.SERVER_UPDATE_INTERVAL,
-                    minDiff:1
+                    start: cur.rotation,
+                    end: transformation.angle,
+                    type: "value",
+                    interval: Math.min(timeSinceLastUpdate, Ticks.MAX_DELAY), //Ticks.SERVER_UPDATE_INTERVAL,
+                    minDiff: 0.01
                 });
             }
+
+        }else{  // when position change is forced:
+            // just change the available values, e.g. sometimes,
+            // just angle is sent, when just the angle is changes
+            if(transformation.position) {
+                cur.position.x = transformation.position.x;
+                cur.position.y = transformation.position.y;
+            }
+            // change rotation, if available
+            cur.rotation = transformation.angle || cur.rotation;
         }
-
-        // if angle(rotation) value exists, and it does not equal the current
-        // entities value, then lerp it
-        if((transformation.angle || transformation.angle === 0)
-            && cur.rotation != transformation.angle){
-
-            this.lerpManager.push(entityID,"rotation",{
-                get value() {
-                    return cur.rotation
-                },
-                set value(v){
-                  cur.rotation = v;
-                },
-                start: cur.rotation,
-                end: transformation.angle,
-                type: "value",
-                interval: Math.min(timeSinceLastUpdate,Ticks.MAX_DELAY), //Ticks.SERVER_UPDATE_INTERVAL,
-                minDiff:0.01
-            });
-        }
-
-
-        // just change the available values, e.g. sometimes,
-        // just angle is sent, when just the angle is changes
-      /*  if(transformation.position) {
-            cur.position.x = transformation.position.x || cur.position.x;
-            cur.position.y = transformation.position.y || cur.position.y;
-        }
-        // change rotation, if available
-        cur.rotation = transformation.angle || cur.rotation;
-*/
     }
 
     /**
@@ -218,6 +222,47 @@ class EntityManager extends PIXI.Container{
         }
 
         this.entities[entityID].showSurface(surfaceIndex);
+    }
+
+
+    /**
+     * gets entities in a certain distance
+     * @param point point for range
+     * @param range
+     * @param getFirst if this is true, just the first found is returned
+     * @param exceptList entities which are not considered in the
+     * @returns {Array} list of arrays in the range of the points
+     */
+    getEntitiesInRange(point,range,getFirst,exceptList){
+        var result = [];
+
+        var x = point.x;
+        var y = point.y;
+
+        // be sure except list is an array, or null
+        if(exceptList) {
+            exceptList = [].concat(exceptList);
+        }
+
+        for(let id in this.entities){
+            if(!this.entities.hasOwnProperty(id)) continue;
+            var curEntity = this.entities[id];
+
+            // if entity is in the except list, do not consider it
+            if(exceptList && exceptList.indexOf(curEntity)) continue;
+
+            // check every entity, which is not the passed entity,
+            // and check if the distance is under the threshold
+            var dist = Util.getVectorDistance(x,y,curEntity.position.x,curEntity.position.y);
+            if(dist <=range){
+                result.push(curEntity); // if near then distance, push to result
+                if(getFirst){   // break / return, if just the first is wanted
+                    break;
+                }
+            }
+        }
+
+        return result;
     }
 }
 

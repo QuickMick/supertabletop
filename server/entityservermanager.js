@@ -21,15 +21,6 @@ var Engine = Matter.Engine,
     Bodies = Matter.Bodies,
     Body = Matter.Body;
 
-/*
- Detector.canCollide = function(filterA, filterB) {
- if (filterA.group === filterB.group && filterA.group !== 0)
- return filterA.group > 0;
-
- return (filterA.mask & filterB.category) !== 0 && (filterB.mask & filterA.category) !== 0;
- };
- */
-
 var Config = require('./../public/resources/config.json');
 
 var Globals = require('./globals');
@@ -306,6 +297,7 @@ class EntityServerManager extends EventEmitter3 {
         entity.position.x = entity.position.x || 0;
         entity.position.y = entity.position.y || 0;
         entity.rotation = entity.rotation || 0;
+        entity.surfaceIndex = entity.surfaceIndex || 0;
 
         entity.hitArea.offset.x = entity.hitArea.offset.x || 0;
         entity.hitArea.offset.y = entity.hitArea.offset.y || 0;
@@ -694,7 +686,7 @@ class EntityServerManager extends EventEmitter3 {
             return;
         }
 
-        if(!curEntity.turnable){
+        if(!curEntity.isTurnable){
             console.log("turnEntity: entity",entityID,"is not turnable, tried by user",userID);
             return;
         }
@@ -733,6 +725,85 @@ class EntityServerManager extends EventEmitter3 {
         );
     }
 
+    batchStackEntities(userID,data){
+        if(!data || !data.stackPairs){
+            console.log("batchRotation: no data passed for user",userID);
+            return;
+        }
+
+        for(var i =0; i<data.stackPairs.length;i++){
+            var currentPair = data.stackPairs[i];
+            this.stackEntities(userID,currentPair.sourceID,currentPair.targetID);
+        }
+    }
+
+    /**
+     * stacks two entities,
+     * this means, when one entity is no stack,
+     * then both are deleted, and a stack is generated
+     *
+     * @param userID user who wants to stack
+     * @param sourceID entity he drags
+     * @param targetID entiy on which he tracks the source entity
+     */
+    stackEntities(userID,sourceID,targetID){
+        if(!userID || userID.length <=0){
+            console.log("stackEntities: no userID passed!");
+            return;
+        }
+
+        if(!this.clientManager.doesClientExist(userID)){
+            console.log("stackEntities: user does not exist!",userID);
+        }
+
+        if(!sourceID){
+            console.log("stackEntities: no source entity id passed!",sourceID);
+            return;
+        }
+
+        if(!this.bodies[sourceID]){
+            console.log("stackEntities: source entity",sourceID,"does not exist!");
+            return;
+        }
+
+        if(!this.entities[sourceID].stackable){
+            console.log("stackEntities: source entity",sourceID,"is not stackable!");
+            return;
+        }
+
+        if(!targetID){
+            console.log("stackEntities: no target entity id passed!",targetID);
+            return;
+        }
+
+        if(!this.bodies[targetID]){
+            console.log("stackEntities: target entity",targetID,"does not exist!");
+            return;
+        }
+
+        if(!this.entities[targetID].stackable){
+            console.log("stackEntities: target entity",targetID,"is not stackable!");
+            return;
+        }
+
+        if(this.entities[targetID].type != this.entities[targetID].type){
+            console.log("stackEntities: target and source entity are not both of the same type!",this.entities[targetID].type,"and",this.entities[targetID].type);
+            return;
+        }
+
+        if(this.bodies[sourceID].claimedBy != userID){
+            console.log("stackEntities: source entity",sourceID,"not claimed by user",userID,"rotation aborted");
+            return;
+        }
+
+        if(this.bodies[targetID].claimedBy){
+            console.log("stackEntities: target entity",sourceID," already claimed by a user - stacking not possible");
+            return;
+        }
+        // actual code
+
+      //  if(this.entities[sourceID].isStack)
+    }
 
     /**
      * rotate all entitys by an amout and by an user
@@ -770,7 +841,7 @@ class EntityServerManager extends EventEmitter3 {
         }
 
         if(!this.clientManager.doesClientExist(userID)){
-            console.log("user does not exist!",userID);
+            console.log("rotation: user does not exist!",userID);
         }
 
         if(!entityID){

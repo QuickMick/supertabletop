@@ -48,7 +48,10 @@ class UpdateQueue{
                 if (!updatedData.hasOwnProperty(key) || key == "_mode") continue;
 
                 if(updatedData._mode){
-                    switch(updatedData._mode){
+                    var mode = updatedData._mode;
+                    delete updatedData._mode;   // delete mode, we do not need to send it
+
+                    switch(mode){
                         case "add":                // if data field looks like {add:true,value:3} then add,
                             if(!this._queue[type][id][key]) this._queue[type][id][key]= 0;
                             this._queue[type][id][key] += updatedData[key];
@@ -63,7 +66,7 @@ class UpdateQueue{
                             this._queue[type][id][key] = [...new Set(this._queue[type][id][key].concat(updatedData[key]))];
                             break;
                         default:
-                            console.error("mode",updatedData._mode,"does not exist!");
+                            console.error("mode",mode,"does not exist! data was not posted");
                             return;
                     }
                 } else { // otherwise just replace

@@ -34,7 +34,13 @@ class EntityManager extends PIXI.Container{
 
     addEntity(entity){
         if(!entity){
-            console.warn("no entity to add was passed");
+            console.warn("addEntity: no entity to add was passed");
+            return;
+        }
+
+        if(this.entities[entity.ENTITY_ID]){
+            console.warn("addEntity: entity already added!");
+            return;
         }
 
         this.entities[entity.ENTITY_ID] = entity;

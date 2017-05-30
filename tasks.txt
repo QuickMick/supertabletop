@@ -3,7 +3,7 @@
 -isSensor bei drag an un aus is noch n bissl buggy
 -outlinefilter bei drehung buggy
 -circle shape/hitzone
-
+-bild anfangs leicht verzerrt
 
 #####################################################  TODOS  ##########################################################
 - table boundaries
@@ -21,7 +21,10 @@ functions:
 -hide zones
 
 
+-refactr every dependency to context
+-create server entity and server stack class
 
+-vanish signal, when new game is loaded?
 ####################################################### done ###########################################################
 -snap points
 -turn card

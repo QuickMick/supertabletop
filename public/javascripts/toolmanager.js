@@ -299,12 +299,10 @@ class SimpleDragTool extends BasicTool{
      * @param evt
      * @private
      */
-    _releaseSelection(evt){
+    _releaseSelection(evt){ //TODO: wird iwie net aufgerufn
         this._checkStacking(this._selected_entities);
         super._releaseSelection(evt);
         this._currentSnaps = {};
-
-
     }
 
     /**

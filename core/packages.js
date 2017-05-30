@@ -91,6 +91,12 @@ module.exports =
                 SERVER_ENTITY_DELETED: "ENTITY_DELETED",
 
                 /**
+                 * is posted by server, when an entity is added,
+                 * package contains all data of the entitys
+                 */
+                SERVER_ENTITY_ADDED: "SERVER_ENTITY_ADDED",
+
+                /**
                  * a user warns to turn a card,
                  * userID and entity in the package
                  * {turnedEntities:[<ids of entities>],surface:<index, or "next", "previous" or "random">}

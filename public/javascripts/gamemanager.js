@@ -77,6 +77,9 @@ class GameManager extends EventEmitter3{
      * during this process, every entity gets deleted,
      * afterwards, the game related entities are created.
      * also all resources are loaded.
+     *
+     * cam be called more than once
+     *
      * @param game resource from server, contains all data about entities, game info and resources
      * @private
      */
@@ -110,9 +113,15 @@ class GameManager extends EventEmitter3{
         // set the snappoints to the toolmanager
         this.toolManager.snapZones = game.snapzones || [];
 
-        // generate uniq ids for the snapzones
+        // generate uniq ids for the snapzones if there is no id available
+        var snapZoneIdCache = new Set();
         for(var i=0;i<this.toolManager.snapZones.length;i++){
-            this.toolManager.snapZones[i].id = "sz"+i; //uuidV4();
+            var id = this.toolManager.snapZones[i].id || "sz"+i+"_"+uuidV4();
+            if(!snapZoneIdCache.has(id)) {  // if there is a duplicate id
+                this.toolManager.snapZones[i].id = id;
+            }else{  // create a new one
+                this.toolManager.snapZones[i].id = (this.toolManager.snapZones[i].id || "sz"+i)+"_"+uuidV4();
+            }
         }
 
         // create entities

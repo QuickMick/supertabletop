@@ -177,6 +177,7 @@ class EntityServerManager extends EventEmitter3 {
             data
         );
 
+        // update the entitiy data
         this.entities[body.ENTITY_ID].position.x = body.position.x;
         this.entities[body.ENTITY_ID].position.y = body.position.y;
         this.entities[body.ENTITY_ID].rotation = body.angle;
@@ -269,11 +270,19 @@ class EntityServerManager extends EventEmitter3 {
     /**
      * adds an entity to the entitymanager and creates
      * @param entity
+     * @param send true, if the entity should be broadcasted to the clients
      * @private
      */
-    addEntity(entity){
+    addEntity(entity,send){
+
+        if(!entity.surfaces || entity.surfaces.length <=0){
+            console.warn("addEntity: cannot create entity without surfaces!");
+            return;
+        }
+
         this.lastID++; //increment id
-        entity.id="e"+this.lastID;
+        entity.id= (entity.isStack?"s":"e")+this.lastID;    // in order to make the debuging more comfortable,
+                                                            // the entity ids start with en "e", and stack ids with an "s"
         this.entities[entity.id] = entity;
         this.entities[entity.id].state = this._createDefaultEntityState();
 
@@ -330,6 +339,20 @@ class EntityServerManager extends EventEmitter3 {
 
         World.add(this.engine.world,body);
 
+        if(send){
+            var sendable = entity;
+
+            if(entity.isStack){ // if the entity is a stack, we do not want to sent the whole content,
+                sendable = Object.assign({},entity);    // so copy the entity
+                delete sendable.content;                // and delete its content
+            }
+
+            this.updateQueue.postUpdate(
+                Packages.PROTOCOL.GAME_STATE.ENTITY.SERVER_ENTITY_DELETED,
+                sendable.id,
+                {entity:sendable}
+            );
+        }
     }
 
     /**
@@ -691,6 +714,10 @@ class EntityServerManager extends EventEmitter3 {
             return;
         }
 
+        // if the turned entity is a stack, there is just the posibility to turn it with "next"
+        if(curEntity.isStack){
+            surface = "next";
+        }
 
         if (typeof surface == "number") {   // if the passed variable is an index
             // apply the new surface, but check, that the new index is inside the valid range
@@ -740,8 +767,13 @@ class EntityServerManager extends EventEmitter3 {
     /**
      * stacks two entities,
      * this means, when one entity is no stack,
-     * then both are deleted, and a stack is generated
+     * then both are deleted, and a stack is generated.
      *
+     * NOTE: first element of the stack is always on the bottom,
+     *      last element is always on the top
+     *
+     * NODE: everytime an stack entity is stacked, a new stack is created, even if one of the two entities is
+     *      already a stack
      * @param userID user who wants to stack
      * @param sourceID entity he drags
      * @param targetID entiy on which he tracks the source entity
@@ -766,7 +798,7 @@ class EntityServerManager extends EventEmitter3 {
             return;
         }
 
-        if(!this.entities[sourceID].stackable){
+        if(!this.entities[sourceID].isStackable){
             console.log("stackEntities: source entity",sourceID,"is not stackable!");
             return;
         }
@@ -781,7 +813,7 @@ class EntityServerManager extends EventEmitter3 {
             return;
         }
 
-        if(!this.entities[targetID].stackable){
+        if(!this.entities[targetID].isStackable){
             console.log("stackEntities: target entity",targetID,"is not stackable!");
             return;
         }
@@ -800,10 +832,106 @@ class EntityServerManager extends EventEmitter3 {
             console.log("stackEntities: target entity",sourceID," already claimed by a user - stacking not possible");
             return;
         }
-        // actual code
 
-      //  if(this.entities[sourceID].isStack)
+        // actual code
+        var targetEntity = this.entities[targetID];
+        var sourceEntity = this.entities[sourceID];
+        delete sourceEntity.position;               // delete unnecessary states
+        delete sourceEntity.rotation;               // they will be recreated later
+        delete sourceEntity.state;                  // when the entity gets unstacked
+
+        var targetStack = this._createStackFromEntity(targetEntity);
+
+        // if the target entiy was not a stack, delete unnecessary values
+        // and add it to the new stack
+        if(!targetEntity.isStack){
+            delete targetEntity.position;
+            delete targetEntity.rotation;
+            delete targetEntity.state;
+            targetStack.concat(targetEntity);
+        }
+
+        // merge the source entity/stack with the new stack
+        if(sourceEntity.isStack){
+            targetStack.concat(sourceEntity.content);
+        }else{
+            targetStack.concat(sourceEntity);
+        }
+
+        // first, release the source entity, because it will be deleted on the client
+        this.releaseEntities(userID,this.bodies[sourceID].claimedBy);
+
+        this.removeEntity(targetID);    // remove the stack, so the new stack is update at the clients
+        this.removeEntity(sourceID);    // remove the entity, because it is now also in the stack
+
+        // finaly add the new stack to the entity manager, and send it (done with the addEntity function)
+        this.addEntity(targetStack,true);
     }
+
+
+    /**
+     * NOTE: first element of the stack is always on the bottom,
+     *      last element is always on the top
+     *
+     * @param targetEntity
+     * @returns {{position: {x: *, y: *}, rotation: *, type: *, classification: *, isStackable: boolean, isTurnable: boolean, surfaceIndex: number, content: Array, surfaces}}
+     * @private
+     */
+    _createStackFromEntity(targetEntity){
+        if(!targetEntity){
+            console.log("_createStackFromEntity: no entity passed!");
+            return null;
+        }
+
+        if(targetEntity.isStack){
+           // console.log("_createStackFromEntity: entity",targetEntity.ENTITY_ID,"is already a stack");
+           // return targetEntity;
+        }
+
+        return {
+            isStack:true,
+            position:{x:targetEntity.position.x,y:targetEntity.position.y},
+            rotation:targetEntity.rotation,
+            width:targetEntity.width,
+            height:targetEntity.height,
+            type:targetEntity.type,
+            classification:targetEntity.classification,
+            isStackable:true,
+            isTurnable:true,
+            surfaceIndex:0,
+            content:targetEntity.content || [],
+            /**
+             * returns the top site of the top object
+             * and the complementary site of the bottom object
+             */
+            get surfaces(){
+                if(this.content.length <=0) return [];
+
+                var bottom = this.content[0];
+                var top = this.content[this.content.length-1];
+
+                var  bottomIndex = bottom.surfaceIndex;
+                //  for bottom element, take the complementary surface to the visible surface,
+                // this means, add the half of the surface count to the current index and use torusRange,
+                // so the next element is the opposite
+                if(bottom.isTurnable) {     // just if it is turnable, else take the current surfaceIndex
+                    Util.torusRange((bottom.surfaceIndex + Math.round(bottom.surfaces.length / 2)), 0, (bottom.surfaces.length - 1));
+                }
+                return [bottom.surfaces[bottomIndex], top.surfaces[top.surfaceIndex]];
+            }
+
+        };
+    }
+
+    /**
+     * get the main characteristic of an entity,
+     * aka the surfaces, type, classification,
+     * @param entityID
+     * @private
+     */
+  /*  _getEntityCharacteristic(entityID){
+
+    }*/
 
     /**
      * rotate all entitys by an amout and by an user

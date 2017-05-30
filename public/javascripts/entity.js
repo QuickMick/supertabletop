@@ -34,8 +34,6 @@ class Entity extends PIXI.Sprite {
          */
         this.rawData = entity;
 
-
-
         // ensure, that the surfaces object is an array, if not, then convert it to an array
         entity.surfaces = Array.isArray(entity.surfaces) ? entity.surfaces : [].concat(entity.surfaces);
 
@@ -63,22 +61,8 @@ class Entity extends PIXI.Sprite {
 
         this.surfaceIndex = entity.surfaceIndex || 0; // is top visible?
 
-        // ------- init surfaces -------------
-        this.surfaces = [];
-        for (let i = 0; i < entity.surfaces.length; i++) {
-            var curSurface = entity.surfaces[i];
-            // init surface
-            var newSurface = {
-                // set the texture
-                texture: entity.surfaces[i].texture,// || PIXI.loader.resources[DEFAULT_RESOURCES.empty_texture],//PIXI.loader.resources[entity.surfaces[i].texture] ? PIXI.loader.resources[entity.surfaces[i].texture].texture : PIXI.loader.resources[DEFAULT_RESOURCES.missing_texture_substitute.texture].texture,// function(){ PIXI.loader.resources[entity.surfaces[i].texture] ? PIXI.loader.resources[entity.surfaces[i].texture].texture : PIXI.loader.resources[DEFAULT_RESOURCES.missing_texture_substitute.texture].texture;} ,
-                // normalize/convert the color of the surface
-                color: Util.parseColor(entity.surfaces[i].color),
-                // if text  is no array, then convert it to an array, if text is undefined, put empty array instead
-                text: curSurface.text ? (Array.isArray(curSurface.text) ? curSurface.text : [].concat(curSurface.text)) : []
-            };
-
-            this.surfaces.push(newSurface);
-        }
+        // init surfaces
+        this.setSurfaces(entity.surfaces);
 
         // finally, display the visible surface
         this.showSurface(this.surfaceIndex);
@@ -86,6 +70,24 @@ class Entity extends PIXI.Sprite {
         // give user mouseover feedback
         this._applyMouseoverEffect();
         this.showMouseoverEffect = true;
+    }
+
+    setSurfaces(surfaces){
+        this.surfaces = [];
+        for (let i = 0; i < surfaces.length; i++) {
+            var curSurface = surfaces[i];
+            // init surface
+            var newSurface = {
+                // set the texture
+                texture: surfaces[i].texture,// || PIXI.loader.resources[DEFAULT_RESOURCES.empty_texture],//PIXI.loader.resources[entity.surfaces[i].texture] ? PIXI.loader.resources[entity.surfaces[i].texture].texture : PIXI.loader.resources[DEFAULT_RESOURCES.missing_texture_substitute.texture].texture,// function(){ PIXI.loader.resources[entity.surfaces[i].texture] ? PIXI.loader.resources[entity.surfaces[i].texture].texture : PIXI.loader.resources[DEFAULT_RESOURCES.missing_texture_substitute.texture].texture;} ,
+                // normalize/convert the color of the surface
+                color: Util.parseColor(surfaces[i].color),
+                // if text  is no array, then convert it to an array, if text is undefined, put empty array instead
+                text: curSurface.text ? (Array.isArray(curSurface.text) ? curSurface.text : [].concat(curSurface.text)) : []
+            };
+
+            this.surfaces.push(newSurface);
+        }
     }
 
     /**

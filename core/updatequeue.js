@@ -60,7 +60,7 @@ class UpdateQueue{
                             if(!this._queue[type][id][key]) this._queue[type][id][key] = [];
                             this._queue[type][id][key] = this._queue[type][id][key].concat(updatedData[key]);
                             break;
-                        case "pushAvoidDuplicates":
+                        case "pushAvoidDuplicates": //TODO: does not work for objects
                             if(!this._queue[type][id][key]) this._queue[type][id][key] = [];
                             // convert the concatinated array to a set, to avoid duplicates, then convert back to array
                             this._queue[type][id][key] = [...new Set(this._queue[type][id][key].concat(updatedData[key]))];

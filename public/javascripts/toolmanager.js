@@ -559,7 +559,6 @@ class SimpleDragTool extends BasicTool{
                     stackPairs: {
                         sourceID: selectedEntity.ENTITY_ID,
                         targetID: target.ENTITY_ID,
-
                     },
                     _mode: "push"
                 }

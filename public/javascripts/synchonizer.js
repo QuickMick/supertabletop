@@ -62,6 +62,14 @@ class Synchronizer{
          */
         this.lastGameStateUpdateTimeStamp = 0;
 
+
+        /**
+         * once the client is connected,
+         * he receives the ID of the server
+         * @type {string}
+         */
+        this.connectedServerID = "";
+
     }
 
     init(){
@@ -106,9 +114,10 @@ class Synchronizer{
     _initHandlers(){
         // get clientdata of this client
         this.socket.on(Packages.PROTOCOL.SERVER.RESPONSE_CLIENT_ACCEPTED, function(evt) {
-            this.CLIENT_INFO = evt.data;
+            this.CLIENT_INFO = evt.data.clientInfo;
             console.log("Clientdata received");
-            this.playerManager.initCurrentPlayer(evt.data);
+            this.playerManager.initCurrentPlayer(this.CLIENT_INFO);
+            this.connectedServerID = evt.data.serverID;
             this._startUpdating();
             window.hideLoadingDialog();
         }.bind(this));
@@ -154,6 +163,11 @@ class Synchronizer{
 
             var updates = updateData[type];
             switch (type){
+                // an entity was added on the server, e.g. a new stack was created
+                case Packages.PROTOCOL.GAME_STATE.ENTITY.SERVER_ENTITY_ADDED:
+                    if(!updates[this.connectedServerID])break; //just handle events from the server
+                    this.entityManager.batchCreateEntities(updates[this.connectedServerID].newEntities);
+                    break;
                 // entity position or rotation has updated
                 case Packages.PROTOCOL.GAME_STATE.ENTITY.SERVER_ENTITY_TRANSFORMATION_UPDATE:
                     this.entityManager.batchUpdateEntityTransformation(updates,timeSinceLastUpdate);
@@ -161,10 +175,6 @@ class Synchronizer{
                 // mouse of other players moves
                 case Packages.PROTOCOL.GAME_STATE.CLIENT.SERVER_CLIENT_POSITION_UPDATE:
                     this.playerManager.batchUpdatePlayerPosition(updates,timeSinceLastUpdate);
-                    break;
-                // an entity gets deleted by a player or by the server
-                case Packages.PROTOCOL.GAME_STATE.ENTITY.SERVER_ENTITY_DELETED:
-                    this.entityManager.removeEntity(Object.keys(updates));//just the entityIDs are passed
                     break;
                 // an entity was turned by a player or by the server
                 case Packages.PROTOCOL.GAME_STATE.ENTITY.SERVER_TURN_ENTITY:
@@ -177,6 +187,12 @@ class Synchronizer{
                 // a users Action was rejected
                 case Packages.PROTOCOL.GAME_STATE.ENTITY.SERVER_REJECT_ACTION:
                     this._batchHandleRejections(updates);
+                    break;
+                // an entity gets deleted by a player or by the server, e.g. a stack was removed
+                // do it last, in case there are still updates in the queue for this entity
+                case Packages.PROTOCOL.GAME_STATE.ENTITY.SERVER_ENTITY_REMOVED:
+                    if(!updates[this.connectedServerID])break; //just handle events from the server
+                    this.entityManager.removeEntity(updates[this.connectedServerID].removedEntities);//just the entityIDs are passed
                     break;
             }
         }

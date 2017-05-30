@@ -92,12 +92,17 @@ class GameManager extends EventEmitter3{
         // prepare resource list
         var game_resource_path = Path.join(game.creator,game.name);
 
+
         // reset the loader, but keep the resoruces,
         // this is necassary, to prevent errors, if the loader is currently running
         var res = PIXI.loader.resources;
         PIXI.loader.reset();
         PIXI.loader.resources = res;
 
+        PIXI.loader.game_resource_path = game_resource_path; // TODO: muss ins contex/loader object
+
+        //TODO: create a new loader for each new game -> when context refactoring
+        //TODO: load shown textures first
         for(let i in game.resources){
             var name = game.resources[i];
             // do not load resource again, if already existing
@@ -124,7 +129,8 @@ class GameManager extends EventEmitter3{
             }
         }
 
-        // create entities
+        // create entities, necessary to pass the loader,
+        // so the required texture can get assigned, once loaded
         var newEntityList = [];
 
         // sort entities, so that the one which was changed last is on top
@@ -135,10 +141,12 @@ class GameManager extends EventEmitter3{
         // create entities based on the loaded data and add them to the gamemanager
         for(let i=0; i< game.entities.length;i++) {
             game.entities[i].game_resource_path = game_resource_path;
-            var newEntity =new Entity(game.entities[i]);
-            newEntityList.push(newEntity);
-            this.entityManager.addEntity(newEntity);
+     //       var newEntity =new Entity(game.entities[i]);
+          //  newEntityList.push(newEntity);
+        //    this.entityManager.addEntities(newEntity);
         }
+
+        newEntityList = this.entityManager.batchCreateEntities(game.entities);
 
         // set first table with default texture
         this.gameTable.setTable(
@@ -149,6 +157,7 @@ class GameManager extends EventEmitter3{
 
         // gamedata is available, hide loading screen
         window.hideLoadingDialog();
+        //TODO: set textures on loaded, not just on complete
 
         // once the gfx is loaded, force every entity, to show its real texture instead of the placeholder
         PIXI.loader.once('complete', function (loader, resources) {

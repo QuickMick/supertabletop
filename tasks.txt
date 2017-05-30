@@ -22,10 +22,15 @@ functions:
 -hide zones
 
 
--refactr every dependency to context
--create server entity and server stack class
+-refactor every dependency to context
+-create server entity and server stack class --> think it is obsolete
 
 -vanish signal, when new game is loaded?
+
+loader:
+    TODO: create a new loader for each new game -> when context refactoring
+    TODO: load shown textures first
+
 ####################################################### done ###########################################################
 -snap points
 -turn card

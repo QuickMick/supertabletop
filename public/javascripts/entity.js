@@ -58,6 +58,7 @@ class Entity extends PIXI.Sprite {
         this.ENTITY_ID = entity.id;
         this.isTurnable = entity.isTurnable || false;
         this.isStackable = entity.isStackable || false;
+        this.isStack = entity.isStack || false;
 
         this.surfaceIndex = entity.surfaceIndex || 0; // is top visible?
 
@@ -73,8 +74,8 @@ class Entity extends PIXI.Sprite {
     }
 
     setSurfaces(surfaces){
-        this.surfaces = [];
-        for (let i = 0; i < surfaces.length; i++) {
+        this.surfaces = surfaces || [];
+      /*  for (let i = 0; i < surfaces.length; i++) {
             var curSurface = surfaces[i];
             // init surface
             var newSurface = {
@@ -87,7 +88,7 @@ class Entity extends PIXI.Sprite {
             };
 
             this.surfaces.push(newSurface);
-        }
+        }*/
     }
 
     /**
@@ -157,22 +158,23 @@ class Entity extends PIXI.Sprite {
         this.removeAll(); // remove text from old surface
 
         // set texture if available
-        var texture = Path.join(this.game_resource_path, curSurface.texture);
+        var texture = Path.join(this.game_resource_path || "", curSurface.texture || "");
 
-        if (!texture || texture == "") {
+        // if texture is not available, take default texture
+        if (!texture) {
             this.texture = PIXI.loader.resources[DEFAULT_RESOURCES.empty_texture].texture;
-
         } else if (!PIXI.loader.resources[texture] || !PIXI.loader.resources[texture].texture) {
             this.texture = PIXI.loader.resources[DEFAULT_RESOURCES.missing_texture_substitute.texture].texture;
         } else {
             this.texture = PIXI.loader.resources[texture].texture;
         }
 
-        this.tint = curSurface.color;
+        this.tint = Util.parseColor(curSurface.color);
 
         // show text
-        for (var i = 0; i < curSurface.text.length; i++) {
-            var cText = curSurface.text[i];
+        var curText =  curSurface.text ? (Array.isArray(curSurface.text) ? curSurface.text : [].concat(curSurface.text)) : [];
+        for (var i = 0; i < curText.length; i++) {
+            var cText = curText[i];
             var font = cText.fontFamily || "monospace";
             var size = cText.fontSize || 12;
             var align = cText.align || "left";

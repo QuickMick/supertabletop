@@ -20,7 +20,7 @@ class GameServer{
         this.ID = uuidV4();
         this.clientManager = new ClientManager();
         this.updateQueue =  new UpdateQueue();
-        this.entityServerManager = new EntityServerManager(60,this.updateQueue,this.clientManager);
+        this.entityServerManager = new EntityServerManager(60,this.updateQueue,this.clientManager,this);
         this.entityServerManager.on('beforeUpdate',this._processReceivedUpdateQueue.bind(this));
 
         /**
@@ -169,7 +169,10 @@ class GameServer{
             Packages.PROTOCOL.SERVER.RESPONSE_CLIENT_ACCEPTED,
             Packages.createEvent(
                 this.ID,
-                this.clientManager.getPrivateClientInfo(socket.id)
+                {
+                    clientInfo:this.clientManager.getPrivateClientInfo(socket.id),
+                    serverID: this.ID
+                }
             )
         );
 

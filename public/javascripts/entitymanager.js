@@ -11,6 +11,8 @@ const RELATIVE_PATH = "./../";
 
 var Util = require('./../../core/util');
 
+var Entity = require('./entity');
+
 const Ticks = require('./../../core/ticks.json');
 var EVT_ENTITYCLICKED = "entityclicked";
 
@@ -32,23 +34,62 @@ class EntityManager extends PIXI.Container{
         };
     }
 
-    addEntity(entity){
-        if(!entity){
-            console.warn("addEntity: no entity to add was passed");
-            return;
+    /**
+     * adds one or more entities to the manager,
+     * entities need to be of type Entity,
+     * otherwise they will be ignored
+     * @param entities
+     */
+    addEntities(entities){
+        entities = [].concat(entities);
+
+        for(var i=0; i< entities.length;i++) {
+            var entity = entities[i];
+            if (!entity) {
+                console.warn("addEntities: no entity to add was passed");
+                continue;
+            }
+            if(!(entity instanceof Entity)){
+                console.warn("addEntities: passed entity is not type of entity!");
+                continue;
+            }
+
+            if (this.entities[entity.ENTITY_ID]) {
+                console.warn("addEntities: entity already added!");
+                continue;
+            }
+
+            this.entities[entity.ENTITY_ID] = entity;
+            this.addChild(entity);
+
+            entity.on('mousedown', this._onEntityClicked.bind(this))
+                .on('touchstart', this._onEntityClicked.bind(this));
         }
-
-        if(this.entities[entity.ENTITY_ID]){
-            console.warn("addEntity: entity already added!");
-            return;
-        }
-
-        this.entities[entity.ENTITY_ID] = entity;
-        this.addChild(entity);
-
-        entity.on('mousedown', this._onEntityClicked.bind(this))
-            .on('touchstart', this._onEntityClicked.bind(this));
     }
+
+    /**
+     * creates antities from an received entity definition from the server
+     * and adds them to the manager, pass one or multiple definitions
+     * @param entityDefinitions
+     * @return returns the created entities
+     */
+    batchCreateEntities(entityDefinitions){
+        entityDefinitions = [].concat(entityDefinitions);
+        var entities = [];
+        for(var i=0; i< entityDefinitions.length;i++){
+            if(!entityDefinitions[i]) continue;
+            entityDefinitions[i].game_resource_path=PIXI.loader.game_resource_path  //TODO: spaeter aus dem context holn beim refactoring
+            entities.push(new Entity(entityDefinitions[i]));
+        }
+
+        // if entities were created, add them to the entity manager
+        if(entities.length >0){
+            this.addEntities(entities);
+        }
+
+        return entities;
+    }
+
 
     _onEntityClicked(event){
         // no entity_id? so its propably no entity
@@ -68,7 +109,7 @@ class EntityManager extends PIXI.Container{
         for(var i=0; i<ids.length;i++) {
             var id = ids[i];
 
-            if(!id || this.entities[id]){
+            if(!id || !this.entities[id]){
                 console.log("entity",id,"does not exist");
                 continue;
             }

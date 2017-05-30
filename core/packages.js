@@ -35,6 +35,7 @@ module.exports =
            /**
             * server sends this to the client, when he connects,
             * packags contains all necessary information about the client
+            * package looks like {clientInfo:<object of client info>,serverID:<string, id of server>
             */
            RESPONSE_CLIENT_ACCEPTED: "RESPONSE_CLIENT_ACCEPTED",
            /**
@@ -88,11 +89,12 @@ module.exports =
                  * is posted by server, when an entity is deleted,
                  * data just contains the deleted entities id
                  */
-                SERVER_ENTITY_DELETED: "ENTITY_DELETED",
+                SERVER_ENTITY_REMOVED: "SERVER_ENTITY_REMOVED",
 
                 /**
                  * is posted by server, when an entity is added,
                  * package contains all data of the entitys
+                 * package looks like {newEntities:<array of new entities>}
                  */
                 SERVER_ENTITY_ADDED: "SERVER_ENTITY_ADDED",
 

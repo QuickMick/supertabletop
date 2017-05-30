@@ -46,10 +46,12 @@ const SEND_PERCISION_ROTATION = 4;
 
 class EntityServerManager extends EventEmitter3 {
 
-    constructor(ticks=60,updateQueue,clientManager){
+    constructor(ticks=60,updateQueue,clientManager,gameServer){
         super();
         Body.update_original = Body.update;
         Body.update = this._bodyUpdateOverwrite.bind(this);
+
+        this.gameServer = gameServer;
 
         /**
          * defines the update time of the physics engine
@@ -194,7 +196,8 @@ class EntityServerManager extends EventEmitter3 {
 
         this._resetGame();
 
-        this.game = JSON.parse(fs.readFileSync(resource_path));
+        // load game and override values from the default game
+        this.game = Object.assign(this.game,JSON.parse(fs.readFileSync(resource_path)));
 
         var keys = Object.keys(this.entities);
 
@@ -206,13 +209,12 @@ class EntityServerManager extends EventEmitter3 {
         }
 
         //TODO: handle stacked, currently just unstacked entities are handled
-
         delete this.game.unstacked;
         delete this.game.stacked;
 
-        this.game.entities = Object.keys(this.entities).map(function(key) {
+        /* this.game.entities = Object.keys(this.entities).map(function(key) {
             return this.entities[key];
-        }.bind(this));
+        }.bind(this));*/
     }
 
     getCurrentGameState(){
@@ -252,6 +254,9 @@ class EntityServerManager extends EventEmitter3 {
                 }
             }
         }
+
+
+
         return result;
     }
 
@@ -276,7 +281,7 @@ class EntityServerManager extends EventEmitter3 {
     addEntity(entity,send){
 
         if(!entity.surfaces || entity.surfaces.length <=0){
-            console.warn("addEntity: cannot create entity without surfaces!");
+            console.warn("addEntities: cannot create entity without surfaces!");
             return;
         }
 
@@ -339,6 +344,8 @@ class EntityServerManager extends EventEmitter3 {
 
         World.add(this.engine.world,body);
 
+        this.game.entities.push(entity);
+
         if(send){
             var sendable = entity;
 
@@ -348,20 +355,16 @@ class EntityServerManager extends EventEmitter3 {
             }
 
             this.updateQueue.postUpdate(
-                Packages.PROTOCOL.GAME_STATE.ENTITY.SERVER_ENTITY_DELETED,
-                sendable.id,
-                {entity:sendable}
+                Packages.PROTOCOL.GAME_STATE.ENTITY.SERVER_ENTITY_ADDED,
+                this.gameServer.ID,
+                {
+                    newEntities:sendable,
+                    _mode:"pushAvoidDuplicates"
+                }
+
+
             );
         }
-    }
-
-    /**
-     * creates a stack of entities
-     * @param stack
-     */
-    addStack(stack){
-
-
     }
 
     /**
@@ -393,9 +396,12 @@ class EntityServerManager extends EventEmitter3 {
 
         if(send) {
             this.updateQueue.postUpdate(
-                Packages.PROTOCOL.GAME_STATE.ENTITY.SERVER_ENTITY_DELETED,
-                id,
-                {}
+                Packages.PROTOCOL.GAME_STATE.ENTITY.SERVER_ENTITY_REMOVED,
+                this.gameServer.ID,
+                {
+                    removedEntities:id,
+                    _mode:"pushAvoidDuplicates"
+                }
             );
         }
     }
@@ -589,7 +595,7 @@ class EntityServerManager extends EventEmitter3 {
      */
     batchSetRelativeConstraintPosition(userID,relativePositions){
         if(!relativePositions){
-            this.cleanRelativConstraintPositions(userID);
+            this.cleanRelativeConstraintPositions(userID);
             return;
         }
 
@@ -606,7 +612,7 @@ class EntityServerManager extends EventEmitter3 {
      * if yes, all relative positions are deleted
      * @param userID to check
      */
-    cleanRelativConstraintPositions(userID){
+    cleanRelativeConstraintPositions(userID){
         if(!userID){
             console.log("setRelativeConstraintPosition: no userID passed");
             return;
@@ -855,7 +861,7 @@ class EntityServerManager extends EventEmitter3 {
         delete sourceEntity.state;                  // when the entity gets unstacked
         delete sourceEntity.id;                     // it will receive a new id, when unstacked
 
-        var targetStack = this._convertEntityToStack(targetEntity);
+        var targetStack = this._convertEntityToStack(targetEntity,true);
 
         // merge the source entity/stack with the new stack
         // if the source entity was a stack, take its content, otherwise concat the entity itself to the new stack
@@ -869,7 +875,7 @@ class EntityServerManager extends EventEmitter3 {
 
         this.removeEntity(sourceID,true);    // remove the entity, because it is now also in the stack
 
-        // finaly add the new stack to the entity manager, and send it (done with the addEntity function)
+        // finaly add the new stack to the entity manager, and send it (done with the addEntities function)
         this.addEntity(targetStack,true);
     }
 
@@ -878,15 +884,15 @@ class EntityServerManager extends EventEmitter3 {
      * if the entity is a stack, its content is also used, otherwise the passed entity is added as content.
      * Basically it converts the passed entity to a stack at the same position of the entity.
      *
-     * NOTE: first element of the stack is always on the bottom,
+     * NOTE: first element of the stack array is always on the bottom,
      *      last element is always on the top
      *
      * @param targetEntity
-     * @param sendDeleteMessage {boolean} default:true, if it is true, the delete signal of the old entity will be broadcasted to the clients
+     * @param sendDeleteMessage {boolean} if it is true, the delete signal of the old entity will be broadcasted to the clients
      * @returns {{position: {x: *, y: *}, rotation: *, type: *, classification: *, isStackable: boolean, isTurnable: boolean, surfaceIndex: number, content: Array, surfaces}}
      * @private
      */
-    _convertEntityToStack(targetEntity, sendDeleteMessage=true){
+    _convertEntityToStack(targetEntity, sendDeleteMessage){
         if(!targetEntity){
             console.log("_createStackFromEntity: no entity passed!");
             return null;
@@ -915,7 +921,7 @@ class EntityServerManager extends EventEmitter3 {
             classification:targetEntity.classification,
             isStackable:true,
             isTurnable:true,
-            surfaceIndex:0,
+            surfaceIndex:1,     // zero is bottom, 1 is up
             content:content,
             /**
              * returns the top site of the top object
@@ -932,7 +938,7 @@ class EntityServerManager extends EventEmitter3 {
                 // this means, add the half of the surface count to the current index and use torusRange,
                 // so the next element is the opposite
                 if(bottom.isTurnable) {     // just if it is turnable, else take the current surfaceIndex
-                    Util.torusRange((bottom.surfaceIndex + Math.round(bottom.surfaces.length / 2)), 0, (bottom.surfaces.length - 1));
+                    bottomIndex = Util.torusRange((bottom.surfaceIndex + Math.round(bottom.surfaces.length / 2)), 0, (bottom.surfaces.length - 1));
                 }
                 return [bottom.surfaces[bottomIndex], top.surfaces[top.surfaceIndex]];
             }

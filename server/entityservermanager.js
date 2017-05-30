@@ -475,7 +475,6 @@ class EntityServerManager extends EventEmitter3 {
             this.bodies[claimedEntityID].isSensor = true;       //this means->"no" collision with normal entities
            // this.bodies[claimedEntityID].collisionFilter=CLAIMED_FILTER;
 
-            //    console.log("claim sensor",this.bodies[claimedEntityID].isSensor,claimedEntityID);
             // save the constraint
             // an user can create several constraints
             if (!this.constraints[userID]) {

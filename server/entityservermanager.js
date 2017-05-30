@@ -406,6 +406,13 @@ class EntityServerManager extends EventEmitter3 {
         }
     }
 
+    /**
+     * claims an entity to an user,
+     * this means, no other user is able to modify an entity.
+     * a user can just modify entities which he has claimed before.
+     * @param userID if of the user who wants to claim the entity
+     * @param claimedEntityIDs the IDs of the entities he wants to claim
+     */
     claimEntity(userID, claimedEntityIDs){
         if(!this.clientManager.doesClientExist(userID)){
             console.warn("user does not exist");
@@ -873,6 +880,10 @@ class EntityServerManager extends EventEmitter3 {
         // first, release the source entity, because it will be deleted on the client
         this.releaseEntities(userID,sourceID);
 
+        for(var i=0;i< targetStack.content.length;i++){
+            console.log(targetStack.content[i].surfaces[0].texture);
+        }
+
         this.removeEntity(sourceID,true);    // remove the entity, because it is now also in the stack
 
         // finaly add the new stack to the entity manager, and send it (done with the addEntities function)
@@ -900,6 +911,16 @@ class EntityServerManager extends EventEmitter3 {
         var content = [];
         if(targetEntity.isStack){ // if entity was already a stack, adapt the content
             content = content.concat(targetEntity.content || []);
+
+            // if the stack was reversed, reverse the content to
+            if(targetEntity.surfaceIndex == 0){
+                content = content.reverse();
+                // also reverse all cards
+                for(var i=0;i< content.length;i++) {
+                    var currentCard = content[i];
+                    currentCard.surfaceIndex = Util.torusRange((currentCard.surfaceIndex + Math.round(currentCard.surfaces.length / 2)), 0, (currentCard.surfaces.length - 1));
+                }
+            }
         }else{ // else add the entity itselfe as content
             var c = Object.assign({},targetEntity); // copy entity and remove unnecessary data
             delete c.content;   // just to be sure
@@ -933,7 +954,7 @@ class EntityServerManager extends EventEmitter3 {
                 var bottom = this.content[0];
                 var top = this.content[this.content.length-1];
 
-                var  bottomIndex = bottom.surfaceIndex;
+                var bottomIndex = bottom.surfaceIndex;
                 //  for bottom element, take the complementary surface to the visible surface,
                 // this means, add the half of the surface count to the current index and use torusRange,
                 // so the next element is the opposite

@@ -5,7 +5,7 @@
     "SENSIVITY": 0.1
   },
   "TABLE_ROTATION_SPEED":10,
-  "STACKING_THRESHOLD":100,
+  "STACKING_THRESHOLD":20,
   "KEY_MAPPING":{
     "TURN":{"keyboard":[70],"mouse":[]},
     "MOUSE_LEFT":{"keyboard":[],"mouse":[0]},

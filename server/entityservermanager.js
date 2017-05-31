@@ -204,13 +204,18 @@ class EntityServerManager extends EventEmitter3 {
         // create entities for unstacked entities
         for(var i=0; i< this.game.unstacked.length; i++){
             var c = this.game.unstacked[i];
-
             this.addEntity(this._reviveEntity(this.game.object_def[c.type],c));
+        }
+
+        for(var i=0; i< this.game.stacks.length; i++){
+            var c = this.game.stacks[i];
+
+            this.addEntity(this._reviveStack(this.game.object_def,c));
         }
 
         //TODO: handle stacked, currently just unstacked entities are handled
         delete this.game.unstacked;
-        delete this.game.stacked;
+        delete this.game.stacks;
 
         /* this.game.entities = Object.keys(this.entities).map(function(key) {
             return this.entities[key];
@@ -225,7 +230,7 @@ class EntityServerManager extends EventEmitter3 {
      * Overwrites the default values from the basetype.
      * Object.assign was not used, because it would overwrite the arrays completely.
      * This method copies and changes array items
-     * @param basetype of the entity, contains all default values
+     * @param basetypes of all entities, containing all default values
      * @param instance contains all specialized values, e.g. position, or unique texture
      * @private
      */
@@ -254,10 +259,38 @@ class EntityServerManager extends EventEmitter3 {
                 }
             }
         }
-
-
-
         return result;
+    }
+
+    _reviveStack(basetypes,instance){
+        if(!instance.content){
+            console.log("_reviveStack: cannot create stack without content!");
+            return;
+        }
+
+        var entities = [];
+
+        // create the content of the stack
+        for(var i=0;i<instance.content.length;i++){
+            var cur = instance.content[i];
+            entities.push(this._reviveEntity(basetypes[cur.type],cur))
+        }
+
+        // take first element from entities out of the array and pass to the create stack method,
+        // it will be the base of the stack
+        var stackBase = entities.shift();
+
+        stackBase.position = instance.position || {};
+        stackBase.position.x = instance.position.x || 0;
+        stackBase.position.y = instance.position.y || 0;
+        stackBase.rotation = instance.rotation || 0;
+
+        var stack = this._convertEntityToStack(stackBase);
+
+        // finally set the created entities as content of the stack
+        stack.content = stack.content.concat(entities);
+
+        return stack;
     }
 
     /**
@@ -867,7 +900,7 @@ class EntityServerManager extends EventEmitter3 {
         delete sourceEntity.state;                  // when the entity gets unstacked
         delete sourceEntity.id;                     // it will receive a new id, when unstacked
 
-        var targetStack = this._convertEntityToStack(targetEntity,true);
+        var targetStack = this._convertEntityToStack(targetEntity);
 
         // merge the source entity/stack with the new stack
         // if the source entity was a stack, take its content, otherwise concat the entity itself to the new stack
@@ -884,7 +917,7 @@ class EntityServerManager extends EventEmitter3 {
         }
 
         this.removeEntity(sourceID,true);    // remove the entity, because it is now also in the stack
-
+        this.removeEntity(targetID,true);     // remove the entity from the game, because it is now in the stack
         // finaly add the new stack to the entity manager, and send it (done with the addEntities function)
         this.addEntity(targetStack,true);
     }
@@ -894,6 +927,8 @@ class EntityServerManager extends EventEmitter3 {
      * if the entity is a stack, its content is also used, otherwise the passed entity is added as content.
      * Basically it converts the passed entity to a stack at the same position of the entity.
      *
+     * IMPORTANT: the passed entity should be removed before or after creating the stack!
+     *
      * NOTE: first element of the stack array is always on the bottom,
      *      last element is always on the top
      *
@@ -902,7 +937,7 @@ class EntityServerManager extends EventEmitter3 {
      * @returns {{position: {x: *, y: *}, rotation: *, type: *, classification: *, isStackable: boolean, isTurnable: boolean, surfaceIndex: number, content: Array, surfaces}}
      * @private
      */
-    _convertEntityToStack(targetEntity, sendDeleteMessage){
+    _convertEntityToStack(targetEntity){
         if(!targetEntity){
             console.log("_createStackFromEntity: no entity passed!");
             return null;
@@ -929,7 +964,6 @@ class EntityServerManager extends EventEmitter3 {
             delete c.id;        // id will be recreated, once its unstacked
             content = content.concat(c);
         }
-        this.removeEntity(targetEntity.id,sendDeleteMessage);     // remove the entity from the game, because it is now in the stack
                                                 // this will als broadcasted to all clients
         return {
             isStack:true,

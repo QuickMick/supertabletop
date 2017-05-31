@@ -18,7 +18,7 @@
       "width": 100,
       "height": 75,
       "isStackable": true,
-      "isStackable": true,
+      "isTurnable": true,
       "surfaceIndex":0,
 
       "surfaces":[
@@ -102,7 +102,6 @@
           }
         }
       ]
-
     }
   ],
   "unstacked":[

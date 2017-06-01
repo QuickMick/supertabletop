@@ -98,6 +98,12 @@
         {
           "type":"wordcard",
           "overwrite":{
+            "surfaces.0":{"texture":"c1.png","color":"0x4286f4"}
+          }
+        },
+        {
+          "type":"wordcard",
+          "overwrite":{
             "surfaces.0":{"texture":"c2.png"}
           }
         }

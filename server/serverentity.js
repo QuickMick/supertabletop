@@ -209,7 +209,10 @@ class ServerEntity extends BaseEntityData{
         this._body.ENTITY_ID = this.ID;
         this._body.frictionAir = GameConfig.ENTITY_FRICTION;
         this._body.collisionFilter=GameConfig.DEFAULT_COLISION_FILTER;
-        Body.rotate(this._body,rotation);
+
+        if(rotation) { //just rotate, if rotation is not equaling zero
+            Body.rotate(this._body, rotation);
+        }
 
         //------------------callbacks------------------------------------
 
@@ -236,15 +239,28 @@ class ServerEntity extends BaseEntityData{
          * @type {oldState:currentState}
          */
         this.onStateChange = null;
+
+        /**
+         * should just be set from the gameManager!
+         * if true, then the entity is set to the gameManager/ world
+         * @type {boolean}
+         */
+        this.isAddedToWorld = false;
+
+        /**
+         * name of the current mode
+         * @type {string}
+         */
+        this._currentMode = "default";
     }
 
+
+    get currentMode(){
+        return this._currentMode;
+    }
 
     get position(){
         return this._body.position;
-    }
-
-    get rotation(){
-        return this._body.rotation;
     }
 
     get claimedBy(){
@@ -263,11 +279,38 @@ class ServerEntity extends BaseEntityData{
         return false;
     }
 
-    claim(userID){
-        var oldState = Object.assing({},this._state);
+    get rotation(){
+        return this._body.angle;
+    }
 
+    /**
+     * sets the rotation of the entity directly
+     * @param v
+     */
+    set rotation(v){
+        if(typeof v != "number"){
+            console.log("rotation can only be a number!");
+            return;
+        }
+        Body.rotate(this._body,v);
+    }
+
+    /**
+     * uses velocity to rotate the entity
+     * @param rotationAmount
+     */
+    rotateEntity(rotationAmount){
+        // multiply the passed value by the rotation speed
+        Body.setAngularVelocity(this._body,rotationAmount);
+        // changes will be postet in the engine.update overrite method,
+        // because the changes are done during the enigne step
+    }
+
+    claim(userID){
+        var oldState = Object.assign({},this._state);
+        // set the claimedBy value to the userID, so we know that the entity is claimed by whom.
         this._state.claimedBy = userID;
-        this._state=Packages.PROTOCOL.GAME_STATE.ENTITY.STATES.ENTITY_CLAIMED;
+        this._state.state=Packages.PROTOCOL.GAME_STATE.ENTITY.STATES.ENTITY_CLAIMED;
         this._state.timestamp=new Date().getTime();
 
         // fire onClaimed event
@@ -288,11 +331,13 @@ class ServerEntity extends BaseEntityData{
     }
 
     release(){
-        var oldState = Object.assing({},this._state);
+        var oldState = Object.assign({},this._state);
 
         this._state.claimedBy = "";
-        this._state=Packages.PROTOCOL.GAME_STATE.ENTITY.STATES.ENTITY_DEFAULT_STATE;
+        this._state.state=Packages.PROTOCOL.GAME_STATE.ENTITY.STATES.ENTITY_DEFAULT_STATE;
         this._state.timestamp=new Date().getTime();
+
+        this.setMode("default");
 
         // fire onClaimed event
         if(this.onReleased){
@@ -308,6 +353,23 @@ class ServerEntity extends BaseEntityData{
                 oldState:oldState,
                 currentState:this._state
             });
+        }
+    }
+
+    setMode(mode){
+        switch (mode){
+            case "move":
+                this._body.frictionAir = GameConfig.GRABBED_ENTITY_FRICTION;
+                this._body.isSensor = true;
+                this._currentMode = "move";
+                break;
+            case "default":
+            default:
+                this._body.frictionAir = GameConfig.ENTITY_FRICTION;
+                this._body.collisionFilter=GameConfig.DEFAULT_COLISION_FILTER;
+                this._body.isSensor = false;
+                this._currentMode = "default";
+                break;
         }
     }
 
@@ -353,6 +415,12 @@ class ServerEntity extends BaseEntityData{
      * @returns {boolean} true, if surfaceIndex has changed
      */
     turn(surface){
+
+        if(!this.isTurnable){
+            console.log("turn: entity is not turnable!",this.ID);
+            return false;
+        }
+
         var previousSurfaceIndex = this.surfaceIndex;
         var surfaces = this.surfaces;
         if (typeof surface == "number") {   // if the passed variable is an index
@@ -390,13 +458,6 @@ class ServerEntity extends BaseEntityData{
         }
         return false;
     }
-
-    rotateEntity(rotationAmount){
-        // multiply the passed value by the rotation speed
-        Body.setAngularVelocity(this._body,rotationAmount);
-        // changes will be postet in the engine.update overrite method,
-        // because the changes are done during the enigne step
-    }
 }
 
 /**
@@ -423,6 +484,7 @@ class ServerEntityStack extends ServerEntity{
         };
 
         stackData.rotation = instanceData.rotation || 0;
+        stackData.surfaceIndex = 1;// instanceData.surfaceIndex || 0;
         stackData.isTurnable = true;
         stackData.isStackable = true;
 
@@ -486,14 +548,14 @@ class ServerEntityStack extends ServerEntity{
         // this means, add the half of the surface count to the current index and use torusRange,
         // so the next element is the opposite
         if(bottom.isTurnable) {     // just if it is turnable, else take the current surfaceIndex
-            bottomIndex = this.complementarySide;//Util.torusRange((bottom.surfaceIndex + Math.round(bottom.surfaces.length / 2)), 0, (bottom.surfaces.length - 1));
+            bottomIndex = bottom.complementarySide;//Util.torusRange((bottom.surfaceIndex + Math.round(bottom.surfaces.length / 2)), 0, (bottom.surfaces.length - 1));
         }
         return [bottom.surfaces[bottomIndex], top.surfaces[top.surfaceIndex]];
     }
     set surfaces(v){} //immutable
 
     /**
-     * has to be overriden, because this.get.surfaces uses this function, and also because there
+     * has to be overriden, because there
      * can just be two surfaces
      * @return {*}
      */
@@ -527,7 +589,7 @@ class ServerEntityStack extends ServerEntity{
     /**
      * overrides entity, just next or index is accepted
      * @param surface
-     * @returns true, if surfaceIndex has changed
+     * @returns {boolean} true, if surfaceIndex has changed
      */
     turn(surface="next") {
         if (typeof surface != "number" && surface != "next") {
@@ -581,11 +643,17 @@ class ServerEntityStack extends ServerEntity{
                console.log("ServerStackEntity.pushContent: can only merge entities from same type");
                return;
            }
-       }else if (entity.type != this.type && entity.classification != this.classification) {
-           console.log("ServerStackEntity.pushContent: can only push entities from same type");
-           return;
-       }
+       }else{
+           if (entity.type != this.type && entity.classification != this.classification) {
+               console.log("ServerStackEntity.pushContent: can only push entities from same type");
+               return;
+           }
 
+           if(!entity.isStackable){
+               console.log("ServerStackEntity.pushContent: pushed entity is not stackable!");
+               return;
+           }
+       }
 
         // push entity to this content
         this.content = this.content.concat(entity);

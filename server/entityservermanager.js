@@ -12,6 +12,11 @@ var Constraint = Matter.Constraint;
 var Packages = require('./../core/packages');
 var Util = require('./../core/util');
 
+var Entity = require('./serverentity');
+var BaseEntityData = Entity.BaseEntityData;
+var ServerEntity = Entity.ServerEntity;
+var ServerEntityStack = Entity.ServerEntityStack;
+
 var GameConfig = require('./gameconfig.json');
 
 var DefaultGame = require('./../public/resources/default_game.json');
@@ -25,10 +30,11 @@ var Config = require('./../public/resources/config.json');
 
 var Globals = require('./globals');
 
-const DEFAULT_BODY_SIZE = 100;
+
 
 const EVT_BEFORE_UPDATE = 'beforeUpdate';
-
+/*
+ const DEFAULT_BODY_SIZE = 100;
 const CLAIMED_COLLISION_CATEGORY = 0x0002;
 
 const DEFAULT_COLLISION_CATEGORY = 0x0001;
@@ -39,7 +45,7 @@ const DEFAULT_FILTER = {
 
 const CLAIMED_FILTER = {
     group:CLAIMED_COLLISION_CATEGORY
-};
+};*/
 
 const SEND_PERCISION_POSITION = 3;
 const SEND_PERCISION_ROTATION = 4;
@@ -59,24 +65,6 @@ class EntityServerManager extends EventEmitter3 {
          * @type {number}
          */
         this.ticks = ticks;
-
-        /**
-         *  each entity gets an ID, the IDs are incremential
-         * @type {number}
-         */
-        this.lastID=0;
-
-        /**
-         * contains the data of the entity, not the bodies, mapped to id
-         * @type {{object}} e.g. {id:entitydata}
-         */
-        this.entities=null;
-
-        /**
-         * contains just the entity bodies, mapped to the corresponding ids
-         * @type {{object}} e.g.{id:body}
-         */
-        this.bodies=null;
 
         /**
          * contains all contstraings, created by user input
@@ -101,6 +89,8 @@ class EntityServerManager extends EventEmitter3 {
         this.game = null;
         this.engine = null;
 
+        this.gameEntities = null;
+
         this._resetGame();
 
         setInterval(function() {
@@ -109,8 +99,7 @@ class EntityServerManager extends EventEmitter3 {
     }
 
     _resetGame(){
-        this.bodies={};
-        this.entities={};
+        this.gameEntities = {};
         this.constraints={};
         this.game = Object.assign({},DefaultGame);
         this.engine = Engine.create();
@@ -178,15 +167,11 @@ class EntityServerManager extends EventEmitter3 {
             body.ENTITY_ID,
             data
         );
-
-        // update the entitiy data
-        this.entities[body.ENTITY_ID].position.x = body.position.x;
-        this.entities[body.ENTITY_ID].position.y = body.position.y;
-        this.entities[body.ENTITY_ID].rotation = body.angle;
     }
 
     /**
      * loads a game from the db and creates the entities.
+     * TODO: class für game machn und alle werte normalisieren
      * @param user
      * @param game
      */
@@ -199,110 +184,26 @@ class EntityServerManager extends EventEmitter3 {
         // load game and override values from the default game
         this.game = Object.assign(this.game,JSON.parse(fs.readFileSync(resource_path)));
 
-        var keys = Object.keys(this.entities);
-
         // create entities for unstacked entities
-        for(var i=0; i< this.game.unstacked.length; i++){
-            var c = this.game.unstacked[i];
-            this.addEntity(this._reviveEntity(this.game.object_def[c.type],c));
+        if(this.game.unstacked) {
+            for (var i = 0; i < this.game.unstacked.length; i++) {
+                this.addEntity(new ServerEntity(this.game.unstacked[i], this.game.object_def));
+            }
+            delete this.game.unstacked; // the raw data of the entities is not needed any longer
         }
 
-        for(var i=0; i< this.game.stacks.length; i++){
-            var c = this.game.stacks[i];
-
-            this.addEntity(this._reviveStack(this.game.object_def,c));
+        if(this.game.stacks) {
+            for (var j = 0; j < this.game.stacks.length; j++) {
+                this.addEntity(new ServerEntityStack(this.game.stacks[j], this.game.object_def));
+            }
+            delete this.game.stacks;    // the raw data of the entities is not needed any longer
         }
-
-        //TODO: handle stacked, currently just unstacked entities are handled
-        delete this.game.unstacked;
-        delete this.game.stacks;
-
-        /* this.game.entities = Object.keys(this.entities).map(function(key) {
-            return this.entities[key];
-        }.bind(this));*/
     }
 
     getCurrentGameState(){
+        //TODO: hier die entities reinsetzen, nicht shcon beim adden
+        this.game.entities = Object.keys(this.gameEntities).map(function (key) { return this.gameEntities[key]; }.bind(this));
         return this.game;
-    }
-
-    /**
-     * Overwrites the default values from the basetype.
-     * Object.assign was not used, because it would overwrite the arrays completely.
-     * This method copies and changes array items
-     * @param basetypes of all entities, containing all default values
-     * @param instance contains all specialized values, e.g. position, or unique texture
-     * @private
-     */
-    _reviveEntity(basetype,instance){
-        // load the default entity
-        let result = JSON.parse(JSON.stringify(basetype));
-
-        //but override changes
-        if(instance.overwrite) {
-            for (let key in instance.overwrite) {
-                if (!instance.overwrite.hasOwnProperty(key)) continue;
-
-                var overwrite_path = key.split(".");    // get the path of the value, which should be overwritten
-                var currentDepthObject = result;        // latest object of the path
-
-                // go down the whole path, till the path can be set
-                for(let i=0; i< overwrite_path.length;i++){
-                    var curKey = overwrite_path[i]; // current validated key
-
-                    if(i==overwrite_path.length-1){ // if last element, then set the real value
-                        currentDepthObject[curKey] = instance.overwrite[key];
-                    }else if(!result[curKey]){      // if object does not exist,
-                        currentDepthObject[curKey]={};          // then create it
-                    }
-                    currentDepthObject=currentDepthObject[curKey];  // and set as new depth object
-                }
-            }
-        }
-        return result;
-    }
-
-    _reviveStack(basetypes,instance){
-        if(!instance.content){
-            console.log("_reviveStack: cannot create stack without content!");
-            return;
-        }
-
-        var entities = [];
-
-        // create the content of the stack
-        for(var i=0;i<instance.content.length;i++){
-            var cur = instance.content[i];
-            entities.push(this._reviveEntity(basetypes[cur.type],cur))
-        }
-
-        // take first element from entities out of the array and pass to the create stack method,
-        // it will be the base of the stack
-        var stackBase = entities.shift();
-
-        stackBase.position = instance.position || {};
-        stackBase.position.x = instance.position.x || 0;
-        stackBase.position.y = instance.position.y || 0;
-        stackBase.rotation = instance.rotation || 0;
-
-        var stack = this._convertEntityToStack(stackBase);
-
-        // finally set the created entities as content of the stack
-        stack.content = stack.content.concat(entities);
-
-        return stack;
-    }
-
-    /**
-     * creates an default state for an entity
-     * @returns {{state: string, timestamp: number}}
-     * @private
-     */
-    _createDefaultEntityState(){
-        return {
-            state:Packages.PROTOCOL.GAME_STATE.ENTITY.STATES.ENTITY_DEFAULT_STATE,
-            timestamp:new Date().getTime()
-        };
     }
 
     /**
@@ -312,89 +213,23 @@ class EntityServerManager extends EventEmitter3 {
      * @private
      */
     addEntity(entity,send){
-        if(!entity.surfaces || entity.surfaces.length <=0){
-            console.warn("addEntities: cannot create entity without surfaces!");
+        if(!entity){
+            console.warn("addEntities: no entity passed!");
             return;
         }
 
-        this.lastID++; //increment id
-        entity.id= (entity.isStack?"s":"e")+this.lastID;    // in order to make the debuging more comfortable,
-                                                            // the entity ids start with en "e", and stack ids with an "s"
-        this.entities[entity.id] = entity;
-        this.entities[entity.id].state = this._createDefaultEntityState();
-
-        // if there is no hitarea defined, use entity size or default value of DEFAULT_BODY_SIZE
-        if(!entity.hitArea){
-            entity.hitArea = {
-                type:"rectangle",
-                width:entity.width || DEFAULT_BODY_SIZE,
-                height:entity.height || DEFAULT_BODY_SIZE
-            }
-        }
-
-        // create _body based on hitarea
-        var body = null;
-
-        // if there is no position or hitarea offset, use default values
-        if (!entity.position) entity.position = {x: 0, y: 0};
-        if (!entity.hitArea.offset) entity.hitArea.offset = {x: 0, y: 0};
-
-        // if an value is missing, replace it with zero
-        entity.position.x = entity.position.x || 0;
-        entity.position.y = entity.position.y || 0;
-        entity.rotation = entity.rotation || 0;
-        entity.surfaceIndex = entity.surfaceIndex || 0;
-
-        entity.hitArea.offset.x = entity.hitArea.offset.x || 0;
-        entity.hitArea.offset.y = entity.hitArea.offset.y || 0;
-
-        //shorten the paths and calculate initial _body position
-        var x = entity.position.x + entity.hitArea.offset.x;
-        var y = entity.position.y + entity.hitArea.offset.y;
-
-        switch (entity.hitArea.type) {
-            case "circle":
-                body = Bodies.circle(x,y,entity.hitArea.radius || (DEFAULT_BODY_SIZE/2));
-                break;
-            case "rectangle":
-                body = Bodies.rectangle(x,y,entity.hitArea.width || DEFAULT_BODY_SIZE,entity.hitArea.height || DEFAULT_BODY_SIZE);
-                break;
-            default:
-                console.warn("entity has no hirarea - collisions will not affect it");
-                return;
-        }
-
-        body.ENTITY_ID = entity.id;
-        body.frictionAir = GameConfig.ENTITY_FRICTION;
-
-        body.claimedBy = entity.claimedBy = "";
-        this.bodies[entity.id] = body;
-        //this.bodies[entity.id].entityData = this.entities[this.lastID];
-        Body.rotate(body,entity.rotation);
-
-        body.collisionFilter=DEFAULT_FILTER;
-
-        World.add(this.engine.world,body);
-
-        this.game.entities.push(entity);
+        this.gameEntities[entity.ID] = entity;
+        World.add(this.engine.world,entity.body);
+        entity.isAddedToWorld = true;
 
         if(send){
-            var sendable = entity;
-
-            if(entity.isStack){ // if the entity is a stack, we do not want to sent the whole content,
-                sendable = Object.assign({},entity);    // so copy the entity
-                delete sendable.content;                // and delete its content
-            }
-
             this.updateQueue.postUpdate(
                 Packages.PROTOCOL.GAME_STATE.ENTITY.SERVER_ENTITY_ADDED,
                 this.gameServer.ID,
                 {
-                    newEntities:sendable,
+                    newEntities:entity.toJSON(),
                     _mode:"pushAvoidDuplicates"
                 }
-
-
             );
         }
     }
@@ -406,25 +241,21 @@ class EntityServerManager extends EventEmitter3 {
      * @private
      */
     removeEntity(id,send){
-        if(!id || !this.entities[id]){
+        if(!id || !this.gameEntities[id]){
             console.warn("removeEntity: entity does not exist or no id passed :",id);
             return;
         }
+        var entity = this.gameEntities[id];
+        entity.isAddedToWorld = false;
+        delete this.gameEntities[id];    // remove form game instanz
 
         // remove claims, if the entity is claimed by a user
-        if(this.entities[id].claimedBy){
-            this.releaseEntities(this.entities[id].claimedBy,id);
+        if(entity.claimedBy){
+            this.releaseEntities(entity.claimedBy,id);
         }
 
-        // remove form game instanz
-        this.game.entities = Util.removeByValue(this.game.entities,this.entities[id]);
-        delete this.entities[id];
+        World.remove(this.engine.world, entity.body);
 
-
-        if(this.bodies[id]){
-            World.remove(this.engine.world, this.bodies[id]);
-            delete this.bodies[id];
-        }
 
         if(send) {
             this.updateQueue.postUpdate(
@@ -466,23 +297,27 @@ class EntityServerManager extends EventEmitter3 {
         // iterated the claimed ids
         for(var i =0; i<claimedEntityIDs.length; i++) {
             var claimedEntityID = claimedEntityIDs[i];
+            if(!this.gameEntities[claimedEntityID]){
+                console.log("claimEntity: entity does not exist:",claimedEntityID);
+                continue;
+            }
 
             if (this.constraints[userID] && this.constraints[userID][claimedEntityID]) {
-                console.log("constraint already exists fot user ", userID, " and entity ", claimedEntityID);
+                console.log("claimEntity: constraint already exists fot user ", userID, " and entity ", claimedEntityID);
                // this._rejectAction(userID,claimedEntityID,Packages.PROTOCOL.GAME_STATE.ENTITY.USER_CLAIM_ENTITY);
-                return;
+                continue;
             }
 
-            if (!this.bodies[claimedEntityID]) {
-                console.warn("claimed entity ", claimedEntityID, " does not exist!");
-                return;
-            }
+            var entity = this.gameEntities[claimedEntityID];
+
+            entity.claim(userID);
+            entity.setMode("move"); //TODO: des jetz nur zu testzwecken, spaeter wieder entfernen
 
             // create the constraint
-            var constraint = Constraint.create({
+            var constraint = Constraint.create({    //TODO: des hier iwie auslagern
                 label: userID,
                 userID: userID,
-                entityID: this.bodies[claimedEntityID].ENTITY_ID,
+                entityID: entity.ID,
                 get pointA() {
                     var cPos = clientManager.getPosition(this.userID);
                   //  console.log(this.userID,cPos,this.relativePosition);
@@ -495,26 +330,18 @@ class EntityServerManager extends EventEmitter3 {
 
                     return result;
                 },
-                bodyB: this.bodies[claimedEntityID],
+                bodyB: entity.body,
                 pointB: {x: 0, y: 0},
                 length: 0.01,
                 stiffness: 0.1,
                 angularStiffness: 1
             });
 
-            this.bodies[claimedEntityID].frictionAir = GameConfig.GRABBED_ENTITY_FRICTION;
-
-            this.bodies[claimedEntityID].isSensor = true;       //this means->"no" collision with normal entities
-           // this.bodies[claimedEntityID].collisionFilter=CLAIMED_FILTER;
-
             // save the constraint
             // an user can create several constraints
             if (!this.constraints[userID]) {
                 this.constraints[userID] = {};
             }
-
-            // set the claimedBy value to the userID, so we know that the entity is claimed by whom.
-            this.entities[claimedEntityID].claimedBy = this.bodies[claimedEntityID].claimedBy = userID;
 
             //mark identifier (entity id)
             constraint.ENTITY_ID = claimedEntityID;
@@ -526,10 +353,8 @@ class EntityServerManager extends EventEmitter3 {
             World.add(this.engine.world, constraint);
 
             // post, that the entity is now claimed by a user
-            this._postStateChange(
-                claimedEntityID,
-                userID,
-                Packages.PROTOCOL.GAME_STATE.ENTITY.STATES.ENTITY_CLAIMED
+            this._postStateChange(  //TODO: nach oben bringen (entityevent)?
+                entity
             );
         }
     }
@@ -541,7 +366,7 @@ class EntityServerManager extends EventEmitter3 {
      * @param action
      * @private
      */
-    _rejectAction(userID,entityID,action){
+   /* _rejectAction(userID,entityID,action){
            this.updateQueue.postUpdate(
             Packages.PROTOCOL.GAME_STATE.ENTITY.SERVER_REJECT_ACTION,
             userID,
@@ -550,7 +375,7 @@ class EntityServerManager extends EventEmitter3 {
                _mode:"pushAvoidDuplicates"
            }
         );
-    }
+    }*/
 
     /**
      * releases all constraints for a user, e.g. when he disconnects
@@ -594,27 +419,19 @@ class EntityServerManager extends EventEmitter3 {
                 continue;
             }
 
-            if(!this.bodies[curEntityID]){
-                console.warn("releaseEntities: _body of entitiy",curEntityID,"does not exist");
-                continue;
-            }
-
-            if(!this.entities[curEntityID]){
+            if(!this.gameEntities[curEntityID]){
                 console.warn("releaseEntities: entitiy",curEntityID,"does not exist");
                 continue;
             }
 
+            var entity = this.gameEntities[curEntityID];
+
             // remove the claim value
-            this.entities[curEntityID].claimedBy = this.bodies[curEntityID].claimedBy = "";
-
-            this.bodies[curEntityID].isSensor = false;
-            //this.bodies[curEntityID].collisionFilter=DEFAULT_FILTER;
-
-            this.bodies[curEntityID].frictionAir = GameConfig.ENTITY_FRICTION;
+            entity.release();
 
             // release the entity by just posting the id in state change,
             // default state will be generated
-            this._postStateChange(curEntityID);
+            this._postStateChange(entity);
 
             // if constraint exist, delete it
             World.remove(this.engine.world,this.constraints[userID][curEntityID]);
@@ -700,12 +517,12 @@ class EntityServerManager extends EventEmitter3 {
             return;
         }
 
-        if(!this.entities[entityID]){
+        if(!this.gameEntities[entityID]){
             console.log("setRelativeConstraintPosition: entity",entityID,"does not exist!");
             return;
         }
 
-        if(this.entities[entityID].claimedBy != userID){
+        if(this.gameEntities[entityID].claimedBy != userID){
            // console.log("setRelativeConstraintPosition: entity",entityID,"not claimed by user",userID,"- aborted");
             return;
         }
@@ -750,15 +567,20 @@ class EntityServerManager extends EventEmitter3 {
      * @param surface accepts the actual index of the surface, "next", "previous" or "random".
      */
     turnEntity(userID,entityID,surface){
-        var curEntity = this.entities[entityID];
-
         if(!userID || userID.length <=0){
-            console.log("turnEntity: no userID passed");
+            console.log("turnEntity: no userID passed!");
             return;
         }
 
         if(!this.clientManager.doesClientExist(userID)){
-            console.log("turnEntity: user",userID,"does not exist");
+            console.log("turnEntity: user",userID,"does not exist!");
+            return;
+        }
+
+        var curEntity = this.gameEntities[entityID];
+
+        if(!curEntity){
+            console.log("turnEntity: entity",entityID,"does not exist!");
             return;
         }
 
@@ -767,48 +589,15 @@ class EntityServerManager extends EventEmitter3 {
             return;
         }
 
-        if(!curEntity.isTurnable){
-            console.log("turnEntity: entity",entityID,"is not turnable, tried by user",userID);
-            return;
+        var turned = curEntity.turn(surface);
+
+        if(turned) {    //TODO: nach oben bringen?
+            this.updateQueue.postUpdate(
+                Packages.PROTOCOL.GAME_STATE.ENTITY.SERVER_TURN_ENTITY,
+                entityID,
+                {surfaceIndex: curEntity.surfaceIndex}
+            );
         }
-
-        // if the turned entity is a stack, there is just the posibility to turn it with "next"
-        if(curEntity.isStack){
-            surface = "next";
-        }
-
-        if (typeof surface == "number") {   // if the passed variable is an index
-            // apply the new surface, but check, that the new index is inside the valid range
-            // the valid range is the number of available surfaces for this object
-            curEntity.surfaceIndex = Util.forceRange(surface,0,curEntity.surfaces.length-1);
-
-        }else if (typeof surface == "string"){
-            var curSurfaceIndex = curEntity.surfaceIndex;
-
-            switch (surface){
-                case "next":
-                    curEntity.surfaceIndex = Util.torusRange((curSurfaceIndex+1),0,(curEntity.surfaces.length-1));
-                    break;
-                case "previous":
-                    curEntity.surfaceIndex = Util.torusRange((curSurfaceIndex-1),0,(curEntity.surfaces.length-1));
-                    break;
-                case "random":
-                    curEntity.surfaceIndex= Util.randomInRange(curEntity.surfaces.length-1);
-                    break;
-                default:
-                    console.log("turnEntity: invalid option passed",surface);
-                    return;
-            }
-        }else{
-            console.log("turnEntity: invalid option passed, not a number nor a string",surface);
-            return;
-        }
-
-        this.updateQueue.postUpdate(
-            Packages.PROTOCOL.GAME_STATE.ENTITY.SERVER_TURN_ENTITY,
-            entityID,
-            {surfaceIndex:curEntity.surfaceIndex}
-        );
     }
 
     batchStackEntities(userID,data){
@@ -842,7 +631,7 @@ class EntityServerManager extends EventEmitter3 {
             console.log("stackEntities: no userID passed!");
             return;
         }
-
+//TODO: stack refactoring
         if(!this.clientManager.doesClientExist(userID)){
             console.log("stackEntities: user does not exist!",userID);
         }
@@ -1031,7 +820,7 @@ class EntityServerManager extends EventEmitter3 {
             return; // nothing to do, when rotation amount does not exist or equals 0
         }
 
-        if(!userID || userID.length <=0){
+        if(!userID){
             console.log("rotation: no userID passed!");
             return;
         }
@@ -1045,19 +834,18 @@ class EntityServerManager extends EventEmitter3 {
             return;
         }
 
-        if(!this.bodies[entityID]){
+        if(!this.gameEntities[entityID]){
             console.log("rotation: entity",entityID,"does not exist!");
             return;
         }
 
-        if(this.bodies[entityID].claimedBy != userID){
+        if(this.gameEntities[entityID].claimedBy != userID){
             console.log("rotation: entity",entityID,"not claimed by user",userID,"rotation aborted");
             return;
         }
 
         // multiply the passed value by the rotation speed
-        Body.setAngularVelocity(this.bodies[entityID],rotationAmount*GameConfig.ROTATION_SPEED);
-
+        this.gameEntities[entityID].rotateEntity(rotationAmount*GameConfig.ROTATION_SPEED);
         // changes will be postet in the engine.update overrite method,
         // because the changes are done during the enigne step
     }
@@ -1072,38 +860,16 @@ class EntityServerManager extends EventEmitter3 {
      * @param data {object}
      * @private
      */
-    _postStateChange(entityID,userID,state,data){
-        if(!entityID){
-            console.warn("no entityID for statechange was passed");
+    _postStateChange(entity){
+        if(!entity) {
+            console.warn("entiy does not exist, no states can be changed");
             return;
         }
-
-        if(!this.entities[entityID]){
-            console.warn("entiy",entityID,"does not exist, no states can be changed");
-            return;
-        }
-
-        var result = this._createDefaultEntityState();
-
-        // if there is all data available, do the state change,
-        // otherwise the entity is set to default state
-        if(userID && state){
-            if (!userID) {
-                console.warn("no user which causes the statechange was passed for entity", entityID);
-            }
-            data = data || {};  // if null, create empty object
-            data.state = state;
-            // assign passed data to default dataset
-            result = Object.assign(result, data);
-            result.userID= userID;
-        }
-
-        this.entities[entityID].state = result;
 
         this.updateQueue.postUpdate(
             Packages.PROTOCOL.GAME_STATE.ENTITY.STATE_CHANGE,
-            entityID,
-            result
+            entity.ID,
+            entity.state
         );
     }
 

@@ -5,6 +5,7 @@
 -circle shape/hitzone
 -bild anfangs leicht verzerrt
 TODO: remove constraint, when removing entity
+-start rotaion geht nemme
 
 #####################################################  TODOS  ##########################################################
 - table boundaries
@@ -28,6 +29,9 @@ functions:
 -create server entity and server stack class --> think it is obsolete
 
 -vanish signal, when new game is loaded?
+
+TODO: constraint manager
+TODO: game manager -> manager der wirklich nur die daten über des geladene spiel hält
 
 loader:
     TODO: create a new loader for each new game -> when context refactoring

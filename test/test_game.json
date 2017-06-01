@@ -84,7 +84,7 @@
       "width":50,
       "height":50,
       "isStackable":false,
-      "isTurnable": false,
+      "isTurnable": true,
       "surfaceIndex":0,
 
       "surfaces":[

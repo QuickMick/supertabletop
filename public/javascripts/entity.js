@@ -55,7 +55,7 @@ class Entity extends PIXI.Sprite {
         this._setHitarea();
 
         // ------- init entity values --------
-        this.ENTITY_ID = entity.id;
+        this.ENTITY_ID = entity.ID;
         this.isTurnable = entity.isTurnable || false;
         this.isStackable = entity.isStackable || false;
         this.isStack = entity.isStack || false;

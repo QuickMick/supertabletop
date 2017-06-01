@@ -56,6 +56,8 @@ describe("ServerEntity", function(){
         it('should give the correct complementary site (wordcard)', function() {
             var entity = new Entity.ServerEntity(testGame.unstacked[0],testGame.object_def);
             assert.equal(entity.complementarySide,1);
+            entity.turn("next");
+            assert.equal(entity.complementarySide,0);
         });
 
         it('should give the correct site after previous turn', function() {
@@ -92,11 +94,12 @@ describe("ServerEntity", function(){
 
         it('stack should turn correctly-> surfaceIndex should change in correct behaviour', function() {
             var stack = new Entity.ServerEntityStack(testGame.stacks[0],testGame.object_def);
+            assert.equal(stack.surfaceIndex,1);
+            stack.turn("next");
+
             assert.equal(stack.surfaceIndex,0);
             stack.turn("next");
             assert.equal(stack.surfaceIndex,1);
-            stack.turn("next");
-            assert.equal(stack.surfaceIndex,0);
         });
 
         it('stack should show the correct surfaces after creating', function() {
@@ -140,6 +143,13 @@ describe("ServerEntity", function(){
             var stack = new Entity.ServerEntityStack(testGame.stacks[0],testGame.object_def);
             assert.equal(stack.content.length,3);
             stack.pushContent(new Entity.ServerEntity(testGame.unstacked[1],testGame.object_def));
+            assert.equal(stack.content.length,3);
+        });
+
+        it('stack should not accept unstackable entity', function() {
+            var stack = new Entity.ServerEntityStack(testGame.stacks[0],testGame.object_def);
+            assert.equal(stack.content.length,3);
+            stack.pushContent(new Entity.ServerEntity(testGame.unstacked[3],testGame.object_def));
             assert.equal(stack.content.length,3);
         });
     });

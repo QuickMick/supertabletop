@@ -636,14 +636,14 @@ class ToolManager{
         switch (stateUpdate.state){
             case Packages.PROTOCOL.GAME_STATE.ENTITY.STATES.ENTITY_CLAIMED:
 
-                if(!stateUpdate.userID){
+                if(!stateUpdate.claimedBy){
                     console.warn("invalide entity seleciton, no user id available - update rejected");
                     return;
                 }
 
                 // the passed id is the human player, then add the entity
                 // to his selection
-                if(this.synchronizer.CLIENT_INFO.id == stateUpdate.userID){
+                if(this.synchronizer.CLIENT_INFO.id == stateUpdate.claimedBy){
                     this.currentTool.addEntityToSelection(curEntity);
                     curEntity.alpha = 0.8;
                 }
@@ -654,7 +654,7 @@ class ToolManager{
                     this.gameManager.app.renderer.width,
                     this.gameManager.app.renderer.height,
                     10,
-                    this.playerManager.players[stateUpdate.userID].rawPlayerData.color || 0xFFFFFF
+                    this.playerManager.players[stateUpdate.claimedBy].rawPlayerData.color || 0xFFFFFF
                 );
 
                 curEntity.addFilter(selectionFilter);

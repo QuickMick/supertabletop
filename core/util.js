@@ -21,6 +21,11 @@ class Util{
      */
     static parseColor(colorString){
         if(!colorString) return 0xFFFFFF;
+
+        if(typeof colorString == "number"){
+            return Math.round(colorString);
+        }
+
         var color = parseInt(colorString.replace("#", "0x"));
         return !Number.isNaN(color)?color: 0xFFFFFF;
     }

@@ -138,7 +138,7 @@ module.exports =
                 STATE_CHANGE:"STATE_CHANGE",
 
                 STATES:{
-                    ENTITY_SELECTED:"ENTITY_SELECTED",
+                    ENTITY_CLAIMED:"ENTITY_CLAIMED",
                     ENTITY_DEFAULT_STATE:"ENTITY_DEFAULT_STATE"
                 }
             },

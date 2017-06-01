@@ -170,7 +170,7 @@ class EntityServerManager extends EventEmitter3 {
             updateRequired=true;
         }
 
-        // if the body has not changed, nothing to do, nothing to send
+        // if the _body has not changed, nothing to do, nothing to send
         if(!updateRequired) return;
 
         this.updateQueue.postUpdate(
@@ -312,7 +312,6 @@ class EntityServerManager extends EventEmitter3 {
      * @private
      */
     addEntity(entity,send){
-
         if(!entity.surfaces || entity.surfaces.length <=0){
             console.warn("addEntities: cannot create entity without surfaces!");
             return;
@@ -333,7 +332,7 @@ class EntityServerManager extends EventEmitter3 {
             }
         }
 
-        // create body based on hitarea
+        // create _body based on hitarea
         var body = null;
 
         // if there is no position or hitarea offset, use default values
@@ -349,7 +348,7 @@ class EntityServerManager extends EventEmitter3 {
         entity.hitArea.offset.x = entity.hitArea.offset.x || 0;
         entity.hitArea.offset.y = entity.hitArea.offset.y || 0;
 
-        //shorten the paths and calculate initial body position
+        //shorten the paths and calculate initial _body position
         var x = entity.position.x + entity.hitArea.offset.x;
         var y = entity.position.y + entity.hitArea.offset.y;
 
@@ -530,7 +529,7 @@ class EntityServerManager extends EventEmitter3 {
             this._postStateChange(
                 claimedEntityID,
                 userID,
-                Packages.PROTOCOL.GAME_STATE.ENTITY.STATES.ENTITY_SELECTED
+                Packages.PROTOCOL.GAME_STATE.ENTITY.STATES.ENTITY_CLAIMED
             );
         }
     }
@@ -596,7 +595,7 @@ class EntityServerManager extends EventEmitter3 {
             }
 
             if(!this.bodies[curEntityID]){
-                console.warn("releaseEntities: body of entitiy",curEntityID,"does not exist");
+                console.warn("releaseEntities: _body of entitiy",curEntityID,"does not exist");
                 continue;
             }
 
@@ -781,7 +780,8 @@ class EntityServerManager extends EventEmitter3 {
         if (typeof surface == "number") {   // if the passed variable is an index
             // apply the new surface, but check, that the new index is inside the valid range
             // the valid range is the number of available surfaces for this object
-            curEntity.surfaceIndex = (surface).forceRange(0,curEntity.surfaces.length-1);
+            curEntity.surfaceIndex = Util.forceRange(surface,0,curEntity.surfaces.length-1);
+
         }else if (typeof surface == "string"){
             var curSurfaceIndex = curEntity.surfaceIndex;
 
@@ -912,9 +912,10 @@ class EntityServerManager extends EventEmitter3 {
         // first, release the source entity, because it will be deleted on the client
         this.releaseEntities(userID,sourceID);
 
+/*
         for(var i=0;i< targetStack.content.length;i++){
             console.log(targetStack.content[i].surfaces[0].texture);
-        }
+        }*/
 
         this.removeEntity(sourceID,true);    // remove the entity, because it is now also in the stack
         this.removeEntity(targetID,true);     // remove the entity from the game, because it is now in the stack
@@ -1087,12 +1088,12 @@ class EntityServerManager extends EventEmitter3 {
         // if there is all data available, do the state change,
         // otherwise the entity is set to default state
         if(userID && state){
-            if (!userID || userID.length <= 0) {
+            if (!userID) {
                 console.warn("no user which causes the statechange was passed for entity", entityID);
             }
             data = data || {};  // if null, create empty object
             data.state = state;
-            // assign passed data to dataset, which is posted
+            // assign passed data to default dataset
             result = Object.assign(result, data);
             result.userID= userID;
         }

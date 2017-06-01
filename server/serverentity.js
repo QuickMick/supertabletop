@@ -28,7 +28,6 @@ class BaseEntityData {
      * @param instanceData the entitie which should be created from the collection
      */
     constructor(instanceData,entityLibrary) {
-
        /* switch(true){
             case !instanceData: throw  "cannot create an enitty without data";
             case !entityLibrary:throw "cannot create an entity without the entity library";
@@ -36,7 +35,7 @@ class BaseEntityData {
        if(!instanceData)
            throw  "cannot create an enitty without data";
 
-        var baseData =entityLibrary?this.overwriteDefaults(entityLibrary[instanceData.type],instanceData):instanceData;
+        var baseData =entityLibrary?BaseEntityData.overwriteDefaults(instanceData, entityLibrary[instanceData.type]):instanceData;
 
         switch(true){
             case !baseData: throw "cannot create entity without data";
@@ -57,9 +56,13 @@ class BaseEntityData {
         this.rawData = baseData;
     }
 
+    get complementarySide(){
+        return Util.torusRange((this.surfaceIndex + Math.round(this.surfaces.length / 2)), 0, (this.surfaces.length - 1));
+    }
+
     toJSON(){
         return {
-            classification:this.data.classification,
+            classification:this.classification,
             type:this.type,
             width:this.width,
             height:this.height,
@@ -145,13 +148,15 @@ class BaseEntityData {
      * @param instance contains all specialized values, e.g. position, or unique texture
      * @private
      */
-    static overwriteDefaults(basetype,instance){
+    static overwriteDefaults(instance, basetype){
+
+        if(!basetype) return instance;  // return instance, if basetype is null
         // load the default entity
-        let result = JSON.parse(JSON.stringify(basetype));
+        var result = Object.assign({},basetype); // JSON.parse(JSON.stringify(basetype));
 
         //but override changes
         if(instance.overwrite) {
-            for (let key in instance.overwrite) {
+            for (var key in instance.overwrite) {
                 if (!instance.overwrite.hasOwnProperty(key)) continue;
 
                 var overwrite_path = key.split(".");    // get the path of the value, which should be overwritten
@@ -330,7 +335,7 @@ class ServerEntity extends BaseEntityData{
             state:this._state,
             isStack: this.isStack,
 
-            classification:this.data.classification,
+            classification:this.classification,
             type:this.type,
             width:this.width,
             height:this.height,
@@ -345,8 +350,9 @@ class ServerEntity extends BaseEntityData{
     /**
      * turns the surface of an entity
      * @param surface accepts the actual index of a surface, "next", "previous" or "random".
+     * @returns {boolean} true, if surfaceIndex has changed
      */
-    turnEntity(surface){
+    turn(surface){
         var previousSurfaceIndex = this.surfaceIndex;
         var surfaces = this.surfaces;
         if (typeof surface == "number") {   // if the passed variable is an index
@@ -365,21 +371,24 @@ class ServerEntity extends BaseEntityData{
                     this.surfaceIndex= Util.randomInRange(surfaces.length-1);
                     break;
                 default:
-                    console.log("turnEntity: invalid option passed",surface);
-                    return;
+                    console.log("turn: invalid option passed",surface);
+                    return false;
             }
         }else{
-            console.log("turnEntity: invalid option passed, not a number nor a string",surface);
-            return;
+            console.log("turn: invalid option passed, not a number nor a string",surface);
+            return false;
         }
-
-        // if something has changed, call event
-        if (this.onEntityTurned && previousSurfaceIndex != this.surfaceIndex) {
-            this.onEntityTurned({
-                previousSurfaceIndex: previousSurfaceIndex,
-                surfaceIndex: this.surfaceIndex
-            });
+        if(previousSurfaceIndex != this.surfaceIndex) {
+            // if something has changed, call event
+            if (this.onEntityTurned) {
+                this.onEntityTurned({
+                    previousSurfaceIndex: previousSurfaceIndex,
+                    surfaceIndex: this.surfaceIndex
+                });
+            }
+            return true;
         }
+        return false;
     }
 
     rotateEntity(rotationAmount){
@@ -430,7 +439,7 @@ class ServerEntityStack extends ServerEntity{
         //------------------callbacks------------------------------------
         /**
          * called, when an entity was pushed  to the stacks content
-         * @type {stack,pushedEntity}
+         * @type {stack,pushedEntity,mergedWithStack(boolean)}
          */
         this.onEntityPushed = null;
 
@@ -451,7 +460,8 @@ class ServerEntityStack extends ServerEntity{
         return true;
     }
 
-    // this values are replaced by getters which just return true, because these values have to be true
+    // this values are replaced by getters which just return true,
+    // because these values have to be true
     get isTurnable(){
         return true
     }
@@ -463,7 +473,8 @@ class ServerEntityStack extends ServerEntity{
     }
     set isStackable(v){} //immutable
 
-    // surfaces is also replaced by a setter which returns the right surfaces of the top and bottom entity
+    // surfaces is also replaced by a setter which returns the
+    // right surfaces of the top and bottom entity
     get surfaces(){
         if(this.content.length <=0) return [];
 
@@ -475,11 +486,21 @@ class ServerEntityStack extends ServerEntity{
         // this means, add the half of the surface count to the current index and use torusRange,
         // so the next element is the opposite
         if(bottom.isTurnable) {     // just if it is turnable, else take the current surfaceIndex
-            bottomIndex = Util.torusRange((bottom.surfaceIndex + Math.round(bottom.surfaces.length / 2)), 0, (bottom.surfaces.length - 1));
+            bottomIndex = this.complementarySide;//Util.torusRange((bottom.surfaceIndex + Math.round(bottom.surfaces.length / 2)), 0, (bottom.surfaces.length - 1));
         }
         return [bottom.surfaces[bottomIndex], top.surfaces[top.surfaceIndex]];
     }
     set surfaces(v){} //immutable
+
+    /**
+     * has to be overriden, because this.get.surfaces uses this function, and also because there
+     * can just be two surfaces
+     * @return {*}
+     */
+    get complementarySide(){
+        return Util.torusRange((this.surfaceIndex + 1), 0, 1);
+    }
+
     /**
      *
      * @param content of the stack object
@@ -498,7 +519,7 @@ class ServerEntityStack extends ServerEntity{
         // create the content of the stack
         for(var i=0;i<content.length;i++){
             var cur = content[i];
-            entities.push(new BaseEntityData(cur,entityLibrary[cur.type]));
+            entities.push(new BaseEntityData(cur,entityLibrary));
         }
         return entities;
     }
@@ -506,19 +527,28 @@ class ServerEntityStack extends ServerEntity{
     /**
      * overrides entity, just next or index is accepted
      * @param surface
+     * @returns true, if surfaceIndex has changed
      */
-    turnEntity(surface) {
+    turn(surface="next") {
         if (typeof surface != "number" && surface != "next") {
-            console.log("ServerEntityStack.turnEntity: unable to turn entity, just index or next is allowed, not:",surface);
-            return;
+            console.log("ServerEntityStack.turn: unable to turn entity, just index or next is allowed, not:",surface);
+            return false;
         }
 
-        if((typeof surface == "number" && surface != this.surfaceIndex) || surface == "next"){
-            // reverse content if something changes, because just 2 sides are available
+        var hasTurned = super.turn(surface);
+
+        // if the turn was sucessfull, turn the stacks content,
+        // and turn the surfaces of the content also
+        if(hasTurned){
             this.content = this.content.reverse();
-        }
+            // also reverse all cards
+            for(var i=0;i< this.content.length;i++) {
+                var currentCard = this.content[i];
+                currentCard.surfaceIndex = currentCard.complementarySide;
+            }
 
-        super.turnEntity(surface);
+        }
+        return hasTurned;
     }
 
     pushContent(entity){
@@ -527,21 +557,44 @@ class ServerEntityStack extends ServerEntity{
             return;
         }
 
-        // convert to entity, if it is no entity
-        if(!entity instanceof BaseEntityData){
-            entity = new BaseEntityData(entity);
-        }else{
-            // else create new baseData entity (without id and position
+        var mergedWithStack = false;
+        // convert entity to base entity / create a clean copy
+        // check waterfall like - because they inherit eachother, start with the lowest of the chain
+       if(entity instanceof ServerEntityStack){
+            mergedWithStack=true;
+            entity = entity.content;    // if entity is a stack, take its content
+        }else if(entity instanceof ServerEntity){
+            // else create new baseData entity (without id and position) from the ServerEntity
             new BaseEntityData(entity.toJSON());
-        }
+        }else if(entity instanceof BaseEntityData){
+           entity = new BaseEntityData(entity);
+       }
+
+       // check for errors
+       if(mergedWithStack){
+           if(entity.length <=0){
+               console.log("ServerStackEntity.pushContent: other stack has no content");
+               return;
+           }
+           // just check for one item of the stack, because they are all the same
+           if(entity[0].type != this.type && entity[0].classification != this.classification){
+               console.log("ServerStackEntity.pushContent: can only merge entities from same type");
+               return;
+           }
+       }else if (entity.type != this.type && entity.classification != this.classification) {
+           console.log("ServerStackEntity.pushContent: can only push entities from same type");
+           return;
+       }
+
 
         // push entity to this content
-        this.content.push(entity);
+        this.content = this.content.concat(entity);
 
         if(this.onEntityPushed){
             this.onEntityPushed({
                 stack:this,
-                pushedEntity:entity
+                pushedEntity:entity,
+                mergedWithStack:mergedWithStack
             });
         }
     }
@@ -573,6 +626,17 @@ class ServerEntityStack extends ServerEntity{
         }
 
         return entity;
+    }
+
+    /**
+     * just removes the last element of the stack, if there is content left
+     */
+    removeLast(){
+        if(this.content.length <=0){
+            console.log("removeLast: cannot remove last from empty stack!");
+            return;
+        }
+        this.content.pop()
     }
 
     /**

@@ -443,7 +443,7 @@ class SimpleDragTool extends BasicTool{
             console.log("cannot claim entity which does not exist");
             return;
         }
-        if(this.entityManager.entities[evt.entity.ENTITY_ID].state.state ==Packages.PROTOCOL.GAME_STATE.ENTITY.STATES.ENTITY_SELECTED){
+        if(this.entityManager.entities[evt.entity.ENTITY_ID].state.state ==Packages.PROTOCOL.GAME_STATE.ENTITY.STATES.ENTITY_CLAIMED){
             console.log("entity already claimed");
             return;
         }
@@ -634,7 +634,7 @@ class ToolManager{
         }
 
         switch (stateUpdate.state){
-            case Packages.PROTOCOL.GAME_STATE.ENTITY.STATES.ENTITY_SELECTED:
+            case Packages.PROTOCOL.GAME_STATE.ENTITY.STATES.ENTITY_CLAIMED:
 
                 if(!stateUpdate.userID){
                     console.warn("invalide entity seleciton, no user id available - update rejected");
@@ -669,7 +669,7 @@ class ToolManager{
             default:
             case Packages.PROTOCOL.GAME_STATE.ENTITY.STATES.ENTITY_DEFAULT_STATE:
                 // if enttiy was selected, unselect it
-                if(curEntity.state.state == Packages.PROTOCOL.GAME_STATE.ENTITY.STATES.ENTITY_SELECTED) {
+                if(curEntity.state.state == Packages.PROTOCOL.GAME_STATE.ENTITY.STATES.ENTITY_CLAIMED) {
                     curEntity.alpha = 1;
                     // check if there is a filter available and remove it from the entity, if it was selected previously
                     if(curEntity.tmpSelectionFilter) {

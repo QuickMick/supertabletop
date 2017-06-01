@@ -71,7 +71,7 @@ window.onload = function() {
             // app.ticker.add(require('./inputhandler').update);
 
 
-      //      var headerHeight = window.getComputedStyle(document.body).getPropertyValue('--header-height');
+      //      var headerHeight = window.getComputedStyle(document._body).getPropertyValue('--header-height');
 
             function resize() {
                 var x = screen.getBoundingClientRect();

@@ -1,0 +1,169 @@
+{
+  "name":"codewords",
+  "creator":"mick",
+  "resources":["back.png","table.jpg","c1.png","c2.png","s1.png"],
+  "description":{
+    "caption":"codewords instructions",
+    "text":"asdf södkf laskföl kaslöf ak"
+  },
+  "table":{
+    "width":1500,
+    "height":1000,
+    "texture":"table.jpg"
+  },
+  "object_def":{
+    "wordcard":{
+      "classification": "card",
+      "type": "wordcard",
+      "width": 100,
+      "height": 75,
+      "isStackable": true,
+      "isTurnable": true,
+      "surfaceIndex":0,
+
+      "surfaces":[
+        {
+          "texture": "c1.png",
+          "text": [
+            {
+              "position": {
+                "x": 0,
+                "y": 0
+              },
+              "content": "surfaces.0",
+              "size": 12,
+              "color": "0x11ff3d",
+              "font": "monospace"
+            }
+          ]
+        },
+        {
+          "texture": "back.png",
+          "text": [
+            {
+              "position": {
+                "x": 0,
+                "y": 0
+              },
+              "content": "testtext",
+              "fontSize": 12,
+              "color": "0x11ff3d",
+              "fontFamily": "monospace",
+              "align":"center",
+              "fontWeight":"bold",
+              "letterSpacing":1
+            }
+          ]
+        }
+      ]
+    },
+
+    "stone":{
+      "classification":"token",
+      "type":"stone",
+      "width":50,
+      "height":50,
+      "isStackable":false,
+      "isTurnable": false,
+      "surfaceIndex":0,
+
+      "surfaces":[
+        {"texture":"s1.png","color":"0x930b58"}
+        ],
+      "hitArea":{
+          "type":"circle",
+          "offset":{"x":0,"y":0},
+          "radius":25
+      },
+      "text":null
+    },
+
+    "dice":{
+      "classification":"dice",
+      "type":"stone",
+      "width":50,
+      "height":50,
+      "isStackable":false,
+      "isTurnable": false,
+      "surfaceIndex":0,
+
+      "surfaces":[
+        {"texture":"s1.png","color":"0x930b58"},
+        {"texture":"s1.png","color":"0x930b58"},
+        {"texture":"s1.png","color":"0x930b58"},
+        {"texture":"s1.png","color":"0x930b58"},
+        {"texture":"s1.png","color":"0x930b58"},
+        {"texture":"s1.png","color":"0x930b58"}
+      ],
+      "hitArea":{
+        "type":"circle",
+        "offset":{"x":0,"y":0},
+        "radius":25
+      },
+      "text":null
+    }
+  },
+  "snapzones":[
+    {
+      "id":"testSnap",
+      "position":{"x":150,"y":150},
+      "radius":320
+    }
+  ],
+  "stacks":[
+    {
+      "position":{"x":100,"y":100},
+      "content":[
+        {
+          "type":"wordcard",
+          "overwrite":{
+            "surfaces.0":{"texture":"c1.png","color":"0x4286f4"}
+          }
+        },
+        {
+          "type":"wordcard",
+          "overwrite":{
+            "surfaces.0":{"texture":"c1.png","color":"0x4286f4"}
+          }
+        },
+        {
+          "type":"wordcard",
+          "overwrite":{
+            "surfaces.0":{"texture":"c2.png"}
+          }
+        }
+      ]
+    }
+  ],
+  "unstacked":[
+    {
+      "type":"wordcard",
+      "overwrite":{
+        "position":{"x":200,"y":100},
+        "surfaceIndex":0,
+        "surfaces.0":{"texture":"c1.png","color":"0x4286f4"}
+      }
+    },
+    {
+      "type":"dice"
+    },
+    {
+      "type":"wordcard",
+      "overwrite":{
+        "position":{"x":200,"y":200},
+        "rotation":1.5708,
+        "surfaceIndex":1,
+        "surfaces.0":{"texture":"c2.png","color":"0x4286f4"}
+      }
+    },
+    {
+      "type": "stone",
+      "overwrite": {
+        "position": {
+          "x": 70,
+          "y": 10
+        }
+      }
+    }
+  ]
+}

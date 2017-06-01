@@ -11,6 +11,11 @@ var BlurXFilter = core.BlurXFilter;
 var VoidFilter = core.VoidFilter;
 
 'use strict';
+
+/**
+ * props gehn raus an https://github.com/englercj
+ * @constructor
+ */
 function BlurYTintFilter() {
     PIXI.Filter.call(this,
         // vertex shader

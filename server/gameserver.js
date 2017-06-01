@@ -14,7 +14,6 @@ var EntityServerManager = require('./entityservermanager');
 var ClientManager = require('./clientmanager');
 
 class GameServer{
-
     constructor(io){
         this.io = io;
         this.ID = uuidV4();
@@ -106,6 +105,11 @@ class GameServer{
             for(var id in data[type]) {
                 if(!data[type].hasOwnProperty(id)) continue;
 
+                if(!this.clientManager.doesClientExist(id)){
+                    console.log("_processUpdates: user does not exist!");
+                    continue;
+                }
+
                 switch (type) { // claim and release entiy is updaated first, becuase the other functions need the claim
                     // an user claimes an entity
                     case Packages.PROTOCOL.GAME_STATE.ENTITY.USER_CLAIM_ENTITY:
@@ -127,6 +131,9 @@ class GameServer{
                     // am user wants to turn an entity
                     case Packages.PROTOCOL.GAME_STATE.ENTITY.USER_TURN_ENTITY:
                         this.entityServerManager.batchTurnEntities(id, data[type][id]);
+                        break;
+                    case Packages.PROTOCOL.GAME_STATE.ENTITY.USER_DRAW_ENTITY:
+                        this.entityServerManager.batchDrawFromStack(id, data[type][id].drawFromStacks);
                         break;
                     // an user moves his mouse
                     case Packages.PROTOCOL.GAME_STATE.CLIENT.USER_POSITION_CHANGE:

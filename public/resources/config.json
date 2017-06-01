@@ -5,9 +5,10 @@
     "SENSIVITY": 0.1
   },
   "TABLE_ROTATION_SPEED":10,
-  "STACKING_THRESHOLD":20,
+  "STACKING_THRESHOLD":30,
   "KEY_MAPPING":{
     "TURN":{"keyboard":[70],"mouse":[]},
+    "DRAW":{"keyboard":[68],"mouse":[]},
     "MOUSE_LEFT":{"keyboard":[],"mouse":[0]},
     "ROTATE_LEFT":{"keyboard":[81],"mouse":[]},
     "ROTATE_RIGHT":{"keyboard":[69],"mouse":[]}

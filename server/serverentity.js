@@ -495,7 +495,7 @@ class ServerEntityStack extends ServerEntity{
                 position:instanceData.position,
                 rotation:instanceData.rotation,
                 content:[instanceData]
-            }
+            };
         }
 
         if(!instanceData.content) // if passed valie is already a server entity, converte it to stack basedata
@@ -511,19 +511,21 @@ class ServerEntityStack extends ServerEntity{
             throw "malformed data in stacks content. cannot create stack!";
 
         // create the stack data based on the last entity in its content (because the last is on top)
-        var stackData = content[content.length-1].toJSON();
-        stackData.position = {
-            x : (instanceData.position || {}).x || 0,
-            y : (instanceData.position || {}).y || 0
-        };
 
-        stackData.rotation = instanceData.rotation || 0;
+        var stackData = content[content.length-1].toJSON();
         stackData.surfaceIndex = 1;// instanceData.surfaceIndex || 0;
         stackData.isTurnable = true;
         stackData.isStackable = true;
 
         // create the stack with the values of the last element
         super(stackData);   // no library needed, becuase the entity already exists
+
+
+        var base = instanceData.content[content.length-1];
+        this.position.x = (instanceData.position || base.position || {}).x || 0;
+        this.position.y = (instanceData.position || base.position || {}).y || 0;
+
+        this.rotation = instanceData.rotation || base.rotation || 0;
 
         /**
          * 0 is the bottem element,
@@ -556,6 +558,15 @@ class ServerEntityStack extends ServerEntity{
          * @type {splitAmount, oldStack,newStack}
          */
         this.onStackSplit = null;
+    }
+
+
+    get isEmpty(){
+        return this.content.length <=0;
+    }
+
+    get length(){
+        return this.content.length;
     }
 
     get isStack(){
@@ -723,7 +734,7 @@ class ServerEntityStack extends ServerEntity{
      * @return {ServerEntity} or null, if stack is empty
      */
     popContent(){
-        if(this.content.length <=0){
+        if(this.isEmpty){
             console.log("popContent: cannot pop from stack - it is already empty!");
             return null;
         }
@@ -753,7 +764,7 @@ class ServerEntityStack extends ServerEntity{
      * just removes the last element of the stack, if there is content left
      */
     removeLast(){
-        if(this.content.length <=0){
+        if(this.isEmpty){
             console.log("removeLast: cannot remove last from empty stack!");
             return;
         }

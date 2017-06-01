@@ -69,6 +69,14 @@ describe("Entities for server:", function(){
             assert.equal(entity.complementarySide,0);
         });
 
+        it('should give the correct complementary site', function() {
+            var entity = new Entity.ServerEntity(testGame.unstacked[0],testGame.object_def);
+            entity.surfaceIndex=0;
+            assert.equal(entity.complementarySide,1);
+            entity.surfaceIndex=1;
+            assert.equal(entity.complementarySide,0);
+        });
+
         it('should give the correct complementary site (wordcard)', function() {
             var entity = new Entity.ServerEntity(testGame.unstacked[0],testGame.object_def);
             assert.equal(entity.complementarySide,1);
@@ -113,22 +121,30 @@ describe("Entities for server:", function(){
         it('should take just an object with a content field as parameter', function() {
 
             var e = new Entity.ServerEntity(testGame.unstacked[0],testGame.object_def);
+            e.rotation=1.2;
+
+
             var stack = new Entity.ServerEntityStack({content:e});
-            assert.equal(stack.position.x,0);
-            assert.equal(stack.position.y,0);
 
+
+            assert.equal(stack.position.x,200);
+            assert.equal(stack.position.y,100);
+
+            assert.equal(stack.width,e.width);
+            assert.equal(stack.height,e.height);
+            assert.equal(stack.rotation,e.rotation);
+
+            e.rotation=1.3;
             stack = new Entity.ServerEntityStack({content:[e]});
-            assert.equal(stack.position.x,0);
-            assert.equal(stack.position.y,0);
+            assert.equal(stack.position.x,200);
+            assert.equal(stack.position.y,100);
+
+            assert.equal(stack.width,e.width);
+            assert.equal(stack.height,e.height);
+            assert.equal(stack.rotation,e.rotation);
+
         });
 
-        it('should give the correct complementary site', function() {
-            var stack = new Entity.ServerEntity(testGame.unstacked[0],testGame.object_def);
-            stack.surfaceIndex=0;
-            assert.equal(stack.complementarySide,1);
-            stack.surfaceIndex=1;
-            assert.equal(stack.complementarySide,0);
-        });
 
         it('should pop an item', function() {
             var stack = new Entity.ServerEntityStack(testGame.stacks[0],testGame.object_def);

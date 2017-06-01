@@ -7,9 +7,9 @@
 /**
  * Contains various utility methods
  */
-class Util{
+class Util {
 
-    constructor(){
+    constructor() {
         throw "no instances allowd of util";
     }
 
@@ -19,15 +19,15 @@ class Util{
      * @param s input string of color in format #FFFFFF or 0xFFFFFF
      * @returns {Number} color as int
      */
-    static parseColor(colorString){
-        if(!colorString) return 0xFFFFFF;
+    static parseColor(colorString) {
+        if (!colorString) return 0xFFFFFF;
 
-        if(typeof colorString == "number"){
+        if (typeof colorString == "number") {
             return Math.round(colorString);
         }
 
         var color = parseInt(colorString.replace("#", "0x"));
-        return !Number.isNaN(color)?color: 0xFFFFFF;
+        return !Number.isNaN(color) ? color : 0xFFFFFF;
     }
 
 
@@ -38,7 +38,7 @@ class Util{
     static getRandomColor() {
         var letters = '0123456789ABCDEF';
         var color = '0x';
-        for (var i = 0; i < 6; i++ ) {
+        for (var i = 0; i < 6; i++) {
             color += letters[Math.floor(Math.random() * 16)];
         }
         return color;
@@ -52,22 +52,32 @@ class Util{
      * @param y2
      * @returns {number} the distance
      */
-    static getVectorDistance(x1,y1,x2,y2){
+    static getVectorDistance(x1, y1, x2, y2) {
         var a = x1 - x2;
         var b = y1 - y2;
-        return Math.sqrt( a*a + b*b );
+        return Math.sqrt(a * a + b * b);
     }
 
-    static round (value, decimal=0) {
+    static round(value, decimal = 0) {
         var x;
-        switch(decimal){
-            case 0: x=1; break;
-            case 1: x=10; break;
-            case 2: x=100; break;
-            case 3: x=1000; break;
-            default: x= Math.pow(10,decimal); break;
+        switch (decimal) {
+            case 0:
+                x = 1;
+                break;
+            case 1:
+                x = 10;
+                break;
+            case 2:
+                x = 100;
+                break;
+            case 3:
+                x = 1000;
+                break;
+            default:
+                x = Math.pow(10, decimal);
+                break;
         }
-        return (Math.round(value * x)/x)
+        return (Math.round(value * x) / x)
     }
 
     /**
@@ -77,9 +87,9 @@ class Util{
      * @param max
      * @returns {*}
      */
-    static torusRange(val,min, max) {
-        if(val < min)return max;
-        if(val > max)return min;
+    static torusRange(val, min, max) {
+        if (val < min)return max;
+        if (val > max)return min;
         return val;
     }
 
@@ -89,7 +99,7 @@ class Util{
      * @param min lowest possible random number (is 0 by default)
      * @returns {number} the random number
      */
-    static randomInRange(max,min=0){
+    static randomInRange(max, min = 0) {
         return Math.floor(Math.random() * (max - min + 1) + min)
     }
 
@@ -100,44 +110,15 @@ class Util{
      * @returns {number} which is in the range, including the boundaries
      */
     static forceRange(val, min, max) {
-        if(val <= min)return min;
-        if(val >= max)return max;
+        if (val <= min)return min;
+        if (val >= max)return max;
 
         return val;
     }
 
-    /**
-     * loads a resurce and passes the data to the callback
-     * the loaded data is base64 and can be used to load
-     * @param url
-     * @param callback
-     */
-    /*loadDataBase64(url, callback) {
-        if(!url){
-            console.log("loadDataURL: no url passed!");
-            return;
-        }
-        if(!callback){
-            console.log("loadDataURL: no callback passed!");
-            return;
-        }
-
-        var xhr = new XMLHttpRequest();
-        xhr.onload = function() {
-            var reader = new FileReader();
-            reader.onloadend = function() {
-                callback(reader.result);
-            };
-            reader.readAsDataURL(xhr.response);
-        };
-        xhr.open('GET', url);
-        xhr.responseType = 'blob';
-        xhr.send();
-    }*/
-
     static removeByValue(array) {
         var what, a = arguments, L = a.length, ax;
-        while (L>1 && array.length) {
+        while (L > 1 && array.length) {
             what = a[--L];
             while ((ax = array.indexOf(what)) !== -1) {
                 array.splice(ax, 1);
@@ -154,8 +135,37 @@ class Util{
      * @param t {number} prograss between 0.0 and 1.0, everything is extrapolation
      * @returns {number} the interpolated value
      */
-    static lerp(start,end,t){
+    static lerp(start, end, t) {
         return (1 - t) * start + t * end;
+    }
+
+
+    /**
+     * returns a random rotation
+     * a.k.a. a number between 0 and 2PI
+     * @returns {number}
+     */
+    static randomRotation(){
+        return Math.random() * Math.PI * 2;
+    }
+
+    /**
+     * caluclates a random point on a circle circumfence
+     * @param x position of the circle
+     * @param y position of the circle
+     * @param radius of the circle
+     * @returns {{x: *, y: *}}
+     */
+    static randomPointOnCircle(x, y, radius) {
+        var angle = Util.randomRotation();
+        return {
+            x: x + Math.cos(angle) * radius,
+            y: y + Math.sin(angle) * radius,
+        }
+    }
+
+    static pythagorean(a,b){
+        return Math.sqrt((a*a)+(b*b));
     }
 }
 

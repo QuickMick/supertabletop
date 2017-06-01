@@ -71,6 +71,8 @@ class BasicTool{
         this.entityManager.on("entityclicked",this._onEntityClicked.bind(this));
 
         this.inputHanlder.mapping.TURN.on("pressed",this._turnSelectedEntities.bind(this));
+
+        this.inputHanlder.mapping.DRAW.on("pressed",this._drawFromSelectedEntities.bind(this));
     }
 
 
@@ -95,8 +97,23 @@ class BasicTool{
                 surface: "next",
             }
         );
+    }
 
+    _drawFromSelectedEntities(evt){
+        var entities = this.selectedEntities;
 
+        for(var i=0; i< entities.length;i++){
+            if(!entities[i] || !entities[i].isStack) continue; // just draw request, if entity is a stack
+            var entity = entities[i];
+            this.synchronizer.updateQueue.postUpdate(Packages.PROTOCOL.GAME_STATE.ENTITY.USER_DRAW_ENTITY,
+                this.synchronizer.CLIENT_INFO.id,
+                {
+                    drawFromStacks: entity.ENTITY_ID,
+                    _mode: "pushAvoidDuplicates"
+                }
+            );
+
+        }
     }
 
     _onEntityClicked(evt){

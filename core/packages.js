@@ -106,6 +106,12 @@ module.exports =
                 USER_TURN_ENTITY: "USER_TURN_ENTITY",
 
                 /**
+                 * is posted by a user, who wants to draw a card,
+                 * package looks like  {stackIDs:<ids of stacks from which the user wants to draw a card>}
+                 */
+                USER_DRAW_ENTITY:"USER_DRAW_ENTITY",
+
+                /**
                  * user wants to stack two entities,
                  * the ids of the entities are in the package
                  * looks like

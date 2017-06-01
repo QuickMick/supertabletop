@@ -335,8 +335,8 @@ class EntityServerManager extends EventEmitter3 {
                 },
                 bodyB: entity.body,
                 pointB: {x: 0, y: 0},
-                length: 0.01,
-                stiffness: 0.1,
+                length: 0.3,
+                stiffness: 0.2,
                 angularStiffness: 1
             });
 
@@ -547,6 +547,65 @@ class EntityServerManager extends EventEmitter3 {
         };
     }
 
+
+    batchDrawFromStack(userID, stackIDs){
+
+        if(!stackIDs){
+            console.log("batchDrawFromStack: no stack ids passed");
+        }
+
+        if(!this.clientManager.doesClientExist(userID)){
+            console.log("batchDrawFromStack: user does not exist");
+        }
+
+        stackIDs = [].concat(stackIDs); //be sure it is an array
+
+        for(var i=0; i<stackIDs.length;i++){
+            var stackID = stackIDs[i];
+            var stack = this.gameEntities[stackID];
+            if(!stack){
+                console.log("batchDrawFromStack: stack",stackID,"does not exist!");
+                continue;
+            }
+
+            if(!stack.isStack){
+                console.log("batchDrawFromStack: entity",stackID,"is no stack!");
+                continue;
+            }
+
+            var popped = stack.popContent();
+            if(popped){
+                var entity = new ServerEntity(popped);
+
+                var PADDING = 40;
+
+                var randomPos= Util.randomPointOnCircle(
+                    stack.position.x,
+                    stack.position.y,
+                    Util.pythagorean(stack.width/2,stack.height/2)*2+PADDING
+                );
+
+                entity.position.x = randomPos.x;
+                entity.position.y = randomPos.y;
+                entity.rotation = Util.randomRotation();
+
+                this.addEntity(entity,true);
+
+                if(stack.length == 1){
+                    var last = new ServerEntity(stack.popContent());
+                    last.position.x = stack.position.x;
+                    last.position.y = stack.position.y;
+                    last.rotation = stack.rotation;
+
+                    this.removeEntity(stack.ID,true);
+                    this.addEntity(last,true);
+                }
+            }
+        }
+    }
+
+
+
     /**
      * turn all entities to the passed side
      * @param userID user who wnats to turn the entity
@@ -558,7 +617,6 @@ class EntityServerManager extends EventEmitter3 {
             console.log("batchTurnEntities: no data passed for user",userID);
             return;
         }
-
         for(var i =0; i<data.turnedEntities.length;i++){
             this.turnEntity(userID,data.turnedEntities[i],data.surface);
         }
@@ -708,11 +766,7 @@ class EntityServerManager extends EventEmitter3 {
 
        if(wasStack){
            // send content changed
-
            if(send) {
-
-               var data={_mode:"push"};
-
                this.updateQueue.postUpdate(
                    Packages.PROTOCOL.GAME_STATE.ENTITY.SERVER_ENTITY_VALUE_CHANGED,
                    targetStack.ID,

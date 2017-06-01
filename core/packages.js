@@ -119,11 +119,6 @@ module.exports =
                 USER_STACK_ENTITY: "USER_STACK_ENTITY",
 
                 /**
-                 * server turns card.
-                 */
-               // SERVER_TURN_ENTITY:"SERVER_TURN_ENTITY",
-
-                /**
                  * is postet from the server, if a value of an entity has changed,
                  * works basically like the replacer of the entity loader,
                  * event data contains the entity IDs as key and the updated data paths as value (e.g. {"enitty1":{changes:{"surface.0":<data>}}}

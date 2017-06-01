@@ -170,7 +170,7 @@ class GameServer{
             Packages.createEvent(
                 this.ID,
                 {
-                    clientInfo:this.clientManager.getPrivateClientInfo(socket.id),
+                    clientInfo:this.clientManager.getClient(socket.id).privateInfo,
                     serverID: this.ID
                 }
             )
@@ -195,7 +195,7 @@ class GameServer{
             Packages.PROTOCOL.SERVER.CLIENT_CONNECTED,
             Packages.createEvent(
                 this.ID,
-                [this.clientManager.getPublicClientInfo(socket.id)]
+                [this.clientManager.getClient(socket.id).publicInfo]
             )
         );
 

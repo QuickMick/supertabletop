@@ -193,7 +193,6 @@ class ServerEntity extends BaseEntityData{
         this.ID=uuidV1();
 
         this._body = null;
-        console.log("x",this.ID,this.width,this.height);
 
         this._state = this._createDefaultEntityState();
         // set the position of the _body
@@ -204,10 +203,8 @@ class ServerEntity extends BaseEntityData{
         switch (this.hitArea.type) {
             case "circle":
                 this._body = Bodies.circle(x,y,this.hitArea.radius);
-                console.log("c",this.ID,this.hitArea.radius);
                 break;
             case "rectangle":
-                console.log("r",this.ID,this.hitArea.width,this.hitArea.height);
                 this._body = Bodies.rectangle(x,y,this.hitArea.width,this.hitArea.height);
                 break;
             default:

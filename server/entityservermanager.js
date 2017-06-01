@@ -295,10 +295,6 @@ class EntityServerManager extends EventEmitter3 {
         // if passed value is no array, then converte it to one
         claimedEntityIDs = [].concat(claimedEntityIDs);
 
-        // needs to be in a local variable,
-        // to be able to pass it to the getter of the constraint
-        var clientManager = this.clientManager;
-
         // iterated the claimed ids
         for(var i =0; i<claimedEntityIDs.length; i++) {
             var claimedEntityID = claimedEntityIDs[i];
@@ -315,6 +311,8 @@ class EntityServerManager extends EventEmitter3 {
 
             var entity = this.gameEntities[claimedEntityID];
 
+            var client = this.clientManager.getClient(userID);
+
             entity.claim(userID);
             entity.setMode("move"); //TODO: des jetz nur zu testzwecken, spaeter wieder entfernen
 
@@ -324,7 +322,7 @@ class EntityServerManager extends EventEmitter3 {
                 userID: userID,
                 entityID: entity.ID,
                 get pointA() {
-                    var cPos = clientManager.getPosition(this.userID);
+                    var cPos = client.position;
                   //  console.log(this.userID,cPos,this.relativePosition);
                     var result = {x: cPos.x, y: cPos.y};
 

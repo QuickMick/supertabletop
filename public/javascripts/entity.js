@@ -2,7 +2,7 @@
  * Created by Mick on 18.05.2017.
  */
 "use strict";
-require('pixi.js');
+var DropShadowFilter = require('./filters/dropshadowfilter');
 var Path = require('path');
 var Util = require("./../../core/util");
 
@@ -73,6 +73,11 @@ class Entity extends PIXI.Sprite {
         // give user mouseover feedback
         this._applyMouseoverEffect();
         this.showMouseoverEffect = true;
+
+        // if this is a stack, apply drop shadow filter
+        if(this.isStack) {
+            this.addFilter(new DropShadowFilter());
+        }
     }
 
     setSurfaces(surfaces){

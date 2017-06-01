@@ -1,6 +1,7 @@
 /**
  * Created by Mick on 31.05.2017.
  */
+"use strict";
 const assert = require('assert');
 
 var Entity = require('./../server/serverentity');
@@ -152,5 +153,15 @@ describe("ServerEntity", function(){
             stack.pushContent(new Entity.ServerEntity(testGame.unstacked[3],testGame.object_def));
             assert.equal(stack.content.length,3);
         });
+        it('stack should split correctly', function() {
+            var stack = new Entity.ServerEntityStack(testGame.stacks[0],testGame.object_def);
+            assert.equal(stack.content.length,3);
+            var result = stack.split(2);
+            assert.equal(result.content.length,2);
+            assert.equal(stack.content.length,1);
+            assert.equal(stack.split(1),null);
+            assert.equal(stack.content.length,1);
+        });
+
     });
 });

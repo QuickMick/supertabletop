@@ -516,6 +516,12 @@ class ServerEntityStack extends ServerEntity{
          * @type {stack}
          */
         this.onStackIsEmpty = null;
+
+        /**
+         * called, whenn the stack was splitted
+         * @type {splitAmount, oldStack,newStack}
+         */
+        this.onStackSplit = null;
     }
 
     get isStack(){
@@ -708,10 +714,41 @@ class ServerEntityStack extends ServerEntity{
     }
 
     /**
-     * splits the top n entities to a new stack, or a single serverEntity
+     * splits the top n entities to a new stack, or a single serverEntity,
+     * the amount should be greater than 1, oterhwise just a serverentity is returned
      */
-    split(){
-        //TODO
+    split(amount){
+        if(this.content.length <2){
+            console.log("split: cannot split, stack is empty or to small- stacksize:",this.content.length);
+            return null;
+        }
+
+        if(this.content.length - amount <1){
+            console.log("split: you want to split more contentn than there is available, amount:",amount,"content size: ",this.content.length);
+            return null;
+        }
+
+        if(amount <=0){
+            console.log("split: cannot split, split amount too small (zero)");
+            return null;
+        }
+        var result;
+        if(amount==1){
+            result = new ServerEntity(this.content.pop());
+        }else{
+            var c = this.content.splice(this.content.length-amount,amount);
+            result = new ServerEntityStack({content:c});
+        }
+
+        if(this.onStackSplit){
+            this.onStackSplit({
+                splitAmount:amount,
+                oldStack:this,
+                newStack:result
+            });
+        }
+
+        return result;
     }
 }
 

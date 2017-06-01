@@ -171,7 +171,7 @@ class GameManager extends EventEmitter3{
             // set the loaded grafix to the entities
             for (let i = 0; i < newEntityList.length; i++) {
                 var c = newEntityList[i];
-                c.showSurface(c.surfaceIndex);
+                c.surfaceIndex = c.surfaceIndex;
             }
 
             // if table is given in the game.json, then set it as new table

@@ -4,11 +4,13 @@
 -outlinefilter bei drehung buggy
 -circle shape/hitzone
 -bild anfangs leicht verzerrt
-TODO: remove constraint, when removing entity
--start rotaion geht nemme
+-wenn entity geklickt wurde, dann is immernoch mouseover drauf, wenn man runtergeht aber immernoch hält, dann nemme
 
+
+#done?# remove constraint, when removing entity
 #####################################################  TODOS  ##########################################################
 - table boundaries
+TODO: surfacechange als valuechange machn? und des nur dafür gedachte event rauskicken?
 
 - claim rejected -> remove entity from user selection
     - prevent user from modifing card which he has not claimed

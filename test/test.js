@@ -8,7 +8,7 @@ var Entity = require('./../server/serverentity');
 // tutorial https://mochajs.org/
 var testGame = require('./test_game.json');
 
-describe("ServerEntity", function(){
+describe("Entities for server:", function(){
 
 /*
     before(function() {
@@ -27,24 +27,20 @@ describe("ServerEntity", function(){
         // runs after each test in this block
     });*/
 
-
-
-    describe('CreateBaseEntity', function() {
-        it('should create an instance of BaseEntityData', function() {
+    describe('BaseEntityData', function() {
+        it('should be instantiated correctly', function() {
             new Entity.BaseEntityData(testGame.unstacked[0],testGame.object_def);
             assert.ok(true);
         });
-        it('should create an instance of ServerEntity', function() {
+    });
+
+    describe('ServerEntity', function() {
+        it('should created correctly', function() {
             new Entity.ServerEntity(testGame.unstacked[0],testGame.object_def);
             assert.ok(true);
         });
 
-        it('should create an instance of ServerEntityStack', function() {
-            new Entity.ServerEntityStack(testGame.stacks[0],testGame.object_def);
-            assert.ok(true);
-        });
-
-        it('should create an instance of ServerEntity (with dice)', function() {
+        it('should created correctly (with dice)', function() {
             new Entity.ServerEntity(testGame.unstacked[1],testGame.object_def);
             assert.ok(true);
         });
@@ -52,6 +48,25 @@ describe("ServerEntity", function(){
         it('should give the correct complementary site (dice)', function() {
             var entity = new Entity.ServerEntity(testGame.unstacked[1],testGame.object_def);
             assert.equal(entity.complementarySide,3);
+            entity.surfaces.pop();
+
+            entity.surfaceIndex=0;
+            assert.equal(entity.complementarySide,3);
+
+            entity.surfaces.pop();
+            entity.surfaceIndex=0;
+            assert.equal(entity.complementarySide,2);
+
+            entity.surfaceIndex=2;
+            assert.equal(entity.complementarySide,0);
+
+            entity.surfaces.pop();
+            entity.surfaceIndex=0;
+            assert.equal(entity.complementarySide,2);
+
+            entity.surfaces.pop();
+            entity.surfaceIndex=1;
+            assert.equal(entity.complementarySide,0);
         });
 
         it('should give the correct complementary site (wordcard)', function() {
@@ -76,15 +91,53 @@ describe("ServerEntity", function(){
             entity.turn(-3);
             assert.equal(entity.surfaceIndex,0);
         });
+    });
 
-        it('should pop an item from a stack', function() {
+    describe('ServerEntityStack', function() {
+        it('should create an instance of ServerEntityStack out of basedata from the test_game', function() {
+            new Entity.ServerEntityStack(testGame.stacks[0],testGame.object_def);
+            assert.ok(true);
+        });
+
+        it('should take an ServerEntity as parameter and positionize the new stack on the right position', function() {
+
+            var e = new Entity.ServerEntity(testGame.unstacked[0],testGame.object_def);
+            e.position.x = 200;
+            e.position.y = 333;
+
+            var stack = new Entity.ServerEntityStack(e);
+            assert.equal(stack.position.x,200);
+            assert.equal(stack.position.y,333);
+        });
+
+        it('should take just an object with a content field as parameter', function() {
+
+            var e = new Entity.ServerEntity(testGame.unstacked[0],testGame.object_def);
+            var stack = new Entity.ServerEntityStack({content:e});
+            assert.equal(stack.position.x,0);
+            assert.equal(stack.position.y,0);
+
+            stack = new Entity.ServerEntityStack({content:[e]});
+            assert.equal(stack.position.x,0);
+            assert.equal(stack.position.y,0);
+        });
+
+        it('should give the correct complementary site', function() {
+            var stack = new Entity.ServerEntity(testGame.unstacked[0],testGame.object_def);
+            stack.surfaceIndex=0;
+            assert.equal(stack.complementarySide,1);
+            stack.surfaceIndex=1;
+            assert.equal(stack.complementarySide,0);
+        });
+
+        it('should pop an item', function() {
             var stack = new Entity.ServerEntityStack(testGame.stacks[0],testGame.object_def);
             var e = stack.popContent();
             assert.equal(e instanceof Entity.ServerEntity,true);
             assert.equal(stack.content.length,2);
         });
 
-        it('should pop an item from a stack', function() {
+        it('should pop more items and return null if empty', function() {
             var stack = new Entity.ServerEntityStack(testGame.stacks[0],testGame.object_def);
             stack.popContent();
             stack.popContent();
@@ -161,6 +214,42 @@ describe("ServerEntity", function(){
             assert.equal(stack.content.length,1);
             assert.equal(stack.split(1),null);
             assert.equal(stack.content.length,1);
+        });
+
+
+        it('stack should have correct content after pushing stack', function() {
+            var stack = new Entity.ServerEntityStack(testGame.stacks[0],testGame.object_def);
+            var stack2 = new Entity.ServerEntityStack(testGame.stacks[0],testGame.object_def);
+
+            stack.pushContent(stack2);
+
+            assert.equal(stack.content.length,6);
+            assert.equal(stack.content[0].surfaces[0].texture,"c1.png");
+            assert.equal(stack.content[1].surfaces[0].texture,"c1.png");
+            assert.equal(stack.content[2].surfaces[0].texture,"c2.png");
+
+            assert.equal(stack.content[3].surfaces[0].texture,"c1.png");
+            assert.equal(stack.content[4].surfaces[0].texture,"c1.png");
+            assert.equal(stack.content[5].surfaces[0].texture,"c2.png");
+        });
+
+        it('stack should have correct content after pushing turned stack', function() {
+            var stack = new Entity.ServerEntityStack(testGame.stacks[0],testGame.object_def);
+            var stack2 = new Entity.ServerEntityStack(testGame.stacks[0],testGame.object_def);
+
+            stack2.turn();
+
+            stack.pushContent(stack2);
+
+            assert.equal(stack.content.length,6);
+            assert.equal(stack.content[0].surfaces[0].texture,"c1.png");
+            assert.equal(stack.content[1].surfaces[0].texture,"c1.png");
+            assert.equal(stack.content[2].surfaces[0].texture,"c2.png");
+
+            assert.equal(stack.content[3].surfaces[0].texture,"c2.png");
+            assert.equal(stack.content[4].surfaces[0].texture,"c1.png");
+            assert.equal(stack.content[5].surfaces[0].texture,"c1.png");
+
         });
 
     });

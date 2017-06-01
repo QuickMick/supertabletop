@@ -180,6 +180,10 @@ class Synchronizer{
                 case Packages.PROTOCOL.GAME_STATE.ENTITY.SERVER_TURN_ENTITY:
                     this.entityManager.batchTurnEntities(updates);
                     break;
+                // a value of an entity was changed
+                case Packages.PROTOCOL.GAME_STATE.ENTITY.SERVER_ENTITY_VALUE_CHANGED:
+                    this.entityManager.batchApplyValueChanges(updates);
+                    break;
                 // the state of an entiy changes
                 case Packages.PROTOCOL.GAME_STATE.ENTITY.STATE_CHANGE:
                     this.toolManager.batchUpdateEntityStateChange(updates);

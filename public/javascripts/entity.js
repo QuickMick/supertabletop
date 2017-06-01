@@ -60,13 +60,15 @@ class Entity extends PIXI.Sprite {
         this.isStackable = entity.isStackable || false;
         this.isStack = entity.isStack || false;
 
-        this.surfaceIndex = entity.surfaceIndex || 0; // is top visible?
+        this._surfaceIndex=0;
+
 
         // init surfaces
         this.setSurfaces(entity.surfaces);
 
         // finally, display the visible surface
-        this.showSurface(this.surfaceIndex);
+      //  this.showSurface(this.surfaceIndex);
+        this.surfaceIndex = entity.surfaceIndex || 0; // is top visible?
 
         // give user mouseover feedback
         this._applyMouseoverEffect();
@@ -138,6 +140,10 @@ class Entity extends PIXI.Sprite {
         }
     }
 
+    get surfaceIndex(){
+        return this._surfaceIndex;
+    }
+
     /**
      * Changes the surface which is shown
      * if the value is bigger or smaller than the number of surface,
@@ -145,15 +151,16 @@ class Entity extends PIXI.Sprite {
      * if no surfaceside passed, the surface just gets re-initialized.
      * @param index of the side
      */
-    showSurface(index=0) {
-        this.surfaceIndex = index;//(!index && index != 0) ? (this.surfaceIndex || 0) : index;
+    set surfaceIndex(index) { //showSurface(index=0) {
+        index = index || 0;
+        this._surfaceIndex = index;//(!index && index != 0) ? (this.surfaceIndex || 0) : index;
 
         // check if the surfaceIndex is inside the possible range (number of surfaces)
         // if not, then force it to be inside of the range
-        if(this.surfaceIndex <= 0) this.surfaceIndex = 0;
-        if(this.surfaceIndex >= this.surfaces.length) this.surfaceIndex = this.surfaces.length-1;
+        if(this._surfaceIndex <= 0) this._surfaceIndex = 0;
+        if(this._surfaceIndex >= this.surfaces.length) this._surfaceIndex = this.surfaces.length-1;
 
-        var curSurface = this.surfaces[this.surfaceIndex];
+        var curSurface = this.surfaces[this._surfaceIndex];
 
         this.removeAll(); // remove text from old surface
 
@@ -229,7 +236,8 @@ class Entity extends PIXI.Sprite {
     _applyMouseoverEffect(){
         if(this._hasMouseOverApplied) return;
         this._hasMouseOverApplied = true;
-        this.on('mouseover', function () {
+
+        var apply=function () {
             if(!this.showMouseoverEffect) return;
             var factor = 1.1;
             this._backupMouseover = {
@@ -243,21 +251,25 @@ class Entity extends PIXI.Sprite {
 
             this.tint = this._backupMouseover.tmpTint;
             this.scale.set(this._backupMouseover.tmpX,this._backupMouseover.tmpY);
-        }.bind(this), false)
-            .on('mouseout', function () {
+        };
 
-                if(!this._backupMouseover) return;
+        var release = function () {
 
-                // if some values we modified in the mouseover have changed, do not override the changes
-                if(this.scale.x == this._backupMouseover.tmpX && this.scale.y == this._backupMouseover.tmpY)
-                    this.scale.set(this._backupMouseover.x,this._backupMouseover.y);
+            if(!this._backupMouseover) return;
 
-                if(this.tint == this._backupMouseover.tmpTint)
-                    this.tint = this._backupMouseover.tint;
+            // if some values we modified in the mouseover have changed, do not override the changes
+            if(this.scale.x == this._backupMouseover.tmpX && this.scale.y == this._backupMouseover.tmpY)
+                this.scale.set(this._backupMouseover.x,this._backupMouseover.y);
 
-                delete this._backupMouseover;
+            if(this.tint == this._backupMouseover.tmpTint)
+                this.tint = this._backupMouseover.tint;
 
-            }.bind(this), false)
+            delete this._backupMouseover;
+        };
+
+        this.on('mouseover', apply.bind(this), false)
+            .on('mouseout', release.bind(this), false)
+            .on('mousedown',release.bind(this),true);
     }
 }
 

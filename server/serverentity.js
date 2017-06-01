@@ -51,7 +51,10 @@ class BaseEntityData {
         this.isTurnable = baseData.isTurnable || false;
         this.surfaceIndex = baseData.surfaceIndex || 0;
         this.surfaces = BaseEntityData.reviveSurfaces(baseData.surfaces); // baseData.surfaces || [];
-        this.hitArea = BaseEntityData.retrieveHitArea(baseData.hitArea);  // baseData.hitArea || null;
+        this.hitArea = BaseEntityData.retrieveHitArea(baseData.hitArea,{
+            width:baseData.width,
+            height:baseData.height
+        });
 
         this.rawData = baseData;
     }
@@ -110,15 +113,18 @@ class BaseEntityData {
         return result;
     }
 
-    static retrieveHitArea(hitArea){
+    static retrieveHitArea(hitArea,defaults){
         var result = {};
 
         result.offset = {x:0,y:0};
 
+        defaults = defaults || {};
+        var defaultWidth = defaults.width || GameConfig.DEFAULT_ENTITY_SIZE;
+        var defaultHeight = defaults.height || GameConfig.DEFAULT_ENTITY_SIZE;
         if(!hitArea || !hitArea.type){
             result.type = "rectangle";
-            result.width = GameConfig.DEFAULT_ENTITY_SIZE;
-            result.height = GameConfig.DEFAULT_ENTITY_SIZE;
+            result.width = defaultWidth;
+            result.height = defaultHeight;
             return result;
         }
 
@@ -130,12 +136,12 @@ class BaseEntityData {
         switch(hitArea.type){
             case "rectangle":
                 result.type = "rectangle";
-                result.width = hitArea.width || GameConfig.DEFAULT_ENTITY_SIZE;
-                result.height = hitArea.height || GameConfig.DEFAULT_ENTITY_SIZE;
+                result.width = defaultWidth;
+                result.height = defaultHeight;
                 return result;
             case "circle":
                 result.type = "circle";
-                result.radius = hitArea.radius || (GameConfig.DEFAULT_ENTITY_SIZE/2);
+                result.radius = hitArea.radius || ((defaultWidth+defaultHeight)/4);
                 return result;
         }
     }
@@ -168,7 +174,8 @@ class BaseEntityData {
 
                     if(i==overwrite_path.length-1){ // if last element, then set the real value
                         currentDepthObject[curKey] = instance.overwrite[key];
-                    }else if(!result[curKey]){      // if object does not exist,
+                    //}else if(!result[curKey]){      // if object does not exist,
+                    }else if(!currentDepthObject[curKey]){      // if object does not exist,
                         currentDepthObject[curKey]={};          // then create it
                     }
                     currentDepthObject=currentDepthObject[curKey];  // and set as new depth object
@@ -186,7 +193,7 @@ class ServerEntity extends BaseEntityData{
         this.ID=uuidV1();
 
         this._body = null;
-
+        console.log("x",this.ID,this.width,this.height);
 
         this._state = this._createDefaultEntityState();
         // set the position of the _body
@@ -197,8 +204,10 @@ class ServerEntity extends BaseEntityData{
         switch (this.hitArea.type) {
             case "circle":
                 this._body = Bodies.circle(x,y,this.hitArea.radius);
+                console.log("c",this.ID,this.hitArea.radius);
                 break;
             case "rectangle":
+                console.log("r",this.ID,this.hitArea.width,this.hitArea.height);
                 this._body = Bodies.rectangle(x,y,this.hitArea.width,this.hitArea.height);
                 break;
             default:
@@ -207,12 +216,17 @@ class ServerEntity extends BaseEntityData{
         }
 
         this._body.ENTITY_ID = this.ID;
-        this._body.frictionAir = GameConfig.ENTITY_FRICTION;
-        this._body.collisionFilter=GameConfig.DEFAULT_COLISION_FILTER;
 
         if(rotation) { //just rotate, if rotation is not equaling zero
             Body.rotate(this._body, rotation);
         }
+
+        /**
+         * name of the current mode
+         * @type {string}
+         */
+        this._currentMode = "";
+        this.setMode("default");    // set default mode
 
         //------------------callbacks------------------------------------
 
@@ -246,12 +260,6 @@ class ServerEntity extends BaseEntityData{
          * @type {boolean}
          */
         this.isAddedToWorld = false;
-
-        /**
-         * name of the current mode
-         * @type {string}
-         */
-        this._currentMode = "default";
     }
 
 
@@ -466,12 +474,41 @@ class ServerEntity extends BaseEntityData{
  * so surfaceIndex 1 means, top is visible, 0 is bottom
  */
 class ServerEntityStack extends ServerEntity{
-
+    /**
+     * creates a new stack, based on position and rotation of the passed entity,
+     * if the entity is a stack, its content is also used, otherwise the passed entity is added as content.
+     * Basically it converts the passed entity to a stack at the same position of the entity.
+     *
+     * IMPORTANT: the passed entity should be removed before or after creating the stack!
+     *
+     * NOTE: first element of the stack array is always on the bottom,
+     *      last element is always on the top
+     *
+     * NODE: by passing an serverEntity as instanceData, a new stack on this position,
+     *      containing the passed entity as data will be spawned
+     *
+     * @param instanceData
+     * @param entityLibrary
+     * @private
+     */
     constructor(instanceData, entityLibrary){
-        if(!instanceData.content)
+        if(instanceData instanceof  ServerEntity){
+            // if instance is a serverEntity, converte it to a stack
+            instanceData = {
+                position:instanceData.position,
+                rotation:instanceData.rotation,
+                content:[instanceData]
+            }
+        }
+
+        if(!instanceData.content) // if passed valie is already a server entity, converte it to stack basedata
             throw "cannot create stack without content";
 
+        // be sure instanceData.content is an array
+        instanceData.content = [].concat(instanceData.content);
+
         var content = ServerEntityStack._reviveStackContent(instanceData.content, entityLibrary);
+
 
         if(!content)
             throw "malformed data in stacks content. cannot create stack!";
@@ -619,11 +656,20 @@ class ServerEntityStack extends ServerEntity{
         return hasTurned;
     }
 
+    /**
+     *
+     * @param entity
+     * @returns {boolean} true, if content was pushed
+     */
     pushContent(entity){
         if(!entity){
             console.log("pushContent: no entity passed!");
-            return;
+            return false;
         }
+
+        this.surfaceIndex = 1;  // reset the service index,
+                                // one means top is visible,
+                                // because the pushed card is now on top
 
         var mergedWithStack = false;
         // convert entity to base entity / create a clean copy
@@ -642,22 +688,22 @@ class ServerEntityStack extends ServerEntity{
        if(mergedWithStack){
            if(entity.length <=0){
                console.log("ServerStackEntity.pushContent: other stack has no content");
-               return;
+               return false;
            }
            // just check for one item of the stack, because they are all the same
            if(entity[0].type != this.type && entity[0].classification != this.classification){
                console.log("ServerStackEntity.pushContent: can only merge entities from same type");
-               return;
+               return false;
            }
        }else{
            if (entity.type != this.type && entity.classification != this.classification) {
                console.log("ServerStackEntity.pushContent: can only push entities from same type");
-               return;
+               return false;
            }
 
            if(!entity.isStackable){
                console.log("ServerStackEntity.pushContent: pushed entity is not stackable!");
-               return;
+               return false;
            }
        }
 
@@ -671,6 +717,8 @@ class ServerEntityStack extends ServerEntity{
                 mergedWithStack:mergedWithStack
             });
         }
+
+        return true;
     }
 
     /**
@@ -683,6 +731,8 @@ class ServerEntityStack extends ServerEntity{
             return null;
         }
 
+        // pop entity out of contnent -> last element of array is taken out of it
+        // and passed to the entity constructor
         var entity = new ServerEntity(this.content.pop());
 
         // fire onEntityPopped event

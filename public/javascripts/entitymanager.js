@@ -242,7 +242,7 @@ class EntityManager extends PIXI.Container{
         }
         for(var entityID in data){
             if(!data.hasOwnProperty(entityID))continue;
-            this.turnEntity(entityID,data[entityID].surfaceIndex);
+        //    this.turnEntity(entityID,data[entityID].surfaceIndex);
         }
     }
 
@@ -252,7 +252,7 @@ class EntityManager extends PIXI.Container{
      * @param surfaceIndex {number} index of the surface, should be in the valid range,
      *  otherwise the maximum or the minimum surface is displayed
      */
-    turnEntity(entityID,surfaceIndex){
+    /*turnEntity(entityID,surfaceIndex){
         if(!entityID){
             console.warn("turnEntity: entity id is necessary to update enitty");
             return;
@@ -268,8 +268,62 @@ class EntityManager extends PIXI.Container{
             return;
         }
 
-        this.entities[entityID].showSurface(surfaceIndex);
+        this.entities[entityID].surfaceIndex = surfaceIndex;
+    }*/
+
+
+    batchApplyValueChanges(data){
+        if(!data){
+            console.warn("batchApplyValueChanges:no update data passed");
+            return;
+        }
+        for(var entityID in data){
+            if(!data.hasOwnProperty(entityID))continue;
+            this.applayEntityValueChange(entityID,data[entityID].changes);
+        }
     }
+
+    applayEntityValueChange(entityID,changes){
+        if(!this.entities[entityID]){
+            console.warn("applayEntityValueChange: entity",entityID,"does not exist!");
+            return;
+        }
+
+        if(!changes || changes.length <= 0) {
+            console.log("applayEntityValueChange: no changeds passed for entity",entityID);
+            return;
+        }
+        var entity = this.entities[entityID];
+
+        for(var i=0; i<changes.length;i++){
+            var change = changes[i];
+            if (!change) continue;
+
+            var overwrite_path = change.keyPath.split(".");    // get the path of the value, which should be overwritten
+            var newValue = change.value;
+            var currentDepthObject = entity;        // latest object of the path
+
+            // go down the whole path, till the path can be set
+            for(let i=0; i< overwrite_path.length;i++){
+                var curKey = overwrite_path[i]; // current validated key
+
+                if(i==overwrite_path.length-1){ // if last element, then set the real value
+                    if(change._mode && change._mode=="push"){
+                        // if mode is push, create a new array, or push the vale to the array
+                        currentDepthObject[curKey] = (currentDepthObject[curKey] || []).concat(newValue);
+                    }else { //otherwise just overwrite the current value
+                        currentDepthObject[curKey] = newValue;
+                    }
+                    break; // break, value is set
+                }else if(!currentDepthObject[curKey]){      // if object does not exist,
+                    currentDepthObject[curKey]={};          // then create it
+                }
+                currentDepthObject=currentDepthObject[curKey];  // and set as new depth object
+            }
+
+        }
+    }
+
 
 
     /**

@@ -218,6 +218,11 @@ class EntityServerManager extends EventEmitter3 {
             return;
         }
 
+        if(this.gameEntities[entity.ID]){
+            console.log("addEntities: enitty already added!");
+            return;
+        }
+
         this.gameEntities[entity.ID] = entity;
         World.add(this.engine.world,entity.body);
         entity.isAddedToWorld = true;
@@ -592,11 +597,26 @@ class EntityServerManager extends EventEmitter3 {
         var turned = curEntity.turn(surface);
 
         if(turned) {    //TODO: nach oben bringen?
-            this.updateQueue.postUpdate(
+          /*  this.updateQueue.postUpdate(
                 Packages.PROTOCOL.GAME_STATE.ENTITY.SERVER_TURN_ENTITY,
                 entityID,
                 {surfaceIndex: curEntity.surfaceIndex}
+            );*/
+
+            this.updateQueue.postUpdate(
+                Packages.PROTOCOL.GAME_STATE.ENTITY.SERVER_ENTITY_VALUE_CHANGED,
+                entityID,
+                {
+                    changes:[
+                        {
+                            keyPath:"surfaceIndex",
+                            value:curEntity.surfaceIndex
+                        }
+                    ],
+                    _mode:"push"
+                }
             );
+
         }
     }
 
@@ -608,7 +628,7 @@ class EntityServerManager extends EventEmitter3 {
 
         for(var i =0; i<data.stackPairs.length;i++){
             var currentPair = data.stackPairs[i];
-            this.stackEntities(userID,currentPair.sourceID,currentPair.targetID);
+            this.stackEntities(userID,currentPair.sourceID,currentPair.targetID,true);
         }
     }
 
@@ -625,8 +645,9 @@ class EntityServerManager extends EventEmitter3 {
      * @param userID user who wants to stack
      * @param sourceID entity he drags
      * @param targetID entiy on which he tracks the source entity
+     * @param send {boolean} if true, the changes are broadcasted to the users
      */
-    stackEntities(userID,sourceID,targetID){
+    stackEntities(userID,sourceID,targetID,send){
         if(!userID || userID.length <=0){
             console.log("stackEntities: no userID passed!");
             return;
@@ -636,158 +657,87 @@ class EntityServerManager extends EventEmitter3 {
             console.log("stackEntities: user does not exist!",userID);
         }
 
-        if(!sourceID){
-            console.log("stackEntities: no source entity id passed!",sourceID);
-            return;
-        }
-
-        if(!this.bodies[sourceID]){
+        if(!sourceID || !this.gameEntities[sourceID]){
             console.log("stackEntities: source entity",sourceID,"does not exist!");
             return;
         }
 
-        if(!this.entities[sourceID].isStackable){
-            console.log("stackEntities: source entity",sourceID,"is not stackable!");
-            return;
-        }
-
-        if(!targetID){
-            console.log("stackEntities: no target entity id passed!",targetID);
-            return;
-        }
-
-        if(!this.bodies[targetID]){
+        if(!targetID || !this.gameEntities[targetID]){
             console.log("stackEntities: target entity",targetID,"does not exist!");
             return;
         }
 
-        if(!this.entities[targetID].isStackable){
-            console.log("stackEntities: target entity",targetID,"is not stackable!");
-            return;
-        }
-
-        if(this.entities[targetID].type != this.entities[targetID].type){
+        if(this.gameEntities[targetID].type != this.gameEntities[targetID].type){
             console.log("stackEntities: target and source entity are not both of the same type!",this.entities[targetID].type,"and",this.entities[targetID].type);
             return;
         }
 
-        if(this.bodies[sourceID].claimedBy != userID){
-            console.log("stackEntities: source entity",sourceID,"not claimed by user",userID,"rotation aborted");
+        if(this.gameEntities[sourceID].claimedBy != userID){
+            console.log("stackEntities: source entity",sourceID,"not claimed by user",userID,"stacking not possible");
             return;
         }
 
-        if(this.bodies[targetID].claimedBy){
+        if(this.gameEntities[targetID].claimedBy){
             console.log("stackEntities: target entity",sourceID," already claimed by a user - stacking not possible");
             return;
         }
 
         // actual code
-        var targetEntity = this.entities[targetID];
-        var sourceEntity = this.entities[sourceID];
-        delete sourceEntity.position;               // delete unnecessary states
-        delete sourceEntity.rotation;               // they will be recreated later
-        delete sourceEntity.state;                  // when the entity gets unstacked
-        delete sourceEntity.id;                     // it will receive a new id, when unstacked
+        var targetEntity = this.gameEntities[targetID];
+        var sourceEntity = this.gameEntities[sourceID];
 
-        var targetStack = this._convertEntityToStack(targetEntity);
+        //TODO muss man doch schaun ob entity oder stack
+        var wasStack = targetEntity.isStack;
+        var targetStack;
+        if(wasStack){
+            targetStack = targetEntity;
+        }else{
+            // create new stack out of entity
+            targetStack = new ServerEntityStack(targetEntity);
+            this.removeEntity(targetID,true);     // remove the entity from the game, because it is now in the stack
+        }
+
 
         // merge the source entity/stack with the new stack
         // if the source entity was a stack, take its content, otherwise concat the entity itself to the new stack
-        targetStack.content = targetStack.content.concat(
-            (sourceEntity.isStack && sourceEntity.content)
-                ? sourceEntity.content
-                : sourceEntity);
+        targetStack.pushContent(sourceEntity);
 
         // first, release the source entity, because it will be deleted on the client
         this.releaseEntities(userID,sourceID);
-
-/*
-        for(var i=0;i< targetStack.content.length;i++){
-            console.log(targetStack.content[i].surfaces[0].texture);
-        }*/
-
         this.removeEntity(sourceID,true);    // remove the entity, because it is now also in the stack
-        this.removeEntity(targetID,true);     // remove the entity from the game, because it is now in the stack
-        // finaly add the new stack to the entity manager, and send it (done with the addEntities function)
-        this.addEntity(targetStack,true);
-    }
 
-    /**
-     * creates a new stack, based on position and rotation of the passed entity,
-     * if the entity is a stack, its content is also used, otherwise the passed entity is added as content.
-     * Basically it converts the passed entity to a stack at the same position of the entity.
-     *
-     * IMPORTANT: the passed entity should be removed before or after creating the stack!
-     *
-     * NOTE: first element of the stack array is always on the bottom,
-     *      last element is always on the top
-     *
-     * @param targetEntity
-     * @param sendDeleteMessage {boolean} if it is true, the delete signal of the old entity will be broadcasted to the clients
-     * @returns {{position: {x: *, y: *}, rotation: *, type: *, classification: *, isStackable: boolean, isTurnable: boolean, surfaceIndex: number, content: Array, surfaces}}
-     * @private
-     */
-    _convertEntityToStack(targetEntity){
-        if(!targetEntity){
-            console.log("_createStackFromEntity: no entity passed!");
-            return null;
-        }
-        var content = [];
-        if(targetEntity.isStack){ // if entity was already a stack, adapt the content
-            content = content.concat(targetEntity.content || []);
 
-            // if the stack was reversed, reverse the content to
-            if(targetEntity.surfaceIndex == 0){
-                content = content.reverse();
-                // also reverse all cards
-                for(var i=0;i< content.length;i++) {
-                    var currentCard = content[i];
-                    currentCard.surfaceIndex = Util.torusRange((currentCard.surfaceIndex + Math.round(currentCard.surfaces.length / 2)), 0, (currentCard.surfaces.length - 1));
-                }
-            }
-        }else{ // else add the entity itselfe as content
-            var c = Object.assign({},targetEntity); // copy entity and remove unnecessary data
-            delete c.content;   // just to be sure
-            delete c.rotation;  // needs no rotation, because it is inside of the stack
-            delete c.position;  // same for position
-            delete c.state;     // needs also no state
-            delete c.id;        // id will be recreated, once its unstacked
-            content = content.concat(c);
-        }
-                                                // this will als broadcasted to all clients
-        return {
-            isStack:true,
-            position:{x:targetEntity.position.x,y:targetEntity.position.y},
-            rotation:targetEntity.rotation,
-            width:targetEntity.width,
-            height:targetEntity.height,
-            type:targetEntity.type,
-            classification:targetEntity.classification,
-            isStackable:true,
-            isTurnable:true,
-            surfaceIndex:1,     // zero is bottom, 1 is up
-            content:content,
-            /**
-             * returns the top site of the top object
-             * and the complementary site of the bottom object
-             */
-            get surfaces(){
-                if(this.content.length <=0) return [];
 
-                var bottom = this.content[0];
-                var top = this.content[this.content.length-1];
+       if(wasStack){
+           // send content changed
 
-                var bottomIndex = bottom.surfaceIndex;
-                //  for bottom element, take the complementary surface to the visible surface,
-                // this means, add the half of the surface count to the current index and use torusRange,
-                // so the next element is the opposite
-                if(bottom.isTurnable) {     // just if it is turnable, else take the current surfaceIndex
-                    bottomIndex = Util.torusRange((bottom.surfaceIndex + Math.round(bottom.surfaces.length / 2)), 0, (bottom.surfaces.length - 1));
-                }
-                return [bottom.surfaces[bottomIndex], top.surfaces[top.surfaceIndex]];
-            }
+           if(send) {
 
-        };
+               var data={_mode:"push"};
+
+               this.updateQueue.postUpdate(
+                   Packages.PROTOCOL.GAME_STATE.ENTITY.SERVER_ENTITY_VALUE_CHANGED,
+                   targetStack.ID,
+                   {
+                       changes:[
+                           {
+                               keyPath:"surfaces",
+                               value:targetStack.surfaces
+                           },
+                           {
+                               keyPath:"surfaceIndex",
+                               value:targetStack.surfaceIndex
+                           }
+                       ],
+                       _mode:"push"
+                   }
+               );
+           }
+
+       }else {
+           // finaly add the new stack to the entity manager, and send it (done with the addEntities function)
+           this.addEntity(targetStack, true);
+       }
     }
 
     /**

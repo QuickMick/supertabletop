@@ -139,6 +139,11 @@ class EntityServerManager extends EventEmitter3 {
         Body.update_original(body, deltaTime, timeScale, correction);//.bind(Body);
         //after update
 
+        if(body.onInitOnce){
+            body.onInitOnce();
+            delete body.onInitOnce;
+        }
+
         var updateRequired = false;
         var data ={};
 
@@ -572,21 +577,40 @@ class EntityServerManager extends EventEmitter3 {
                 continue;
             }
 
-            var popped = stack.popContent();
+            var popped = stack.popContent();    // take content from stack
             if(popped){
-                var entity = new ServerEntity(popped);
+                var entity = new ServerEntity(popped);  // if it is not empty, create an entity from it
 
                 var PADDING = 10;
-
+/*
                 var randomPos= Util.randomPointOnCircle(
                     stack.position.x,
                     stack.position.y,
                     Util.pythagorean(stack.width/2,stack.height/2)*2 +PADDING
                 );
-
+                // and spawn it to a random position in the near
                 entity.position = randomPos;
                 entity.rotation = Util.randomRotation();
 
+                //TODO: oder lieber die positionen direkt setzen un dann nur am client lerpen?
+                */
+
+                // set the entity to the stack position
+                entity.position = {
+                    x:stack.position.x,
+                    y:stack.position.y
+                };
+
+                // create random movement and rotation, so the drawing looks a bit more fancy
+                Body.setVelocity(entity.body,Util.randomPointOnCircle(
+                    0,
+                    0,
+                    Util.pythagorean(stack.width/2,stack.height/2)/2
+                ));
+                Body.setAngularVelocity(entity.body,Util.randomRotation()/10);
+
+
+                // if it was the last element, remove the stack and add the last element also
                 if(stack.length == 1){
                     var last = new ServerEntity(stack.popContent());
                     last.position = {
@@ -619,8 +643,6 @@ class EntityServerManager extends EventEmitter3 {
                             _mode:"push"
                         }
                     );
-
-
                 }
             }
         }
@@ -685,8 +707,6 @@ class EntityServerManager extends EventEmitter3 {
                     changes:[
                         {
                             keyPath:"surfaceIndex",
-                            // if entity is stack, the server entity always has surfaceIndex1,
-                            // but client can have both, so after turn, the complementary side should be shown
                             value:curEntity.surfaceIndex
                         }
                     ],

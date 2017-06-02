@@ -8,6 +8,10 @@
 
 -surface index update bei turn von stackEntity ist etwas kagge, ist immer die 1 oben, aber wird am clienten nicht so geupdatet
 
+
+-gedraggtes entitiy muss immer on top sein --> vielelicht mit display index arbeiten?
+
+
 #done?# remove constraint, when removing entity
 #####################################################  TODOS  ##########################################################
 - table boundaries

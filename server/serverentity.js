@@ -225,6 +225,13 @@ class ServerEntity extends BaseEntityData{
         this._currentMode = "";
         this.setMode("default");    // set default mode
 
+      /*  this._body.isSensor=true;
+        this._body.onInitOnce = function () {
+            this._body.isSensor=false;
+            console.log("init");
+        }.bind(this);
+*/
+
         //------------------callbacks------------------------------------
 
         /**

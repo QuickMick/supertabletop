@@ -32,7 +32,7 @@ var Globals = require('./globals');
 
 
 
-const EVT_BEFORE_UPDATE = 'beforeUpdate';
+const EVT_BEFORE_UPDATE = 'afterUpdate';
 /*
  const DEFAULT_BODY_SIZE = 100;
 const CLAIMED_COLLISION_CATEGORY = 0x0002;
@@ -110,7 +110,7 @@ class EntityServerManager extends EventEmitter3 {
         // add before update event, so that all received updates from the clients
         // can be executed before an engine-step
         Matter.Events.on(this.engine,
-        'beforeUpdate', function () {
+        'afterUpdate', function () {
            this.emit(EVT_BEFORE_UPDATE);
         }.bind(this));
 
@@ -549,7 +549,6 @@ class EntityServerManager extends EventEmitter3 {
 
 
     batchDrawFromStack(userID, stackIDs){
-
         if(!stackIDs){
             console.log("batchDrawFromStack: no stack ids passed");
         }
@@ -577,34 +576,56 @@ class EntityServerManager extends EventEmitter3 {
             if(popped){
                 var entity = new ServerEntity(popped);
 
-                var PADDING = 40;
+                var PADDING = 10;
 
                 var randomPos= Util.randomPointOnCircle(
                     stack.position.x,
                     stack.position.y,
-                    Util.pythagorean(stack.width/2,stack.height/2)*2+PADDING
+                    Util.pythagorean(stack.width/2,stack.height/2)*2 +PADDING
                 );
 
-                entity.position.x = randomPos.x;
-                entity.position.y = randomPos.y;
+                entity.position = randomPos;
                 entity.rotation = Util.randomRotation();
 
-                this.addEntity(entity,true);
+
 
                 if(stack.length == 1){
                     var last = new ServerEntity(stack.popContent());
-                    last.position.x = stack.position.x;
-                    last.position.y = stack.position.y;
+                    last.position = {
+                        x: stack.position.x,
+                        y: stack.position.y
+                    };
+
                     last.rotation = stack.rotation;
 
                     this.removeEntity(stack.ID,true);
                     this.addEntity(last,true);
+                    this.addEntity(entity,true);    // add the new entity after the last, so it is on top of the last
+                }else{
+                    this.addEntity(entity,true);
+                    this.updateQueue.postUpdate(
+                        Packages.PROTOCOL.GAME_STATE.ENTITY.SERVER_ENTITY_VALUE_CHANGED,
+                        stack.ID,
+                        {
+                            changes:[
+                                {
+                                    keyPath:"surfaces",
+                                    value:stack.surfaces
+                                },
+                                {
+                                    keyPath:"surfaceIndex",
+                                    value:stack.surfaceIndex
+                                }
+                            ],
+                            _mode:"push"
+                        }
+                    );
+
+
                 }
             }
         }
     }
-
-
 
     /**
      * turn all entities to the passed side
@@ -749,8 +770,10 @@ class EntityServerManager extends EventEmitter3 {
             targetStack = targetEntity;
         }else{
             // create new stack out of entity
+
+            this.removeEntity(targetID,true);
             targetStack = new ServerEntityStack(targetEntity);
-            this.removeEntity(targetID,true);     // remove the entity from the game, because it is now in the stack
+           // remove the entity from the game, because it is now in the stack
         }
 
 
@@ -761,8 +784,6 @@ class EntityServerManager extends EventEmitter3 {
         // first, release the source entity, because it will be deleted on the client
         this.releaseEntities(userID,sourceID);
         this.removeEntity(sourceID,true);    // remove the entity, because it is now also in the stack
-
-
 
        if(wasStack){
            // send content changed

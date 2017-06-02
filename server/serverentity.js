@@ -264,9 +264,33 @@ class ServerEntity extends BaseEntityData{
         return this._currentMode;
     }
 
-    get position(){
-        return this._body.position;
+    /**
+     * read only, do not try to overwrite, becuase it changes the velocity of the body
+     * @returns {{x, y}}
+     */
+    get position() {
+        var p = (this._body || {}).position || {};
+        return {
+            get x() {
+                return p.x || 0;
+            },
+            get y() {
+                return p.y || 0;
+            }
+        }
     }
+
+    /**
+     *
+     * @param {{x, y}}
+     */
+    set position(v){
+        Body.setPosition(this._body, {
+            x: v.x || 0,
+            y: v.y || 0
+        });
+    }
+
 
     get claimedBy(){
         return this._state.claimedBy || "";
@@ -512,18 +536,22 @@ class ServerEntityStack extends ServerEntity{
 
         // create the stack data based on the last entity in its content (because the last is on top)
 
-        var stackData = content[content.length-1].toJSON();
+        var stackData = content[0].toJSON();
         stackData.surfaceIndex = 1;// instanceData.surfaceIndex || 0;
         stackData.isTurnable = true;
         stackData.isStackable = true;
+
+        var base = instanceData.content[0];
+        stackData.position ={
+            x:(instanceData.position || base.position || {}).x || 0,
+            y:(instanceData.position || base.position || {}).y || 0
+        };
 
         // create the stack with the values of the last element
         super(stackData);   // no library needed, becuase the entity already exists
 
 
-        var base = instanceData.content[content.length-1];
-        this.position.x = (instanceData.position || base.position || {}).x || 0;
-        this.position.y = (instanceData.position || base.position || {}).y || 0;
+
 
         this.rotation = instanceData.rotation || base.rotation || 0;
 
@@ -560,7 +588,6 @@ class ServerEntityStack extends ServerEntity{
         this.onStackSplit = null;
     }
 
-
     get isEmpty(){
         return this.content.length <=0;
     }
@@ -584,6 +611,7 @@ class ServerEntityStack extends ServerEntity{
     get isStackable(){
         return true
     }
+
     set isStackable(v){} //immutable
 
     // surfaces is also replaced by a setter which returns the
@@ -603,6 +631,7 @@ class ServerEntityStack extends ServerEntity{
         }
         return [bottom.surfaces[bottomIndex], top.surfaces[top.surfaceIndex]];
     }
+
     set surfaces(v){} //immutable
 
     /**

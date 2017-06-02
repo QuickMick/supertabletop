@@ -122,13 +122,13 @@ describe("Entities for server:", function(){
 
             var e = new Entity.ServerEntity(testGame.unstacked[0],testGame.object_def);
             e.rotation=1.2;
-
+            e.position.x=300;
+            e.position.y=400;
 
             var stack = new Entity.ServerEntityStack({content:e});
 
-
-            assert.equal(stack.position.x,200);
-            assert.equal(stack.position.y,100);
+            assert.equal(stack.position.x,300);
+            assert.equal(stack.position.y,400);
 
             assert.equal(stack.width,e.width);
             assert.equal(stack.height,e.height);
@@ -136,8 +136,8 @@ describe("Entities for server:", function(){
 
             e.rotation=1.3;
             stack = new Entity.ServerEntityStack({content:[e]});
-            assert.equal(stack.position.x,200);
-            assert.equal(stack.position.y,100);
+            assert.equal(stack.position.x,300);
+            assert.equal(stack.position.y,400);
 
             assert.equal(stack.width,e.width);
             assert.equal(stack.height,e.height);
@@ -247,6 +247,9 @@ describe("Entities for server:", function(){
             assert.equal(stack.content[3].surfaces[0].texture,"c1.png");
             assert.equal(stack.content[4].surfaces[0].texture,"c1.png");
             assert.equal(stack.content[5].surfaces[0].texture,"c2.png");
+
+            assert.equal(stack.position.x,testGame.stacks[0].position.x);
+            assert.equal(stack.position.y,testGame.stacks[0].position.y);
         });
 
         it('stack should have correct content after pushing turned stack', function() {

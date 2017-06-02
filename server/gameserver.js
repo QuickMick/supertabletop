@@ -20,7 +20,7 @@ class GameServer{
         this.clientManager = new ClientManager();
         this.updateQueue =  new UpdateQueue();
         this.entityServerManager = new EntityServerManager(60,this.updateQueue,this.clientManager,this);
-        this.entityServerManager.on('beforeUpdate',this._processReceivedUpdateQueue.bind(this));
+        this.entityServerManager.on('afterUpdate',this._processReceivedUpdateQueue.bind(this));
 
         /**
          * all updates, which are received by the clients are stored in this array

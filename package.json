@@ -6,7 +6,8 @@
     "start": "node ./bin/www",
     "watch-js": "cmd /k watchify public/javascripts/main.js -o public/js/game.js -v -d",
     "editor-watch-js": "cmd /k watchify editor/editormain.js -o public/js/editor.js -v -d",
-    "test": "mocha"
+    "test": "mocha",
+    "debug":"node --inspect --debug-brk ./bin/www"
   },
   "devDependencies": {
     "mocha":"*",

@@ -6,6 +6,7 @@
 -bild anfangs leicht verzerrt
 -wenn entity geklickt wurde, dann is immernoch mouseover drauf, wenn man runtergeht aber immernoch hält, dann nemme
 
+-surface index update bei turn von stackEntity ist etwas kagge, ist immer die 1 oben, aber wird am clienten nicht so geupdatet
 
 #done?# remove constraint, when removing entity
 #####################################################  TODOS  ##########################################################
@@ -18,9 +19,7 @@ TODO: surfacechange als valuechange machn? und des nur dafür gedachte event rau
 functions:
 -rotate view
 -touch support --> evlt hammerjs benutzen https://www.npmjs.com/package/hammerjs
--stacks
-    -pop
-    TODO: wenn stapel bereits vorhanden, nur surfaces updaten
+
 -polygon shapes
 
 -hide card with button
@@ -28,7 +27,7 @@ functions:
 
 
 -refactor every dependency to context
--create server entity and server stack class --> think it is obsolete
+
 
 -vanish signal, when new game is loaded?
 
@@ -45,8 +44,11 @@ loader:
 -rotate card
 - human player mouse display -> playermanager, becuase he can change his cursor
 -client: player/entity smoothing
+-create server entity and server stack class
 
-
+-stacks
+    -pop
+    TODO: wenn stapel bereits vorhanden, nur surfaces updaten
 
 
 

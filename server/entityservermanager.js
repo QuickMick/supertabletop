@@ -587,8 +587,6 @@ class EntityServerManager extends EventEmitter3 {
                 entity.position = randomPos;
                 entity.rotation = Util.randomRotation();
 
-
-
                 if(stack.length == 1){
                     var last = new ServerEntity(stack.popContent());
                     last.position = {
@@ -603,6 +601,7 @@ class EntityServerManager extends EventEmitter3 {
                     this.addEntity(entity,true);    // add the new entity after the last, so it is on top of the last
                 }else{
                     this.addEntity(entity,true);
+
                     this.updateQueue.postUpdate(
                         Packages.PROTOCOL.GAME_STATE.ENTITY.SERVER_ENTITY_VALUE_CHANGED,
                         stack.ID,
@@ -679,7 +678,6 @@ class EntityServerManager extends EventEmitter3 {
                 entityID,
                 {surfaceIndex: curEntity.surfaceIndex}
             );*/
-
             this.updateQueue.postUpdate(
                 Packages.PROTOCOL.GAME_STATE.ENTITY.SERVER_ENTITY_VALUE_CHANGED,
                 entityID,
@@ -687,6 +685,8 @@ class EntityServerManager extends EventEmitter3 {
                     changes:[
                         {
                             keyPath:"surfaceIndex",
+                            // if entity is stack, the server entity always has surfaceIndex1,
+                            // but client can have both, so after turn, the complementary side should be shown
                             value:curEntity.surfaceIndex
                         }
                     ],

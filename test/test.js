@@ -110,8 +110,7 @@ describe("Entities for server:", function(){
         it('should take an ServerEntity as parameter and positionize the new stack on the right position', function() {
 
             var e = new Entity.ServerEntity(testGame.unstacked[0],testGame.object_def);
-            e.position.x = 200;
-            e.position.y = 333;
+            e.position = {x:200,y:333};
 
             var stack = new Entity.ServerEntityStack(e);
             assert.equal(stack.position.x,200);
@@ -122,8 +121,7 @@ describe("Entities for server:", function(){
 
             var e = new Entity.ServerEntity(testGame.unstacked[0],testGame.object_def);
             e.rotation=1.2;
-            e.position.x=300;
-            e.position.y=400;
+            e.position = {x:300,y:400};
 
             var stack = new Entity.ServerEntityStack({content:e});
 
@@ -271,5 +269,26 @@ describe("Entities for server:", function(){
 
         });
 
+        it('stack should have correct surfaces after popping', function() {
+            var stack = new Entity.ServerEntityStack(testGame.stacks[0],testGame.object_def);
+            assert.equal(stack.surfaces[1].texture,"c2.png");
+            stack.popContent();
+            assert.equal(stack.surfaces[1].texture,"c1.png");
+            stack.popContent();
+            assert.equal(stack.surfaces[1].texture,"c1.png");
+        });
+
+        it('stack should have correct surfaces after turning and popping', function() {
+            var stack = new Entity.ServerEntityStack(testGame.stacks[0],testGame.object_def);
+
+            stack.turn();
+
+            assert.equal(stack.surfaces[1].texture,"back.png");
+            stack.popContent();
+            assert.equal(stack.surfaces[1].texture,"back.png");
+            stack.popContent();
+            assert.equal(stack.surfaces[1].texture,"back.png");
+
+        });
     });
 });

@@ -668,16 +668,15 @@ class ServerEntityStack extends ServerEntity{
 
     /**
      * overrides entity, just next or index is accepted
-     * @param surface
      * @returns {boolean} true, if surfaceIndex has changed
      */
-    turn(surface="next") {
-        if (typeof surface != "number" && surface != "next") {
+    turn(surface) {
+     /*   if (typeof surface != "number" && surface != "next") {
             console.log("ServerEntityStack.turn: unable to turn entity, just index or next is allowed, not:",surface);
             return false;
-        }
+        }*/
 
-        var hasTurned = super.turn(surface);
+        var hasTurned = super.turn("next");
 
         // if the turn was sucessfull, turn the stacks content,
         // and turn the surfaces of the content also
@@ -688,7 +687,6 @@ class ServerEntityStack extends ServerEntity{
                 var currentCard = this.content[i];
                 currentCard.surfaceIndex = currentCard.complementarySide;
             }
-
         }
         return hasTurned;
     }
@@ -716,7 +714,7 @@ class ServerEntityStack extends ServerEntity{
             entity = entity.content;    // if entity is a stack, take its content
         }else if(entity instanceof ServerEntity){
             // else create new baseData entity (without id and position) from the ServerEntity
-            new BaseEntityData(entity.toJSON());
+           entity = new BaseEntityData(entity.toJSON());
         }else if(entity instanceof BaseEntityData){
            entity = new BaseEntityData(entity);
        }
@@ -771,6 +769,10 @@ class ServerEntityStack extends ServerEntity{
         // pop entity out of contnent -> last element of array is taken out of it
         // and passed to the entity constructor
         var entity = new ServerEntity(this.content.pop());
+
+        this.surfaceIndex = 1;  // reset the service index,
+                                // one means top is visible,
+                                // because the pushed card is now on top
 
         // fire onEntityPopped event
         if(this.onEntityPopped){

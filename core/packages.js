@@ -19,6 +19,12 @@ module.exports =
            SEND_STATE: "send_state",
            //SEND_CLIENT_SESSION:"send_client_session",
 
+
+           /**
+            * a client changes a value of himselfe, for example, the color
+            */
+           CLIENT_VALUE_UPDATE: "CLIENT_VALUE_UPDATE",
+
            /**
             * used to change configurations like the player color
             */
@@ -42,6 +48,12 @@ module.exports =
             * broadcasts public information about a newly connected client
             */
            CLIENT_CONNECTED: "CLIENT_CONNECTED",
+
+
+           /**
+            * a client changes a value of himselfe, for example, the color
+            */
+           CLIENT_VALUE_UPDATE: "CLIENT_VALUE_UPDATE",
 
            /**
             * broadcasts that one client has disconnected

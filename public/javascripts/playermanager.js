@@ -102,6 +102,28 @@ class PlayerManager extends PIXI.Container {
     }
 
     /**
+     * updates a value of a player
+     * @param evt
+     */
+    updatePlayerValue(id,key,value){
+        if(!this.players[id]){
+            console.log("updatePlayerValue: player not found",id);
+            return;
+        }
+
+        if(!key){
+            console.log("updatePlayerValue: no key passed");
+            return;
+        }
+
+        switch(key){
+            case "color":
+                this.players[id].tint = value;
+                return;
+        }
+    }
+
+    /**
      * changes the displayed image of a player
      * @param id of the player
      * @param cursor_type new cursortype

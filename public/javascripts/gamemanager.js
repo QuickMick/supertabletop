@@ -21,6 +21,8 @@ var InputHandler = require('./inputhandler');
 var ToolManager = require('./toolmanager');
 var CursorManager = require('./cursormanager');
 
+var ColorChooser = require('./colorchooser');
+
 const RELATIVE_PATH = "./../";
 
 /**
@@ -53,6 +55,14 @@ class GameManager extends EventEmitter3{
         this.entityManager = new EntityManager(this.lerpManager,this.cursorManager);
         this.playerManager = new PlayerManager(this.lerpManager,this.cursorManager,this.inputHandler,this.gameTable);
         this.synchronizer = new Synchronizer(this);     // initialize socket-connection/synchronizer
+
+
+        /**
+         * if player has no color, this will have a value
+         * showColorChooser() and hideColorChooser() are depending on this value
+         * @type {null}
+         */
+        this.colorChooser = null;
 
        /* this.gameTable.min_zoom = Config.ZOOM.MIN;
         this.gameTable.max_zoom = Config.ZOOM.MAX;
@@ -101,6 +111,16 @@ class GameManager extends EventEmitter3{
 
         PIXI.loader.game_resource_path = game_resource_path; // TODO: muss ins contex/loader object
 
+        // if a table is set, load the texture if available
+        if(!game.DEFAULT_GAME && game.table && game.table.texture){
+            PIXI.loader.add(
+                {
+                    name:Path.join(game_resource_path,game.table.texture),
+                    url: Path.join(RELATIVE_PATH,Config.PATHS.USERS_RESOURCES,game_resource_path,game.table.texture)
+                }
+            );
+        }
+
         //TODO: create a new loader for each new game -> when context refactoring
         //TODO: load shown textures first
         for(let i in game.resources){
@@ -116,8 +136,8 @@ class GameManager extends EventEmitter3{
         }
 
         // set the snappoints to the toolmanager
-        this.toolManager.snapZones = game.snapzones || [];
-
+        // the player seats are also snapzones
+        this.toolManager.snapZones = (game.snapzones || []).concat((game.table || {}).seats || []);
         // generate uniq ids for the snapzones if there is no id available
         var snapZoneIdCache = new Set();
         for(var i=0;i<this.toolManager.snapZones.length;i++){
@@ -141,19 +161,22 @@ class GameManager extends EventEmitter3{
         // create entities based on the loaded data and add them to the gamemanager
         for(let i=0; i< game.entities.length;i++) {
             game.entities[i].game_resource_path = game_resource_path;
-     //       var newEntity =new Entity(game.entities[i]);
-          //  newEntityList.push(newEntity);
-        //    this.entityManager.addEntities(newEntity);
         }
+
+         // just set the path if it is not the default game
+        // and if table exists
+        (game.table || {}).game_resource_path = game.DEFAULT_GAME? "" : game_resource_path;
+
 
         newEntityList = this.entityManager.batchCreateEntities(game.entities);
 
         // set first table with default texture
-        this.gameTable.setTable(
+       /* this.gameTable.setTable(
             game.table.width,
             game.table.height,
             PIXI.loader.resources[Resources.default.content.table.texture].texture
-        );
+        );*/
+        this.gameTable.setTable(game.table);          // if table is given in the game.json, then set it as new table
 
         // gamedata is available, hide loading screen
         window.hideLoadingDialog();
@@ -162,21 +185,18 @@ class GameManager extends EventEmitter3{
         // once the gfx is loaded, force every entity, to show its real texture instead of the placeholder
         PIXI.loader.once('complete', function (loader, resources) {
              // once all textures are loaded, then set table with real texture
-            this.gameTable.setTable(
+          /*  this.gameTable.setTable(
                 game.table.width,
                 game.table.height,
                 PIXI.loader.resources[game.table.texture].texture
             );
-
+*/
             // set the loaded grafix to the entities
             for (let i = 0; i < newEntityList.length; i++) {
                 var c = newEntityList[i];
                 c.surfaceIndex = c.surfaceIndex;
             }
-
-            // if table is given in the game.json, then set it as new table
-            var table_texture = Path.join(game_resource_path, game.table.texture);
-            if (game.table && game.table.width
+            /*if (game.table && game.table.width
                 && game.table.height && game.table.texture
                 && PIXI.loader.resources[table_texture]
                 && PIXI.loader.resources[table_texture].texture) {
@@ -185,7 +205,10 @@ class GameManager extends EventEmitter3{
                     game.table.height,
                     PIXI.loader.resources[table_texture].texture
                 );
-            }
+            }*/
+            this.gameTable.setTable(game.table);    // sets the table of the game, or the default table
+                                                    // if no table available in the game
+
         }.bind(this)).load();
     }
 
@@ -194,6 +217,9 @@ class GameManager extends EventEmitter3{
         var d = elapsed/1000;
         this.toolManager.update(d);   //TODO: pass real delta time - weis net was passiert wenn ichs mach
         this.lerpManager.update(d);
+
+        if(this.colorChooser)
+            this.colorChooser.update(d);
     }
 
     initEasterEggs(){
@@ -217,6 +243,21 @@ class GameManager extends EventEmitter3{
         document.getYourShitTogether = function () {
             this.stage.filters = null;
         }.bind(this.app);
+    }
+
+
+    showColorChooser(){
+        this.colorChooser = new ColorChooser(this.gameTable,this.synchronizer);
+        this.gameTable.addChild(this.colorChooser);
+
+        this.colorChooser.on('colorselected',this.hideColorChooser.bind(this));
+    }
+
+    hideColorChooser(){
+        if(this.colorChooser && this.colorChooser.parent) {
+            this.colorChooser.parent.removeChild(this.colorChooser);
+            this.colorChooser = null;
+        }
     }
 }
 

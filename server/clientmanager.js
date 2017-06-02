@@ -3,6 +3,8 @@
  */
 'use strict';
 
+const Util = require('./../core/util');
+
 class Client{
     constructor(socket,clientInfo){
 
@@ -61,6 +63,10 @@ class ClientManager{
         return (id && this.clients[id]);
     }
 
+    isClientReady(id){
+        return this.clients[id].color || this.clients.color == 0;
+    }
+
     /**
      * @param id
      * @returns {Client} the client instance corresponding to the id
@@ -71,6 +77,16 @@ class ClientManager{
             return null;
         }
         return this.clients[id];
+    }
+
+    /**
+     * updates the color of an client
+     * @param id
+     * @param color
+     */
+    updateClientColor(id,color){
+        console.log("updated client color from",id," color:",color);
+        this.clients[id].color = Util.parseColor(color);
     }
 
     /**

@@ -153,8 +153,12 @@ class LerpManager {
 
                 // if lerp has reached end, prevent from further processing
                 // by deleting it from the queue
-                if(percent >=1){
+                if(percent >=1 || cur.aborted){
                     this.abortLerp(objectID,label);
+                    // fire on finished event
+                    if(cur.onFinished){
+                        cur.onFinished(cur,cur.aborted);
+                    }
                 }
             }
         }

@@ -1,3 +1,13 @@
 {
-  "default_cursor":"0xc6c6c6"
+  "default_cursor":"0xc6c6c6",
+  "PLAYERS_COLORS":[
+    "0xff3a3a",
+    "0xff8e4c",
+    "0xf5ff44",
+    "0xaeff5e",
+    "0x63ffea",
+    "0x6066ff",
+    "0xa359ff",
+    "0xff3fd5"
+  ]
 }

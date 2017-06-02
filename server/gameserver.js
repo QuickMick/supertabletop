@@ -73,6 +73,25 @@ class GameServer{
     _onConnectionReceived(socket) {
         this._initClient(socket);
 
+        socket.on(Packages.PROTOCOL.CLIENT.CLIENT_VALUE_UPDATE, function (evt) {
+
+            var valid = this._processClientValueUpdates(evt);
+            if(valid) {
+                this._boradcastExceptSender(
+                    socket,
+                    Packages.PROTOCOL.SERVER.CLIENT_VALUE_UPDATE,
+                    Packages.createEvent(
+                        this.ID,
+                        {
+                            clientID: evt.senderID,
+                            key: evt.data.key,
+                            value: evt.data.value
+                        }
+                    )
+                );
+            }
+        }.bind(this));
+
         //removes this client from the serverclient list and broadcasts the information to all remaining clients
         socket.on('disconnect', function (data) {
             this.entityServerManager.releaseAllContraintsForUser(socket.id);
@@ -95,6 +114,27 @@ class GameServer{
     }
 
     /**
+     *
+     * @returns {boolean} true, if accepted
+     * @private
+     */
+    _processClientValueUpdates(evt){
+        console.log(evt);
+        if(!this.clientManager.doesClientExist(evt.senderID)){
+            console.log("_processClientValueUpdates: client",evt.senderID,"does not exist!");
+            return false;
+        }
+
+        switch (evt.data.key){
+            case "color":
+                this.clientManager.updateClientColor(evt.senderID,evt.data.value);
+                return true;
+        }
+
+        return false;
+    }
+
+    /**
      * process the posted updates of all players
      * @param data
      * @private
@@ -107,6 +147,11 @@ class GameServer{
 
                 if(!this.clientManager.doesClientExist(id)){
                     console.log("_processUpdates: user does not exist!");
+                    continue;
+                }
+
+                if(!this.clientManager.isClientReady(id)){
+                    console.log("_processUpdates: client",id,"is not ready");
                     continue;
                 }
 
@@ -163,8 +208,8 @@ class GameServer{
         // TODO: load clientinfo from database
         var clientInfo = {
             name:"ranz",
-            cursor:"default",
-            color:Util.getRandomColor()
+            cursor:"default"/*,
+            color:Util.getRandomColor()*/
         };
 
         // connect client to this server

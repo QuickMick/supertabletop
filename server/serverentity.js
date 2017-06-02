@@ -281,8 +281,8 @@ class ServerEntity extends BaseEntityData{
     }
 
     /**
-     *
-     * @param {{x, y}}
+     *sets the position of an enitty
+     * @param v {{x, y}}
      */
     set position(v){
         Body.setPosition(this._body, {

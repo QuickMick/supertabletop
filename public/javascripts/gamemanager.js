@@ -21,7 +21,7 @@ var InputHandler = require('./inputhandler');
 var ToolManager = require('./toolmanager');
 var CursorManager = require('./cursormanager');
 
-var ColorChooser = require('./colorchooser');
+var SeatChooser = require('./seatchooser');
 
 const RELATIVE_PATH = "./../";
 
@@ -62,7 +62,9 @@ class GameManager extends EventEmitter3{
          * showColorChooser() and hideColorChooser() are depending on this value
          * @type {null}
          */
-        this.colorChooser = null;
+        this.seatChooser = null;
+
+        this.playerManager.on('playerindexchanged',this.hideSeatChooser.bind(this));
 
        /* this.gameTable.min_zoom = Config.ZOOM.MIN;
         this.gameTable.max_zoom = Config.ZOOM.MAX;
@@ -218,8 +220,8 @@ class GameManager extends EventEmitter3{
         this.toolManager.update(d);   //TODO: pass real delta time - weis net was passiert wenn ichs mach
         this.lerpManager.update(d);
 
-        if(this.colorChooser)
-            this.colorChooser.update(d);
+        if(this.seatChooser)
+            this.seatChooser.update(d);
     }
 
     initEasterEggs(){
@@ -246,18 +248,34 @@ class GameManager extends EventEmitter3{
     }
 
 
-    showColorChooser(){
-        this.colorChooser = new ColorChooser(this.gameTable,this.synchronizer);
-        this.gameTable.addChild(this.colorChooser);
+    showSeatChooser(){
+        this.seatChooser = new SeatChooser(this.gameTable,this.synchronizer,this.playerManager.getAssignments());
 
-        this.colorChooser.on('colorselected',this.hideColorChooser.bind(this));
+       // this.playerManager.on('colorchanged',this.seatChooser.onColorChanged);
+        this.playerManager.on('playerindexchanged',this.seatChooser.onPlayerIndexChanged.bind(this.seatChooser));
+        this.playerManager.on('playerdisconnected',this.seatChooser.onPlayerDisconnected.bind(this.seatChooser));
+        this.gameTable.addChild(this.seatChooser);
+
+    //    this.seatChooser.on('colorselected',this.hideColorChooser.bind(this));
     }
 
-    hideColorChooser(){
-        if(this.colorChooser && this.colorChooser.parent) {
-            this.colorChooser.parent.removeChild(this.colorChooser);
-            this.colorChooser = null;
-        }
+    hideSeatChooser(evt){
+        if(!this.seatChooser || !this.seatChooser.parent) return;
+
+            /*{
+                player:this.players[id],
+                    oldPlayerIndex:old,
+                newPlayerIndex:value
+            }*/
+            if(!evt.player.isCurrentPlayer) return; // if change does not affect human player, dont hide
+            if(evt.newPlayerIndex < 0) return;  // if seat still not selected, dont hide
+
+          //  this.playerManager.removeListener('colorchanged',this.seatChooser.onColorChanged);
+            this.playerManager.removeListener('playerindexchanged',this.seatChooser.onPlayerIndexChanged.bind(this.seatChooser));
+
+            this.seatChooser.parent.removeChild(this.seatChooser);
+            this.seatChooser = null;
+
     }
 }
 

@@ -216,6 +216,51 @@
           "y": 10
         }
       }
+    },
+    {
+      "type": "stone",
+      "overwrite": {
+        "position": {
+          "x": 70,
+          "y": 10
+        }
+      }
+    },
+    {
+      "type": "stone",
+      "overwrite": {
+        "position": {
+          "x": 70,
+          "y": 10
+        }
+      }
+    },
+    {
+      "type": "stone",
+      "overwrite": {
+        "position": {
+          "x": 70,
+          "y": 10
+        }
+      }
+    },
+    {
+      "type": "stone",
+      "overwrite": {
+        "position": {
+          "x": 70,
+          "y": 10
+        }
+      }
+    },
+    {
+      "type": "stone",
+      "overwrite": {
+        "position": {
+          "x": 70,
+          "y": 10
+        }
+      }
     }
   ]
 }

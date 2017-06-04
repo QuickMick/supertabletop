@@ -117,9 +117,11 @@ class Synchronizer{
             this.CLIENT_INFO = evt.data.clientInfo;
             console.log("Clientdata received");
             this.playerManager.initCurrentPlayer(this.CLIENT_INFO);
-            if(!this.CLIENT_INFO.color){
-                this.gameManager.showColorChooser();
+
+            if(this.CLIENT_INFO.playerIndex <0 || this.CLIENT_INFO.color <0){
+                this.gameManager.showSeatChooser();
             }
+
             this.connectedServerID = evt.data.serverID;
             this._startUpdating();
             window.hideLoadingDialog();
@@ -152,7 +154,7 @@ class Synchronizer{
 
         // a value of a client/player has changed
         this.socket.on(Packages.PROTOCOL.SERVER.CLIENT_VALUE_UPDATE, function (evt) {
-            this.playerManager.updatePlayerValue(evt.data.clientID,evt.data.key,evt.data.value);
+            this.playerManager.updatePlayerValue(evt.data.clientID,evt.data.changes);
         }.bind(this));
     }
 
@@ -162,16 +164,16 @@ class Synchronizer{
 
     /**
      * sends a message to the server which means, that one value of this client has changed
-     * @param key e.g. "color"
-     * @param value e.g. 0xFFFFFF
+     * key e.g. "color"
+     * value e.g. 0xFFFFFF
+     * @param {[{key,value}]}
      */
-    sendPlayerUpdate(key,value){
-        this.sendMessage(Packages.PROTOCOL.CLIENT.CLIENT_VALUE_UPDATE,Packages.createEvent(
-            this.CLIENT_INFO.id,
-            {
-                key:key,
-                value:value
-            })
+    sendPlayerUpdate(data){
+        this.sendMessage(Packages.PROTOCOL.CLIENT.CLIENT_VALUE_UPDATE,
+            Packages.createEvent(
+                this.CLIENT_INFO.id,
+                data
+            )
         );
     }
 

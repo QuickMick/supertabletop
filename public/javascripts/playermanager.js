@@ -5,9 +5,14 @@
 require('pixi.js');
 var Util = require("./../../core/util");
 const Ticks = require('./../../core/ticks.json');
+const Packages = require('./../../core/packages');
 
 var CursorLibrary = require('./../resources/resources.json').cursors.content;
-var ColorLibrary = require('./../resources/colors.json');
+
+
+var EVT_COLOR_CHANGES='colorchanged';
+var EVT_PLAYER_INDEX_CHANGED='playerindexchanged';
+var EVT_PLAYER_DISCONNECTED ='playerdisconnected';
 
 /**
  * Inherites PIXI.Container,
@@ -40,6 +45,28 @@ class PlayerManager extends PIXI.Container {
 
         this.gameTable = gameTable;
         inputHandler.on("rawmousemove",this._processPlayerInput.bind(this));*/
+
+
+        /**
+         * contains the player assignedPlayerIndexes aka seats, false means,
+         * the seat is free, otherwise the id of the player will be put in the cell,
+         * if an ID is in an array cell instead of "false" this means, the seat was taken by a user
+         * @type {boolean[]}
+         */
+        this.assignedPlayerIndexes=[];
+        for(var i=0; i< Ticks.MAX_PLAYERS;i++){
+            this.assignedPlayerIndexes.push(false);
+        }
+
+
+        this.assignedColors = {};
+    }
+
+    getAssignments(){
+        return{
+            indexes:this.assignedPlayerIndexes,
+            colors:this.assignedColors
+        }
     }
 
     /**
@@ -69,6 +96,14 @@ class PlayerManager extends PIXI.Container {
             // set the anchor of the the cursor, depending on the texture defined in the json file
             this.players[player_data.id].anchor.x = cursor.anchor.x || 0;
             this.players[player_data.id].anchor.y = cursor.anchor.y || 0;
+            this.players[player_data.id].playerIndex = player_data.playerIndex;
+            this.players[player_data.id].PLAYER_ID = player_data.id;
+
+            // assing the seat, if player already has chosen one
+            if(player_data.playerIndex >=0){
+                this.assignedPlayerIndexes[player_data.playerIndex] = player_data.id;
+            }
+
 
             //set the initial position of the player
             if (player_data.position) {
@@ -80,7 +115,11 @@ class PlayerManager extends PIXI.Container {
             if (player_data.color) {
                 /* var color = parseInt(player_data.color.replace("#", "0x"));
                  color = !Number.isNaN(color)?color: parseInt(ColorLibrary.default_cursor);*/
-                this.players[player_data.id].tint = Util.parseColor(player_data.color);
+                var color = Util.parseColor(player_data.color);
+                this.players[player_data.id].tint = color;
+
+                // assign color, if player has already chosen one
+                this.assignedColors[color] = player_data.id;
             }
 
             // finaly add the cursor to this container
@@ -105,21 +144,70 @@ class PlayerManager extends PIXI.Container {
      * updates a value of a player
      * @param evt
      */
-    updatePlayerValue(id,key,value){
+    updatePlayerValue(id,changes){
+
+        if(!changes || changes.length <= 0){
+            console.log("no changes passed!");
+            return;
+        }
+
         if(!this.players[id]){
             console.log("updatePlayerValue: player not found",id);
             return;
         }
+        for(var i=0; i<changes.length;i++){
+            var key = changes[i].key;
+            var value = changes[i].value;
 
-        if(!key){
-            console.log("updatePlayerValue: no key passed");
-            return;
-        }
-
-        switch(key){
-            case "color":
-                this.players[id].tint = value;
+            if(!key){
+                console.log("updatePlayerValue: no key passed");
                 return;
+            }
+
+            switch(key){
+                case Packages.PROTOCOL.CLIENT_VALUE_UPDATE.COLOR:
+                    if(this.players[id].tint == value) return;  // return if there is no change
+
+                    var old = this.players[id].tint;
+                    var newColor =Util.parseColor(value);
+                    this.players[id].tint = value;
+
+                    this.assignedColors[newColor] = id;
+
+                    if(this.assignedColors[old]){
+                        delete this.assignedColors[old];
+                    }
+
+                    // emit color change event
+                    this.emit(EVT_COLOR_CHANGES,{
+                        player:this.players[id],
+                        oldColor:old,
+                        newColor:newColor
+                    });
+                    return;
+
+                case Packages.PROTOCOL.CLIENT_VALUE_UPDATE.PLAYER_INDEX:
+                    if(this.players[id].playerIndex == value) return;  // return if there is no change
+
+                    var old =this.players[id].playerIndex;
+                    this.players[id].playerIndex = value;
+
+                    // assign seat
+                    this.assignedPlayerIndexes[value] = id;
+
+                    //if seat was changed, releas old one
+                    if(old >=0){
+                        this.assignedPlayerIndexes[value] = false;
+                    }
+
+                    // emit index change event
+                    this.emit(EVT_PLAYER_INDEX_CHANGED,{
+                        player:this.players[id],
+                        oldPlayerIndex:old,
+                        newPlayerIndex:value
+                    });
+                    return;
+            }
         }
     }
 
@@ -174,9 +262,16 @@ class PlayerManager extends PIXI.Container {
         }
 
         this.removeChild(this.players[id]);
+
+        delete this.assignedColors[this.players[id].color];
+        delete this.assignedPlayerIndexes[this.players[id].playerIndex];
+
+        this.emit(EVT_PLAYER_DISCONNECTED,{id:id,player:this.players[id]});
         delete this.players[id];
 
         console.info(id,"disconnected");
+
+
     }
 
     /**
@@ -249,9 +344,7 @@ class PlayerManager extends PIXI.Container {
             interval: Math.min(timeSinceLastUpdate,Ticks.MAX_DELAY), //Ticks.SERVER_UPDATE_INTERVAL,
             minDiff:1
         });
-
     }
-
 }
 
 /**

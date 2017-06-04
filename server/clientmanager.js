@@ -4,6 +4,7 @@
 'use strict';
 
 const Util = require('./../core/util');
+const Ticks = require('./../core/ticks.json');
 
 class Client{
     constructor(socket,clientInfo){
@@ -16,6 +17,7 @@ class Client{
         this.name = clientInfo.name || "anonymous";
         this.cursor = clientInfo.cursor || "default";
         this.position = {x:0,y:0};
+        this.playerIndex =-1;
     }
 
     get ID(){
@@ -27,7 +29,8 @@ class Client{
             id:this.ID,
             name:this.name,
             color:this.color,
-            cursor:this.cursor
+            cursor:this.cursor,
+            playerIndex:this.playerIndex
         };
     }
 
@@ -36,10 +39,10 @@ class Client{
             id:this.ID,
             name:this.name,
             color:this.color,
-            cursor:this.cursor
+            cursor:this.cursor,
+            playerIndex:this.playerIndex
         };
     }
-
 }
 
 
@@ -48,7 +51,27 @@ class ClientManager{
     constructor(){
         this.clients = {};
         this.admin=null;
+
+        /**
+         * contains the player assignedPlayerIndexes aka seats, false means,
+         * the seat is free, otherwise the id of the player will be put in the cell,
+         * if an ID is in an array cell instead of "false" this means, the seat was taken by a user
+         * @type {boolean[]}
+         */
+        this.assignedPlayerIndexes= [];
+        for(var i=0; i< Ticks.MAX_PLAYERS;i++){
+            this.assignedPlayerIndexes.push(false);
+        }
+
+        this.assignedColors = {};
     }
+/*
+    getAssignments(){
+        return {
+            assignedPlayerIndexes: this.assignedPlayerIndexes,
+            assignedColors: this.assignedColors
+        }
+    }*/
 
     /**
      *  initializes this client on the server
@@ -57,6 +80,11 @@ class ClientManager{
      */
     _addClient(socket, clientInfo){
         this.clients[socket.id] = new Client(socket,clientInfo);
+
+        // assign prefered color to client
+        if(typeof clientInfo.color == 'number' && clientInfo >=0){
+            this.assignedColors[clientInfo.color] = socket.id;
+        }
     }
 
     doesClientExist(id){
@@ -64,7 +92,7 @@ class ClientManager{
     }
 
     isClientReady(id){
-        return this.clients[id].color || this.clients.color == 0;
+        return  this.clients[id].playerIndex >=0 && this.clients[id].color >=0;
     }
 
     /**
@@ -83,10 +111,49 @@ class ClientManager{
      * updates the color of an client
      * @param id
      * @param color
+     * @returns {boolean}
      */
     updateClientColor(id,color){
-        console.log("updated client color from",id," color:",color);
-        this.clients[id].color = Util.parseColor(color);
+        if(!this.doesClientExist(id)){
+            console.log("client",id,"does not exist");
+            return false;
+        }
+
+        var c =Util.parseColor(color);
+
+        if(this.assignedColors[c]){
+            console.log("color",c,"already chosen by",this.assignedColors[c],"cannot be chosen from",id);
+            return false;
+        }
+
+        console.log("updated client",id," color:",color);
+
+        this.clients[id].color = c;
+        this.assignedColors[c] = id;
+        return true;
+    }
+
+    /**
+     * updates the playerindex of a client (aka the seat)
+     * @param id
+     * @param index
+     * @returns {boolean}
+     */
+    updateClientIndex(id,index){
+        if(!this.doesClientExist(id)){
+            console.log("client",id,"does not exist");
+            return false;
+        }
+
+        if(this.assignedPlayerIndexes[index]){
+            console.log("seat",index,"already chosen by",this.assignedPlayerIndexes[index],"cannot be chosen from",id);
+            return false;
+        }
+
+        console.log("updated client",id,"player index index:",index);
+        this.clients[id].playerIndex = index;
+        this.assignedPlayerIndexes[index] = id; // seat is now taken
+        return true;
     }
 
     /**
@@ -123,6 +190,7 @@ class ClientManager{
 
         console.log("Connected: "+socket.id+" Users: "+Object.keys(this.clients).length);
 
+
         if(this.admin == null){
             this.admin = socket.id;
             console.log("Admin is now: "+this.admin);
@@ -134,9 +202,10 @@ class ClientManager{
 
         //this.boradcastExceptSender(clientSocket,Packages.PROTOCOL.SERVER.CLIENT_DISCONNECTED,{msg:"",data:{id:clientSocket.id}});
 
-        // remove client out of the list
+
         if (this.clients.hasOwnProperty(socket.id)) {
-            delete this.clients[socket.id];
+            this.assignedPlayerIndexes[this.clients[socket.id].playerIndex] = false;   // free the seat
+            delete this.clients[socket.id];                             // remove client out of the list
         }
 
         // change addmin

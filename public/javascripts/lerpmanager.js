@@ -12,6 +12,10 @@ class LerpManager {
         this._queue = {};
     }
 
+    getLerp(id){
+        return this._queue[id];
+    }
+
     /**
      * queues a lerp operation to the manager,
      * the operations are processed every frame.
@@ -153,11 +157,12 @@ class LerpManager {
 
                 // if lerp has reached end, prevent from further processing
                 // by deleting it from the queue
+
                 if(percent >=1 || cur.aborted){
                     this.abortLerp(objectID,label);
                     // fire on finished event
                     if(cur.onFinished){
-                        cur.onFinished(cur,cur.aborted);
+                        cur.onFinished({lerpTask:cur,wasAborted:cur.aborted});
                     }
                 }
             }

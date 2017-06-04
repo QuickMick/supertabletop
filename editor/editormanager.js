@@ -13,8 +13,6 @@ class EditorManager extends EventEmitter3{
     }
 
     start(){
-
-
         // close loding screen, when initialization is done.
         window.hideLoadingDialog();
     }

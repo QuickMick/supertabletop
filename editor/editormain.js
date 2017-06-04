@@ -54,7 +54,7 @@ window.onload = function() {
             var resource_path = Path.join(Config.PATHS.RESOURCE_BASE,folder,resource_name);
             PIXI.loader.add({
                 name: resource_name,
-                url: resource_path
+                url: resource_pathv
             });
         }
     }*/

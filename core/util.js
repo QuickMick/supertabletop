@@ -164,8 +164,49 @@ class Util {
         }
     }
 
+    /**
+     * returns points on a circle
+     * @param x center of the circle
+     * @param y centerof the circle
+     * @param radius radius of the circle
+     * @param resolution number of points
+     * @returns {[{x: *, y: *}]}
+     */
+    static pointsOfCircle(x=0, y=0, radius=1,resolution=1) {
+
+        var result = [];
+        var step = Math.PI*2 / resolution;
+
+        var cur=0;
+        for(var i=0;i<resolution;i++) {
+            result.push({
+                x: x + Math.cos(cur) * radius,
+                y: y + Math.sin(cur) * radius,
+            });
+
+            cur+=step;
+        }
+        return result;
+    }
+
     static pythagorean(a,b){
         return Math.sqrt((a*a)+(b*b));
+    }
+
+
+    /**
+     * Shuffles array in place. ES6 version
+     * @param {Array} a items The array containing the items.
+     */
+    static shuffleArray(a) {
+        var j, x, i;
+        for (i = a.length; i; i--) {
+            j = Math.floor(Math.random() * i);
+            x = a[i - 1];
+            a[i - 1] = a[j];
+            a[j] = x;
+        }
+        return a;
     }
 }
 

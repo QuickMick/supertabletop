@@ -11,6 +11,10 @@ module.exports =
         return {senderID:id,data:data || {},timeStamp:new Date().getTime()};
     },
     PROTOCOL: {
+        CLIENT_VALUE_UPDATE:{
+            COLOR:"color",
+            PLAYER_INDEX:"playerIndex"
+        },
        CLIENT: {
            /**
             * used to notify server about changes (position, rotation,...) of entityies

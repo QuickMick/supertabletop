@@ -20,7 +20,7 @@ TODO: surfacechange als valuechange machn? und des nur dafür gedachte event rau
 
 - claim rejected -> remove entity from user selection
     - prevent user from modifing card which he has not claimed
-
+TODO: snapzone -> rotation/orientation -> angle
 functions:
 -rotate view
 -touch support --> evlt hammerjs benutzen https://www.npmjs.com/package/hammerjs

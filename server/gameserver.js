@@ -74,18 +74,15 @@ class GameServer{
         this._initClient(socket);
 
         socket.on(Packages.PROTOCOL.CLIENT.CLIENT_VALUE_UPDATE, function (evt) {
-
             var valid = this._processClientValueUpdates(evt);
             if(valid) {
-                this._boradcastExceptSender(
-                    socket,
+                this._boradcast(    // if the change was valid, send everyone the new information
                     Packages.PROTOCOL.SERVER.CLIENT_VALUE_UPDATE,
                     Packages.createEvent(
                         this.ID,
                         {
                             clientID: evt.senderID,
-                            key: evt.data.key,
-                            value: evt.data.value
+                            changes: evt.data
                         }
                     )
                 );
@@ -115,23 +112,29 @@ class GameServer{
 
     /**
      *
-     * @returns {boolean} true, if accepted
+     * @returns {boolean} true, if accepted/ valid change
      * @private
      */
     _processClientValueUpdates(evt){
-        console.log(evt);
         if(!this.clientManager.doesClientExist(evt.senderID)){
             console.log("_processClientValueUpdates: client",evt.senderID,"does not exist!");
             return false;
         }
 
-        switch (evt.data.key){
-            case "color":
-                this.clientManager.updateClientColor(evt.senderID,evt.data.value);
-                return true;
+        var result = false;
+        for(var i=0; i<evt.data.length;i++) {
+            var cur = evt.data[i];
+            switch (cur.key) {
+                case Packages.PROTOCOL.CLIENT_VALUE_UPDATE.COLOR:
+                    result=this.clientManager.updateClientColor(evt.senderID, cur.value);
+                    break;
+                case Packages.PROTOCOL.CLIENT_VALUE_UPDATE.PLAYER_INDEX:
+                    result = this.clientManager.updateClientIndex(evt.senderID, cur.value);
+                    break;
+            }
         }
 
-        return false;
+        return result;
     }
 
     /**
@@ -223,6 +226,7 @@ class GameServer{
                 this.ID,
                 {
                     clientInfo:this.clientManager.getClient(socket.id).privateInfo,
+                 //   assignments:this.clientManager.getAssignments(),
                     serverID: this.ID
                 }
             )

@@ -47,6 +47,9 @@ class GameManager extends EventEmitter3{
 
         // setup main gameTable container
         this.gameTable = new GameTable(this.app.renderer);
+
+        // this.playerManager.on('colorchanged',this.seatChooser.onColorChanged);
+
         this.cursorManager = new CursorManager(this.app);
         this.inputHandler = new InputHandler(this.app,this.gameTable);
         this.inputHandler.loadMapping(Config.KEY_MAPPING);
@@ -54,6 +57,14 @@ class GameManager extends EventEmitter3{
         this.lerpManager = new LerpManager();
         this.entityManager = new EntityManager(this.lerpManager,this.cursorManager);
         this.playerManager = new PlayerManager(this.lerpManager,this.cursorManager,this.inputHandler,this.gameTable);
+
+        this.playerManager.on('playerindexchanged',this.gameTable.onPlayerIndexChanged.bind(this.gameTable));
+
+
+        this.playerManager.on('playerconnected',this.gameTable.onPlayerConnected.bind(this.gameTable));
+        this.playerManager.on('playerdisconnected',this.gameTable.onPlayerDisconnected.bind(this.gameTable));
+        this.playerManager.on('colorchanged',this.gameTable.onColorChanged.bind(this.gameTable));
+
         this.synchronizer = new Synchronizer(this);     // initialize socket-connection/synchronizer
 
 
@@ -178,7 +189,7 @@ class GameManager extends EventEmitter3{
             game.table.height,
             PIXI.loader.resources[Resources.default.content.table.texture].texture
         );*/
-        this.gameTable.setTable(game.table);          // if table is given in the game.json, then set it as new table
+        this.gameTable.setTable(game.table,this.playerManager.getAssignments());          // if table is given in the game.json, then set it as new table
 
         // gamedata is available, hide loading screen
         window.hideLoadingDialog();
@@ -208,7 +219,7 @@ class GameManager extends EventEmitter3{
                     PIXI.loader.resources[table_texture].texture
                 );
             }*/
-            this.gameTable.setTable(game.table);    // sets the table of the game, or the default table
+            this.gameTable.setTable(game.table,this.playerManager.getAssignments());    // sets the table of the game, or the default table
                                                     // if no table available in the game
 
         }.bind(this)).load();
@@ -254,6 +265,7 @@ class GameManager extends EventEmitter3{
        // this.playerManager.on('colorchanged',this.seatChooser.onColorChanged);
         this.playerManager.on('playerindexchanged',this.seatChooser.onPlayerIndexChanged.bind(this.seatChooser));
         this.playerManager.on('playerdisconnected',this.seatChooser.onPlayerDisconnected.bind(this.seatChooser));
+        this.playerManager.on('playerconnected',this.seatChooser.onPlayerConnected.bind(this.seatChooser));
         this.gameTable.addChild(this.seatChooser);
 
     //    this.seatChooser.on('colorselected',this.hideColorChooser.bind(this));
@@ -262,19 +274,20 @@ class GameManager extends EventEmitter3{
     hideSeatChooser(evt){
         if(!this.seatChooser || !this.seatChooser.parent) return;
 
-            /*{
-                player:this.players[id],
-                    oldPlayerIndex:old,
-                newPlayerIndex:value
-            }*/
-            if(!evt.player.isCurrentPlayer) return; // if change does not affect human player, dont hide
-            if(evt.newPlayerIndex < 0) return;  // if seat still not selected, dont hide
+        /*{
+            player:this.players[id],
+                oldPlayerIndex:old,
+            newPlayerIndex:value
+        }*/
+        if(!evt.player.isCurrentPlayer) return; // if change does not affect human player, dont hide
+        if(evt.newPlayerIndex < 0) return;  // if seat still not selected, dont hide
 
-          //  this.playerManager.removeListener('colorchanged',this.seatChooser.onColorChanged);
-            this.playerManager.removeListener('playerindexchanged',this.seatChooser.onPlayerIndexChanged.bind(this.seatChooser));
-
-            this.seatChooser.parent.removeChild(this.seatChooser);
-            this.seatChooser = null;
+      //  this.playerManager.removeListener('colorchanged',this.seatChooser.onColorChanged);
+        this.playerManager.removeListener('playerindexchanged',this.seatChooser.onPlayerIndexChanged.bind(this.seatChooser));
+        this.playerManager.removeListener('playerdisconnected',this.seatChooser.onPlayerDisconnected.bind(this.seatChooser));
+        this.playerManager.removeListener('playerconnected',this.seatChooser.onPlayerConnected.bind(this.seatChooser));
+        this.seatChooser.parent.removeChild(this.seatChooser);
+        this.seatChooser = null;
 
     }
 }

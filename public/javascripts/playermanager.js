@@ -13,7 +13,7 @@ var CursorLibrary = require('./../resources/resources.json').cursors.content;
 var EVT_COLOR_CHANGES='colorchanged';
 var EVT_PLAYER_INDEX_CHANGED='playerindexchanged';
 var EVT_PLAYER_DISCONNECTED ='playerdisconnected';
-
+var EVT_PLAYER_CONNECTED ='playerconnected';
 /**
  * Inherites PIXI.Container,
  * used to display all player cursors, and to poll input of the player of this instance.
@@ -88,7 +88,7 @@ class PlayerManager extends PIXI.Container {
     addPlayers(players) {
         players = [].concat(players);
         for(var i=0; i<players.length;i++) {
-            var player_data = players[i];
+            let player_data = players[i];
             // load cursor from library and create sprite
             var cursor = CursorLibrary[player_data.cursor] || CursorLibrary["default"];
             this.players[player_data.id] = new PIXI.Sprite(PIXI.loader.resources[cursor.texture].texture);
@@ -125,6 +125,8 @@ class PlayerManager extends PIXI.Container {
             // finaly add the cursor to this container
             this.addChild(this.players[player_data.id]);
             console.info(player_data.id,"connected");
+
+            this.emit(EVT_PLAYER_CONNECTED,{id:player_data.id,player:this.players[player_data.id]});
         }
     }
 

@@ -50,7 +50,7 @@ class SeatChooser extends PIXI.Container{
 
             if(assignments.indexes[i]) {    // if seat is assigned by another player
                 this._setSeatAsSelected(seat);
-                return;
+                continue;
             }
             //if seat is free, add color choosers
 /*
@@ -162,9 +162,16 @@ class SeatChooser extends PIXI.Container{
     }
     onPlayerIndexChanged(evt){
 
-        if(evt.player.isCurrentPlayer) return;
+      //  if(evt.player.isCurrentPlayer) return;
 
-        this._setSeatAsSelected(this.seats[evt.newPlayerIndex]);
+        if(evt.newPlayerIndex >=0) {
+            this._setSeatAsSelected(this.seats[evt.newPlayerIndex]);
+        }
+        // release old seat
+        if(evt.oldPlayerIndex >=0){
+            this.removeChild(this.seats[evt.oldPlayerIndex]);
+            this.seats.push(this._createSeat(this.gameTable.seats[evt.oldPlayerIndex],evt.oldPlayerIndex));
+        }
 
      /*
       {
@@ -175,13 +182,20 @@ class SeatChooser extends PIXI.Container{
          */
     }
 
-    onPlayerDisconnected(evt){
-        //evt:id,player
-        this.removeChild(this.seats[evt.player.playerIndex]);
-
-        this.seats.push(this._createSeat(this.gameTable.seats[evt.player.playerIndex],evt.player.playerIndex));
+    onPlayerConnected(evt){
+        if(evt.player.playerIndex >=0){
+            this.removeChild(this.seats[evt.player.playerIndex]);
+            this.seats.push(this._createSeat(this.gameTable.seats[evt.player.playerIndex],evt.player.playerIndex));
+        }
     }
 
+    onPlayerDisconnected(evt){
+        //evt:id,player
+        if(evt.player.playerIndex >=0) {
+            this.removeChild(this.seats[evt.player.playerIndex]);
+            this.seats.push(this._createSeat(this.gameTable.seats[evt.player.playerIndex], evt.player.playerIndex));
+        }
+    }
 
     /**
      * creates the small->big->small animation
@@ -192,7 +206,6 @@ class SeatChooser extends PIXI.Container{
      * @private
      */
     _getLerp(cur,lerpManager, x,id){
-
         this.lerpManager.push(id,"value", {
             get value() {
                 return cur.scale.x;
@@ -241,7 +254,6 @@ class SeatChooser extends PIXI.Container{
     update(delta){
         this.lerpManager.update(delta);
     }
-
 }
 
 module.exports = SeatChooser;

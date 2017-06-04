@@ -78,6 +78,17 @@ class Entity extends PIXI.Sprite {
         if(this.isStack) {
             this.addFilter(new DropShadowFilter());
         }
+
+        this._hidden=false;
+    }
+
+    get hidden(){
+        return this._hidden;
+    }
+
+    set hidden(v){
+        this._hidden = v;
+        this.surfaceIndex=this.surfaceIndex;    // reset the surface, so the hidden texture is shown
     }
 
     setSurfaces(surfaces){
@@ -169,12 +180,21 @@ class Entity extends PIXI.Sprite {
 
         this.removeAll(); // remove text from old surface
 
+        // apply the hidden texture, if the entity is hidden
+        if(this.hidden){
+            console.log("x");
+            this.texture = PIXI.loader.resources[DEFAULT_RESOURCES.hidden.texture].texture;
+            this.tint = 0xFFFFFF;
+            return;
+        }
+
+
         // set texture if available
         var texture = Path.join(this.game_resource_path || "", curSurface.texture || "");
 
         // if texture is not available, take default texture
         if (!texture) {
-            this.texture = PIXI.loader.resources[DEFAULT_RESOURCES.empty_texture].texture;
+            this.texture = PIXI.loader.resources[DEFAULT_RESOURCES.empty_texture.texture].texture;
         } else if (!PIXI.loader.resources[texture] || !PIXI.loader.resources[texture].texture) {
             this.texture = PIXI.loader.resources[DEFAULT_RESOURCES.missing_texture_substitute.texture].texture;
         } else {

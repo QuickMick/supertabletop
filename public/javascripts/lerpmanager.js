@@ -138,6 +138,10 @@ class LerpManager {
                 if (!objectLerps.hasOwnProperty(label)) continue;
                 var cur = objectLerps[label];
 
+                if(cur.beforeUpdate){
+                    cur.beforeUpdate(cur);
+                }
+
                 cur.intervallProgress += deltaTime;
                 var percent = cur.intervallProgress / cur.interval;
 
@@ -157,6 +161,10 @@ class LerpManager {
 
                 // if lerp has reached end, prevent from further processing
                 // by deleting it from the queue
+
+                if(cur.afterUpdate){
+                    cur.afterUpdate(cur);
+                }
 
                 if(percent >=1 || cur.aborted){
                     this.abortLerp(objectID,label);

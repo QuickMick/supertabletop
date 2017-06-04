@@ -16,7 +16,6 @@
           "y": 0
         }
       }
-
     }
   },
   "default":{
@@ -30,6 +29,9 @@
       },
       "table":{
         "texture":"table.jpg"
+      },
+      "hidden":{
+        "texture":"hidden.png"
       }
     }
   }

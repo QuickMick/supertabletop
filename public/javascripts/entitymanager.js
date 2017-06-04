@@ -14,7 +14,9 @@ var Util = require('./../../core/util');
 var Entity = require('./entity');
 
 const Ticks = require('./../../core/ticks.json');
-var EVT_ENTITYCLICKED = "entityclicked";
+var EVT_ENTITY_CLICKED = "entityclicked";
+
+var EVT_ENTITY_MOVED = "entitymoved";
 
 class EntityManager extends PIXI.Container{
 
@@ -96,7 +98,7 @@ class EntityManager extends PIXI.Container{
        if(!event.currentTarget || !event.currentTarget.ENTITY_ID) return;
 
         var entity = event.currentTarget;
-        this.emit(EVT_ENTITYCLICKED,{id:entity.ENTITY_ID,entity:entity});
+        this.emit(EVT_ENTITY_CLICKED,{id:entity.ENTITY_ID,entity:entity});
     }
 
     /**
@@ -180,7 +182,7 @@ class EntityManager extends PIXI.Container{
                 // if position has changed, lerp position
                 if (transformation.position.x != cur.position.x
                     || transformation.position.y != cur.position.y) {
-
+                    var self = this;
                     this.lerpManager.push(entityID,"position",{
                         get value() {
                             return cur.position
@@ -188,6 +190,15 @@ class EntityManager extends PIXI.Container{
                         set value(v){
                             cur.position.x = v.x || 0;
                             cur.position.y = v.y || 0;
+                        },
+                        beforeUpdate:function(){
+                            this._oldX = cur.position.x;
+                            this._oldY = cur.position.y;
+                        },
+                        afterUpdate:function(){
+                            if(cur.position.x != this._oldX || cur.position.y != this._oldY) {
+                                self.emit(EVT_ENTITY_MOVED,{entity:cur,oldPosition:{x:this._oldX ,y:this._oldY}});
+                            }
                         },
                         start: {x: cur.position.x, y: cur.position.y},
                         end: {x: transformation.position.x, y: transformation.position.y},
@@ -202,7 +213,6 @@ class EntityManager extends PIXI.Container{
             // entities value, then lerp it
             if ((transformation.angle || transformation.angle === 0)
                 && cur.rotation != transformation.angle) {
-
                 this.lerpManager.push(entityID, "rotation", {
                     get value() {
                         return cur.rotation
@@ -222,12 +232,19 @@ class EntityManager extends PIXI.Container{
             // just change the available values, e.g. sometimes,
             // just angle is sent, when just the angle is changes
             if(transformation.position) {
+                var oldX = cur.position.x;
+                var oldY = cur.position.y;
+
                 cur.position.x = transformation.position.x;
                 cur.position.y = transformation.position.y;
+                if(cur.position.x != oldX || cur.position.y != oldY) {
+                    this.emit(EVT_ENTITY_MOVED,{entity:cur,oldPosition:{x:curX,y:curY}});
+                }
             }
             // change rotation, if available
             cur.rotation = transformation.angle || cur.rotation;
         }
+
     }
 
     batchApplyValueChanges(data){

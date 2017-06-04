@@ -56,6 +56,9 @@ class GameManager extends EventEmitter3{
 
         this.lerpManager = new LerpManager();
         this.entityManager = new EntityManager(this.lerpManager,this.cursorManager);
+
+        this.entityManager.on('entitymoved',this.gameTable.onEntityMoved.bind(this.gameTable));
+
         this.playerManager = new PlayerManager(this.lerpManager,this.cursorManager,this.inputHandler,this.gameTable);
 
         this.playerManager.on('playerindexchanged',this.gameTable.onPlayerIndexChanged.bind(this.gameTable));

@@ -208,6 +208,10 @@ class Util {
         }
         return a;
     }
+
+    static isPointInRectangle(x,y,rectX,rectY,rectWidth,rectHeight){
+        return x <= x && x <= rectX + rectWidth && y <= y && y <= rectY + rectHeight;
+    }
 }
 
 module.exports = Util;

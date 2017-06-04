@@ -4,6 +4,7 @@
 'use strict';
 require('pixi.js');
 const Ticks = require('./../../core/ticks.json');
+const Util = require('./../../core/util');
 var DEFAULT_TABLE = require('./../resources/default_game.json').table;
 var Path = require('path');
 
@@ -31,13 +32,11 @@ class GameTable extends PIXI.Container {
         this.addChild(this.tableContainer);
         this.addChild(this.seatContainer);
 
-
         /**
          * contains all graphic objects of the seats
          * @type {Array}
          */
         this.seatGFX = [];
-
 
         /**
          * seats of the players
@@ -144,6 +143,26 @@ class GameTable extends PIXI.Container {
         // release the seat
         if(evt.player.playerIndex >=0){
             this.seatGFX[evt.player.playerIndex].visible=false;
+        }
+    }
+
+    onEntityMoved(evt){
+        //entitymoved
+        //{entity:cur,oldPosition:{x:curX,y:curY}}
+        var x = evt.entity.position.x;
+        var y = evt.entity.position.y;
+        for(var i=0;i<this.seats.length;i++){
+            if(!this.seatGFX[i].visible) continue;
+
+            var c= this.seats[i];
+console.log(evt.entity.ENTITY_ID);
+            if(Util.isPointInRectangle(x,y,c.position.x,c.position.y,c.width,c.height)){
+                if(!evt.entity.hidden) {
+                    evt.entity.hidden = true;
+                }
+            }else if(evt.entity.hidden){
+                evt.entity.hidden=false;
+            }
         }
     }
 }

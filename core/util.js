@@ -198,40 +198,15 @@ class Util {
      * Shuffles array in place. ES6 version
      * @param {Array} a items The array containing the items.
      */
-    static shuffleArray(array) {
-       /* var j, x, i;
+    static shuffleArray(a) {
+       var j, x, i;
         for (i = a.length; i; i--) {
             j = Math.floor(Math.random() * i);
             x = a[i - 1];
             a[i - 1] = a[j];
             a[j] = x;
         }
-        return a;*/
-
-       /* var currentIndex = array.length, temporaryValue, randomIndex;
-
-        // While there remain elements to shuffle...
-        while (0 !== currentIndex) {
-            // Pick a remaining element...
-            randomIndex = Math.floor(Math.random() * currentIndex);
-            currentIndex -= 1;
-
-            // And swap it with the current element.
-            temporaryValue = array[currentIndex];
-            array[currentIndex] = array[randomIndex];
-            array[randomIndex] = temporaryValue;
-        }*/
-        var i = 0
-            , j = 0
-            , temp = null;
-
-        for (i = array.length - 1; i > 0; i -= 1) {
-            j = Math.floor(Math.random() * (i + 1));
-            temp = array[i];
-            array[i] = array[j];
-            array[j] = temp;
-        }
-        return array;
+        return a;
     }
 
     static isPointInRectangle(x,y,rectX,rectY,rectWidth,rectHeight){

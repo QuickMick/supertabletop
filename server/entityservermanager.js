@@ -101,7 +101,7 @@ class EntityServerManager extends EventEmitter3 {
     _resetGame(){
         this.gameEntities = {};
         this.constraints={};
-        this.game = Object.assign({},DefaultGame);
+        this.game = JSON.parse(JSON.stringify(DefaultGame)); // deepcopy default game //Object.assign({},DefaultGame);
         this.engine = Engine.create();
 
         // no gravity, because topdown
@@ -188,7 +188,7 @@ class EntityServerManager extends EventEmitter3 {
 
         // load game and override values from the default game
         this.game = Object.assign(this.game,JSON.parse(fs.readFileSync(resource_path)));
-
+        delete this.game.DEFAULT_GAME; // delete the default game value, because it is a custom game
         // create entities for unstacked entities
         if(this.game.unstacked) {
             for (var i = 0; i < this.game.unstacked.length; i++) {
@@ -199,7 +199,9 @@ class EntityServerManager extends EventEmitter3 {
 
         if(this.game.stacks) {
             for (var j = 0; j < this.game.stacks.length; j++) {
-                this.game.stacks[j].content = Util.shuffleArray(this.game.stacks[j].content);
+                if(this.game.stacks[j].shuffle) {   // if stack should be shuffeled, shuffle the content array
+                    this.game.stacks[j].content = Util.shuffleArray(this.game.stacks[j].content);
+                }
                 this.addEntity(new ServerEntityStack(this.game.stacks[j], this.game.object_def));
             }
             delete this.game.stacks;    // the raw data of the entities is not needed any longer

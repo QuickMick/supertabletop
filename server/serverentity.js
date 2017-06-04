@@ -158,7 +158,7 @@ class BaseEntityData {
 
         if(!basetype) return instance;  // return instance, if basetype is null
         // load the default entity
-        var result = Object.assign({},basetype); // JSON.parse(JSON.stringify(basetype));
+        var result =  JSON.parse(JSON.stringify(basetype));//Object.assign({},basetype); //
 
         //but override changes
         if(instance.overwrite) {
@@ -371,7 +371,7 @@ class ServerEntity extends BaseEntityData{
     }
 
     claim(userID){
-        var oldState = Object.assign({},this._state);
+        var oldState = JSON.parse(JSON.stringify(this._state)); //Object.assign({},this._state);
         // set the claimedBy value to the userID, so we know that the entity is claimed by whom.
         this._state.claimedBy = userID;
         this._state.state=Packages.PROTOCOL.GAME_STATE.ENTITY.STATES.ENTITY_CLAIMED;
@@ -395,7 +395,7 @@ class ServerEntity extends BaseEntityData{
     }
 
     release(){
-        var oldState = Object.assign({},this._state);
+        var oldState = JSON.parse(JSON.stringify(this._state)); //Object.assign({},this._state);
 
         this._state.claimedBy = "";
         this._state.state=Packages.PROTOCOL.GAME_STATE.ENTITY.STATES.ENTITY_DEFAULT_STATE;

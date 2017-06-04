@@ -198,7 +198,7 @@
       "type":"wordcard",
       "overwrite":{
         "position":{"x":200,"y":100},
-        "surface":0,
+        "surfaceIndex":1,
         "surfaces.0":{"texture":"c1.png","color":"0x4286f4"}
       }
     },
@@ -267,7 +267,68 @@
         "position": {
           "x": 70,
           "y": 10
-        }
+        },
+        "surfaces.0": {"texture":"s1.png","color":"0xff2121"}
+      }
+    },
+    {
+      "type": "stone",
+      "overwrite": {
+        "position": {
+          "x": 70,
+          "y": 10
+        },
+        "surfaces.0": {"texture":"s1.png","color":"0xff2121"}
+      }
+    },
+    {
+      "type": "stone",
+      "overwrite": {
+        "position": {
+          "x": 70,
+          "y": 10
+        },
+        "surfaces.0":{"texture":"s1.png","color":"0xff2121"}
+      }
+    },
+    {
+      "type": "stone",
+      "overwrite": {
+        "position": {
+          "x": 70,
+          "y": 10
+        },
+        "surfaces.0":{"texture":"s1.png","color":"0xff2121"}
+      }
+    },
+    {
+      "type": "stone",
+      "overwrite": {
+        "position": {
+          "x": 70,
+          "y": 10
+        },
+        "surfaces.0": {"texture":"s1.png","color":"0xff2121"}
+      }
+    },
+    {
+      "type": "stone",
+      "overwrite": {
+        "position": {
+          "x": 70,
+          "y": 10
+        },
+        "surfaces.0": {"texture":"s1.png","color":"0xff2121"}
+      }
+    },
+    {
+      "type": "stone",
+      "overwrite": {
+        "position": {
+          "x": 70,
+          "y": 10
+        },
+        "surfaces.0": {"texture":"s1.png","color":"0xff2121"}
       }
     }
   ]

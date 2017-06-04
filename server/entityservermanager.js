@@ -199,7 +199,7 @@ class EntityServerManager extends EventEmitter3 {
 
         if(this.game.stacks) {
             for (var j = 0; j < this.game.stacks.length; j++) {
-                this.game.stacks[j] = Util.shuffleArray(this.game.stacks[j]);
+                this.game.stacks[j].content = Util.shuffleArray(this.game.stacks[j].content);
                 this.addEntity(new ServerEntityStack(this.game.stacks[j], this.game.object_def));
             }
             delete this.game.stacks;    // the raw data of the entities is not needed any longer

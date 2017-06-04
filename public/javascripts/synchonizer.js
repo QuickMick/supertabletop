@@ -25,8 +25,7 @@ class Synchronizer{
          * socket,
             id,
             color,
-            name,
-            verification
+            name
             }
          */
         this.CLIENT_INFO = {};
@@ -49,6 +48,7 @@ class Synchronizer{
         this.entityManager = null;
         this.toolManager = null;
         this.playerManager = null;
+        this.gameTable = null;
 
         /**
          * contains the timestamp of the last received gameState update
@@ -81,6 +81,7 @@ class Synchronizer{
         this.entityManager = this.gameManager.entityManager;
         this.playerManager = this.gameManager.playerManager;
         this.toolManager = this.gameManager.toolManager;
+        this.gameTable = this.gameManager.gameTable;
 
         this.socket = require('socket.io-client').connect();
         this._initHandlers();
@@ -117,6 +118,7 @@ class Synchronizer{
             this.CLIENT_INFO = evt.data.clientInfo;
             console.log("Clientdata received");
             this.playerManager.initCurrentPlayer(this.CLIENT_INFO);
+            this.gameTable.initCurrentPlayer(this.CLIENT_INFO);
 
             if(this.CLIENT_INFO.playerIndex <0 || this.CLIENT_INFO.color <0){
                 this.gameManager.showSeatChooser();
@@ -202,9 +204,9 @@ class Synchronizer{
                     this.playerManager.batchUpdatePlayerPosition(updates,timeSinceLastUpdate);
                     break;
                 // an entity was turned by a player or by the server
-                case Packages.PROTOCOL.GAME_STATE.ENTITY.SERVER_TURN_ENTITY:
-                    this.entityManager.batchTurnEntities(updates);
-                    break;
+                // case Packages.PROTOCOL.GAME_STATE.ENTITY.SERVER_TURN_ENTITY:
+                //     this.entityManager.batchTurnEntities(updates);
+                //     break;
                 // a value of an entity was changed
                 case Packages.PROTOCOL.GAME_STATE.ENTITY.SERVER_ENTITY_VALUE_CHANGED:
                     this.entityManager.batchApplyValueChanges(updates);

@@ -210,7 +210,7 @@ class Util {
     }
 
     static isPointInRectangle(x,y,rectX,rectY,rectWidth,rectHeight){
-        return x <= x && x <= rectX + rectWidth && y <= y && y <= rectY + rectHeight;
+        return rectX <= x && x <= rectX + rectWidth && rectY <= y && y <= rectY + rectHeight;
     }
 }
 

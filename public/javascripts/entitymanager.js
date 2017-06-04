@@ -18,6 +18,8 @@ var EVT_ENTITY_CLICKED = "entityclicked";
 
 var EVT_ENTITY_MOVED = "entitymoved";
 
+var EVT_ENTITY_ADDED = "entityadded";
+
 class EntityManager extends PIXI.Container{
 
     constructor(lerpManager,cursorManager){
@@ -66,6 +68,9 @@ class EntityManager extends PIXI.Container{
 
             entity.on('mousedown', this._onEntityClicked.bind(this))
                 .on('touchstart', this._onEntityClicked.bind(this));
+
+            this.emit(EVT_ENTITY_ADDED,{entity:entity});
+
         }
     }
 

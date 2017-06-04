@@ -137,7 +137,9 @@ class PlayerManager extends PIXI.Container {
         }
         this.players[data.id] ={
             rawPlayerData:data,
-            isCurrentPlayer: true
+            isCurrentPlayer: true,
+            playerIndex:data.playerIndex,
+            PLAYER_ID:data.id
         };
         this.cursorManager.setCursor(data.cursor);
     }

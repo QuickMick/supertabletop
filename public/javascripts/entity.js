@@ -182,7 +182,6 @@ class Entity extends PIXI.Sprite {
 
         // apply the hidden texture, if the entity is hidden
         if(this.hidden){
-            console.log("x");
             this.texture = PIXI.loader.resources[DEFAULT_RESOURCES.hidden.texture].texture;
             this.tint = 0xFFFFFF;
             return;

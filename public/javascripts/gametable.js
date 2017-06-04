@@ -43,6 +43,17 @@ class GameTable extends PIXI.Container {
          * @type {array}
          */
         this.seats=[];
+
+        /**
+         * ID of the player who is currently playing, it is used to identify,
+         * which cards he is able to see and which he is not.
+         * @type {null}
+         */
+        this.currentPlayerID= null;
+    }
+
+    initCurrentPlayer(clientInfo){
+        this.currentPlayerID = clientInfo.id;
     }
 
     /**
@@ -53,6 +64,10 @@ class GameTable extends PIXI.Container {
 
         tableData = tableData || DEFAULT_TABLE;    // if no table was passed, set default values
 
+        /**
+         * contains the raw data of the loaded table seats
+         * @type {Array}
+         */
         this.seats = tableData.seats || [];
 
         var w = tableData.width || DEFAULT_TABLE.width;
@@ -87,6 +102,11 @@ class GameTable extends PIXI.Container {
         this.seatContainer.removeAll();
 
         for(var i=0;(i<Ticks.MAX_PLAYERS && i<this.seats.length); i++){
+            // be sure, the seat has an offset, even if its 0
+            this.seats[i].offset = this.seats[i].offset || {};
+            this.seats[i].offset.x = this.seats[i].offset.x || 0;
+            this.seats[i].offset.y = this.seats[i].offset.y || 0;
+
             var cur = this._generatePlayerSeats(this.seats[i]);
             this.seatGFX.push(cur);
             this.seatContainer.addChild(cur);
@@ -94,6 +114,8 @@ class GameTable extends PIXI.Container {
                 cur.visible = false;
                 continue;
             }
+
+            cur.claimedBy = assignments.indexes[i];
         }
     }
 
@@ -104,8 +126,8 @@ class GameTable extends PIXI.Container {
         graphics.drawRect(0, 0, seat.width, seat.height);
 
         graphics.rotation = seat.rotation;
-        graphics.position.x = seat.position.x + ((seat.offset || {}).x || 0);
-        graphics.position.y = seat.position.y + ((seat.offset || {}).y || 0);
+        graphics.position.x = seat.position.x + seat.offset.x;
+        graphics.position.y = seat.position.y + seat.offset.y;
      /*   graphics.pivot.x = seat.width/2;
         graphics.pivot.y = -seat.height/2;*/
 
@@ -117,15 +139,18 @@ class GameTable extends PIXI.Container {
         // set new player index, and release old
         if(evt.newPlayerIndex >=0) {
             this.seatGFX[evt.newPlayerIndex].visible = true;
+            this.seatGFX[evt.newPlayerIndex].claimedBy = evt.player.PLAYER_ID;
         }
         if(evt.oldPlayerIndex >=0){
             this.seatGFX[evt.oldPlayerIndex].visible=false;
+            delete this.seatGFX[evt.oldPlayerIndex].claimedBy;
         }
     }
 
     onPlayerConnected(evt){
         if(evt.player.playerIndex >=0){
             this.seatGFX[evt.player.playerIndex].visible=true;
+            this.seatGFX[evt.player.playerIndex].claimedBy = evt.player.PLAYER_ID;
         }
     }
 
@@ -143,10 +168,11 @@ class GameTable extends PIXI.Container {
         // release the seat
         if(evt.player.playerIndex >=0){
             this.seatGFX[evt.player.playerIndex].visible=false;
+            delete this.seatGFX[evt.player.playerIndex].claimedBy;
         }
     }
 
-    onEntityMoved(evt){
+    onEntityMovedOrAdded(evt){
         //entitymoved
         //{entity:cur,oldPosition:{x:curX,y:curY}}
         var x = evt.entity.position.x;
@@ -154,12 +180,21 @@ class GameTable extends PIXI.Container {
         for(var i=0;i<this.seats.length;i++){
             if(!this.seatGFX[i].visible) continue;
 
+            // if hidezone is current player, then continue
+            if(this.seatGFX[i].claimedBy && this.seatGFX[i].claimedBy == this.currentPlayerID){
+                if(evt.entity.hidden){
+                    evt.entity.hidden=false;
+                }
+                continue;
+            }
+         // TODO: do not hide for current player
+//TODO: also hide on load
             var c= this.seats[i];
-console.log(evt.entity.ENTITY_ID);
-            if(Util.isPointInRectangle(x,y,c.position.x,c.position.y,c.width,c.height)){
+            if(Util.isPointInRectangle(x,y,c.position.x+c.offset.x,c.position.y+c.offset.y,c.width,c.height)){
                 if(!evt.entity.hidden) {
                     evt.entity.hidden = true;
                 }
+                break;
             }else if(evt.entity.hidden){
                 evt.entity.hidden=false;
             }

@@ -13,10 +13,16 @@
 
 -belegte farben sind noch nicht blockeirt
 
+playerSnapzones sollten nur aktive player affectieren?
+
 #done?# remove constraint, when removing entity
 #####################################################  TODOS  ##########################################################
 - table boundaries
 TODO: surfacechange als valuechange machn? und des nur dafür gedachte event rauskicken?
+
+karten hiden
+    TODO: do not hide for current player
+    TODO: also hide on load
 
 - claim rejected -> remove entity from user selection
     - prevent user from modifing card which he has not claimed

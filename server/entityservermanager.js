@@ -603,12 +603,12 @@ class EntityServerManager extends EventEmitter3 {
                 };
 
                 // create random movement and rotation, so the drawing looks a bit more fancy
-                Body.setVelocity(entity.body,Util.randomPointOnCircle(
+                entity.velocity = Util.randomPointOnCircle(
                     0,
                     0,
                     Util.pythagorean(stack.width/2,stack.height/2)/2
-                ));
-                Body.setAngularVelocity(entity.body,Util.randomRotation()/10);
+                );
+                entity.angularVelocity = Util.randomRotation()/10;
 
 
                 // if it was the last element, remove the stack and add the last element also
@@ -893,6 +893,49 @@ class EntityServerManager extends EventEmitter3 {
         // changes will be postet in the engine.update overrite method,
         // because the changes are done during the enigne step
     }
+
+
+    copyEntities(id,data){
+
+        data = [].concat(data); // be sure, data is an array
+        for(var i=0; i<data.length;i++){
+            var cur = data[i];
+
+            if(!cur.entityID){
+                console.log("copyEntities: cannot copy, because no id was passed");
+                continue;
+            }
+            if(!cur.position){
+                console.log("copyEntities: cannot copy, because no position was passed for entity",cur.entityID);
+                continue;
+            }
+
+            var source = this.gameEntities[cur.entityID];
+
+            if(!source){
+                console.log("copyEntites: cannot copy, because source entity does not exist anymore:",cur.entityID);
+                continue;
+            }
+
+            // if everythign is valid, check if entity is a stack or a normal entity
+            var copy;
+
+            if(source instanceof ServerEntityStack){
+                copy = new ServerEntityStack(source);
+            }else if(source instanceof ServerEntity){
+                copy = new ServerEntity(source);
+            }else{
+                console.log("copyEntites: cannot copy entity from unknown type",cur.entityID);
+                return;
+            }
+
+            copy.position = cur.position;
+
+            // add entity and broadcast it to all clients
+            this.addEntity(copy,true);
+        }
+    }
+
 
     /**
      * posts state changes,

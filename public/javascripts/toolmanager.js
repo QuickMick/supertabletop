@@ -40,6 +40,12 @@ class BasicTool{
         this._max_zoom = 2.5;
 
         /**
+         * current position of the mouse
+         * @type {{x: number, y: number}}
+         */
+        this.mousePosition= {x:0,y:0};
+
+        /**
          * used to block cameramovement, when an entity was clicked,
          * is released, when the key was released - see: this._initInputListeners
          * @type {boolean}
@@ -136,6 +142,8 @@ class BasicTool{
      * @private
      */
     _mouseMove(evt){
+        //this.mousePosition.x = evt.x;
+        //this.mousePosition.y = evt.y;
         if(!this.isCameraGrabbed) return;
         this.gameTable.position.x +=evt.dx;
         this.gameTable.position.y +=evt.dy;
@@ -149,7 +157,10 @@ class BasicTool{
      * @private
      */
     _onRawMouseMove(evt){
+        var localPos = evt.data.getLocalPosition(this.gameTable);
 
+        this.mousePosition.x = localPos.x;
+        this.mousePosition.y = localPos.y;
     }
 
     /**
@@ -308,6 +319,41 @@ class SimpleDragTool extends BasicTool{
          * @private
          */
         this._currentSnaps = {};
+
+        this.inputHanlder.mapping.COPY.on("released",this._copySelectionToCache.bind(this));
+        this.inputHanlder.mapping.PASTE.on("released",this._pasteCache.bind(this));
+        /**
+         * contains entity IDs, used to copy entities on the server
+         * @type {Array}
+         * @private
+         */
+        this._cache=[];
+    }
+
+    _copySelectionToCache(){
+        if(!this.inputHanlder.mapping.FUNCTION_KEY.isDown) return; // no strg pressed
+        this._cache = this.selectedEntityIDs;
+    }
+
+    _pasteCache(){
+        if(!this.inputHanlder.mapping.FUNCTION_KEY.isDown) return; // no strg pressed
+        if(!this._cache ||this._cache.length <=0) return; // if cache is empty, nothing to paste
+
+        // create objects to send based on cache, so that the array contains position and id of the entity
+        var data = this._cache.map(function(obj){
+            return {
+                entityID:obj,
+                position:this.mousePosition
+            }
+        }.bind(this));
+
+        this.synchronizer.updateQueue.postUpdate(Packages.PROTOCOL.GAME_STATE.ENTITY.USER_COPY_ENTITY,
+            this.synchronizer.CLIENT_INFO.id,
+            {
+                copyRequest: data,
+                _mode: "push"
+            }
+        );
     }
 
     /**

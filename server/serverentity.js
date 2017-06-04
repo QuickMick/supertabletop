@@ -299,6 +299,34 @@ class ServerEntity extends BaseEntityData{
     }
 
 
+    get velocity() {
+        var p = (this._body || {}).velocity || {};
+        return {
+            get x() {
+                return p.x || 0;
+            },
+            get y() {
+                return p.y || 0;
+            }
+        }
+    }
+
+    set velocity(v){
+        Body.setVelocity(this._body, {
+            x: v.x || 0,
+            y: v.y || 0
+        });
+    }
+
+    get angularVelocity() {
+        var p = (this._body || {}).angularVelocity || 0;
+        return p;
+    }
+
+    set angularVelocity(v){
+        Body.setAngularVelocity(this._body, v);
+    }
+
     get claimedBy(){
         return this._state.claimedBy || "";
     }

@@ -159,6 +159,11 @@ class GameServer{
                 }
 
                 switch (type) { // claim and release entiy is updaated first, becuase the other functions need the claim
+
+                    // an user copys an entity
+                    case Packages.PROTOCOL.GAME_STATE.ENTITY.USER_COPY_ENTITY:
+                        this.entityServerManager.copyEntities(id,data[type][id].copyRequest);
+                        break;
                     // an user claimes an entity
                     case Packages.PROTOCOL.GAME_STATE.ENTITY.USER_CLAIM_ENTITY:
                         this.entityServerManager.claimEntity(id, data[type][id].claimedEntity);
@@ -207,7 +212,6 @@ class GameServer{
      * @param socket
      */
     _initClient(socket){
-
         // TODO: load clientinfo from database
         var clientInfo = {
             name:"ranz",

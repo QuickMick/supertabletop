@@ -102,6 +102,12 @@ module.exports =
                 SERVER_ENTITY_TRANSFORMATION_UPDATE: "SERVER_ENTITY_TRANSFORMATION_UPDATE",
 
                 /**
+                 * a user wants to copy an entity
+                 * package looks like (copyRequest:[enityID,position])
+                 */
+                USER_COPY_ENTITY:"USER_COPY_ENTITY",
+
+                /**
                  * is posted by server, when an entity is deleted,
                  * data just contains the deleted entities id
                  */

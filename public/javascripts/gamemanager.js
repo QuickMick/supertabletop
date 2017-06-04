@@ -45,17 +45,21 @@ class GameManager extends EventEmitter3{
         // init the inputhandler
       //  PIXI.SCALE_MODES.DEFAULT = PIXI.SCALE_MODES.NEAREST;
 
-        // setup main gameTable container
-        this.gameTable = new GameTable(this.app.renderer);
+
 
         // this.playerManager.on('colorchanged',this.seatChooser.onColorChanged);
 
         this.cursorManager = new CursorManager(this.app);
+
+
+        // setup main gameTable container
+        this.lerpManager = new LerpManager();
+        this.entityManager = new EntityManager(this.lerpManager,this.cursorManager);
+        this.gameTable = new GameTable(this.app.renderer,this.entityManager);
         this.inputHandler = new InputHandler(this.app,this.gameTable);
         this.inputHandler.loadMapping(Config.KEY_MAPPING);
 
-        this.lerpManager = new LerpManager();
-        this.entityManager = new EntityManager(this.lerpManager,this.cursorManager);
+
 
         this.entityManager.on('entitymoved',this.gameTable.onEntityMovedOrAdded.bind(this.gameTable));
         this.entityManager.on('entityadded',this.gameTable.onEntityMovedOrAdded.bind(this.gameTable));

@@ -18,9 +18,11 @@ class GameTable extends PIXI.Container {
      * @param height Playground size
      * @param renderer pixi renderer
      */
-    constructor(renderer){
+    constructor(renderer,entityManager){
         super();
         this.renderer = renderer;
+
+        this.entityManager = entityManager;
 
         /**
          * Thisn container holds the sprite of the table
@@ -140,6 +142,12 @@ class GameTable extends PIXI.Container {
         if(evt.newPlayerIndex >=0) {
             this.seatGFX[evt.newPlayerIndex].visible = true;
             this.seatGFX[evt.newPlayerIndex].claimedBy = evt.player.PLAYER_ID;
+
+            for(var key in this.entityManager.entities){
+                if(!this.entityManager.entities.hasOwnProperty(key)) continue;
+
+                this.onEntityMovedOrAdded({entity:this.entityManager.entities[key]});
+            }
         }
         if(evt.oldPlayerIndex >=0){
             this.seatGFX[evt.oldPlayerIndex].visible=false;
@@ -179,16 +187,16 @@ class GameTable extends PIXI.Container {
         var y = evt.entity.position.y;
         for(var i=0;i<this.seats.length;i++){
             if(!this.seatGFX[i].visible) continue;
-
+            evt.entity.aplha = 0.4;
             // if hidezone is current player, then continue
+
             if(this.seatGFX[i].claimedBy && this.seatGFX[i].claimedBy == this.currentPlayerID){
                 if(evt.entity.hidden){
                     evt.entity.hidden=false;
                 }
                 continue;
             }
-         // TODO: do not hide for current player
-//TODO: also hide on load
+
             var c= this.seats[i];
             if(Util.isPointInRectangle(x,y,c.position.x+c.offset.x,c.position.y+c.offset.y,c.width,c.height)){
                 if(!evt.entity.hidden) {

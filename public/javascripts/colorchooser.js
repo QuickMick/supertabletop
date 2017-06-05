@@ -8,8 +8,8 @@ const Ticks = require('./../../core/ticks.json');
 const Util = require('./../../core/util');
 
 
-const PERCENT_PADDING = 0.1;
-
+const PERCENT_PADDING = 0.2;
+const BORDER_SIZE = 3;
 class ColorChooser extends PIXI.Container{
 
     constructor(renderer,gameTable,synchronizer,playerManager){
@@ -19,8 +19,11 @@ class ColorChooser extends PIXI.Container{
         var assignments = this.playerManager.assignments;
     //    this.lerpManager = new LerpManager();
         this.synchronizer = synchronizer;
+
         this.selected = this.getSelectedTexture();
         this.unselected = this.getUnselectedTexture();
+        this.backgroundTexture = this.getBackgroundTexture();
+
         this.gameTable = gameTable;
 
         this.seats = [];
@@ -40,7 +43,10 @@ class ColorChooser extends PIXI.Container{
 
         this.removeAll();
 
-
+        var bg = new PIXI.Sprite(this.backgroundTexture);
+        bg.width = evt.width;
+        bg.height = evt.height;
+        this.addChild(bg);
 
         // calculate the positions of the picker buttons depending on screensize
         var radius = Math.min(evt.width,evt.height)/3;
@@ -53,7 +59,7 @@ class ColorChooser extends PIXI.Container{
 
         // calculate the size of the picker buttons depending on the screen size
         var size = (2*Math.PI*radius) / colorPickerPositions.length;
-        size = ((size/2) - (size*PERCENT_PADDING))/100;
+        size = (size - (size*PERCENT_PADDING));
 
         for(let i=0; i<colorPickerPositions.length; i++){
 
@@ -61,7 +67,9 @@ class ColorChooser extends PIXI.Container{
                 var currentColor = new PIXI.Sprite(this.unselected);
                 currentColor.tint = Util.parseColor(Colors[j]);
                 currentColor.anchor.set(0.5);
-                currentColor.scale.set(size);
+               // currentColor.scale.set(size);
+                currentColor.width = size;
+                currentColor.height = size;
                 currentColor.position.x = colorPickerPositions[j].x;
                 currentColor.position.y = colorPickerPositions[j].y;
                 currentColor.interactive = true;
@@ -135,7 +143,7 @@ class ColorChooser extends PIXI.Container{
 
     getUnselectedTexture(){
         var graphics = new PIXI.Graphics();
-        graphics.lineStyle (1 , 0x000000,  0.8);
+        graphics.lineStyle (BORDER_SIZE , 0x000000,  0.8);
         graphics.beginFill(0xFFFFFF,0.8);
         graphics.drawCircle(0,0, 100);
 
@@ -147,6 +155,15 @@ class ColorChooser extends PIXI.Container{
         // graphics.lineStyle (2 , 0x000000,  1);
         graphics.beginFill(0xFFFFFF,0.3);
         graphics.drawCircle(0,0, 100);
+
+        return graphics.generateCanvasTexture(); //.generateTexture();
+    }
+
+    getBackgroundTexture(){
+        var graphics = new PIXI.Graphics();
+        // graphics.lineStyle (2 , 0x000000,  1);
+        graphics.beginFill(0x000000,0.8);
+        graphics.drawCircle(0,0, 1);
 
         return graphics.generateCanvasTexture(); //.generateTexture();
     }

@@ -230,7 +230,7 @@ class GameServer{
                 this.ID,
                 {
                     clientInfo:this.clientManager.getClient(socket.id).privateInfo,
-                 //   assignments:this.clientManager.getAssignments(),
+                 //   assignments:this.clientManager.assignments(),
                     serverID: this.ID
                 }
             )

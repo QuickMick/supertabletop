@@ -58,15 +58,20 @@ class PlayerManager extends PIXI.Container {
             this.assignedPlayerIndexes.push(false);
         }
 
+        this._currentPlayer = null;
 
         this.assignedColors = {};
     }
 
-    getAssignments(){
+    get currentPlayer(){
+        return this._currentPlayer;
+    }
+
+    get assignments(){
         return{
             indexes:this.assignedPlayerIndexes,
             colors:this.assignedColors
-        }
+        };
     }
 
     /**
@@ -112,7 +117,7 @@ class PlayerManager extends PIXI.Container {
             }
 
             // set color if available otherwise take default color defined in json
-            if (player_data.color) {
+            if (player_data.color && player_data.color >=0) {
                 /* var color = parseInt(player_data.color.replace("#", "0x"));
                  color = !Number.isNaN(color)?color: parseInt(ColorLibrary.default_cursor);*/
                 var color = Util.parseColor(player_data.color);
@@ -135,13 +140,25 @@ class PlayerManager extends PIXI.Container {
             console.error("cannot init player without data");
             return;
         }
+        console.log("asd",data.playerIndex);
         this.players[data.id] ={
             rawPlayerData:data,
             isCurrentPlayer: true,
             playerIndex:data.playerIndex,
             PLAYER_ID:data.id
         };
+        this._currentPlayer =this.players[data.id];
         this.cursorManager.setCursor(data.cursor);
+
+        // assing the seat, if player already has chosen one
+        if(data.playerIndex >=0){
+            this.assignedPlayerIndexes[data.playerIndex] = data.id;
+        }
+        // set color if available otherwise take default color defined in json
+        if (data.color && data.color >=0) {
+            // assign color, if player has already chosen one
+            this.assignedColors[color] = player_data.id;
+        }
     }
 
     /**
@@ -169,6 +186,7 @@ class PlayerManager extends PIXI.Container {
             }
 
             switch(key){
+                //update player color
                 case Packages.PROTOCOL.CLIENT_VALUE_UPDATE.COLOR:
                     if(this.players[id].tint == value) return;  // return if there is no change
 
@@ -190,6 +208,7 @@ class PlayerManager extends PIXI.Container {
                     });
                     return;
 
+                // update playerIndex aka seat
                 case Packages.PROTOCOL.CLIENT_VALUE_UPDATE.PLAYER_INDEX:
                     if(this.players[id].playerIndex == value) return;  // return if there is no change
 

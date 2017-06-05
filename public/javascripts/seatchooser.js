@@ -20,9 +20,11 @@ const SCALE= 0.5;
 
 class SeatChooser extends PIXI.Container{
 
-    constructor(gameTable,synchronizer,assignments){
+    constructor(gameTable,synchronizer,playerManager){
         super();
 
+        this.playerManager = playerManager;
+        var assignments = this.playerManager.assignments;
         this.lerpManager = new LerpManager();
         this.synchronizer = synchronizer;
         this.selected = this.getSelectedTexture();
@@ -101,8 +103,11 @@ class SeatChooser extends PIXI.Container{
 
 
         currentSeat.on('mousedown',function(){
+
+            // do not send, if nothing has changed
+            if(this.playerManager.currentPlayer.playerIndex == i) return;
+
             this.synchronizer.sendPlayerUpdate([
-                //  {key:Packages.PROTOCOL.CLIENT_VALUE_UPDATE.COLOR,value:color},
                 {key:Packages.PROTOCOL.CLIENT_VALUE_UPDATE.PLAYER_INDEX,value:i}
             ]);
             this.emit('seatSelected',{seat:i});
@@ -139,7 +144,7 @@ class SeatChooser extends PIXI.Container{
         graphics.beginFill(0xFFFFFF,0.8);
         graphics.drawCircle(0,0, SEAT_SIZE);
 
-        return graphics.generateTexture();
+        return graphics.generateCanvasTexture(); //.generateTexture();
     }
 
     getSelectedTexture(){
@@ -148,7 +153,7 @@ class SeatChooser extends PIXI.Container{
         graphics.beginFill(0xFFFFFF,0.3);
         graphics.drawCircle(0,0, SEAT_SIZE);
 
-        return graphics.generateTexture();
+        return graphics.generateCanvasTexture(); //.generateTexture();
     }
 
     onColorChanged(evt){

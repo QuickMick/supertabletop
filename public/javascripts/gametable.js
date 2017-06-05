@@ -90,9 +90,10 @@ class GameTable extends PIXI.Container {
         this.tableContainer.width = newTable.width = w;
         this.tableContainer.height = newTable.height = h;
 
-        if(this._table){    // remove the old table, if there is one
+       /* if(this._table){    // remove the old table, if there is one
             this.removeChild(this._table);
-        }
+        }*/
+        this.tableContainer.removeAll();
 
         this._table = newTable;
 

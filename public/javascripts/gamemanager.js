@@ -22,6 +22,7 @@ var ToolManager = require('./toolmanager');
 var CursorManager = require('./cursormanager');
 
 var SeatChooser = require('./seatchooser');
+var ColorChooser = require('./colorchooser');
 
 const RELATIVE_PATH = "./../";
 
@@ -82,6 +83,7 @@ class GameManager extends EventEmitter3{
          * @type {null}
          */
         this.seatChooser = null;
+        this.colorChooser = null;
 
         this.playerManager.on('playerindexchanged',this.hideSeatChooser.bind(this));
 
@@ -197,7 +199,7 @@ class GameManager extends EventEmitter3{
             game.table.height,
             PIXI.loader.resources[Resources.default.content.table.texture].texture
         );*/
-        this.gameTable.setTable(game.table,this.playerManager.getAssignments());          // if table is given in the game.json, then set it as new table
+        this.gameTable.setTable(game.table,this.playerManager.assignments);          // if table is given in the game.json, then set it as new table
 
         // gamedata is available, hide loading screen
         window.hideLoadingDialog();
@@ -227,7 +229,7 @@ class GameManager extends EventEmitter3{
                     PIXI.loader.resources[table_texture].texture
                 );
             }*/
-            this.gameTable.setTable(game.table,this.playerManager.getAssignments());    // sets the table of the game, or the default table
+            this.gameTable.setTable(game.table,this.playerManager.assignments);    // sets the table of the game, or the default table
                                                     // if no table available in the game
 
         }.bind(this)).load();
@@ -268,7 +270,7 @@ class GameManager extends EventEmitter3{
 
 
     showSeatChooser(){
-        this.seatChooser = new SeatChooser(this.gameTable,this.synchronizer,this.playerManager.getAssignments());
+        this.seatChooser = new SeatChooser(this.gameTable,this.synchronizer,this.playerManager);
 
        // this.playerManager.on('colorchanged',this.seatChooser.onColorChanged);
         this.playerManager.on('playerindexchanged',this.seatChooser.onPlayerIndexChanged.bind(this.seatChooser));
@@ -280,7 +282,7 @@ class GameManager extends EventEmitter3{
     }
 
     hideSeatChooser(evt){
-        if(!this.seatChooser || !this.seatChooser.parent) return;
+        if(!this.seatChooser || !this.seatChooser.parent || this.playerManager.currentPlayer.playerIndex <0) return;
 
         /*{
             player:this.players[id],
@@ -297,6 +299,20 @@ class GameManager extends EventEmitter3{
         this.seatChooser.parent.removeChild(this.seatChooser);
         this.seatChooser = null;
 
+        this.showColorChooser();
+    }
+
+    showColorChooser(){
+        this.colorChooser = new ColorChooser(this.app.renderer,this.gameTable,this.synchronizer,this.playerManager);
+        this.app.stage.addChild(this.colorChooser);
+        this.on('resize',this.colorChooser.redrawChooser.bind(this.colorChooser));
+    }
+
+    hideColorChooser(){
+
+        if(!this.colorChooser || !this.colorChooser.parent || this.playerManager.currentPlayer.color <0) return;
+        this.removeListener('reseize',this.colorChooser.redrawChooser.bind(this.colorChooser));
+        this.colorChooser = null;
     }
 }
 

@@ -13,7 +13,7 @@ class Client{
             throw "no socket or clientInfo, client cannot get instantiated";
 
         this.socket = socket;
-        this.color = clientInfo.color || 0;
+        this.color = clientInfo.color || -1;
         this.name = clientInfo.name || "anonymous";
         this.cursor = clientInfo.cursor || "default";
         this.position = {x:0,y:0};
@@ -66,7 +66,7 @@ class ClientManager{
         this.assignedColors = {};
     }
 /*
-    getAssignments(){
+    assignments(){
         return {
             assignedPlayerIndexes: this.assignedPlayerIndexes,
             assignedColors: this.assignedColors

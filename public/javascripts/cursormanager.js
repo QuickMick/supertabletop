@@ -7,6 +7,8 @@ var EventEmitter3 = require('eventemitter3');
 
 var CursorLibrary = require('./../resources/resources.json').cursors.content;
 
+var Util = require('./../../core/util');
+
 const EVT_CUSOR_CHANGED = 'cursorchanged';
 
 class CursorManager extends EventEmitter3{
@@ -85,7 +87,18 @@ class CursorManager extends EventEmitter3{
      * @private
      */
     _convertImgToDataURLviaCanvas(cursorDef, outputFormat) {
+
         var curentResource = PIXI.loader.resources[cursorDef.texture];
+        if(!curentResource || !curentResource.texture) return "pointer";
+
+        var anchor_x = curentResource.texture.width * (cursorDef.anchor.x || 0);
+        var anchor_y = curentResource.texture.height * (cursorDef.anchor.y || 0);
+
+        var dataURL =  Util.convertTextureToBase64String(curentResource,outputFormat);
+
+        return  "url('" + dataURL + "') " + anchor_x + " " + anchor_y + ", auto";
+
+       /* var curentResource = PIXI.loader.resources[cursorDef.texture];
         var img = curentResource.data;
         var width = curentResource.texture.width;
         var height = curentResource.texture.height;
@@ -99,7 +112,7 @@ class CursorManager extends EventEmitter3{
         ctx.drawImage(img, 0, 0);
         var dataURL = canvas.toDataURL(outputFormat);
         canvas = null;
-        return  "url('" + dataURL + "') " + anchor_x + " " + anchor_y + ", auto";
+        return  "url('" + dataURL + "') " + anchor_x + " " + anchor_y + ", auto";*/
     }
 }
 

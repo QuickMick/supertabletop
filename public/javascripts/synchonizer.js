@@ -158,6 +158,10 @@ class Synchronizer{
         this.socket.on(Packages.PROTOCOL.SERVER.CLIENT_VALUE_UPDATE, function (evt) {
             this.playerManager.updatePlayerValue(evt.data.clientID,evt.data.changes);
         }.bind(this));
+
+        this.socket.on('disconnect',function (evt) {
+           console.log("DISCONNECT",evt);
+        });
     }
 
     sendMessage(type,msg){

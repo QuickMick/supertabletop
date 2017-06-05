@@ -18,9 +18,119 @@ body,html {
 }
 
 #header{
+  margin: 0;
   height: var(--header-height);
+  display: flex;
+  flex-direction: row;
 }
 
+.separator {
+  height: 80%;
+  background-color: grey;
+  width: 2px;
+  margin-left: 10px;
+  margin-right: 10px;
+  margin-top: auto;
+  margin-bottom: auto;
+}
+
+h1{
+  margin: 0;
+}
+.title{
+  margin: 0;
+  font-size: 30px;
+}
+
+#player-container{
+  flex-grow: 1;
+  height:100%;
+  display: flex;
+  flex-direction: row;
+  overflow: auto;
+  flex-wrap: wrap;
+}
+/*
+.player-item:first-child {
+  margin-left: 10px;
+}
+
+.player-item:not(:first-child) {
+  margin-left: 20px;
+}*/
+
+.player-item{
+  height: 90%;
+  margin-top: auto;
+  margin-bottom: auto;
+  display: flex;
+  flex-direction: row;
+  margin-left: 10px;
+}
+
+
+.player-item .player-image{
+  width: calc(var(--header-height) - 10px);
+  height: calc(var(--header-height) - 10px);
+  margin-top: auto;
+  margin-bottom: auto;
+  /*content: url('/resources/default/missing_avatar.png');*/
+  background-position: center;
+  background-size: contain;
+}
+/*
+.player-item .player-image:empty {
+  content: url('/resources/default/missing_avatar.png');
+}*/
+
+.player-item .player-details{
+  display: flex;
+  flex-direction: column;
+  margin-left: 10px;
+  margin-top: auto;
+  margin-bottom: auto;
+}
+
+.player-item .player-info-container{
+  display: flex;
+  flex-direction: row;
+  margin-top: 2px;
+}
+
+.player-item .player-seat{
+  font-weight: bold;
+  margin-right: 5px;
+}
+.player-item .player-seat:empty{
+  margin-right: 0;
+}
+
+.player-item .player-color{
+  background-color: grey;
+  width: 100%;
+  height: 10px;
+  margin-top: auto;
+  margin-bottom: auto;
+}
+
+.player-item .player-name-container{
+  display: flex;
+  flex-direction: row;
+}
+
+.player-item .player-prefix{
+  margin: 0;
+  font-weight: bold;
+}
+.player-item .player-prefix::after{
+   content: "] ";
+ }
+.player-item .player-prefix::before{
+  content: "[";
+}
+.player-item .player-name{
+  margin: 0 0 0 2px;
+}
 
 #main{
   padding: 0;
@@ -32,9 +142,6 @@ body,html {
   flex-direction: column;
 }
 
-h1{
-  margin: 0;
-}
 
 a {
   color: #00B7FF;
@@ -45,6 +152,7 @@ a {
   flex-grow: 1;
   display: flex;
 }
+
 
 #stage canvas{
   flex-grow: 1;

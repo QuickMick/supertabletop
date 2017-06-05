@@ -221,6 +221,37 @@ class Util {
     static isPointInRectangle(x,y,rectX,rectY,rectWidth,rectHeight){
         return rectX <= x && x <= rectX + rectWidth && rectY <= y && y <= rectY + rectHeight;
     }
+
+    /**
+     * converts a loaded image from the pixi loader to the base64 format,
+     * afterwards an url is created, which can be used as cursor
+     * @param resName name of the available pixi loader resource
+     * @param outputFormat optional
+     * @returns {string}
+     * @private
+     */
+    static convertTextureToBase64String(pixiResource, outputFormat) {
+        var curentResource = pixiResource;
+        var img = curentResource.data;
+        var width = curentResource.texture.width;
+        var height = curentResource.texture.height;
+
+
+        var canvas = document.createElement('CANVAS');
+        var ctx = canvas.getContext('2d');
+        canvas.height = height;
+        canvas.width = width;
+        ctx.drawImage(img, 0, 0);
+        var dataURL = canvas.toDataURL(outputFormat);
+        canvas = null;
+
+        return  dataURL;
+    }
+
+    static intToColorString(int){
+        if(typeof int != 'number') return "#000000";
+        return "#"+int.toString(16);
+    }
 }
 
 module.exports = Util;

@@ -15,6 +15,7 @@ class Client{
         this.socket = socket;
         this.color = clientInfo.color || -1;
         this.name = clientInfo.name || "anonymous";
+        this.userStatus = clientInfo.userStatus || "guest";
         this.cursor = clientInfo.cursor || "default";
         this.position = {x:0,y:0};
         this.playerIndex =-1;
@@ -28,6 +29,7 @@ class Client{
         return {
             id:this.ID,
             name:this.name,
+            userStatus:this.userStatus,
             color:this.color,
             cursor:this.cursor,
             playerIndex:this.playerIndex
@@ -38,6 +40,7 @@ class Client{
         return {
             id:this.ID,
             name:this.name,
+            userStatus:this.userStatus,
             color:this.color,
             cursor:this.cursor,
             playerIndex:this.playerIndex
@@ -64,7 +67,14 @@ class ClientManager{
         }
 
         this.assignedColors = {};
+
+        this._currentConnectionCount = 0;
     }
+
+    get currentConnectionCount(){
+        return this._currentConnectionCount;
+    }
+
 /*
     assignments(){
         return {
@@ -208,7 +218,9 @@ class ClientManager{
     clientConnected(socket,clientInfo){
         this._addClient(socket,clientInfo);
 
-        console.log("Connected: "+socket.id+" Users: "+Object.keys(this.clients).length);
+        this._currentConnectionCount = Object.keys(this.clients).length;
+        console.log("Connected: "+socket.id+" Users: "+this._currentConnectionCount);
+
 
 
         if(this.admin == null){
@@ -218,7 +230,8 @@ class ClientManager{
     }
 
     clientDisconnected(socket,data){
-        console.log("disconnect: "+socket.id+" Users left: "+Object.keys(this.clients).length);
+        this._currentConnectionCount = Object.keys(this.clients).length;
+        console.log("disconnect: "+socket.id+" Users left: "+this._currentConnectionCount);
 
         //this.boradcastExceptSender(clientSocket,Packages.PROTOCOL.SERVER.CLIENT_DISCONNECTED,{msg:"",data:{id:clientSocket.id}});
 

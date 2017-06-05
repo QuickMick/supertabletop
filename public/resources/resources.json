@@ -32,6 +32,9 @@
       },
       "hidden":{
         "texture":"hidden.png"
+      },
+      "missing_avatar":{
+        "texture":"missing_avatar.png"
       }
     }
   }

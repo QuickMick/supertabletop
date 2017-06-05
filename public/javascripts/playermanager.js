@@ -7,6 +7,8 @@ var Util = require("./../../core/util");
 const Ticks = require('./../../core/ticks.json');
 const Packages = require('./../../core/packages');
 
+const Config = require('./../resources/config.json');
+
 var CursorLibrary = require('./../resources/resources.json').cursors.content;
 
 
@@ -30,6 +32,7 @@ class PlayerManager extends PIXI.Container {
         this.lerpManager = lerpManager;
         this.cursorManager = cursorManager;
 
+        this.playerHTMLContainer = document.getElementById("player-container");
         /**
          * Contains all players
          * @type {object} --> id:sprite
@@ -110,6 +113,8 @@ class PlayerManager extends PIXI.Container {
             this.players[player_data.id].playerIndex = player_data.playerIndex;
             this.players[player_data.id].PLAYER_ID = player_data.id;
             this.players[player_data.id].color = player_data.color;
+            this.players[player_data.id].name = player_data.name;
+            this.players[player_data.id].userStatus = player_data.userStatus;
             // assing the seat, if player already has chosen one
             if(player_data.playerIndex >=0){
                 this.assignedPlayerIndexes[player_data.playerIndex] = player_data.id;
@@ -135,6 +140,16 @@ class PlayerManager extends PIXI.Container {
 
             // finaly add the cursor to this container
             this.addChild(this.players[player_data.id]);
+
+            this._createPlayerHTMLItem(
+                this.playerHTMLContainer,
+                player_data.id,
+                player_data.userStatus,
+                player_data.name,
+                player_data.color,
+                player_data.playerIndex
+            );
+
             console.info(player_data.id,"connected");
 
             this.emit(EVT_PLAYER_CONNECTED,{id:player_data.id,player:this.players[player_data.id]});
@@ -151,7 +166,9 @@ class PlayerManager extends PIXI.Container {
             isCurrentPlayer: true,
             playerIndex:data.playerIndex,
             PLAYER_ID:data.id,
-            color:data.color
+            color:data.color,
+            name:data.name,
+            userStatus:data.userStatus
         };
         this._currentPlayer =this.players[data.id];
         this.cursorManager.setCursor(data.cursor);
@@ -165,6 +182,9 @@ class PlayerManager extends PIXI.Container {
             // assign color, if player has already chosen one
             this.assignedColors[data.color] = data.id;
         }
+
+        this._createPlayerHTMLItem(this.playerHTMLContainer,data.id,data.userStatus,data.name,data.color,data.playerIndex);
+
     }
 
     /**
@@ -207,6 +227,12 @@ class PlayerManager extends PIXI.Container {
                         delete this.assignedColors[old];
                     }
 
+                    if(value >= 0) {    // set color if available
+                        var playerItem = document.getElementById(id);
+                        var colorNode = playerItem.getElementsByClassName("player-color");
+                        colorNode[0].style.backgroundColor = Util.intToColorString(value);
+                    }
+
                     // emit color change event
                     this.emit(EVT_COLOR_CHANGES,{
                         player:this.players[id],
@@ -228,6 +254,12 @@ class PlayerManager extends PIXI.Container {
                     //if seat was changed, releas old one
                     if(old >=0){
                         this.assignedPlayerIndexes[value] = false;
+                    }
+
+                    if(value >= 0) {    // set color if available
+                        var playerItem = document.getElementById(id);
+                        var indexNode = playerItem.getElementsByClassName("player-seat");
+                        indexNode[0].innerHTML = (value+1);
                     }
 
                     // emit index change event
@@ -292,6 +324,7 @@ class PlayerManager extends PIXI.Container {
         }
 
         this.removeChild(this.players[id]);
+        this._removePlayerHTMLItem(id);
 
         delete this.assignedColors[this.players[id].color];
         delete this.assignedPlayerIndexes[this.players[id].playerIndex];
@@ -374,6 +407,115 @@ class PlayerManager extends PIXI.Container {
             interval: Math.min(timeSinceLastUpdate,Ticks.MAX_DELAY), //Ticks.SERVER_UPDATE_INTERVAL,
             minDiff:1
         });
+    }
+
+    /**
+     * creates and addes an html based on all passed informations to the passed container
+     * the id of the new node is the passed id
+     * @param container
+     * @param id {string}
+     * @param prefix {string}
+     * @param name {string}
+     * @param color {number}
+     * @private
+     */
+    _createPlayerHTMLItem(container,id,prefix,name,color,index){
+
+        var e = document.getElementById(id);
+        if(e){
+            console.log("player item already added to header");
+            return;
+        }
+
+        var itemNode = document.createElement("div");
+        itemNode.className = "player-item";
+        itemNode.id = id;
+
+        var imageNode = document.createElement("img");
+        imageNode.className = "player-image";
+        imageNode.onerror = function(){
+            console.log("err");
+            this.src = Config.PATHS.RESOURCE_BASE+"/default/missing_avatar.png";
+        };
+        if(prefix != "guest") { //TODO: i18n translation here
+            imageNode.src = Config.PATHS.USERS_RESOURCES + "/" + name + "/" + name + "_avatar.png";//"url('/"+Config.PATHS.USERS_RESOURCES+"/"+name+"/"+name+"_avatar.png";
+        }else{
+            imageNode.src = Config.PATHS.RESOURCE_BASE+"/default/missing_avatar.png";
+        }
+
+        var detailsNode = document.createElement("div");
+        detailsNode.className = "player-details";
+
+        var name_containerNode = document.createElement("div");
+        name_containerNode.className="player-name-container";
+
+        var prefixNode = document.createElement("div");
+        prefixNode.className="player-prefix";
+        prefixNode.innerHTML = prefix;
+
+        var nameNode = document.createElement("div");
+        nameNode.className="player-name";
+        nameNode.innerHTML = name;
+
+        var seatNode = document.createElement("div");
+        seatNode.className = "player-seat";
+        seatNode.innerHTML = index>=0?(index+1) : "";
+
+        var colorNode = document.createElement("div");
+        colorNode.className="player-color";
+
+        if(color >= 0) {    // set color if available
+            colorNode.style.backgroundColor = Util.intToColorString(color);
+        }
+
+        var info_container = document.createElement("div");
+        info_container.className = "player-info-container";
+
+        itemNode.appendChild(imageNode);
+        name_containerNode.appendChild(prefixNode);
+        name_containerNode.appendChild(nameNode);
+        detailsNode.appendChild(name_containerNode);
+        info_container.appendChild(seatNode);
+        info_container.appendChild(colorNode);
+        detailsNode.appendChild(info_container);
+        itemNode.appendChild(detailsNode);
+
+
+        container.appendChild(itemNode);
+
+        /*
+            jade example
+         *       div#player-container
+         div.player-item
+         div.player-image
+         div.player-details
+         div.player-name-container
+         p.player-prefix admin
+         p.player-name mick
+         div.player-color
+
+         div.player-item
+         img.player-image
+         div.player-details
+         div.player-name-container
+         p.player-prefix admin
+         p.player-name mick
+         div.player-color
+         */
+    }
+
+    /**
+     * removes an playeritem based on the id from the header
+     * @param id {string}
+     * @private
+     */
+    _removePlayerHTMLItem(id){
+        var e = document.getElementById(id);
+        if(!e || !e.parentNode){
+            console.log("player item does not exist");
+            return;
+        }
+        e.parentNode.removeChild(e);
     }
 }
 

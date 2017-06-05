@@ -71,9 +71,23 @@ class GameServer{
      * @private
      */
     _onConnectionReceived(socket) {
+        console.log("connection received from:"+socket.handshake.address);
+
+        // disconnect a new connection, when server is full
+        if(this.clientManager.currentConnectionCount >= Ticks.MAX_PLAYERS){
+            console.warn("player limit reached, new request has to be prohibited");
+            socket.disconnect();
+            return;
+        }
+
+      //  if(socket.handshake.address.includes("109.193.174.201")) return;
         this._initClient(socket);
 
         socket.on(Packages.PROTOCOL.CLIENT.CLIENT_VALUE_UPDATE, function (evt) {
+            if(!evt || !evt.data){
+                console.log("CLIENT_VALUE_UPDATE: no data received");
+                return;
+            }
             var valid = this._processClientValueUpdates(evt);
             if(valid) {
                 this._boradcast(    // if the change was valid, send everyone the new information
@@ -91,6 +105,10 @@ class GameServer{
 
         //removes this client from the serverclient list and broadcasts the information to all remaining clients
         socket.on('disconnect', function (data) {
+            if(!data){
+                console.log("disconnect: no data received");
+                return;
+            }
             this.entityServerManager.releaseAllContraintsForUser(socket.id);
             this.clientManager.clientDisconnected(socket, data);
             this._boradcastExceptSender(
@@ -105,6 +123,10 @@ class GameServer{
 
         // server receives client entity updates in this event
         socket.on(Packages.PROTOCOL.CLIENT.SEND_STATE, function (evt) {
+            if(!evt || !evt.data){
+                console.log("SEND_STATE: no data received");
+                return;
+            }
             // the received updates are processes everytime before the engine is processed.
             this.receivedUpdateQueue.push(evt.data);
         }.bind(this));
@@ -205,6 +227,17 @@ class GameServer{
             }
         }
     }
+/*
+    imageExists(image_url){
+
+        var http = new XMLHttpRequest();
+
+        http.open('HEAD', image_url, false);
+        http.send();
+
+        return http.status != 404;
+
+    }*/
 
     /**
      * a new client enters the server,
@@ -214,8 +247,9 @@ class GameServer{
     _initClient(socket){
         // TODO: load clientinfo from database
         var clientInfo = {
-            name:"ranz",
-            cursor:"default"/*,
+            name:"mick",
+            cursor:"default",
+            userStatus:"admin"/*,
             color:Util.getRandomColor()*/
         };
 

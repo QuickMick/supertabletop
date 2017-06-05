@@ -11,7 +11,7 @@
 
 -gedraggtes entitiy muss immer on top sein --> vielelicht mit display index arbeiten?
 
-
+-synchronizer falsch geschreibn (die klasse und file)
 
 playerSnapzones sollten nur aktive player affectieren?
 

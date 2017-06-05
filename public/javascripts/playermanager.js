@@ -168,10 +168,11 @@ class PlayerManager extends PIXI.Container {
             PLAYER_ID:data.id,
             color:data.color,
             name:data.name,
-            userStatus:data.userStatus
+            userStatus:data.userStatus,
+            cursor:data.cursor
         };
         this._currentPlayer =this.players[data.id];
-        this.cursorManager.setCursor(data.cursor);
+        this.cursorManager.setCursor(data.cursor,data.color);
 
         // assing the seat, if player already has chosen one
         if(data.playerIndex >=0){
@@ -230,6 +231,7 @@ class PlayerManager extends PIXI.Container {
                     if(value >= 0) {    // set color if available
                         var playerItem = document.getElementById(id);
                         var colorNode = playerItem.getElementsByClassName("player-color");
+                        this.cursorManager.setCursor(this.players[id].cursor,value);
                         colorNode[0].style.backgroundColor = Util.intToColorString(value);
                     }
 
@@ -291,7 +293,8 @@ class PlayerManager extends PIXI.Container {
 
         // if the passed player is the current human player
         if(this.players[playerID].isCurrentPlayer){
-            this.cursorManager.setCursor(cursor_type);
+            this.players[playerID].cursor = cursor_type;
+            this.cursorManager.setCursor(cursor_type,this.players[playerID].color);
             return;
         }
 

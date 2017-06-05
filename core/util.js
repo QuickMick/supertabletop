@@ -30,6 +30,22 @@ class Util {
         return !Number.isNaN(color) ? color : 0xFFFFFF;
     }
 
+    static getHexColor(number){
+        return "#"+((number)>>>0).toString(16).slice(-6);
+    }
+
+    /**
+     * converts a hex color to an RGB object
+     * @param hex
+     * @returns {{r: number, g: number, b: number}}
+     */
+    static hexToRGB(hex){
+        return {
+            r: (hex & 0xff0000) >> 16,
+            g: (hex & 0x00ff00) >> 8,
+            b: (hex & 0x0000ff)
+        };
+    }
 
     /**
      * Creates a random color string
@@ -227,10 +243,11 @@ class Util {
      * afterwards an url is created, which can be used as cursor
      * @param resName name of the available pixi loader resource
      * @param outputFormat optional
+     * @param tint {number} or {string}
      * @returns {string}
      * @private
      */
-    static convertTextureToBase64String(pixiResource, outputFormat) {
+    static convertTextureToBase64String(pixiResource, outputFormat,tint) {
         var curentResource = pixiResource;
         var img = curentResource.data;
         var width = curentResource.texture.width;
@@ -242,6 +259,30 @@ class Util {
         canvas.height = height;
         canvas.width = width;
         ctx.drawImage(img, 0, 0);
+
+        tint = Util.parseColor(tint);
+        if(tint) {
+            var buffer = ctx.getImageData(0, 0, width, height);
+            var len = buffer.data.length;
+            var data = buffer.data;
+            var c = Util.hexToRGB(tint);
+            // use inverse to tint white
+            c.r = 255-c.r;
+            c.g = 255-c.g;
+            c.b = 255-c.b;
+
+            // loop through pixel array (RGBA = 4 bytes)
+            for (var i=0; i < len; i += 4) {
+                data[i] = data[i] - c.r;  // add R
+                data[i + 1] = data[i + 1] - c.g;  // add G
+                data[i + 2] = data[i + 2] - c.b;  // add B
+            }
+
+            // we're done, put back the new data to canvas
+            ctx.putImageData(buffer, 0, 0);
+
+        }
+
         var dataURL = canvas.toDataURL(outputFormat);
         canvas = null;
 

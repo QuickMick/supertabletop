@@ -51,17 +51,17 @@ class CursorManager extends EventEmitter3{
         });
     }
 
-    setCursor(cursorName){
+    setCursor(cursorName,color){
         var cursor_defaultLib = CursorLibrary[cursorName] || CursorLibrary["default"];
       //  var cursor_hoverLib  = CursorLibrary[cursorName+"_hover"] || CursorLibrary["default_hover"];
 
         this._setDefault();
 
-
         // convert the default cursor
         if(cursor_defaultLib && PIXI.loader.resources[cursor_defaultLib.texture]){
-            this.defaultCursor = this._convertImgToDataURLviaCanvas(cursor_defaultLib);
+            this.defaultCursor = this._convertImgToDataURLviaCanvas(cursor_defaultLib,null,color);
         }
+
         // set the cursor to the pixi canvas
         this.app.renderer.view.parentNode.style.cursor = this.defaultCursor;
 
@@ -86,7 +86,7 @@ class CursorManager extends EventEmitter3{
      * @returns {string}
      * @private
      */
-    _convertImgToDataURLviaCanvas(cursorDef, outputFormat) {
+    _convertImgToDataURLviaCanvas(cursorDef, outputFormat,tint) {
 
         var curentResource = PIXI.loader.resources[cursorDef.texture];
         if(!curentResource || !curentResource.texture) return "pointer";
@@ -94,7 +94,7 @@ class CursorManager extends EventEmitter3{
         var anchor_x = curentResource.texture.width * (cursorDef.anchor.x || 0);
         var anchor_y = curentResource.texture.height * (cursorDef.anchor.y || 0);
 
-        var dataURL =  Util.convertTextureToBase64String(curentResource,outputFormat);
+        var dataURL =  Util.convertTextureToBase64String(curentResource,outputFormat,tint);
 
         return  "url('" + dataURL + "') " + anchor_x + " " + anchor_y + ", auto";
 

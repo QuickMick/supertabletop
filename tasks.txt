@@ -15,13 +15,16 @@
 
 playerSnapzones sollten nur aktive player affectieren?
 
+-mouseover sollte disabled sein, wenn player nich nicht ready
 
 #####################################################  TODOS  ##########################################################
 - table boundaries
 TODO: surfacechange als valuechange machn? und des nur dafür gedachte event rauskicken?
 
-karten hiden
-    TODO: zeigen dass eigene karte für die anderen hidden ist
+
+
+chat
+color für cursor
 
 TODO: snapzone -> rotation/orientation -> angle
 functions:
@@ -63,7 +66,7 @@ loader:
 
 #done?# remove constraint, when removing entity
 
-
+-karten hiden:  zeigen dass eigene karte für die anderen hidden ist
 
 
 

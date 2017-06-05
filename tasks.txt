@@ -1,8 +1,8 @@
 
 ####################################################  ISSUES  ##########################################################
--isSensor bei drag an un aus is noch n bissl buggy
+-isSensor bei drag an un aus is noch n bissl buggy -> wenn an kanten collision war, un dann in iSensor geht is des glaub immer
 -outlinefilter bei drehung buggy
--circle shape/hitzone
+
 -bild anfangs leicht verzerrt
 -wenn entity geklickt wurde, dann is immernoch mouseover drauf, wenn man runtergeht aber immernoch hält, dann nemme
 
@@ -11,21 +11,18 @@
 
 -gedraggtes entitiy muss immer on top sein --> vielelicht mit display index arbeiten?
 
--belegte farben sind noch nicht blockeirt
+
 
 playerSnapzones sollten nur aktive player affectieren?
 
-#done?# remove constraint, when removing entity
+
 #####################################################  TODOS  ##########################################################
 - table boundaries
 TODO: surfacechange als valuechange machn? und des nur dafür gedachte event rauskicken?
 
 karten hiden
-    TODO: do not hide for current player
-    TODO: also hide on load
+    TODO: zeigen dass eigene karte für die anderen hidden ist
 
-- claim rejected -> remove entity from user selection
-    - prevent user from modifing card which he has not claimed
 TODO: snapzone -> rotation/orientation -> angle
 functions:
 -rotate view
@@ -33,14 +30,12 @@ functions:
 
 -polygon shapes
 
--hide card with button
--hide zones
-
-
 -refactor every dependency to context
 
-
 -vanish signal, when new game is loaded?
+-snappoints mit rotation
+
+-chat
 
 TODO: constraint manager
 TODO: game manager -> manager der wirklich nur die daten über des geladene spiel hält
@@ -56,12 +51,17 @@ loader:
 - human player mouse display -> playermanager, becuase he can change his cursor
 -client: player/entity smoothing
 -create server entity and server stack class
-
+-belegte farben sind noch nicht blockeirt
+-hide card with button
+-hide zones
+-circle shape/hitzone
+- claim rejected -> remove entity from user selection
+    - prevent user from modifing card which he has not claimed
 -stacks
     -pop
     TODO: wenn stapel bereits vorhanden, nur surfaces updaten
 
-
+#done?# remove constraint, when removing entity
 
 
 

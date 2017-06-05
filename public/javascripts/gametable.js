@@ -208,22 +208,26 @@ class GameTable extends PIXI.Container {
             if(!this.seatGFX[i].visible) continue;
             evt.entity.aplha = 0.4;
             // if hidezone is current player, then continue
-
+/*
             if(this.seatGFX[i].claimedBy && this.seatGFX[i].claimedBy == this.currentPlayerID){
                 if(evt.entity.hidden){
                     evt.entity.hidden=false;
                 }
                 continue;
-            }
+            }*/
 
             var c= this.seats[i];
             if(Util.isPointInRectangle(x,y,c.position.x+c.offset.x,c.position.y+c.offset.y,c.width,c.height)){
-                if(!evt.entity.hidden) {
+
+                if(this.seatGFX[i].claimedBy == this.currentPlayerID){
+                    evt.entity.alpha = 0.5;
+                }else if(!evt.entity.hidden) {
                     evt.entity.hidden = true;
                 }
                 break;
             }else if(evt.entity.hidden){
                 evt.entity.hidden=false;
+                evt.entity.alpha=1;
             }
         }
     }

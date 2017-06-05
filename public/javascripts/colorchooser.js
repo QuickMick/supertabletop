@@ -33,8 +33,6 @@ class ColorChooser extends PIXI.Container{
             width:renderer.width,
             height:renderer.height
         });
-
-
     }
 
     /**
@@ -54,14 +52,13 @@ class ColorChooser extends PIXI.Container{
             y:evt.height/2
         };
 
-
         this.removeAll();
 
         var bg = new PIXI.Sprite(this.backgroundTexture);
         bg.width = evt.width;
         bg.height = evt.height;
         bg.interactive=true;
-        bg.mousemove =  (e) => e.stopPropegation();
+        bg.mousemove =  (e) => e.stopped = true;//e.stopPropegation();
         this.addChild(bg);
 
 
@@ -93,24 +90,29 @@ class ColorChooser extends PIXI.Container{
         currentColor.width = size;
         currentColor.height = size;
 
-
-
         currentColor.position.x = this.colorPiclerPositions[j].x;
         currentColor.position.y = this.colorPiclerPositions[j].y;
         currentColor.interactive = true;
+
         this.addChild(currentColor);
 
+
+        var oldScale = currentColor.scale.x;    // scale is not exaclty 1,
+                                                // setting whight and height previously changes the scale
+                                                // so use this value for the mouse over effect
+
+        currentColor.mouseover = (e) => currentColor.scale.set(oldScale+PERCENT_PADDING);
+        currentColor.mouseout = (e) => currentColor.scale.set(oldScale);
+
+
+
         if(assignments.colors[color]){
-            currentColor.scale.set(0.7);
+            currentColor.scale.set(oldScale*0.7);
             currentColor.alpha = 0.4;
             return; // no input possible, if color is already assigned
         }
 
-        currentColor.mouseover = (e) => currentColor.scale.set(1+PERCENT_PADDING);
-        currentColor.mouseout = (e) => currentColor.scale.set(1);
-
         currentColor.on('mousedown',function(){
-
             // do not send, if nothing has changed
             if(this.playerManager.currentPlayer.color == color) return;
 

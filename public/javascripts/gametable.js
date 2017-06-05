@@ -3,6 +3,8 @@
  */
 'use strict';
 require('pixi.js');
+require('pixi-filters');
+
 const Ticks = require('./../../core/ticks.json');
 const Util = require('./../../core/util');
 var DEFAULT_TABLE = require('./../resources/default_game.json').table;
@@ -116,6 +118,7 @@ class GameTable extends PIXI.Container {
             var cur = this._generatePlayerSeats(this.seats[i]);
             this.seatGFX.push(cur);
             this.seatContainer.addChild(cur);
+
             if(!assignments.indexes[i]){
                 cur.visible = false;
                 continue;
@@ -127,6 +130,8 @@ class GameTable extends PIXI.Container {
             var player = playerManager.getPlayer(assignments.indexes[i]);
             cur.tint = player.color || Colors.SEAT_DEFAULT_COLOR;
         }
+
+        this._refreshHiding();
     }
 
     _generatePlayerSeats(seat) {
@@ -138,12 +143,14 @@ class GameTable extends PIXI.Container {
         graphics.rotation = seat.rotation;
         graphics.position.x = seat.position.x + seat.offset.x;
         graphics.position.y = seat.position.y + seat.offset.y;
+
+        graphics.entitiesInside = [];
+
      /*   graphics.pivot.x = seat.width/2;
         graphics.pivot.y = -seat.height/2;*/
 
         return graphics;//.generateTexture();
     }
-
 
     onPlayerIndexChanged(evt){
         // set new player index, and release old
@@ -151,15 +158,18 @@ class GameTable extends PIXI.Container {
             this.seatGFX[evt.newPlayerIndex].visible = true;
             this.seatGFX[evt.newPlayerIndex].claimedBy = evt.player.PLAYER_ID;
 
-            for(var key in this.entityManager.entities){
-                if(!this.entityManager.entities.hasOwnProperty(key)) continue;
-
-                this.onEntityMovedOrAdded({entity:this.entityManager.entities[key]});
-            }
+            this._refreshHiding();
         }
         if(evt.oldPlayerIndex >=0){
             this.seatGFX[evt.oldPlayerIndex].visible=false;
             delete this.seatGFX[evt.oldPlayerIndex].claimedBy;
+        }
+    }
+
+    _refreshHiding(){
+        for(var key in this.entityManager.entities){
+            if(!this.entityManager.entities.hasOwnProperty(key)) continue;
+            this.onEntityMovedOrAdded({entity:this.entityManager.entities[key]});
         }
     }
 
@@ -175,13 +185,6 @@ class GameTable extends PIXI.Container {
     }
 
     onColorChanged(evt){
-        /*
-         {
-         player:this.players[id],
-         oldColor:old,
-         newColor:newColor
-         }
-         */
         if(!evt.player || evt.player.playerIndex <0) return; // no seat chosen
 
         var seat = this.seatGFX[evt.player.playerIndex];
@@ -196,6 +199,18 @@ class GameTable extends PIXI.Container {
         if(evt.player.playerIndex >=0){
             this.seatGFX[evt.player.playerIndex].visible=false;
             delete this.seatGFX[evt.player.playerIndex].claimedBy;
+
+            // set all entities which were in the players zone visible again
+            for(var i=0; i< this.seatGFX[evt.player.playerIndex].entitiesInside.length; i++){
+                var curID = this.seatGFX[evt.player.playerIndex].entitiesInside[i];
+                if(this.entityManager.entities[curID] && this.entityManager.entities[curID].hidden){
+                    this.entityManager.entities[curID].hidden = false;
+                    this.entityManager.entities[curID].alpha = 1;
+                }
+            }
+
+            // and reset the contianing value
+            this.seatGFX[evt.player.playerIndex].entitiesInside =[];
         }
     }
 
@@ -218,16 +233,21 @@ class GameTable extends PIXI.Container {
 
             var c= this.seats[i];
             if(Util.isPointInRectangle(x,y,c.position.x+c.offset.x,c.position.y+c.offset.y,c.width,c.height)){
-
                 if(this.seatGFX[i].claimedBy == this.currentPlayerID){
-                    evt.entity.alpha = 0.5;
+                    evt.entity.alpha = 0.8;
                 }else if(!evt.entity.hidden) {
                     evt.entity.hidden = true;
+                }
+                // add entity to entitiesInside list, if it is no there already
+                if(this.seatGFX[i].entitiesInside.indexOf(evt.entity.ENTITY_ID) <=-1) {
+                    this.seatGFX[i].entitiesInside.push(evt.entity.ENTITY_ID);
                 }
                 break;
             }else if(evt.entity.hidden){
                 evt.entity.hidden=false;
                 evt.entity.alpha=1;
+                // remove from entitiesInside list
+                Util.removeByValue(this.seatGFX[i].entitiesInside,evt.entity.ENTITY_ID);
             }
         }
     }

@@ -285,11 +285,6 @@ class GameManager extends EventEmitter3{
     hideSeatChooser(evt){
         if(!this.seatChooser || !this.seatChooser.parent || this.playerManager.currentPlayer.playerIndex <0) return;
 
-        /*{
-            player:this.players[id],
-                oldPlayerIndex:old,
-            newPlayerIndex:value
-        }*/
         if(!evt.player.isCurrentPlayer) return; // if change does not affect human player, dont hide
         if(evt.newPlayerIndex < 0) return;  // if seat still not selected, dont hide
 

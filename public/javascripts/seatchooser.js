@@ -200,7 +200,7 @@ class SeatChooser extends PIXI.Container{
         //evt:id,player
         if(evt.player.playerIndex >=0) {
             this.removeChild(this.seats[evt.player.playerIndex]);
-            this.seats.push(this._createSeat(this.gameTable.seats[evt.player.playerIndex], evt.player.playerIndex));
+            this.seats[evt.player.playerIndex] = this._createSeat(this.gameTable.seats[evt.player.playerIndex], evt.player.playerIndex);
         }
     }
 

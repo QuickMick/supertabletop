@@ -86,6 +86,7 @@ class GameManager extends EventEmitter3{
         this.colorChooser = null;
 
         this.playerManager.on('playerindexchanged',this.hideSeatChooser.bind(this));
+        this.playerManager.on('colorchanged',this.hideColorChooser.bind(this));
 
        /* this.gameTable.min_zoom = Config.ZOOM.MIN;
         this.gameTable.max_zoom = Config.ZOOM.MAX;
@@ -199,7 +200,7 @@ class GameManager extends EventEmitter3{
             game.table.height,
             PIXI.loader.resources[Resources.default.content.table.texture].texture
         );*/
-        this.gameTable.setTable(game.table,this.playerManager.assignments);          // if table is given in the game.json, then set it as new table
+        this.gameTable.setTable(game.table,this.playerManager);          // if table is given in the game.json, then set it as new table
 
         // gamedata is available, hide loading screen
         window.hideLoadingDialog();
@@ -229,7 +230,7 @@ class GameManager extends EventEmitter3{
                     PIXI.loader.resources[table_texture].texture
                 );
             }*/
-            this.gameTable.setTable(game.table,this.playerManager.assignments);    // sets the table of the game, or the default table
+            this.gameTable.setTable(game.table,this.playerManager);    // sets the table of the game, or the default table
                                                     // if no table available in the game
 
         }.bind(this)).load();
@@ -306,12 +307,20 @@ class GameManager extends EventEmitter3{
         this.colorChooser = new ColorChooser(this.app.renderer,this.gameTable,this.synchronizer,this.playerManager);
         this.app.stage.addChild(this.colorChooser);
         this.on('resize',this.colorChooser.redrawChooser.bind(this.colorChooser));
+
+        this.playerManager.on('colorchanged',this.colorChooser.onRedrawNecessaryHandler.bind(this.colorChooser));
+        this.playerManager.on('playerdisconnected',this.colorChooser.onRedrawNecessaryHandler.bind(this.colorChooser));
+        this.playerManager.on('playerconnected',this.colorChooser.onRedrawNecessaryHandler.bind(this.colorChooser));
     }
 
     hideColorChooser(){
 
         if(!this.colorChooser || !this.colorChooser.parent || this.playerManager.currentPlayer.color <0) return;
         this.removeListener('reseize',this.colorChooser.redrawChooser.bind(this.colorChooser));
+        this.playerManager.removeListener('colorchanged',this.colorChooser.onRedrawNecessaryHandler.bind(this.colorChooser));
+        this.playerManager.removeListener('playerdisconnected',this.colorChooser.onRedrawNecessaryHandler.bind(this.colorChooser));
+        this.playerManager.removeListener('playerconnected',this.colorChooser.onRedrawNecessaryHandler.bind(this.colorChooser));
+        this.colorChooser.parent.removeChild(this.colorChooser);
         this.colorChooser = null;
     }
 }

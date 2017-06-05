@@ -79,12 +79,15 @@ class ClientManager{
      * @param clientInfo
      */
     _addClient(socket, clientInfo){
-        this.clients[socket.id] = new Client(socket,clientInfo);
-
         // assign prefered color to client
-        if(typeof clientInfo.color == 'number' && clientInfo >=0){
+        // if it is not assigned already, if it is assigned, he has to choose another color
+        if(typeof clientInfo.color == 'number' && clientInfo >=0  && !this.assignedColors[clientInfo.color] ){
             this.assignedColors[clientInfo.color] = socket.id;
+        }else{
+            clientInfo.color = -1;
         }
+
+        this.clients[socket.id] = new Client(socket,clientInfo);
     }
 
     doesClientExist(id){
@@ -128,6 +131,12 @@ class ClientManager{
 
         console.log("updated client",id," color:",color);
 
+        // release old color
+        var oldColor = this.getClient(id).color;
+        if(oldColor >=0){
+            delete this.assignedColors[oldColor];
+        }
+
         this.clients[id].color = c;
         this.assignedColors[c] = id;
         return true;
@@ -141,13 +150,24 @@ class ClientManager{
      */
     updateClientIndex(id,index){
         if(!this.doesClientExist(id)){
-            console.log("client",id,"does not exist");
+            console.log("updateClientIndex: client",id,"does not exist");
+            return false;
+        }
+
+        if(index >=Ticks.MAX_PLAYERS){
+            console.log("updateClientIndex: client",id,"wants an index which is higher than the maximum player count",index);
             return false;
         }
 
         if(this.assignedPlayerIndexes[index]){
-            console.log("seat",index,"already chosen by",this.assignedPlayerIndexes[index],"cannot be chosen from",id);
+            console.log("updateClientIndex: seat",index,"already chosen by",this.assignedPlayerIndexes[index],"cannot be chosen from",id);
             return false;
+        }
+
+        // release old index
+        var oldIndex = this.getClient(id).playerIndex;
+        if(oldIndex >=0){
+            this.assignedPlayerIndexes[oldIndex]=false;
         }
 
         console.log("updated client",id,"player index index:",index);
@@ -205,6 +225,7 @@ class ClientManager{
 
         if (this.clients.hasOwnProperty(socket.id)) {
             this.assignedPlayerIndexes[this.clients[socket.id].playerIndex] = false;   // free the seat
+            delete this.assignedColors[this.clients[socket.id].color];  // release color
             delete this.clients[socket.id];                             // remove client out of the list
         }
 

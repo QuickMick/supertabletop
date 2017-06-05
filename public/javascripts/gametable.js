@@ -7,6 +7,7 @@ const Ticks = require('./../../core/ticks.json');
 const Util = require('./../../core/util');
 var DEFAULT_TABLE = require('./../resources/default_game.json').table;
 var Path = require('path');
+const Colors = require('./../resources/colors.json');
 
 const BORDER_SIZE = 5;
 
@@ -62,9 +63,11 @@ class GameTable extends PIXI.Container {
      * Sets a table to the camera
      * @param table
      */
-    setTable(tableData,assignments){//(width,height,texture){
+    setTable(tableData,playerManager){//(width,height,texture){
 
         tableData = tableData || DEFAULT_TABLE;    // if no table was passed, set default values
+
+        var assignments = playerManager.assignments;
 
         /**
          * contains the raw data of the loaded table seats
@@ -119,6 +122,10 @@ class GameTable extends PIXI.Container {
             }
 
             cur.claimedBy = assignments.indexes[i];
+
+            // set color of the player
+            var player = playerManager.getPlayer(assignments.indexes[i]);
+            cur.tint = player.color || Colors.SEAT_DEFAULT_COLOR;
         }
     }
 
@@ -158,8 +165,12 @@ class GameTable extends PIXI.Container {
 
     onPlayerConnected(evt){
         if(evt.player.playerIndex >=0){
-            this.seatGFX[evt.player.playerIndex].visible=true;
-            this.seatGFX[evt.player.playerIndex].claimedBy = evt.player.PLAYER_ID;
+            var seat = this.seatGFX[evt.player.playerIndex];
+            seat.visible=true;
+            seat.claimedBy = evt.player.PLAYER_ID;
+            if(evt.player.color >=0) {      // set color of the players chair
+                seat.tint = evt.player.color;
+            }
         }
     }
 
@@ -171,6 +182,13 @@ class GameTable extends PIXI.Container {
          newColor:newColor
          }
          */
+        if(!evt.player || evt.player.playerIndex <0) return; // no seat chosen
+
+        var seat = this.seatGFX[evt.player.playerIndex];
+
+        if(!seat) return;
+
+        seat.tint = evt.newColor;
     }
 
     onPlayerDisconnected(evt){

@@ -74,6 +74,12 @@ class PlayerManager extends PIXI.Container {
         };
     }
 
+    getPlayer(id){
+        if(!this.players[id]) return null;
+
+        return this.players[id];
+    }
+
     /**
      * updates the players position
      * @param evt
@@ -103,7 +109,7 @@ class PlayerManager extends PIXI.Container {
             this.players[player_data.id].anchor.y = cursor.anchor.y || 0;
             this.players[player_data.id].playerIndex = player_data.playerIndex;
             this.players[player_data.id].PLAYER_ID = player_data.id;
-
+            this.players[player_data.id].color = player_data.color;
             // assing the seat, if player already has chosen one
             if(player_data.playerIndex >=0){
                 this.assignedPlayerIndexes[player_data.playerIndex] = player_data.id;
@@ -140,12 +146,12 @@ class PlayerManager extends PIXI.Container {
             console.error("cannot init player without data");
             return;
         }
-        console.log("asd",data.playerIndex);
         this.players[data.id] ={
             rawPlayerData:data,
             isCurrentPlayer: true,
             playerIndex:data.playerIndex,
-            PLAYER_ID:data.id
+            PLAYER_ID:data.id,
+            color:data.color
         };
         this._currentPlayer =this.players[data.id];
         this.cursorManager.setCursor(data.cursor);
@@ -157,7 +163,7 @@ class PlayerManager extends PIXI.Container {
         // set color if available otherwise take default color defined in json
         if (data.color && data.color >=0) {
             // assign color, if player has already chosen one
-            this.assignedColors[color] = player_data.id;
+            this.assignedColors[data.color] = data.id;
         }
     }
 
@@ -193,6 +199,7 @@ class PlayerManager extends PIXI.Container {
                     var old = this.players[id].tint;
                     var newColor =Util.parseColor(value);
                     this.players[id].tint = value;
+                    this.players[id].color = value;
 
                     this.assignedColors[newColor] = id;
 

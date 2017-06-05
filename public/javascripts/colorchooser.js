@@ -6,7 +6,7 @@
 const Colors = require('./../resources/colors.json').PLAYERS_COLORS;
 const Ticks = require('./../../core/ticks.json');
 const Util = require('./../../core/util');
-
+const Packages = require('./../../core/packages');
 
 const PERCENT_PADDING = 0.2;
 const BORDER_SIZE = 3;
@@ -14,7 +14,7 @@ class ColorChooser extends PIXI.Container{
 
     constructor(renderer,gameTable,synchronizer,playerManager){
         super();
-
+        this.renderer = renderer;
         this.playerManager = playerManager;
         var assignments = this.playerManager.assignments;
     //    this.lerpManager = new LerpManager();
@@ -26,13 +26,26 @@ class ColorChooser extends PIXI.Container{
 
         this.gameTable = gameTable;
 
-        this.seats = [];
+        this.colors = JSON.parse(JSON.stringify(Colors));
+        this.colorPiclerPositions=[];
 
         this.redrawChooser({
             width:renderer.width,
             height:renderer.height
         });
 
+
+    }
+
+    /**
+     * should be called by events, where redrawing is necessary,
+     * e.g. color choosen or client added
+     */
+    onRedrawNecessaryHandler(){
+        this.redrawChooser({
+            width:this.renderer.width,
+            height:this.renderer.height
+        });
     }
 
     redrawChooser(evt){
@@ -41,16 +54,20 @@ class ColorChooser extends PIXI.Container{
             y:evt.height/2
         };
 
+
         this.removeAll();
 
         var bg = new PIXI.Sprite(this.backgroundTexture);
         bg.width = evt.width;
         bg.height = evt.height;
+        bg.interactive=true;
+        bg.mousemove =  (e) => e.stopPropegation();
         this.addChild(bg);
+
 
         // calculate the positions of the picker buttons depending on screensize
         var radius = Math.min(evt.width,evt.height)/3;
-        var colorPickerPositions = Util.pointsOfCircle(
+        this.colorPiclerPositions = Util.pointsOfCircle(
             center.x,
             center.y,
             radius,
@@ -58,86 +75,50 @@ class ColorChooser extends PIXI.Container{
         );
 
         // calculate the size of the picker buttons depending on the screen size
-        var size = (2*Math.PI*radius) / colorPickerPositions.length;
+        var size = (2*Math.PI*radius) / this.colorPiclerPositions.length;
         size = (size - (size*PERCENT_PADDING));
 
-        for(let i=0; i<colorPickerPositions.length; i++){
+        var assignments = this.playerManager.assignments;
 
-            for(let j=0;j<colorPickerPositions.length;j++){
-                var currentColor = new PIXI.Sprite(this.unselected);
-                currentColor.tint = Util.parseColor(Colors[j]);
-                currentColor.anchor.set(0.5);
-               // currentColor.scale.set(size);
-                currentColor.width = size;
-                currentColor.height = size;
-                currentColor.position.x = colorPickerPositions[j].x;
-                currentColor.position.y = colorPickerPositions[j].y;
-                currentColor.interactive = true;
-                this.addChild(currentColor);
-            }
-
-            /*
-             var seat = gameTable.seats[i];
-             this.seats.push(this._createSeat(seat,i));
-
-             if(assignments.indexes[i]) {    // if seat is assigned by another player
-             this._setColorAsSelected(seat);
-             continue;
-             }*/
-            //if seat is free, add color choosers
-            /*
-
-             */
-
-
-
-
-            /*
-             let color = Util.parseColor(PLAYERS_COLORS[i]);
-
-
-             cur.on('mousedown',function(){
-             synchronizer.sendPlayerUpdate([
-             {key:Packages.PROTOCOL.CLIENT_VALUE_UPDATE.COLOR,value:color},
-             {key:Packages.PROTOCOL.CLIENT_VALUE_UPDATE.PLAYER_INDEX,value:i}
-             ]);
-             //  this.emit('colorselected',{color:color});
-             }.bind(this),true);*/
+        for(let j=0;j<this.colorPiclerPositions.length;j++){
+            this._createSinglePicker(assignments,j,size);
         }
     }
 
-
-    _createSeat(seat,i){
-        var currentSeat = new PIXI.Sprite(this.unselected);
-        currentSeat.tint = Util.parseColor(Colors.SEAT_DEFAULT_COLOR);
-        currentSeat.anchor.set(0.5);
-        currentSeat.scale.set(1);
-        currentSeat.position.x = seat.position.x;
-        currentSeat.position.y = seat.position.y;
-        currentSeat.interactive = true;
-        currentSeat.id = seat.id;
-        this.addChild(currentSeat);
+    _createSinglePicker(assignments,j,size){
+        var currentColor = new PIXI.Sprite(this.unselected);
+        var color = Util.parseColor(this.colors[j]);
+        currentColor.tint = color;
+        currentColor.anchor.set(0.5);
+        currentColor.width = size;
+        currentColor.height = size;
 
 
-        this._getLerp(currentSeat, this.lerpManager, this, seat.id);
 
+        currentColor.position.x = this.colorPiclerPositions[j].x;
+        currentColor.position.y = this.colorPiclerPositions[j].y;
+        currentColor.interactive = true;
+        this.addChild(currentColor);
 
-        currentSeat.on('mousedown',function(){
+        if(assignments.colors[color]){
+            currentColor.scale.set(0.7);
+            currentColor.alpha = 0.4;
+            return; // no input possible, if color is already assigned
+        }
+
+        currentColor.mouseover = (e) => currentColor.scale.set(1+PERCENT_PADDING);
+        currentColor.mouseout = (e) => currentColor.scale.set(1);
+
+        currentColor.on('mousedown',function(){
 
             // do not send, if nothing has changed
-            if(this.playerManager.currentPlayer.playerIndex == i) return;
+            if(this.playerManager.currentPlayer.color == color) return;
 
             this.synchronizer.sendPlayerUpdate([
-                {key:Packages.PROTOCOL.CLIENT_VALUE_UPDATE.PLAYER_INDEX,value:i}
+                {key:Packages.PROTOCOL.CLIENT_VALUE_UPDATE.COLOR,value:color}
             ]);
-            this.emit('seatSelected',{seat:i});
+            this.emit('colorSelected',{color:color});
         }.bind(this),true);
-
-        return currentSeat;
-    }
-
-    _setColorAsSelected(){
-
     }
 
 

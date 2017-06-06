@@ -249,7 +249,7 @@ class GameServer{
         var clientInfo = {
             name:"mick",
             cursor:"default",
-            userStatus:"admin"/*,
+            userStatus:"guest"/*,
             color:Util.getRandomColor()*/
         };
 

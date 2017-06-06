@@ -20,7 +20,8 @@ playerSnapzones sollten nur aktive player affectieren?
 - table boundaries
 TODO: surfacechange als valuechange machn? und des nur dafür gedachte event rauskicken?
 
-
+kamera
+touch support
 
 chat
 color für cursor

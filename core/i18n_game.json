@@ -1,0 +1,14 @@
+{
+  "en-EN":{
+    "send":"send",
+    "guest":"guest",
+    "admin":"admin",
+    "mod":"mod"
+  },
+  "de-DE":{
+    "send":"send",
+    "guest":"Gast",
+    "admin":"admin",
+    "mod":"mod"
+  }
+}

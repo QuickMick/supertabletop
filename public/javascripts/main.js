@@ -4,6 +4,7 @@
 "use strict";
 require('pixi.js');
 
+var i18n =require('./../../core/i18n');
 
 var Statics = require("./../../core/statics");
 
@@ -29,6 +30,9 @@ else if (window.mozRequestAnimationFrame)
     window.requestAnimationFrame=window.mozRequestAnimationFrame;
 else if (window.webkitRequestAnimationFrame)
     window.requestAnimationFrame=window.webkitRequestAnimationFrame;
+
+
+window.I18N = new i18n(I18N_DATA);
 
 /*Number.prototype.round = function (decimal=0) {
     var x;

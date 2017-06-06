@@ -465,7 +465,7 @@ class PlayerManager extends PIXI.Container {
 
         var prefixNode = document.createElement("div");
         prefixNode.className="player-prefix";
-        prefixNode.innerHTML = prefix;
+        prefixNode.innerHTML = I18N.translate(prefix);
 
         var nameNode = document.createElement("div");
         nameNode.className="player-name";

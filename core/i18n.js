@@ -11,10 +11,29 @@ class I18N {
         this.languageData = languageData;
     }
 
-    translate(key){
-        return this.languageData[key] || "!"+key;
+    get timeFormat(){
+        return this.languageData.timeformat || "HH:MM:ss"
     }
 
+    translate(key){
+        if(!key || !this.languageData[key]) return "!NOT_FOUND";
+
+        var result = this.languageData[key] || "!"+key;
+        if(arguments.length > 1){   // replace keywords, if there are more arguments passed
+            result = this._replace(key,...arguments);
+        }
+        return result;
+    }
+
+    _replace(format) {
+        var args = Array.prototype.slice.call(arguments, 1);
+        return format.replace(/{(\d+)}/g, function(match, number) {
+            return typeof args[number] != 'undefined'
+                ? args[number]
+                : match
+                ;
+        });
+    }
 }
 
 module.exports = I18N;

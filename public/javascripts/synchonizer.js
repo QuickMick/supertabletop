@@ -49,6 +49,7 @@ class Synchronizer{
         this.toolManager = null;
         this.playerManager = null;
         this.gameTable = null;
+        this.chatHandler = null;
 
         /**
          * contains the timestamp of the last received gameState update
@@ -82,6 +83,7 @@ class Synchronizer{
         this.playerManager = this.gameManager.playerManager;
         this.toolManager = this.gameManager.toolManager;
         this.gameTable = this.gameManager.gameTable;
+        this.chatHandler = this.gameManager.chatHandler;
 
         this.socket = require('socket.io-client').connect();
         this._initHandlers();
@@ -98,7 +100,7 @@ class Synchronizer{
         setInterval(function(){
             if(!this.updateQueue.updateRequired) return;
 
-            this.sendMessage(Packages.PROTOCOL.CLIENT.SEND_STATE,Packages.createEvent(
+            this.sendPackage(Packages.PROTOCOL.CLIENT.SEND_STATE,Packages.createEvent(
                 this.CLIENT_INFO.id,
                 this.updateQueue.popUpdatedData()
                 )
@@ -159,13 +161,27 @@ class Synchronizer{
             this.playerManager.updatePlayerValue(evt.data.clientID,evt.data.changes);
         }.bind(this));
 
+        // if chat message from server is received
+        this.socket.on(Packages.PROTOCOL.CHAT.SERVER_CHAT_MSG, function (evt) {
+            //message
+            var from = this.playerManager.getPlayer(evt.data.clientID);
+            this.chatHandler.pushMessage(evt.data.message,evt.data.type,evt.timeStamp, from);
+        }.bind(this));
+
         this.socket.on('disconnect',function (evt) {
            console.log("DISCONNECT",evt);
         });
     }
 
-    sendMessage(type,msg){
+    sendPackage(type, msg){
         this.socket.emit(type,msg);
+    }
+
+    sendChatMessage(msg){
+        this.socket.emit(
+            Packages.PROTOCOL.CHAT.CLIENT_CHAT_MSG,
+            Packages.createEvent(this.CLIENT_INFO.id,{message:msg})
+        );
     }
 
     /**
@@ -175,7 +191,7 @@ class Synchronizer{
      * @param {[{key,value}]}
      */
     sendPlayerUpdate(data){
-        this.sendMessage(Packages.PROTOCOL.CLIENT.CLIENT_VALUE_UPDATE,
+        this.sendPackage(Packages.PROTOCOL.CLIENT.CLIENT_VALUE_UPDATE,
             Packages.createEvent(
                 this.CLIENT_INFO.id,
                 data

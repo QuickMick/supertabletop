@@ -8,19 +8,20 @@ block content
       div#player-container
     div.content
       div#stage
-      div.chat-container
-        div#chat-expander.btn &#x2B9F;
-        div#chat-output
-          div.message.system tesdf sdf sdfsdf
-          div.message.system.error tesdf sdf sdfsdasdsdf
-          div.message
-            span.user-message-time 10-23
-            span.user-message-prefix.admin admin
-            span.user-message-name mick
-            span.user-message-content hallo was geht absdf asd fasdf asdf asdf asf asd fasd fafsdf ss fds
-        div.chat-input
-          input#chat-input-field
-          div#chat-send.btn #{I18N_LAYOUT.send}
+      div#game-chat.chat-container.show
+        div.chat-expander.btn
+        div.chat-content
+          div.chat-output
+            div.message.system tesdf sdf sdfsdf
+            div.message.system.error tesdf sdf sdfsdasdsdf
+            div.message
+              span.user-message-time 10-23
+              span.user-message-prefix.admin admin
+              span.user-message-name mick
+              span.user-message-content hallo was geht absdf asd fasdf asdf asdf asf asd fasd fafsdf ss fds
+          div.chat-input
+            input.chat-input-field
+            div.chat-send.btn #{I18N_LAYOUT.send}
     div#loading-overlay
       div.loading-content
         div.spinner

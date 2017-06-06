@@ -432,69 +432,15 @@ class PlayerManager extends PIXI.Container {
      * @private
      */
     _createPlayerHTMLItem(container,id,prefix,name,color,index){
-
         var e = document.getElementById(id);
         if(e){
             console.log("player item already added to header");
             return;
         }
-/*
-        var itemNode = document.createElement("div");
-        itemNode.className = "player-item";
-        itemNode.id = id;
 
-        itemNode.dataset.index = index;
 
-        var imageNode = document.createElement("img");
-        imageNode.className = "player-image";
-        imageNode.onerror = function(){
-            console.log("err");
-            this.src = Config.PATHS.RESOURCE_BASE+"/default/missing_avatar.png";
-        };
-        if(prefix != "guest") { //TODO: i18n translation here
-            imageNode.src = Config.PATHS.USERS_RESOURCES + "/" + name + "/" + name + "_avatar.png";//"url('/"+Config.PATHS.USERS_RESOURCES+"/"+name+"/"+name+"_avatar.png";
-        }else{
-            imageNode.src = Config.PATHS.RESOURCE_BASE+"/default/missing_avatar.png";
-        }
 
-        var detailsNode = document.createElement("div");
-        detailsNode.className = "player-details";
 
-        var name_containerNode = document.createElement("div");
-        name_containerNode.className="player-name-container";
-
-        var prefixNode = document.createElement("div");
-        prefixNode.className="player-prefix";
-        prefixNode.innerHTML = I18N.translate(prefix);
-
-        var nameNode = document.createElement("div");
-        nameNode.className="player-name";
-        nameNode.innerHTML = name;
-
-        var seatNode = document.createElement("div");
-        seatNode.className = "player-seat";
-        seatNode.innerHTML = index>=0?(index+1) : "";
-
-        var colorNode = document.createElement("div");
-        colorNode.className="player-color";
-
-        if(color >= 0) {    // set color if available
-            colorNode.style.backgroundColor = Util.intToColorString(color);
-        }
-
-        var info_container = document.createElement("div");
-        info_container.className = "player-info-container";
-
-        itemNode.appendChild(imageNode);
-        name_containerNode.appendChild(prefixNode);
-        name_containerNode.appendChild(nameNode);
-        detailsNode.appendChild(name_containerNode);
-        info_container.appendChild(seatNode);
-        info_container.appendChild(colorNode);
-        detailsNode.appendChild(info_container);
-        itemNode.appendChild(detailsNode);
-
-*/
         var itemNode = document.createElement("div");
         itemNode.className = "player-item";
         itemNode.id = id;
@@ -506,28 +452,23 @@ class PlayerManager extends PIXI.Container {
             color:(color >= 0)?Util.intToColorString(color) : null // if color is fine, pass it, otherwise null
         });
 
+        // set the player image
+        var imageNode = itemNode.getElementsByClassName('player-image')[0];
+        imageNode.onerror = function(){
+            console.log("err");
+            this.src = Config.PATHS.RESOURCE_BASE+"/default/missing_avatar.png";
+        };
+        if(prefix != "guest") {
+            imageNode.src = Config.PATHS.USERS_RESOURCES + "/" + name + "/" + name + "_avatar.png";//"url('/"+Config.PATHS.USERS_RESOURCES+"/"+name+"/"+name+"_avatar.png";
+        }else{
+            imageNode.src = Config.PATHS.RESOURCE_BASE+"/default/missing_avatar.png";
+        }
+
+
+
+
         container.appendChild(itemNode);
         this._sortPlayerItems();
-
-        /*
-            jade example
-         *       div#player-container
-         div.player-item
-         div.player-image
-         div.player-details
-         div.player-name-container
-         p.player-prefix admin
-         p.player-name mick
-         div.player-color
-
-         div.player-item
-         img.player-image
-         div.player-details
-         div.player-name-container
-         p.player-prefix admin
-         p.player-name mick
-         div.player-color
-         */
     }
     _sortPlayerItems(){
         var playerItem = this.playerHTMLContainer.getElementsByClassName("player-item");
@@ -536,25 +477,13 @@ class PlayerManager extends PIXI.Container {
         for(var i=0; i< playerItem.length;i++){
             var c = playerItem[i];
             sorted.push(c);
-           // this.playerHTMLContainer.removeChild(c);
-
         }
-//         sorted.sort(function(a, b){
-//             /*if(a.dataset.index <0) return b;
-//             if(b.dataset.index <0) return a;
-// */
-//             console.log(parseInt(a.dataset.index) || 0 ,parseInt(b.dataset.index) );
-//             return (parseInt(a.dataset.index) || 0) - (parseInt(b.dataset.index) || 0);
-//         });
 
         sorted.sort(function(a, b) {
-        /*    if((parseInt(a.dataset.index) || 0) <0) return a;
-            if((parseInt(b.dataset.index) || 0) <0) return b;*/
             return a.dataset.index.localeCompare(b.dataset.index);
         });
         var d = document.createDocumentFragment();
         for(var i=0; i< sorted.length;i++){
-            //this.playerHTMLContainer.appendChild(sorted[i]);
             d.appendChild(sorted[i]);
         }
         this.playerHTMLContainer.appendChild(d);

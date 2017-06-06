@@ -11,6 +11,16 @@ module.exports =
         return {senderID:id,data:data || {},timeStamp:new Date().getTime()};
     },
     PROTOCOL: {
+        CHAT:{
+            /**
+             * the client wants to post a chat message
+             */
+            CLIENT_CHAT_MSG:"CLIENT_CHAT_MSG",
+            /**
+             * a message from the server which should be postet in the chat window
+             */
+            SERVER_CHAT_MSG:"SERVER_CHAT_MSG"
+        },
         CLIENT_VALUE_UPDATE:{
             COLOR:"color",
             PLAYER_INDEX:"playerIndex"

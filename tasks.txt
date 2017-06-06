@@ -20,6 +20,8 @@ playerSnapzones sollten nur aktive player affectieren?
 - table boundaries
 TODO: surfacechange als valuechange machn? und des nur dafür gedachte event rauskicken?
 
+TODO: compilen von pug templates als gulp task
+TODO: client message vertification
 kamera
 touch support
 

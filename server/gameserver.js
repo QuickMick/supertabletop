@@ -88,6 +88,10 @@ class GameServer{
                 console.log("CLIENT_VALUE_UPDATE: no data received");
                 return;
             }
+            if(!this.clientManager.doesClientExist(evt.senderID)){
+                console.log("message received from not existing client!",evt.senderID);
+                return;
+            }
             var valid = this._processClientValueUpdates(evt);
             if(valid) {
                 this._boradcast(    // if the change was valid, send everyone the new information
@@ -101,6 +105,33 @@ class GameServer{
                     )
                 );
             }
+        }.bind(this));
+
+        socket.on(Packages.PROTOCOL.CHAT.CLIENT_CHAT_MSG, function (evt) {
+            if(!evt || !evt.data){
+                console.log("CLIENT_CHAT_MSG: no data received");
+                return;
+            }
+            if(!this.clientManager.doesClientExist(evt.senderID)){
+                console.log("message received from not existing client!",evt.senderID);
+                return;
+            }
+
+            if(!evt.data.message){
+                return; // no chat message to share
+            }
+
+            this._boradcast(    // if the change was valid, send everyone the new information
+                Packages.PROTOCOL.CHAT.SERVER_CHAT_MSG,
+                Packages.createEvent(
+                    this.ID,
+                    {
+                        clientID: evt.senderID,
+                        type:"user",
+                        message: evt.data.message
+                    }
+                )
+            );
         }.bind(this));
 
         //removes this client from the serverclient list and broadcasts the information to all remaining clients
@@ -125,6 +156,10 @@ class GameServer{
         socket.on(Packages.PROTOCOL.CLIENT.SEND_STATE, function (evt) {
             if(!evt || !evt.data){
                 console.log("SEND_STATE: no data received");
+                return;
+            }
+            if(!this.clientManager.doesClientExist(evt.senderID)){
+                console.log("message received from not existing client!",evt.senderID);
                 return;
             }
             // the received updates are processes everytime before the engine is processed.
@@ -249,7 +284,7 @@ class GameServer{
         var clientInfo = {
             name:"mick",
             cursor:"default",
-            userStatus:"guest"/*,
+            userStatus:"registered"/*,
             color:Util.getRandomColor()*/
         };
 

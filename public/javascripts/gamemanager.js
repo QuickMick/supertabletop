@@ -21,6 +21,8 @@ var InputHandler = require('./inputhandler');
 var ToolManager = require('./toolmanager');
 var CursorManager = require('./cursormanager');
 
+var ChatHandler = require('./chathandler');
+
 var SeatChooser = require('./seatchooser');
 var ColorChooser = require('./colorchooser');
 
@@ -74,7 +76,10 @@ class GameManager extends EventEmitter3{
         this.playerManager.on('playerdisconnected',this.gameTable.onPlayerDisconnected.bind(this.gameTable));
         this.playerManager.on('colorchanged',this.gameTable.onColorChanged.bind(this.gameTable));
 
+        this.chatHandler = new ChatHandler("game-chat");
         this.synchronizer = new Synchronizer(this);     // initialize socket-connection/synchronizer
+
+        this.chatHandler.on('send',this.synchronizer.sendChatMessage.bind(this.synchronizer));
 
 
         /**

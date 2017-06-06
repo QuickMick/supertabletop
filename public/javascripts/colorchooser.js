@@ -101,16 +101,18 @@ class ColorChooser extends PIXI.Container{
                                                 // setting whight and height previously changes the scale
                                                 // so use this value for the mouse over effect
 
-        currentColor.mouseover = (e) => currentColor.scale.set(oldScale+PERCENT_PADDING);
-        currentColor.mouseout = (e) => currentColor.scale.set(oldScale);
 
-
-
-        if(assignments.colors[color]){
+        if(assignments.colors[color]){  // check if current color is currently assigned
             currentColor.scale.set(oldScale*0.7);
             currentColor.alpha = 0.4;
             return; // no input possible, if color is already assigned
         }
+
+
+        currentColor.mouseover = (e) => currentColor.scale.set(oldScale+PERCENT_PADDING);
+        currentColor.mouseout = (e) => currentColor.scale.set(oldScale);
+
+
 
         currentColor.on('mousedown',function(){
             // do not send, if nothing has changed

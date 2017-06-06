@@ -258,11 +258,17 @@ class PlayerManager extends PIXI.Container {
                         this.assignedPlayerIndexes[value] = false;
                     }
 
-                    if(value >= 0) {    // set color if available
-                        var playerItem = document.getElementById(id);
-                        var indexNode = playerItem.getElementsByClassName("player-seat");
+                     // set color if available
+                    var playerItem = document.getElementById(id);
+                    playerItem.dataset.index = value;
+                    var indexNode = playerItem.getElementsByClassName("player-seat");
+                    if(value >= 0) {
                         indexNode[0].innerHTML = (value+1);
+                    }else{
+                        indexNode[0].innerHTML = "";
                     }
+
+                    this._sortPlayerItems();
 
                     // emit index change event
                     this.emit(EVT_PLAYER_INDEX_CHANGED,{
@@ -434,6 +440,8 @@ class PlayerManager extends PIXI.Container {
         itemNode.className = "player-item";
         itemNode.id = id;
 
+        itemNode.dataset.index = index;
+
         var imageNode = document.createElement("img");
         imageNode.className = "player-image";
         imageNode.onerror = function(){
@@ -485,6 +493,7 @@ class PlayerManager extends PIXI.Container {
 
 
         container.appendChild(itemNode);
+        this._sortPlayerItems();
 
         /*
             jade example
@@ -506,7 +515,34 @@ class PlayerManager extends PIXI.Container {
          div.player-color
          */
     }
+    _sortPlayerItems(){
+        var playerItem = this.playerHTMLContainer.getElementsByClassName("player-item");
 
+        var sorted = [];
+        for(var i=0; i< playerItem.length;i++){
+            var c = playerItem[i];
+            sorted.push(c);
+           // this.playerHTMLContainer.removeChild(c);
+
+        }
+//         sorted.sort(function(a, b){
+//             /*if(a.dataset.index <0) return b;
+//             if(b.dataset.index <0) return a;
+// */
+//             console.log(parseInt(a.dataset.index) || 0 ,parseInt(b.dataset.index) );
+//             return (parseInt(a.dataset.index) || 0) - (parseInt(b.dataset.index) || 0);
+//         });
+
+        sorted.sort(function(a, b) {
+        /*    if((parseInt(a.dataset.index) || 0) <0) return a;
+            if((parseInt(b.dataset.index) || 0) <0) return b;*/
+            return a.dataset.index.localeCompare(b.dataset.index);
+        });
+
+        for(var i=0; i< sorted.length;i++){
+            this.playerHTMLContainer.appendChild(sorted[i]);
+        }
+    }
     /**
      * removes an playeritem based on the id from the header
      * @param id {string}

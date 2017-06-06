@@ -266,6 +266,7 @@ class Util {
             var len = buffer.data.length;
             var data = buffer.data;
             var c = Util.hexToRGB(tint);
+
             // use inverse to tint white
             c.r = 255-c.r;
             c.g = 255-c.g;

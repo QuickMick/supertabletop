@@ -231,7 +231,10 @@ class PlayerManager extends PIXI.Container {
                     if(value >= 0) {    // set color if available
                         var playerItem = document.getElementById(id);
                         var colorNode = playerItem.getElementsByClassName("player-color");
-                        this.cursorManager.setCursor(this.players[id].cursor,value);
+
+                        if(this.players[id].isCurrentPlayer) {   // if current player is updating his color, update his cursor too
+                            this.cursorManager.setCursor(this.players[id].cursor, value);
+                        }
                         colorNode[0].style.backgroundColor = Util.intToColorString(value);
                     }
 

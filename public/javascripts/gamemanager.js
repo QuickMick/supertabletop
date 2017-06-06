@@ -76,7 +76,28 @@ class GameManager extends EventEmitter3{
         this.playerManager.on('playerdisconnected',this.gameTable.onPlayerDisconnected.bind(this.gameTable));
         this.playerManager.on('colorchanged',this.gameTable.onColorChanged.bind(this.gameTable));
 
+
         this.chatHandler = new ChatHandler("game-chat");
+/*
+        var EVT_COLOR_CHANGES='colorchanged';
+        var EVT_PLAYER_INDEX_CHANGED='playerindexchanged';
+        var EVT_PLAYER_DISCONNECTED ='playerdisconnected';
+        var EVT_PLAYER_CONNECTED ='playerconnected';
+
+
+
+        this.playerManager.on('playerdisconnected',this.chatHandler.onPlayerDisconnected.bind(this.gameTable));
+        this.playerManager.on('colorchanged',this.chatHandler.onColorChanged.bind(this.gameTable));
+*/
+     //   this.chatHandler.pushMessage(I18N.translate("player_connected",evt.data.name,evt.data.creator),"system",evt.timeStamp);
+        this.playerManager.on('playerconnected',(evt) => this.chatHandler.pushMessage(I18N.translate("player_connected",evt.player.name),"system"));
+        this.playerManager.on('playerdisconnected',(evt) => this.chatHandler.pushMessage(I18N.translate("player_disconnected",evt.player.name),"system"));
+        this.playerManager.on('colorchanged',(evt) => this.chatHandler.pushMessage(I18N.translate("player_color_changed",evt.player.name),"system"));
+        this.playerManager.on('playerindexchanged',(evt) => this.chatHandler.pushMessage(I18N.translate("player_seat_changed",evt.player.name),"system"));
+
+
+
+
         this.synchronizer = new Synchronizer(this);     // initialize socket-connection/synchronizer
 
         this.chatHandler.on('send',this.synchronizer.sendChatMessage.bind(this.synchronizer));

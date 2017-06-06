@@ -100,7 +100,15 @@ a {
 .btn:active{
   background-color: #808080;
 }
-
+/*
+[tooltip]:before {
+  position : absolute;
+  content : attr(tooltip);
+  opacity : 0;
+}
+[tooltip]:hover:before {
+  opacity : 1;
+}*/
 /*----------- CHAT --------------------------*/
 
 .chat-container{
@@ -166,7 +174,6 @@ a {
   transition: opacity 0.3s ease;
 }
 
-
 .chat-container.show .chat-content .chat-output{
   flex-grow: 1;
   background-color: gainsboro;
@@ -182,11 +189,11 @@ a {
 
 }
 
-.chat-container.show .chat-content .chat-output .message .system{
+.chat-container.show .chat-content .chat-output .message.system{
   font-style:italic;
   text-align: center;
 }
-.chat-container.show .chat-content .chat-output .message .system.error{
+.chat-container.show .chat-content .chat-output .message.system.error{
   color: #e20000;
 }
 
@@ -247,6 +254,7 @@ a {
 .chat-container.show .chat-content .chat-input .chat-send.btn{
 
 }
+
 .chat-container.hide .chat-content *{
   margin: 0;
   padding: 0;

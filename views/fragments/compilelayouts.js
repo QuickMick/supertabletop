@@ -11,6 +11,7 @@ var Path = require('path');
 class CompileLayouts {
 
     constructor() {
+
     }
 
     compile(){

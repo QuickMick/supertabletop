@@ -219,14 +219,17 @@ class Util {
     }
 
     /**
-     * converst a string to html nodes
+     * converst a string to html nodes,
+     * string must contain just ONE root note
      * @param string {string}
      * @returns {NodeList}
      */
-    static htmlStringToNodes(string){
-        var div = document.createElement('div');
+    static htmlStringToNode(htmlString){
+        /*var div =  document.createDocumentFragment(); //document.createElement('div');
         div.innerHTML = string;
-        return div.childNodes;
+        return div.childNodes[0];*/
+
+        return document.createRange().createContextualFragment(htmlString);
     }
 
     /**

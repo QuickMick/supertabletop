@@ -4,21 +4,43 @@
 
 'use strict';
 var EventEmitter3 = require('eventemitter3');
+var Util = require('./../../core/util');
 
 var dateFormat = require('dateformat');
 
 const EVT_SEND = 'send';
 
+/**
+ * it chat window is scrolled down in the amount of this threshold, then the next message
+ * will scroll it completely down, otherwise it stays in this position and the user
+ * has to scroll down by himself.
+ * @type {number}
+ */
+const SCROLL_DOWN_TRESHOLD = 15;
+
 class ChatHandler extends EventEmitter3{
 
-    constructor(chatRootID) {
+    /**
+     *
+     * @param chatRootID ID of the container, which is the "home" of the chat
+     * @param maxLogLength maximum of displayed messages
+     */
+    constructor(chatRootID,maxLogLength = 50) {
         super();
+        this.maxLogLength = maxLogLength;
         this.rootContainer = document.getElementById(chatRootID);
-
-        this.rootContainer.addEventListener("mousewheel", (e)=>e.preventBubble() , false);
 
         if(!this.rootContainer)
             throw "chat container does not exist!";
+
+
+        // prevent, that input from chat is fowarded to the gampelay - e.g. mousehweel must be blocked
+        this.rootContainer.addEventListener("mousewheel", (e)=>e.stopPropagation() , true);
+        this.rootContainer.addEventListener("mousemove", (e)=>e.stopPropagation() , true);
+        this.rootContainer.addEventListener("mousedown", (e)=>e.stopPropagation() , true);
+        this.rootContainer.addEventListener("mouseup", (e)=>e.stopPropagation() , true);
+        this.rootContainer.addEventListener("keydown", (e)=>e.stopPropagation() , true);
+        this.rootContainer.addEventListener("keyup", (e)=>e.stopPropagation() , true);
 
         // get the required html elements
         // for expanding/inflating
@@ -62,23 +84,31 @@ class ChatHandler extends EventEmitter3{
     _sendMessage(){
         var msg = this._inputText.value;
         this._inputText.value = "";
+        this._inputText.focus();
         msg = msg || "";
         if(!msg) return;    // no text to send available
 
         this.emit(EVT_SEND,msg.toString());
     }
 
-
+    /**
+     * shows a message in the chat
+     * @param msg {string}
+     * @param type {string}
+     * @param timeStamp {number} just necesarry, when type is user
+     * @param sender {player} just necesarry, when type is user
+     */
     pushMessage(msg, type, timeStamp, sender){
         msg = msg || "";
 
         if(!msg || !type) return; // message is empty, no need to display
 
-        type = type;
+        type = type || "";
 
         var fn = null;
         var local = {};
 
+        // load the template and prepare the values for the template
         switch(type){
             case "error":
                 fn = window.chatServerErrorMsg;
@@ -95,30 +125,42 @@ class ChatHandler extends EventEmitter3{
                     return;
                 }
                 local.msg = msg;
-                local.time = dateFormat(new Date(timeStamp), I18N.timeFormat);
                 local.prefix = I18N.translate(sender.userStatus || "");
                 local.name = sender.name || "name-not-found";
                 break;
             default:
                 return; // no type, nothing to do
         }
-        var range = 5;
+
+        timeStamp = timeStamp || new Date().getTime();
+        local.time = dateFormat(new Date(timeStamp), I18N.timeFormat);
+
         var scrollDown = false;
 
-
-        if( this._outputContainer.scrollHeight -this._outputContainer.scrollTop- this._outputContainer.offsetHeight <= range){
+        // check if is scrolled to bottom
+        if( this._outputContainer.scrollHeight -this._outputContainer.scrollTop- this._outputContainer.offsetHeight <= SCROLL_DOWN_TRESHOLD){
             scrollDown =true;
         }
 
-        var newMessage = document.createElement("div");
-        newMessage.classList = "message";
-        newMessage.innerHTML = fn(local);
-        this._outputContainer.appendChild(newMessage);
+        // create the new message element
+      //  var newMessage = document.createElement("div");
+      //  newMessage.classList = "message";
+       // newMessage.innerHTML = fn(local);
 
+        // add it to the log
+       // this._outputContainer.appendChild(newMessage);
+        this._outputContainer.appendChild(Util.htmlStringToNode(fn(local)));
+
+        //check if messages are more then the maximum, if yes, remove
+        if(this._outputContainer.childNodes.length > this.maxLogLength){
+            // remove first child
+            this._outputContainer.removeChild(this._outputContainer.childNodes[0]);
+        }
+
+        // if it was scrolled to the bottom previously, then als scroll down
         if(scrollDown) {
             this._outputContainer.scrollTop = this._outputContainer.scrollHeight;
         }
-
     }
 }
 

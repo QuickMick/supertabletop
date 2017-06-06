@@ -133,6 +133,7 @@ class Synchronizer{
 
         // receive data about the dame (after initialisation, or gamechange
         this.socket.on(Packages.PROTOCOL.SERVER.INIT_GAME, function (evt) {
+            this.chatHandler.pushMessage(I18N.translate("load_game",evt.data.name,evt.data.creator),"system",evt.timeStamp);
             this.gameManager.initGame(evt.data);
             this.lastGameStateUpdateEventTimeStamp=this.lastGameStateUpdateTimeStamp = new Date().getTime();
         }.bind(this));

@@ -6,7 +6,12 @@
     "admin":"Admin",
     "registered":"Registered",
     "mod":"Mod",
-    "timeformat":"h:MM:ss"
+    "timeformat":"h:MM:ss",
+    "load_game":"Load game '{0}' created by {1}",
+    "player_connected":"Player {0} connected",
+    "player_disconnected":"Player {0} disconnected",
+    "player_color_changed":"Player {0} has changed his color",
+    "player_seat_changed":"Player {0} has changed his seat"
   },
   "de-DE":{
     "title":"Super Tabletop",
@@ -15,6 +20,11 @@
     "admin":"Admin",
     "mod":"Mod",
     "registered":"Registriert",
-    "timeformat":"HH:MM:ss"
+    "timeformat":"HH:MM:ss",
+    "load_game":"Lade Spiel '{0}' erstellt von {1}",
+    "player_connected":"Spieler {0} hat sich verbunden",
+    "player_disconnected":"Spieler {0} hat die verbindung abgebrochen",
+    "player_color_changed":"Spieler {0} hat die Farbe gewechselt",
+    "player_seat_changed":"Spieler {0} hat den Platz gewechselt"
   }
 }

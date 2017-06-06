@@ -25,6 +25,8 @@ TODO: client message vertification
 kamera
 touch support
 
+spamschutz am server
+
 chat
 color für cursor
 

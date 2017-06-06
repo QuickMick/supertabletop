@@ -8,19 +8,28 @@
 class I18N {
 
     constructor(languageData) {
-        this.languageData = languageData;
+        this._languageData = languageData;
+    }
+
+    /**
+     * returns all language data
+     * @returns {*}
+     */
+    get data(){
+        return this._languageData;
     }
 
     get timeFormat(){
-        return this.languageData.timeformat || "HH:MM:ss"
+        return this._languageData.timeformat || "HH:MM:ss"
     }
 
     translate(key){
-        if(!key || !this.languageData[key]) return "!NOT_FOUND";
+        if(!key || !this._languageData[key]) return "!NOT_FOUND";
 
-        var result = this.languageData[key] || "!"+key;
+        var result = this._languageData[key] || "!"+key;
         if(arguments.length > 1){   // replace keywords, if there are more arguments passed
-            result = this._replace(key,...arguments);
+            arguments[0] = result;
+            result = this._replace(...arguments);
         }
         return result;
     }
@@ -30,8 +39,7 @@ class I18N {
         return format.replace(/{(\d+)}/g, function(match, number) {
             return typeof args[number] != 'undefined'
                 ? args[number]
-                : match
-                ;
+                : match;
         });
     }
 }

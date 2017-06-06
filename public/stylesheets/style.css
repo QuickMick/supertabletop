@@ -194,6 +194,7 @@ a {
 
 .chat-container .chat-input{
   height: 25px;
+  min-height: 25px;
   display: flex;
   flex-direction: row;
   margin: 0 10px 10px 10px;

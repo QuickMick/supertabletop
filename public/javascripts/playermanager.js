@@ -438,7 +438,7 @@ class PlayerManager extends PIXI.Container {
             console.log("player item already added to header");
             return;
         }
-
+/*
         var itemNode = document.createElement("div");
         itemNode.className = "player-item";
         itemNode.id = id;
@@ -494,6 +494,17 @@ class PlayerManager extends PIXI.Container {
         detailsNode.appendChild(info_container);
         itemNode.appendChild(detailsNode);
 
+*/
+        var itemNode = document.createElement("div");
+        itemNode.className = "player-item";
+        itemNode.id = id;
+        itemNode.dataset.index = index;
+        itemNode.innerHTML = window.tabletopUserItem({
+            prefix: I18N.translate(prefix),
+            name:name,
+            index: index>=0?(index+1) : "", // pass index, or empty string if index is not chosen yet
+            color:(color >= 0)?Util.intToColorString(color) : null // if color is fine, pass it, otherwise null
+        });
 
         container.appendChild(itemNode);
         this._sortPlayerItems();
@@ -541,10 +552,12 @@ class PlayerManager extends PIXI.Container {
             if((parseInt(b.dataset.index) || 0) <0) return b;*/
             return a.dataset.index.localeCompare(b.dataset.index);
         });
-
+        var d = document.createDocumentFragment();
         for(var i=0; i< sorted.length;i++){
-            this.playerHTMLContainer.appendChild(sorted[i]);
+            //this.playerHTMLContainer.appendChild(sorted[i]);
+            d.appendChild(sorted[i]);
         }
+        this.playerHTMLContainer.appendChild(d);
     }
     /**
      * removes an playeritem based on the id from the header

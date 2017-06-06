@@ -218,6 +218,16 @@ class Util {
         return Math.sqrt((a*a)+(b*b));
     }
 
+    /**
+     * converst a string to html nodes
+     * @param string {string}
+     * @returns {NodeList}
+     */
+    static htmlStringToNodes(string){
+        var div = document.createElement('div');
+        div.innerHTML = string;
+        return div.childNodes;
+    }
 
     /**
      * Shuffles array in place. ES6 version

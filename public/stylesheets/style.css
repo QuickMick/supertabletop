@@ -42,6 +42,171 @@ h1{
   font-size: 30px;
 }
 
+
+#main{
+  padding: 0;
+  margin:0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  position: relative;
+  flex-direction: column;
+}
+
+
+a {
+  color: #00B7FF;
+}
+
+.content{
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: row;
+}
+
+#stage{
+  width: 100%;
+  flex-grow: 1;
+  display: flex;
+}
+
+
+#stage canvas{
+  flex-grow: 1;
+}
+
+.btn{
+  border: none;
+  background-color: #cfcfcf;
+  padding: 5px;
+  text-align: center;
+  text-decoration: none;
+  display: table-cell;
+  vertical-align: middle;
+  cursor:pointer;
+  font-weight: bold;
+}
+
+.btn:hover{
+  background-color: #9c9c9c;
+}
+.btn:active{
+  background-color: #808080;
+}
+
+/*----------- CHAT --------------------------*/
+
+.chat-container{
+  width: 400px;
+  height: 250px;
+  background-color: red;
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/** & #x2B9D; */
+.chat-container #chat-expander.btn{
+  height: 15px;
+  background-color: #00B7FF;
+  text-align: center;
+  padding: 2px;
+}
+
+.chat-container #chat-output{
+  flex-grow: 1;
+  background-color: green;
+  margin: 0 0 10px 10px;
+  display: flex;
+  flex-direction: column;
+  overflow-y: scroll;
+  overflow-x: hidden;
+}
+
+.chat-container #chat-output .message{
+  margin:3px 10px;
+
+}
+
+.chat-container #chat-output .message.system{
+  font-style:italic;
+  text-align: center;
+}
+.chat-container #chat-output .message.system.error{
+  color: #e20000;
+}
+
+.chat-container #chat-output .message .user-message-time {
+  font-weight: bold;
+  margin-right: 5px;
+}
+/*
+.chat-container #chat-output .message .user-message-time:before {
+  content: "[";
+}*/
+.chat-container #chat-output .message .user-message-time:after {
+  content: " |";
+}
+
+.chat-container #chat-output .message .user-message-prefix {
+  font-weight: bold;
+  margin-right: 3px;
+}
+
+.chat-container #chat-output .message .user-message-prefix.admin {
+  color: #e20000;
+}
+
+.chat-container #chat-output .message .user-message-prefix:before {
+  content: "[";
+}
+.chat-container #chat-output .message .user-message-prefix:after {
+  content: "]";
+}
+
+.chat-container #chat-output .message .user-message-name {
+  font-weight: bold;
+  margin-right: 5px;
+}
+.chat-container #chat-output .message .user-message-name:after {
+  content: ":";
+}
+
+.chat-container #chat-output .message .user-message-content {
+
+}
+
+.chat-container .chat-input{
+  height: 25px;
+  display: flex;
+  flex-direction: row;
+  margin: 0 10px 10px 10px;
+}
+
+.chat-container .chat-input #chat-input-field{
+  flex-grow: 1;
+  margin-right: 10px;
+}
+
+.chat-container .chat-input #chat-send.btn{
+
+}
+
+
+@media (min-width: 0em) and (max-width: 40em) {
+  .chat-container{
+    width: 250px;
+    height: 100px;
+  }
+}
+
+/*----------- CHAT END ----------------------*/
+
+/*----------- PLAYER CONTAINER --------------*/
+
 #player-container{
   flex-grow: 1;
   height:100%;
@@ -67,7 +232,6 @@ h1{
   flex-direction: row;
   margin-left: 10px;
 }
-
 
 .player-item .player-image{
   width: calc(var(--header-height) - 10px);
@@ -131,62 +295,27 @@ h1{
 .player-item .player-name{
   margin: 0 0 0 2px;
 }
+/*----------- PLAYER CONTAINER END-------*/
 
-#main{
-  padding: 0;
-  margin:0;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  position: relative;
-  flex-direction: column;
-}
-
-
-a {
-  color: #00B7FF;
-}
-
-#stage{
-  width: 100%;
-  flex-grow: 1;
-  display: flex;
-}
-
-
-#stage canvas{
-  flex-grow: 1;
+/*----------- LOADING ANIM --------------*/
+.loading-content{
+  margin: auto;
+  width: 40px;
+  height: 40px;
 }
 
 #loading-overlay{
- /* margin: auto;*/
+  /* margin: auto;*/
   top: 0;
   bottom: 0;
   left: 0;
   right: 0;
   position: absolute;
   display:flex;
+  z-index: 1000;
   background-color: rgba(0, 0, 0, 0.85);
 }
 
-.loading-content{
-  margin: auto;
-  width: 40px;
-  height: 40px;
-}
-/*
-canvas{
-  image-rendering: optimizeSpeed;
-  image-rendering: -moz-crisp-edges;
-  image-rendering: -webkit-optimize-contrast;
-  image-rendering: -o-crisp-edges;
-  image-rendering: pixelated;
-  -ms-interpolation-mode: nearest-neighbor;
-}*/
-
-
-
-/*----------- LOADING ANIM --------------*/
 .spinner {
  /* margin: 100px auto;*/
   width: 40px;

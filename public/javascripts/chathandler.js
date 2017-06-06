@@ -102,11 +102,22 @@ class ChatHandler extends EventEmitter3{
             default:
                 return; // no type, nothing to do
         }
+        var range = 5;
+        var scrollDown = false;
 
-        var x = document.createElement("div");
-        x.classList = "message";
-        x.innerHTML = fn(local);
-        this._outputContainer.appendChild(x);
+
+        if( this._outputContainer.scrollHeight -this._outputContainer.scrollTop- this._outputContainer.offsetHeight <= range){
+            scrollDown =true;
+        }
+
+        var newMessage = document.createElement("div");
+        newMessage.classList = "message";
+        newMessage.innerHTML = fn(local);
+        this._outputContainer.appendChild(newMessage);
+
+        if(scrollDown) {
+            this._outputContainer.scrollTop = this._outputContainer.scrollHeight;
+        }
 
     }
 }

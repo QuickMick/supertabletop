@@ -7,11 +7,11 @@
     "watch-js": "cmd /k watchify public/javascripts/main.js -o public/js/game.js -v -d",
     "editor-watch-js": "cmd /k watchify editor/editormain.js -o public/js/editor.js -v -d",
     "test": "mocha",
-    "debug":"node --inspect --debug-brk ./bin/www"
+    "debug": "node --inspect --debug-brk ./bin/www"
   },
   "devDependencies": {
-    "mocha":"*",
-    "watchify":"*"
+    "mocha": "*",
+    "watchify": "*"
   },
   "dependencies": {
     "bcrypt": "^1.0.2",
@@ -21,13 +21,13 @@
     "eventemitter3": "^2.0.3",
     "express": "~4.14.1",
     "glslify": "^6.0.2",
-    "jade": "~1.11.0",
     "matter-js": "^0.12.0",
     "morgan": "~1.7.0",
     "pixi-display": "*",
     "pixi-extra-filters": "*",
     "pixi-filters": "^1.0.6",
     "pixi.js": "*",
+    "pug": "^2.0.0-rc.2",
     "serve-favicon": "~2.3.2",
     "socket.io": "*",
     "socket.io-client": "*",

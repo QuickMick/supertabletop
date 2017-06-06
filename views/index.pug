@@ -3,7 +3,7 @@ extends layout
 block content
   div#main
     div#header
-      p.title= title
+      p.title #{I18N_LAYOUT.title}
       div.separator
       div#player-container
     div.content
@@ -20,7 +20,7 @@ block content
             span.user-message-content hallo was geht absdf asd fasdf asdf asdf asf asd fasd fafsdf ss fds
         div.chat-input
           input#chat-input-field
-          div#chat-send.btn send
+          div#chat-send.btn #{I18N_LAYOUT.send}
     div#loading-overlay
       div.loading-content
         div.spinner

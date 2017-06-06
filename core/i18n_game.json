@@ -1,12 +1,14 @@
 {
   "en-EN":{
+    "title":"Super Tabletop",
     "send":"send",
     "guest":"guest",
     "admin":"admin",
     "mod":"mod"
   },
   "de-DE":{
-    "send":"send",
+    "title":"Super Tabletop",
+    "send":"senden",
     "guest":"Gast",
     "admin":"admin",
     "mod":"mod"

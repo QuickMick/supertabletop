@@ -8,7 +8,6 @@
 
 -surface index update bei turn von stackEntity ist etwas kagge, ist immer die 1 oben, aber wird am clienten nicht so geupdatet
 
-
 -gedraggtes entitiy muss immer on top sein --> vielelicht mit display index arbeiten?
 
 -synchronizer falsch geschreibn (die klasse und file)
@@ -68,7 +67,7 @@ loader:
 
 -karten hiden:  zeigen dass eigene karte für die anderen hidden ist
 
-
+-wenn spieleranzahl voll, und einer geht raus und wieder rein, dann wird der au blockiert
 
 
 

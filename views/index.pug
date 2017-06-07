@@ -1,20 +1,22 @@
-extends layout
-
-block content
-  div#main
-    div#header
-      p.title #{I18N_LAYOUT.title}
-      div.separator
-      div#player-container
-    div.content
-      div#game-chat
-      div#stage
-    div#loading-overlay
-      div.loading-content
-        div.spinner
-          div.dot1
-          div.dot2
-    script.
-      var I18N_DATA = !{I18N_DATA};
-    script(src='/js/templates.js')
-    script(src='/js/game.js')
+html
+  head
+    title #{I18N_LAYOUT.title}
+    link(rel='stylesheet', href='/stylesheets/style.css')
+  body
+    div#main
+      div#header
+        p.title #{I18N_LAYOUT.title}
+        div.separator
+        div#player-container
+      div.content
+        div#game-chat
+        div#stage
+      div#loading-overlay
+        div.loading-content
+          div.spinner
+            div.dot1
+            div.dot2
+      script.
+        var I18N_DATA = !{I18N_DATA};
+      script(src='/js/templates.js')
+      script(src='/js/game.js')

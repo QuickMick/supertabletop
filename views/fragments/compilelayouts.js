@@ -17,7 +17,7 @@ class CompileLayouts {
     compile(){
         console.log("COMPILE TEMPLATES");
         var chat = "";
-        chat += this._add('chat/chat.pug', "chatTemplate");
+        chat += this._add('chat/chat_template.pug', "chatTemplate");
         chat += this._add('chat/chat_user_msg.pug', "chatUserMsg");
         chat += this._add('chat/chat_server_msg.pug', "chatServerMsg");
         chat += this._add('chat/chat_server_error_msg.pug', "chatServerErrorMsg");

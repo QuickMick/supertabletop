@@ -101,10 +101,6 @@ a {
   background-color: #808080;
 }
 
-
-
-
-
 .tooltip .tooltiptext {
   visibility: hidden;
   width: 120px;
@@ -120,7 +116,6 @@ a {
   bottom: 125%;
   left: 25%;
   margin-left: -60px;
-
 
   opacity: 0;
   -moz-transition: opacity 0.2s ease 1s;
@@ -192,6 +187,16 @@ a {
   line-height: 15px;
   padding: 2px;
   background-color: #00B7FF;
+  text-align: center;
+}
+
+.chat-container .chat-expander.btn.unseen-message{
+  height: 15px;
+  min-height: 15px;
+  max-height: 15px;
+  line-height: 15px;
+  padding: 2px;
+  background-color: red;
   text-align: center;
 }
 

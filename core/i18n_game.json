@@ -11,7 +11,8 @@
     "player_connected":"Player {0} connected",
     "player_disconnected":"Player {0} disconnected",
     "player_color_changed":"Player {0} has changed his color",
-    "player_seat_changed":"Player {0} has changed his seat"
+    "player_seat_changed":"Player {0} has changed his seat",
+    "minimize_maximize":"minimize/maximize"
   },
   "de-DE":{
     "title":"Super Tabletop",
@@ -25,6 +26,7 @@
     "player_connected":"Spieler {0} hat sich verbunden",
     "player_disconnected":"Spieler {0} hat die verbindung abgebrochen",
     "player_color_changed":"Spieler {0} hat die Farbe gewechselt",
-    "player_seat_changed":"Spieler {0} hat den Platz gewechselt"
+    "player_seat_changed":"Spieler {0} hat den Platz gewechselt",
+    "minimize_maximize":"minimieren/maximieren"
   }
 }

@@ -14,6 +14,12 @@
     "player_seat_changed":"Player {0} has changed his seat",
     "minimize_maximize":"minimize/maximize",
     "you":"you",
+
+    "what_to_change":"What do you want to change?",
+    "change_name":"change name",
+    "change_color":"change color",
+    "change_seat":"change seat",
+
     "choose_name":"Choose your name",
     "confirm":"ok",
     "cancel":"cancel",
@@ -22,6 +28,7 @@
     "name_already_taken":"chosen name is already taken",
     "name_contains_prohibited_characters":"chosen name contains prohibited characters, just letters and numbers are allowed!"
   },
+
   "de-DE":{
     "title":"Super Tabletop",
     "send":"senden",
@@ -37,6 +44,12 @@
     "player_seat_changed":"Spieler {0} hat den Platz gewechselt",
     "minimize_maximize":"minimieren/maximieren",
     "you":"du",
+
+    "what_to_change":"Was möchtest du ändern?",
+    "change_name":"Name ändern",
+    "change_color":"Farbe wechseln",
+    "change_seat":"Sitzplatz wechseln",
+
     "choose_name":"Wähle deinen Namen",
     "confirm":"ok",
     "cancel":"abbrechen",

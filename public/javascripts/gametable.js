@@ -164,6 +164,23 @@ class GameTable extends PIXI.Container {
             this.seatGFX[evt.oldPlayerIndex].visible=false;
             delete this.seatGFX[evt.oldPlayerIndex].claimedBy;
         }
+
+        if(typeof evt.player.color == 'number' && evt.player.color >= 0){
+            this.onColorChanged({
+               player:evt.player,
+                newColor:evt.player.color
+            });
+        }
+    }
+
+    onColorChanged(evt){
+        if(!evt.player || evt.player.playerIndex <0) return; // no seat chosen
+
+        var seat = this.seatGFX[evt.player.playerIndex];
+
+        if(!seat) return;
+
+        seat.tint = evt.newColor;
     }
 
     _refreshHiding(){
@@ -184,15 +201,7 @@ class GameTable extends PIXI.Container {
         }
     }
 
-    onColorChanged(evt){
-        if(!evt.player || evt.player.playerIndex <0) return; // no seat chosen
 
-        var seat = this.seatGFX[evt.player.playerIndex];
-
-        if(!seat) return;
-
-        seat.tint = evt.newColor;
-    }
 
     onPlayerDisconnected(evt){
         // release the seat

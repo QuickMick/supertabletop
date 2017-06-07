@@ -34,6 +34,16 @@ body,html {
   margin-bottom: auto;
 }
 
+.separator.horizontal{
+  width: 80%;
+  background-color: grey;
+  height: 2px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
 h1{
   margin: 0;
 }
@@ -113,6 +123,13 @@ a {
   background-color: rgba(0, 0, 0, 0.85);
 }
 
+.overlay-content {
+  margin: auto;
+  background-color: red;
+  text-align: center;
+  padding: 10px;
+}
+
 .tooltip .tooltiptext {
   visibility: hidden;
   width: 120px;
@@ -159,14 +176,32 @@ a {
   visibility: visible;
   opacity: 1;
 }
-/*----------- NAME CHOOSER ------------------*/
-.name-chooser-content {
-  margin: auto;
-  background-color: red;
-  text-align: center;
-  padding: 10px;
+
+/*----------- CHOOSER SELECTOR --------------*/
+.chooser-selector-content{
+
 }
 
+.chooser-selector-content .chooser-selector-caption{
+  font-size: 25px;
+}
+
+.chooser-selector-content .btn.chooser-selector-option{
+  margin: 10px;
+  border-radius: 20px;
+  padding: 12px;
+  font-size: 18px;
+}
+
+.chooser-selector-content .btn.chooser-selector-cancel{
+  margin: 10px;
+  border-radius: 20px;
+}
+
+
+/*----------- END CHOOSER SELECTOR ----------*/
+
+/*----------- NAME CHOOSER ------------------*/
 .name-chooser-content .caption {
   font-size: 25px;
 }
@@ -418,11 +453,22 @@ a {
   flex-direction: row;
   margin-left: 10px;
   position: relative;
+  cursor: default;
 }
 
 .player-item.current-player{
   background-color: rgba(255, 215, 0, 0.33);
+  cursor: pointer;
 }
+
+.player-item.current-player:hover {
+  background-color: rgba(255, 215, 0, 0.8);
+}
+
+.player-item.current-player:active {
+  background-color: rgba(255, 200, 0, 0.8);
+}
+
 
 .player-item .current-player-info{
   display: none;
@@ -468,6 +514,7 @@ a {
   display: flex;
   flex-direction: column;
   margin-left: 10px;
+  margin-right: 3px;
   margin-top: auto;
   margin-bottom: auto;
 }
@@ -517,6 +564,7 @@ a {
 .player-item.current-player .player-name:after{
   content:"\270E";
   position:absolute;
+  padding-left: 5px;
   top: 0px;
 }
 

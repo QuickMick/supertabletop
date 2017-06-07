@@ -31,6 +31,18 @@ else if (window.mozRequestAnimationFrame)
 else if (window.webkitRequestAnimationFrame)
     window.requestAnimationFrame=window.webkitRequestAnimationFrame;
 
+if ((typeof Range !== "undefined") && !Range.prototype.createContextualFragment)
+{
+    Range.prototype.createContextualFragment = function(html)
+    {
+        var frag = document.createDocumentFragment(),
+            div = document.createElement("div");
+        frag.appendChild(div);
+        div.outerHTML = html;
+        return frag;
+    };
+}
+
 
 window.I18N = new i18n(I18N_DATA);
 

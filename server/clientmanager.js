@@ -7,6 +7,10 @@ const Util = require('./../core/util');
 const Ticks = require('./../core/ticks.json');
 const uuidV1 = require('uuid/v1');
 
+var Rights = require('./../core/rights');
+
+const RANDOM_NAMES = require('./../core/random_names.json');
+
 class Client{
     constructor(socket,clientInfo){
 
@@ -16,7 +20,7 @@ class Client{
         this.socket = socket;
         this.color = clientInfo.color || -1;
         this.name = clientInfo.name || "anonymous";
-        this.userStatus = clientInfo.userStatus || "guest";
+        this.userStatus = clientInfo.userStatus || Rights.RIGHTS.guest;
         this.cursor = clientInfo.cursor || "default";
         this.position = {x:0,y:0};
         this.playerIndex =-1;
@@ -71,6 +75,13 @@ class ClientManager{
 
         this.assignedColors = {};
 
+        /**
+         * contains all names, which are already used by another player
+         * @type {{name,id}}
+         */
+        this.assignedNames = {};
+
+
         this._currentConnectionCount = 0;
     }
 
@@ -98,6 +109,12 @@ class ClientManager{
             this.assignedColors[clientInfo.color] = socket.id;
         }else{
             clientInfo.color = -1;
+        }
+
+        this.assignedNames[clientInfo.name] = socket.id;
+
+        if(clientInfo.playerIndex >=0){
+            this.assignedPlayerIndexes[clientInfo.playerIndex] = clientInfo.playerIndex;
         }
 
         this.clients[socket.id] = new Client(socket,clientInfo);
@@ -228,8 +245,6 @@ class ClientManager{
         this._currentConnectionCount = Object.keys(this.clients).length;
         console.log("Connected: "+socket.id+" Users: "+this._currentConnectionCount);
 
-
-
         if(this.admin == null){
             this.admin = socket.id;
             console.log("Admin is now: "+this.admin);
@@ -246,6 +261,7 @@ class ClientManager{
         if (this.clients.hasOwnProperty(socket.id)) {
             this.assignedPlayerIndexes[this.clients[socket.id].playerIndex] = false;   // free the seat
             delete this.assignedColors[this.clients[socket.id].color];  // release color
+            delete this.assignedNames[this.clients[socket.id].name];
             delete this.clients[socket.id];                             // remove client out of the list
         }
 
@@ -291,6 +307,25 @@ class ClientManager{
         cur.position.y = newPosition.y || 0;
 
         return true;
+    }
+
+
+    /**
+     * get a random name. If the name is already assigned, take another one
+     * @returns {*}
+     */
+    getRandomName(i=0){
+        var result = RANDOM_NAMES[Math.floor(Math.random()*RANDOM_NAMES.length)];
+
+        if(i>5){    // if it is called mare then 5 times recursively, then combine two random names
+            result = RANDOM_NAMES[Math.floor(Math.random()*RANDOM_NAMES.length)]+"-"+RANDOM_NAMES[Math.floor(Math.random()*RANDOM_NAMES.length)];
+        }
+
+        if(this.assignedNames[result]){
+            i++;
+            return this.getRandomName(i);
+        }
+        return result;
     }
 }
 

@@ -4,10 +4,11 @@
 'use strict';
 
 const Ticks = require('./../core/ticks.json');
-const RANDOM_NAMES = require('./../core/random_names.json');
 
 var Packages = require('./../core/packages');
 var Util = require('./../core/util');
+
+var Rights = require('./../core/rights');
 
 const uuidV1 = require('uuid/v1');
 
@@ -302,18 +303,26 @@ class GameServer{
     _initClient(socket){
         // TODO: load clientinfo from database
         var clientInfo = {
-            name:"mick",
-            cursor:"default",
-            userStatus:"guest"/*,
-            color:Util.getRandomColor()*/
+            //name:"mick"
+            //,cursor:"default"
+            //,userStatus:Rights.RIGHTS.guest
+            //,color:Util.getRandomColor()
         };
 
-        // if the user is a guest, give him a random name
-        if(clientInfo.userStatus=="guest"){
-            clientInfo.name = RANDOM_NAMES[Math.floor(Math.random()*RANDOM_NAMES.length)];
+        // if user has no cursor, give him the default cursor
+      /*  if(!clientInfo.cursor){
+            clientInfo.cursor="default";
         }
 
+        // if user has no rights, give im the lowest one
+        if(!clientInfo.userStatus){
+            clientInfo.userStatus = Rights.RIGHTS.guest;
+        }*/
 
+        // if the user is a guest, give him a random name
+        if(!clientInfo.name || clientInfo.userStatus==Rights.RIGHTS.guest){
+            clientInfo.name = this.clientManager.getRandomName();
+        }
 
         // connect client to this server
         this.clientManager.clientConnected(socket,clientInfo);

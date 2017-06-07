@@ -228,7 +228,6 @@ class Util {
         /*var div =  document.createDocumentFragment(); //document.createElement('div');
         div.innerHTML = string;
         return div.childNodes[0];*/
-
         return document.createRange().createContextualFragment(htmlString);
     }
 
@@ -306,6 +305,16 @@ class Util {
     static intToColorString(int){
         if(typeof int != 'number') return "#000000";
         return "#"+int.toString(16);
+    }
+
+    static stopPropagation(htmlNode){
+        htmlNode.addEventListener("mousewheel", (e)=>e.stopPropagation(), true);
+        htmlNode.addEventListener("mousemove", (e)=>e.stopPropagation(), true);
+        htmlNode.addEventListener("mousedown", (e)=>e.stopPropagation(), true);
+        htmlNode.addEventListener("mouseup", (e)=>e.stopPropagation(), true);
+        htmlNode.addEventListener("keydown", (e)=>e.stopPropagation(), true);
+        htmlNode.addEventListener("keyup", (e)=>e.stopPropagation(), true);
+        htmlNode.addEventListener("click", (e)=>e.stopPropagation(), true);
     }
 }
 

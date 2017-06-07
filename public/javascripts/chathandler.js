@@ -40,12 +40,15 @@ class ChatHandler extends EventEmitter3 {
         this._rootContainer.classList.add("show");
 
         // prevent, that input from chat is fowarded to the gampelay - e.g. mousehweel must be blocked
-        this._rootContainer.addEventListener("mousewheel", (e)=>e.stopPropagation(), true);
+        Util.stopPropagation(this._rootContainer);
+       /* this._rootContainer.addEventListener("mousewheel", (e)=>e.stopPropagation(), true);
         this._rootContainer.addEventListener("mousemove", (e)=>e.stopPropagation(), true);
         this._rootContainer.addEventListener("mousedown", (e)=>e.stopPropagation(), true);
         this._rootContainer.addEventListener("mouseup", (e)=>e.stopPropagation(), true);
         this._rootContainer.addEventListener("keydown", (e)=>e.stopPropagation(), true);
         this._rootContainer.addEventListener("keyup", (e)=>e.stopPropagation(), true);
+*/
+
 
         // get the required html elements
         // for expanding/inflating

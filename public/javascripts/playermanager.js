@@ -6,6 +6,7 @@ require('pixi.js');
 var Util = require("./../../core/util");
 const Ticks = require('./../../core/ticks.json');
 const Packages = require('./../../core/packages');
+const Rights = require('./../../core/rights');
 
 const Config = require('./../resources/config.json');
 
@@ -16,6 +17,13 @@ var EVT_COLOR_CHANGES='colorchanged';
 var EVT_PLAYER_INDEX_CHANGED='playerindexchanged';
 var EVT_PLAYER_DISCONNECTED ='playerdisconnected';
 var EVT_PLAYER_CONNECTED ='playerconnected';
+
+/**
+ * fired, when player wants to change his name/color/seat
+ * @type {string}
+ */
+var EVT_CONFIG_CHANGE_REQUEST = 'configchangerequest';
+
 /**
  * Inherites PIXI.Container,
  * used to display all player cursors, and to poll input of the player of this instance.
@@ -257,7 +265,7 @@ class PlayerManager extends PIXI.Container {
 
                     //if seat was changed, releas old one
                     if(old >=0){
-                        this.assignedPlayerIndexes[value] = false;
+                        this.assignedPlayerIndexes[old] = false;
                     }
 
                      // set color if available
@@ -425,12 +433,12 @@ class PlayerManager extends PIXI.Container {
      * the id of the new node is the passed id
      * @param container
      * @param id {string}
-     * @param prefix {string}
+     * @param userStatus {string}
      * @param name {string}
      * @param color {number}
      * @private
      */
-    _createPlayerHTMLItem(container,id,prefix,name,color,index){
+    _createPlayerHTMLItem(container,id,userStatus,name,color,index){
         var e = document.getElementById(id);
         if(e){
             console.log("player item already added to header");
@@ -440,12 +448,10 @@ class PlayerManager extends PIXI.Container {
         var itemNode = document.createElement("div");
         itemNode.className = "player-item";
 
-
-
         itemNode.id = id;
         itemNode.dataset.index = index;
         itemNode.innerHTML = window.tabletopUserItem({
-            prefix: I18N.translate(prefix),
+            prefix: I18N.translate(userStatus),
             name:name,
             index: index>=0?(index+1) : "", // pass index, or empty string if index is not chosen yet
             color:(color >= 0)?Util.intToColorString(color) : null // if color is fine, pass it, otherwise null
@@ -454,10 +460,10 @@ class PlayerManager extends PIXI.Container {
         // set the player image
         var imageNode = itemNode.getElementsByClassName('player-image')[0];
         imageNode.onerror = function(){
-            console.log("err");
+            console.log("avatar not found");
             this.src = Config.PATHS.RESOURCE_BASE+"/default/missing_avatar.png";
         };
-        if(prefix != "guest") {
+        if(userStatus != Rights.RIGHTS.guest) {
             imageNode.src = Config.PATHS.USERS_RESOURCES + "/" + name + "/" + name + "_avatar.png";//"url('/"+Config.PATHS.USERS_RESOURCES+"/"+name+"/"+name+"_avatar.png";
         }else{
             imageNode.src = Config.PATHS.RESOURCE_BASE+"/default/missing_avatar.png";
@@ -468,6 +474,9 @@ class PlayerManager extends PIXI.Container {
             itemNode.classList.add("current-player");
             var currentPlayerInfo = itemNode.getElementsByClassName('current-player-info')[0];
             currentPlayerInfo.textContent  = I18N.translate("you");
+
+            // if this is currentplayer, add click listerner, so that values can be changed
+            itemNode.addEventListener("click",(e)=>this.emit(EVT_CONFIG_CHANGE_REQUEST,{player:this.getPlayer(id)}));
         }
 
         container.appendChild(itemNode);

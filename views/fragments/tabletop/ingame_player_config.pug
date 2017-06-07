@@ -1,0 +1,9 @@
+div.overlay
+    div.overlay-content.chooser-selector-content
+        div.chooser-selector-caption #{I18N.what_to_change}
+        if(!isRegistered)
+            div.btn.chooser-selector-option(data-action="name") #{I18N.change_name}
+        div.btn.chooser-selector-option(data-action="color") #{I18N.change_color}
+        div.btn.chooser-selector-option(data-action="seat") #{I18N.change_seat}
+        div.separator.horizontal
+        div.btn.chooser-selector-cancel(data-action="cancel") #{I18N.cancel}

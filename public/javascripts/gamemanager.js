@@ -23,8 +23,12 @@ var CursorManager = require('./cursormanager');
 
 var ChatHandler = require('./chathandler');
 
+
+var ChooserSelectorDialog = require('./dialogs/chooserselectordialog');
+
 var SeatChooser = require('./seatchooser');
 var ColorChooser = require('./colorchooser');
+
 
 const RELATIVE_PATH = "./../";
 
@@ -96,6 +100,14 @@ class GameManager extends EventEmitter3{
         this.playerManager.on('playerindexchanged',(evt) => this.chatHandler.pushMessage(I18N.translate("player_seat_changed",evt.player.name),"system"));
 
 
+        this.playerManager.on('configchangerequest',(evt)=>{
+            // do not open selector chooser, if a dialog is already open
+            if(this.seatChooser || this.colorChooser) return;
+            var selector = new ChooserSelectorDialog(evt);
+
+            selector.on('opencolorchooser',(e)=>this.showColorChooser());
+            selector.on('openseatchooser',(e)=>this.showSeatChooser());
+        });
 
 
         this.synchronizer = new Synchronizer(this);     // initialize socket-connection/synchronizer
@@ -297,6 +309,7 @@ class GameManager extends EventEmitter3{
 
 
     showSeatChooser(){
+        if(this.seatChooser) return; // do not show again, if seatchooser is already shown
         this.seatChooser = new SeatChooser(this.gameTable,this.synchronizer,this.playerManager);
 
        // this.playerManager.on('colorchanged',this.seatChooser.onColorChanged);
@@ -321,10 +334,13 @@ class GameManager extends EventEmitter3{
         this.seatChooser.parent.removeChild(this.seatChooser);
         this.seatChooser = null;
 
-        this.showColorChooser();
+        if(!evt.player.color || evt.player.color <0) {
+            this.showColorChooser();
+        }
     }
 
     showColorChooser(){
+        if(this.colorChooser) return; // do not show colorchooser again, if it is already shown
         this.colorChooser = new ColorChooser(this.app.renderer,this.gameTable,this.synchronizer,this.playerManager);
         this.app.stage.addChild(this.colorChooser);
         this.on('resize',this.colorChooser.redrawChooser.bind(this.colorChooser));
@@ -335,7 +351,6 @@ class GameManager extends EventEmitter3{
     }
 
     hideColorChooser(){
-
         if(!this.colorChooser || !this.colorChooser.parent || this.playerManager.currentPlayer.color <0) return;
         this.removeListener('reseize',this.colorChooser.redrawChooser.bind(this.colorChooser));
         this.playerManager.removeListener('colorchanged',this.colorChooser.onRedrawNecessaryHandler.bind(this.colorChooser));

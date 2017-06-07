@@ -34,56 +34,14 @@ class SeatChooser extends PIXI.Container{
         this.seats = [];
 
         for(let i=0; (i< gameTable.seats.length && i<Ticks.MAX_PLAYERS); i++){
-
-
-           /* var graphics = new PIXI.Graphics();
             var seat = gameTable.seats[i];
-            // graphics.lineStyle ( 2 , 0x000000,  1);
-            graphics.beginFill(Util.parseColor(PLAYERS_COLORS[i]));
-            graphics.drawCircle(0,0, 100);
-            graphics.anchor.set(0.5);
-
-            graphics.position.x = seat.position.x;
-            graphics.position.y = seat.position.y;
-
-            graphics.interactive = true;*/
-            var seat = gameTable.seats[i];
-            this.seats.push(this._createSeat(seat,i));
+            var seatGFX = this._createSeat(seat,i);
+            this.seats.push(seatGFX);
 
             if(assignments.indexes[i]) {    // if seat is assigned by another player
-                this._setSeatAsSelected(seat);
-                continue;
+                this._setSeatAsSelected(seatGFX);
+               // continue;
             }
-            //if seat is free, add color choosers
-/*
-            var colorPickerPositions = Util.pointsOfCircle(seat.position.x,seat.position.y,SEAT_SIZE*2,Ticks.MAX_PLAYERS);
-
-            for(let j=0;j<colorPickerPositions.length;j++){
-                var currentColor = new PIXI.Sprite(unselected);
-                currentColor.tint = Util.parseColor(Colors.PLAYERS_COLORS[j]);
-                currentColor.anchor.set(0.5);
-                currentColor.scale.set(0.5);
-                currentColor.position.x = colorPickerPositions[j].x;
-                currentColor.position.y = colorPickerPositions[j].y;
-                currentColor.interactive = true;
-                this.addChild(currentColor);
-            }
-*/
-
-
-
-
-/*
-            let color = Util.parseColor(PLAYERS_COLORS[i]);
-
-
-            cur.on('mousedown',function(){
-                synchronizer.sendPlayerUpdate([
-                    {key:Packages.PROTOCOL.CLIENT_VALUE_UPDATE.COLOR,value:color},
-                    {key:Packages.PROTOCOL.CLIENT_VALUE_UPDATE.PLAYER_INDEX,value:i}
-                    ]);
-              //  this.emit('colorselected',{color:color});
-            }.bind(this),true);*/
         }
     }
 

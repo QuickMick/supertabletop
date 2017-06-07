@@ -50,12 +50,13 @@ class InputHandler extends EventEmitter{
 
     _init(app,gameTable){
         //add key listeners
+        // TODO: nichtmehr auf window lassen
         window.addEventListener("keydown", this._keyDown.bind(this), false);
         window.addEventListener("keyup", this._keyUp.bind(this), false);
 
         app.stage.interactive = true;
       //  gameTable.interactive = true;
-        document.addEventListener("mousewheel", this._mouseWheelMove.bind(this), false);
+        app.renderer.view.addEventListener("mousewheel", this._mouseWheelMove.bind(this), false);
 
         app.renderer.view.addEventListener("mousedown", this._mouseDown.bind(this),true);
         app.renderer.view.addEventListener("mouseup", this._mouseUp.bind(this),true);

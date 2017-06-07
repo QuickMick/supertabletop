@@ -121,7 +121,7 @@ class ColorChooser extends PIXI.Container{
 
 
         var cPixiText = new PIXI.Text(I18N.translate("back"),{
-            fontSize : 36,
+            fontSize : size/5,
             fontFamily: "Impact",
             fill : 0
         });

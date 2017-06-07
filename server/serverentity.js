@@ -548,7 +548,15 @@ class ServerEntityStack extends ServerEntity{
      * @private
      */
     constructor(instanceData, entityLibrary){
-        if(instanceData instanceof  ServerEntity){
+
+        if(instanceData instanceof  ServerEntityStack){
+            // if instance is a serverEntityStack, converte it to a stack
+            instanceData = {
+                position:instanceData.position,
+                rotation:instanceData.rotation,
+                content:instanceData.content
+            };
+        }else if(instanceData instanceof  ServerEntity){
             // if instance is a serverEntity, converte it to a stack
             instanceData = {
                 position:instanceData.position,

@@ -35,9 +35,9 @@ class BasicTool{
         this._selected_entities= [];
 
         this._current_zoom = 1;
-        this.zoom_sensivity = 0.1;
-        this._min_zoom = 0.4;
-        this._max_zoom = 2.5;
+        this.zoom_sensivity = Config.ZOOM.SENSIVITY;
+        this._min_zoom = Config.ZOOM.MIN;
+        this._max_zoom = Config.ZOOM.MAX;
 
         /**
          * current position of the mouse

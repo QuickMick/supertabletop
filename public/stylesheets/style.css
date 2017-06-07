@@ -295,6 +295,7 @@ a {
   max-height: 15px;
   line-height: 15px;
   padding: 2px;
+  box-shadow: gold 0px 0px 25px;
   background-color: red;
   text-align: center;
 }
@@ -457,7 +458,8 @@ a {
 }
 
 .player-item.current-player{
-  background-color: rgba(255, 215, 0, 0.33);
+ /* background-color: rgba(255, 215, 0, 0.33);*/
+  box-shadow: gold 0px 0px 15px;
   cursor: pointer;
 }
 
@@ -467,6 +469,7 @@ a {
 
 .player-item.current-player:active {
   background-color: rgba(255, 200, 0, 0.8);
+
 }
 
 
@@ -542,6 +545,7 @@ a {
   margin-bottom: auto;
   flex-grow: 1;
   border-radius: 10px;
+  border: 1px solid black;
 }
 
 .player-item .player-name-container{

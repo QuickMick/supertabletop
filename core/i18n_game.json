@@ -14,7 +14,7 @@
     "player_color_changed":"Player {0} has changed his color",
     "player_seat_changed":"Player {0} has changed his seat",
     "minimize_maximize":"minimize/maximize",
-    "you":"you",
+    "you":"YOU",
 
     "what_to_change":"What do you want to change?",
     "change_name":"change name",
@@ -48,7 +48,7 @@
     "player_color_changed":"Spieler {0} hat die Farbe gewechselt",
     "player_seat_changed":"Spieler {0} hat den Platz gewechselt",
     "minimize_maximize":"minimieren/maximieren",
-    "you":"du",
+    "you":"DU",
 
     "what_to_change":"Was möchtest du ändern?",
     "change_name":"Name ändern",

@@ -16,6 +16,10 @@ playerSnapzones sollten nur aktive player affectieren?
 
 -mouseover sollte disabled sein, wenn player nich nicht ready
 
+TODO: IMPORTANT: STAPEL COPY GEHT NICHT - nur die erste karte geht dann beim droppen
+
+TODO: IMPORTANT: detect outside mouse ups
+
 #####################################################  TODOS  ##########################################################
 - table boundaries
 
@@ -26,8 +30,12 @@ popup, wenn versucht wird ein dialog zu öffnen, obwohl schon einer offen ist
 kamera
 touch support
 
+games changen
+
 display game info/description
 
+wispering im chat, oder team-chat
+teams -- teamchat mit /team
 
 spamschutz am server
 

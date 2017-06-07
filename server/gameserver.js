@@ -232,7 +232,7 @@ class GameServer{
                 }
 
                 if(!this.clientManager.isClientReady(id)){
-                    console.log("_processUpdates: client",id,"is not ready");
+                    //console.log("_processUpdates: client",id,"is not ready");
                     continue;
                 }
 

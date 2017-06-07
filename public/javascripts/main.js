@@ -75,7 +75,7 @@ window.onload = function() {
         e.preventDefault();
     };
 
-    var app = new PIXI.Application(800, 600, {backgroundColor : 0x1099bb});
+    var app = new PIXI.Application(800, 600, {backgroundColor : 0x1099bb, antialising:true,autoResize:true});
     screen.appendChild(app.view);
 
     // preparing loading game resouces

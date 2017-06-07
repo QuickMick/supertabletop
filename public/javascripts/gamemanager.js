@@ -348,6 +348,8 @@ class GameManager extends EventEmitter3{
         this.playerManager.on('colorchanged',this.colorChooser.onRedrawNecessaryHandler.bind(this.colorChooser));
         this.playerManager.on('playerdisconnected',this.colorChooser.onRedrawNecessaryHandler.bind(this.colorChooser));
         this.playerManager.on('playerconnected',this.colorChooser.onRedrawNecessaryHandler.bind(this.colorChooser));
+
+        this.colorChooser.on('canceled',this.hideColorChooser.bind(this));
     }
 
     hideColorChooser(){

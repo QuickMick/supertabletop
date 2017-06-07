@@ -10,6 +10,10 @@ const Packages = require('./../../core/packages');
 
 const PERCENT_PADDING = 0.2;
 const BORDER_SIZE = 3;
+
+const EVT_COLOR_SELECTED = 'colorSelected';
+const EVT_CANCELED = 'canceled';
+
 class ColorChooser extends PIXI.Container{
 
     constructor(renderer,gameTable,synchronizer,playerManager){
@@ -83,14 +87,52 @@ class ColorChooser extends PIXI.Container{
 
 
         var currentColor = this.playerManager.currentPlayer.color;
-
-        if(currentColor || currentColor >= 0){
+        if(typeof currentColor == 'number' && currentColor >= 0){
             // show abort butten, if user already has chosen a color
-
-
+            this._createCancelButton(center,radius/1.5);
         }
-
     }
+
+    _createCancelButton(position,size){
+        var button = new PIXI.Container();
+        var currentColor = new PIXI.Sprite(this.unselected);
+      /*  var color = Util.parseColor(this.colors[j]);
+        currentColor.tint = color;*/
+        currentColor.anchor.set(0.5);
+        currentColor.width = size;
+        currentColor.height = size;
+
+        button.position.x = position.x;
+        button.position.y = position.y;
+        button.interactive = true;
+
+        button.addChild(currentColor);
+
+        var oldScale = 1;//button.scale.x;    // scale is not exaclty 1,
+                                                // setting whight and height previously changes the scale
+                                                // so use this value for the mouse over effect
+
+        button.mouseover = (e) => button.scale.set(oldScale+PERCENT_PADDING);
+        button.mouseout = (e) => button.scale.set(oldScale);
+
+        button.on('mousedown',function(){
+            this.emit(EVT_CANCELED,{source:this});
+        }.bind(this),true);
+
+
+        var cPixiText = new PIXI.Text(I18N.translate("back"),{
+            fontSize : 36,
+            fontFamily: "Impact",
+            fill : 0
+        });
+
+        cPixiText.position.x = -cPixiText.width/2;
+        cPixiText.position.y =  - cPixiText.height/2;
+
+        button.addChild(cPixiText);
+        this.addChild(button);
+    }
+
 
     _createSinglePicker(assignments,j,size){
         var currentColor = new PIXI.Sprite(this.unselected);
@@ -131,7 +173,7 @@ class ColorChooser extends PIXI.Container{
             this.synchronizer.sendPlayerUpdate([
                 {key:Packages.PROTOCOL.CLIENT_VALUE_UPDATE.COLOR,value:color}
             ]);
-            this.emit('colorSelected',{color:color});
+            this.emit(EVT_COLOR_SELECTED,{color:color});
         }.bind(this),true);
     }
 

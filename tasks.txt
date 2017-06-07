@@ -18,19 +18,16 @@ playerSnapzones sollten nur aktive player affectieren?
 
 #####################################################  TODOS  ##########################################################
 - table boundaries
-TODO: surfacechange als valuechange machn? und des nur dafür gedachte event rauskicken?
 
 TODO: compilen von pug templates als gulp task
-TODO: client message vertification
+
 kamera
 touch support
 
-current player in playerliste anzeigen
+display game info/description
+
 
 spamschutz am server
-
-chat
-color für cursor
 
 TODO: snapzone -> rotation/orientation -> angle
 functions:
@@ -39,12 +36,10 @@ functions:
 
 -polygon shapes
 
--refactor every dependency to context
+-refactor every dependency to context or events?
 
 -vanish signal, when new game is loaded?
 -snappoints mit rotation
-
--chat
 
 TODO: constraint manager
 TODO: game manager -> manager der wirklich nur die daten über des geladene spiel hält
@@ -76,13 +71,13 @@ loader:
 
 -wenn spieleranzahl voll, und einer geht raus und wieder rein, dann wird der au blockiert
 
+chat
+color für cursor
+current player in playerliste anzeigen
 
+client message vertification
 
-
-
-
-
-
+surfacechange als valuechange machn? und des nur dafür gedachte event rauskicken?
 
 
 

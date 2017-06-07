@@ -513,6 +513,17 @@ a {
 .player-item .player-name{
   margin: 0 0 0 2px;
 }
+
+.player-item.current-player .player-name:after{
+  content:"\270E";
+  position:absolute;
+  top: 0px;
+}
+
+.player-item.current-player .player-name{
+  padding-right: 15px;
+}
+
 /*----------- PLAYER CONTAINER END-------*/
 
 /*----------- LOADING ANIM --------------*/

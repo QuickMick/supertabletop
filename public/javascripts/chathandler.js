@@ -144,6 +144,7 @@ class ChatHandler extends EventEmitter3 {
                 local.msg = msg;
                 local.prefix = I18N.translate(sender.userStatus || "");
                 local.name = sender.name || "name-not-found";
+                local.color = Util.intToColorString(sender.color);
                 if (this._isMinimized) {    // when minimazed, give user a hint, that there is a new message hidden
                     this._expanderButton.classList.add("unseen-message");
                 }

@@ -1,7 +1,8 @@
 div.message.tooltip
     div.tooltiptext #{time}
     span.user-message-prefix [#{prefix}]
-    span.user-message-name #{name} :
+    -var c = color || "#000000";
+    span.user-message-name(style="color:"+c) #{name} :
     span.user-message-content #{msg}
 
 

@@ -8,6 +8,8 @@ const Ticks = require('./../../core/ticks.json');
 const Util = require('./../../core/util');
 const Packages = require('./../../core/packages');
 
+const Config = require('./../resources/config.json');
+
 const PERCENT_PADDING = 0.2;
 const BORDER_SIZE = 3;
 
@@ -67,7 +69,7 @@ class ColorChooser extends PIXI.Container{
 
 
         // calculate the positions of the picker buttons depending on screensize
-        var radius = Math.min(evt.width,evt.height)/3;
+        var radius = Math.min(evt.width,evt.height)/4;
         this.colorPiclerPositions = Util.pointsOfCircle(
             center.x,
             center.y,
@@ -78,6 +80,17 @@ class ColorChooser extends PIXI.Container{
         // calculate the size of the picker buttons depending on the screen size
         var size = (2*Math.PI*radius) / this.colorPiclerPositions.length;
         size = (size - (size*PERCENT_PADDING));
+
+        // set caption
+        var cPixiText = new PIXI.Text(I18N.translate("choose_color"),{
+            fontSize : size/2,
+            fontFamily: Config.DEFAULT_FONT_FAMILY,
+            fill : Util.parseColor("#FFFFFF")
+        });
+
+        cPixiText.position.x = center.x-cPixiText.width/2;
+        cPixiText.position.y = center.y-cPixiText.height/2 - radius-size;
+        this.addChild(cPixiText);
 
         var assignments = this.playerManager.assignments;
 
@@ -122,7 +135,7 @@ class ColorChooser extends PIXI.Container{
 
         var cPixiText = new PIXI.Text(I18N.translate("back"),{
             fontSize : size/5,
-            fontFamily: "Impact",
+            fontFamily: Config.DEFAULT_FONT_FAMILY,
             fill : 0
         });
 

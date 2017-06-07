@@ -22,6 +22,7 @@
     "change_seat":"change seat",
 
     "choose_name":"Choose your name",
+    "choose_color":"Choose your color",
     "confirm":"ok",
     "cancel":"cancel",
     "back":"back",
@@ -39,7 +40,7 @@
     "admin":"Admin",
     "mod":"Mod",
     "registered":"Registriert",
-    "seat":"Platz",
+    "seat":"Sitz",
     "load_game":"Lade Spiel '{0}', erstellt von {1}",
     "player_connected":"Spieler {0} hat sich verbunden",
     "player_disconnected":"Spieler {0} hat die verbindung abgebrochen",
@@ -54,6 +55,7 @@
     "change_seat":"Sitzplatz wechseln",
 
     "choose_name":"Wähle deinen Namen",
+    "choose_color":"Wähle deine Farbe",
     "confirm":"ok",
     "cancel":"abbrechen",
     "back":"zurück",

@@ -82,7 +82,7 @@ a {
   padding: 5px;
   text-align: center;
   text-decoration: none;
-  display: table-cell;
+ /* display: table-cell;*/
   vertical-align: middle;
   cursor:pointer;
   font-weight: bold;
@@ -99,6 +99,18 @@ a {
 }
 .btn:active{
   background-color: #808080;
+}
+
+.overlay{
+  /* margin: auto;*/
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  position: absolute;
+  display:flex;
+  z-index: 1000;
+  background-color: rgba(0, 0, 0, 0.85);
 }
 
 .tooltip .tooltiptext {
@@ -147,6 +159,43 @@ a {
   visibility: visible;
   opacity: 1;
 }
+/*----------- NAME CHOOSER ------------------*/
+.name-chooser-content {
+  margin: auto;
+  background-color: red;
+  text-align: center;
+  padding: 10px;
+}
+
+.name-chooser-content .caption {
+  font-size: 25px;
+}
+
+.name-chooser-content .btn {
+  margin-top:10px;
+}
+
+.name-chooser-content .label{
+  margin-top: 5px;
+}
+
+.name-chooser-content .label.valid{
+  color:green
+}
+
+
+.name-chooser-content .label.invalid{
+
+}
+
+.name-chooser-content .name-chooser-input{
+  margin-top:5px;
+  font-size: 20px;
+}
+
+/*----------- NAME CHOOSER END --------------*/
+
+
 /*----------- CHAT --------------------------*/
 
 .chat-container{
@@ -425,18 +474,6 @@ a {
   margin: auto;
   width: 40px;
   height: 40px;
-}
-
-#loading-overlay{
-  /* margin: auto;*/
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  position: absolute;
-  display:flex;
-  z-index: 1000;
-  background-color: rgba(0, 0, 0, 0.85);
 }
 
 .spinner {

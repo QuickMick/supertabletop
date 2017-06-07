@@ -120,7 +120,6 @@ class PlayerManager extends PIXI.Container {
                 this.assignedPlayerIndexes[player_data.playerIndex] = player_data.id;
             }
 
-
             //set the initial position of the player
             if (player_data.position) {
                 this.players[player_data.id].position.x = player_data.x || 0;
@@ -438,11 +437,11 @@ class PlayerManager extends PIXI.Container {
             return;
         }
 
-
-
-
         var itemNode = document.createElement("div");
         itemNode.className = "player-item";
+
+
+
         itemNode.id = id;
         itemNode.dataset.index = index;
         itemNode.innerHTML = window.tabletopUserItem({
@@ -464,8 +463,12 @@ class PlayerManager extends PIXI.Container {
             imageNode.src = Config.PATHS.RESOURCE_BASE+"/default/missing_avatar.png";
         }
 
-
-
+        // if this is the current player, change the style, so he sees, who he is
+        if(this.getPlayer(id).isCurrentPlayer){
+            itemNode.classList.add("current-player");
+            var currentPlayerInfo = itemNode.getElementsByClassName('current-player-info')[0];
+            currentPlayerInfo.textContent  = I18N.translate("you");
+        }
 
         container.appendChild(itemNode);
         this._sortPlayerItems();

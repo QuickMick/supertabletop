@@ -6,8 +6,9 @@
 
 class NameChooser {
 
-    constructor() {
-
+    constructor(currentPlayer) {
+        this.currentPlayer
+        this._rootContainer = Util.htmlStringToNode(window.chatTemplate({I18N: I18N.completeLanguageData}))
     }
 
 }

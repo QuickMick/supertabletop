@@ -25,6 +25,8 @@ TODO: client message vertification
 kamera
 touch support
 
+current player in playerliste anzeigen
+
 spamschutz am server
 
 chat

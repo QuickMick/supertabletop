@@ -12,7 +12,15 @@
     "player_disconnected":"Player {0} disconnected",
     "player_color_changed":"Player {0} has changed his color",
     "player_seat_changed":"Player {0} has changed his seat",
-    "minimize_maximize":"minimize/maximize"
+    "minimize_maximize":"minimize/maximize",
+    "you":"you",
+    "choose_name":"Choose your name",
+    "confirm":"ok",
+    "cancel":"cancel",
+    "name_too_long":"chosen name is too long, max {0} characters are allowed",
+    "name_forbidden":"chosen name contains forbidden words",
+    "name_already_taken":"chosen name is already taken",
+    "name_contains_prohibited_characters":"chosen name contains prohibited characters, just letters and numbers are allowed!"
   },
   "de-DE":{
     "title":"Super Tabletop",
@@ -22,11 +30,19 @@
     "mod":"Mod",
     "registered":"Registriert",
     "timeformat":"HH:MM:ss",
-    "load_game":"Lade Spiel '{0}' erstellt von {1}",
+    "load_game":"Lade Spiel '{0}', erstellt von {1}",
     "player_connected":"Spieler {0} hat sich verbunden",
     "player_disconnected":"Spieler {0} hat die verbindung abgebrochen",
     "player_color_changed":"Spieler {0} hat die Farbe gewechselt",
     "player_seat_changed":"Spieler {0} hat den Platz gewechselt",
-    "minimize_maximize":"minimieren/maximieren"
+    "minimize_maximize":"minimieren/maximieren",
+    "you":"du",
+    "choose_name":"Wähle deinen Namen",
+    "confirm":"ok",
+    "cancel":"abbrechen",
+    "name_too_long":"Der Name ist zu lang, es sind maximal {0} Buchstaben erlaubt",
+    "name_forbidden":"Der gewählte Name enthält verbotene Wörter",
+    "name_already_taken":"Der gewählte Name ist bereits belegt",
+    "name_contains_prohibited_characters":"Der gewählte Name enthält verbotene Zeichen, nur Buchstaben und Zahlen sind erlaubt!"
   }
 }

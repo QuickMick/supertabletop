@@ -24,6 +24,8 @@ class CompileLayouts {
 
         var tabletop = "";
         tabletop += this._add('tabletop/user_item.pug',"tabletopUserItem");
+        tabletop += this._add('tabletop/name_chooser.pug',"nameChooserTemplate");
+
 
         console.log("WRITE TEMPLATES");
         fs.writeFileSync("./public/js/templates.js", chat+tabletop);

@@ -185,12 +185,27 @@ a {
 
 
 .name-chooser-content .label.invalid{
+  color:red
+}
 
+.name-chooser-content .label.hidden{
+  display: none;
 }
 
 .name-chooser-content .name-chooser-input{
   margin-top:5px;
   font-size: 20px;
+}
+
+.name-chooser-content .name-chooser-buttons{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+.name-chooser-content .name-chooser-buttons .btn{
+  flex-grow: 1;
+  margin-right: 5px;
+  margin-left: 5px;
 }
 
 /*----------- NAME CHOOSER END --------------*/
@@ -402,11 +417,42 @@ a {
   display: flex;
   flex-direction: row;
   margin-left: 10px;
+  position: relative;
 }
 
+.player-item.current-player{
+  background-color: rgba(255, 215, 0, 0.33);
+}
+
+.player-item .current-player-info{
+  display: none;
+}
+
+.player-item.current-player .current-player-info{
+  display: block;
+  position: absolute;
+  color: white;
+  background-color: rgba(0, 0, 0, 0.27);
+  padding: 0 3px;
+  bottom: 0;
+}
+
+
+/*
+.player-item.current-player::before {
+  content: "you";
+  position: absolute;
+  transform: translateY(146%);
+  color: white;
+  padding-left: 2px;
+  background-color: rgba(0, 0, 0, 0.27);
+  padding-right: 2px;
+}*/
+
 .player-item .player-image{
-  width: calc(var(--header-height) - 10px);
-  height: calc(var(--header-height) - 10px);
+ /* width: calc(var(--header-height) - 10px);
+  height: calc(var(--header-height) - 10px);*/
+  height: 100%;
   margin-top: auto;
   margin-bottom: auto;
   /*content: url('/resources/default/missing_avatar.png');*/

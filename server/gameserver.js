@@ -4,6 +4,8 @@
 'use strict';
 
 const Ticks = require('./../core/ticks.json');
+const RANDOM_NAMES = require('./../core/random_names.json');
+
 var Packages = require('./../core/packages');
 var Util = require('./../core/util');
 
@@ -302,9 +304,16 @@ class GameServer{
         var clientInfo = {
             name:"mick",
             cursor:"default",
-            userStatus:"registered"/*,
+            userStatus:"guest"/*,
             color:Util.getRandomColor()*/
         };
+
+        // if the user is a guest, give him a random name
+        if(clientInfo.userStatus=="guest"){
+            clientInfo.name = RANDOM_NAMES[Math.floor(Math.random()*RANDOM_NAMES.length)];
+        }
+
+
 
         // connect client to this server
         this.clientManager.clientConnected(socket,clientInfo);

@@ -273,7 +273,7 @@ class PlayerManager extends PIXI.Container {
                     playerItem.dataset.index = value;
                     var indexNode = playerItem.getElementsByClassName("player-seat");
                     if(value >= 0) {
-                        indexNode[0].innerHTML = (value+1);
+                        indexNode[0].innerHTML = I18N.translate("seat")+": "+(value+1);
                     }else{
                         indexNode[0].innerHTML = "";
                     }
@@ -453,7 +453,7 @@ class PlayerManager extends PIXI.Container {
         itemNode.innerHTML = window.tabletopUserItem({
             prefix: I18N.translate(userStatus),
             name:name,
-            index: index>=0?(index+1) : "", // pass index, or empty string if index is not chosen yet
+            index: index>=0?I18N.translate("seat")+": "+(index+1) : "", // pass index, or empty string if index is not chosen yet
             color:(color >= 0)?Util.intToColorString(color) : null // if color is fine, pass it, otherwise null
         });
 

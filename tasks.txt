@@ -21,6 +21,8 @@ playerSnapzones sollten nur aktive player affectieren?
 
 TODO: compilen von pug templates als gulp task
 
+popup, wenn versucht wird ein dialog zu öffnen, obwohl schon einer offen ist
+
 kamera
 touch support
 

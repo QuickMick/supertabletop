@@ -33,6 +33,10 @@ class ChatHandler extends EventEmitter3{
         if(!this.rootContainer)
             throw "chat container does not exist!";
 
+        // load and insert the chat template to the passed rootID
+        this.rootContainer.innerHTML = window.chatTemplate({I18N:I18N.completeLanguageData});
+        this.rootContainer.classList.add("chat-container");
+        this.rootContainer.classList.add("show");
 
         // prevent, that input from chat is fowarded to the gampelay - e.g. mousehweel must be blocked
         this.rootContainer.addEventListener("mousewheel", (e)=>e.stopPropagation() , true);
@@ -141,11 +145,6 @@ class ChatHandler extends EventEmitter3{
         if( this._outputContainer.scrollHeight -this._outputContainer.scrollTop- this._outputContainer.offsetHeight <= SCROLL_DOWN_TRESHOLD){
             scrollDown =true;
         }
-
-        // create the new message element
-      //  var newMessage = document.createElement("div");
-      //  newMessage.classList = "message";
-       // newMessage.innerHTML = fn(local);
 
         // add it to the log
        // this._outputContainer.appendChild(newMessage);

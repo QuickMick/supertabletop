@@ -15,7 +15,7 @@ class I18N {
      * returns all language data
      * @returns {*}
      */
-    get data(){
+    get completeLanguageData(){
         return this._languageData;
     }
 

@@ -316,13 +316,14 @@ class GameManager extends EventEmitter3{
         this.playerManager.on('playerindexchanged',this.seatChooser.onPlayerIndexChanged.bind(this.seatChooser));
         this.playerManager.on('playerdisconnected',this.seatChooser.onPlayerDisconnected.bind(this.seatChooser));
         this.playerManager.on('playerconnected',this.seatChooser.onPlayerConnected.bind(this.seatChooser));
+        this.seatChooser.on('canceled',this.hideSeatChooser.bind(this));
         this.gameTable.addChild(this.seatChooser);
 
     //    this.seatChooser.on('colorselected',this.hideColorChooser.bind(this));
     }
 
     hideSeatChooser(evt){
-        if(!this.seatChooser || !this.seatChooser.parent || this.playerManager.currentPlayer.playerIndex <0) return;
+        if(!this.seatChooser || !this.seatChooser.parent || evt.player.playerIndex <0) return;
 
         if(!evt.player.isCurrentPlayer) return; // if change does not affect human player, dont hide
         if(evt.newPlayerIndex < 0) return;  // if seat still not selected, dont hide

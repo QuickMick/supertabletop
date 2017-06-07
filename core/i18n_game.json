@@ -20,6 +20,7 @@
     "change_name":"change name",
     "change_color":"change color",
     "change_seat":"change seat",
+    "keep_seat":"keep\nseat",
 
     "choose_name":"Choose your name",
     "choose_color":"Choose your color",
@@ -53,6 +54,7 @@
     "change_name":"Name ändern",
     "change_color":"Farbe wechseln",
     "change_seat":"Sitzplatz wechseln",
+    "keep_seat": "Sitzplatz\nbehalten",
 
     "choose_name":"Wähle deinen Namen",
     "choose_color":"Wähle deine Farbe",

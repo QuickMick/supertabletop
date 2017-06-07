@@ -9,6 +9,8 @@ const Packages = require('./../../core/packages');
 const Colors = require('./../resources/colors.json');
 const Util = require('./../../core/util');
 
+const Config = require('./../resources/config.json');
+
 const LerpManager = require('./lerpmanager');
 
 const Ticks = require('./../../core/ticks.json');
@@ -17,6 +19,12 @@ const SEAT_SIZE = 100;
 const SEAT_BORDER_SIZE=10;
 
 const SCALE= 0.5;
+
+const SELECTED_COLOR = Util.parseColor("#ffd400");
+
+const EVT_SEAT_SELECTED='seatSelected';
+
+const EVT_CANCELED = 'canceled';
 
 class SeatChooser extends PIXI.Container{
 
@@ -39,7 +47,12 @@ class SeatChooser extends PIXI.Container{
             this.seats.push(seatGFX);
 
             if(assignments.indexes[i]) {    // if seat is assigned by another player
-                this._setSeatAsSelected(seatGFX);
+
+                if(assignments.indexes[i] == this.playerManager.currentPlayer.PLAYER_ID && this.playerManager.currentPlayer.playerIndex >=0){
+                    this._setSeatAsCurrentPlayersSeat(seatGFX);
+                }else {
+                    this._setSeatAsSelected(seatGFX);
+                }
                // continue;
             }
         }
@@ -59,8 +72,11 @@ class SeatChooser extends PIXI.Container{
 
         this._getLerp(currentSeat, this.lerpManager, this, seat.id);
 
+        var oldTint = currentSeat.tint;
+        currentSeat.mouseover = (e) => { currentSeat.tint = SELECTED_COLOR; };
+        currentSeat.mouseout = (e) => { currentSeat.tint = oldTint; };
 
-        currentSeat.on('mousedown',function(){
+        currentSeat.on('click',function(){
 
             // do not send, if nothing has changed
             if(this.playerManager.currentPlayer.playerIndex == i) return;
@@ -68,14 +84,52 @@ class SeatChooser extends PIXI.Container{
             this.synchronizer.sendPlayerUpdate([
                 {key:Packages.PROTOCOL.CLIENT_VALUE_UPDATE.PLAYER_INDEX,value:i}
             ]);
-            this.emit('seatSelected',{seat:i});
+            this.emit(EVT_SEAT_SELECTED,{seat:i});
         }.bind(this),true);
 
         return currentSeat;
     }
 
+    _setSeatAsCurrentPlayersSeat(seat){
+        seat.texture = this.unselected;
+        seat.interactive=true;
+        this.lerpManager.abortAllLerpsOfObject(seat.id);
+
+        seat.scale.set(SCALE*3);
+
+        var cPixiText = new PIXI.Text(I18N.translate("keep_seat"),{
+            fontSize : (SEAT_SIZE)*0.4,
+            fontFamily: Config.DEFAULT_FONT_FAMILY,
+            fill : 0xFFFFFF
+        });
+
+        cPixiText.position.x = -cPixiText.width/2;
+        cPixiText.position.y = -cPixiText.height/2;
+        seat.addChild(cPixiText);
+
+
+        var oldScale = seat.scale.x;    // scale is not exaclty 1,
+                                          // setting whight and height previously changes the scale
+                                          // so use this value for the mouse over effect
+
+        var oldTint = seat.tint;
+        seat.mouseover = (e) => {seat.scale.set(oldScale+0.2); seat.tint = SELECTED_COLOR; };
+        seat.mouseout = (e) => {seat.scale.set(oldScale); seat.tint = oldTint; };
+
+        seat.on('click',function(){
+            this.emit(EVT_CANCELED,{
+                sender:this,
+                player:this.playerManager.currentPlayer,
+                oldPlayerIndex:this.playerManager.currentPlayer.playerIndex,
+                newPlayerIndex:this.playerManager.currentPlayer.playerIndex,
+                canceled:true
+            });
+        }.bind(this),true);
+    }
+
     _setSeatAsSelected(seat){
         seat.texture = this.selected;
+        seat.interactive = false;
         this.lerpManager.abortAllLerpsOfObject(seat.id);
 
         this.lerpManager.push(seat.id,"value", {

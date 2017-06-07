@@ -85,7 +85,7 @@ class ColorChooser extends PIXI.Container{
         var cPixiText = new PIXI.Text(I18N.translate("choose_color"),{
             fontSize : size/2,
             fontFamily: Config.DEFAULT_FONT_FAMILY,
-            fill : Util.parseColor("#FFFFFF")
+            fill : 0xFFFFFF
         });
 
         cPixiText.position.x = center.x-cPixiText.width/2;
@@ -121,14 +121,14 @@ class ColorChooser extends PIXI.Container{
 
         button.addChild(currentColor);
 
-        var oldScale = 1;//button.scale.x;    // scale is not exaclty 1,
+        var oldScale = button.scale.x;    // scale is not exaclty 1,
                                                 // setting whight and height previously changes the scale
                                                 // so use this value for the mouse over effect
 
         button.mouseover = (e) => button.scale.set(oldScale+PERCENT_PADDING);
         button.mouseout = (e) => button.scale.set(oldScale);
 
-        button.on('mousedown',function(){
+        button.on('click',function(){
             this.emit(EVT_CANCELED,{source:this});
         }.bind(this),true);
 
@@ -179,7 +179,7 @@ class ColorChooser extends PIXI.Container{
 
 
 
-        currentColor.on('mousedown',function(){
+        currentColor.on('click',function(){
             // do not send, if nothing has changed
             if(this.playerManager.currentPlayer.color == color) return;
 

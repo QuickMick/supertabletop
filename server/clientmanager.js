@@ -5,6 +5,7 @@
 
 const Util = require('./../core/util');
 const Ticks = require('./../core/ticks.json');
+const uuidV1 = require('uuid/v1');
 
 class Client{
     constructor(socket,clientInfo){
@@ -19,6 +20,7 @@ class Client{
         this.cursor = clientInfo.cursor || "default";
         this.position = {x:0,y:0};
         this.playerIndex =-1;
+        this.verification = uuidV1();
     }
 
     get ID(){
@@ -32,7 +34,8 @@ class Client{
             userStatus:this.userStatus,
             color:this.color,
             cursor:this.cursor,
-            playerIndex:this.playerIndex
+            playerIndex:this.playerIndex,
+            token:this.verification
         };
     }
 
@@ -102,6 +105,10 @@ class ClientManager{
 
     doesClientExist(id){
         return (id && this.clients[id]);
+    }
+
+    verificateClient(id,token){
+        return token && this.clients[id].verification == token;
     }
 
     isClientReady(id){

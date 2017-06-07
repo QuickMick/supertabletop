@@ -102,7 +102,8 @@ class Synchronizer{
 
             this.sendPackage(Packages.PROTOCOL.CLIENT.SEND_STATE,Packages.createEvent(
                 this.CLIENT_INFO.id,
-                this.updateQueue.popUpdatedData()
+                this.updateQueue.popUpdatedData(),
+                this.CLIENT_INFO.token
                 )
             );
         }.bind(this),Ticks.CLIENT_UPDATE_INTERVAL);
@@ -133,6 +134,7 @@ class Synchronizer{
 
         // receive data about the dame (after initialisation, or gamechange
         this.socket.on(Packages.PROTOCOL.SERVER.INIT_GAME, function (evt) {
+            if(!this._vertifyServer(evt.senderID)){console.log("message is not from server"); return; }
             this.chatHandler.pushMessage(I18N.translate("load_game",evt.data.name,evt.data.creator),"system",evt.timeStamp);
             this.gameManager.initGame(evt.data);
             this.lastGameStateUpdateEventTimeStamp=this.lastGameStateUpdateTimeStamp = new Date().getTime();
@@ -140,6 +142,7 @@ class Synchronizer{
 
         // receive game updates
         this.socket.on(Packages.PROTOCOL.SERVER.UPDATE_STATE, function (evt) {
+            if(!this._vertifyServer(evt.senderID)){console.log("message is not from server"); return; }
             if(evt.timeStamp < this.lastGameStateUpdateEventTimeStamp) return;    // if update is old, do not apply it
             var currentTime = new Date().getTime();
             this.processServerUpdates(evt.data,currentTime-this.lastGameStateUpdateTimeStamp);
@@ -149,22 +152,25 @@ class Synchronizer{
 
         // another player connected
         this.socket.on(Packages.PROTOCOL.SERVER.CLIENT_CONNECTED, function (evt) {
+            if(!this._vertifyServer(evt.senderID)){console.log("message is not from server"); return; }
             this.playerManager.addPlayers(evt.data);
         }.bind(this));
 
         // an client disconnects
         this.socket.on(Packages.PROTOCOL.SERVER.CLIENT_DISCONNECTED, function (evt) {
+            if(!this._vertifyServer(evt.senderID)){console.log("message is not from server"); return; }
             this.playerManager.removePlayer(evt.data.id)
         }.bind(this));
 
         // a value of a client/player has changed
         this.socket.on(Packages.PROTOCOL.SERVER.CLIENT_VALUE_UPDATE, function (evt) {
+            if(!this._vertifyServer(evt.senderID)){console.log("message is not from server"); return; }
             this.playerManager.updatePlayerValue(evt.data.clientID,evt.data.changes);
         }.bind(this));
 
         // if chat message from server is received
         this.socket.on(Packages.PROTOCOL.CHAT.SERVER_CHAT_MSG, function (evt) {
-            //message
+            if(!this._vertifyServer(evt.senderID)){console.log("message is not from server"); return; }
             var from = this.playerManager.getPlayer(evt.data.clientID);
             this.chatHandler.pushMessage(evt.data.message,evt.data.type,evt.timeStamp, from);
         }.bind(this));
@@ -174,6 +180,16 @@ class Synchronizer{
         });
     }
 
+    /**
+     * checks if id is the current server
+     * @param id
+     * @returns {*|boolean}
+     * @private
+     */
+    _vertifyServer(id){
+        return id && id == this.connectedServerID;
+    }
+
     sendPackage(type, msg){
         this.socket.emit(type,msg);
     }
@@ -181,7 +197,7 @@ class Synchronizer{
     sendChatMessage(msg){
         this.socket.emit(
             Packages.PROTOCOL.CHAT.CLIENT_CHAT_MSG,
-            Packages.createEvent(this.CLIENT_INFO.id,{message:msg})
+            Packages.createEvent(this.CLIENT_INFO.id,{message:msg},this.CLIENT_INFO.token)
         );
     }
 
@@ -195,7 +211,8 @@ class Synchronizer{
         this.sendPackage(Packages.PROTOCOL.CLIENT.CLIENT_VALUE_UPDATE,
             Packages.createEvent(
                 this.CLIENT_INFO.id,
-                data
+                data,
+                this.CLIENT_INFO.token
             )
         );
     }

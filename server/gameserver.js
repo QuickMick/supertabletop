@@ -7,7 +7,7 @@ const Ticks = require('./../core/ticks.json');
 var Packages = require('./../core/packages');
 var Util = require('./../core/util');
 
-const uuidV4 = require('uuid/v4');
+const uuidV1 = require('uuid/v1');
 
 var UpdateQueue = require("./../core/updatequeue");
 var EntityServerManager = require('./entityservermanager');
@@ -16,7 +16,7 @@ var ClientManager = require('./clientmanager');
 class GameServer{
     constructor(io){
         this.io = io;
-        this.ID = uuidV4();
+        this.ID = uuidV1();
         this.clientManager = new ClientManager();
         this.updateQueue =  new UpdateQueue();
         this.entityServerManager = new EntityServerManager(60,this.updateQueue,this.clientManager,this);
@@ -92,6 +92,12 @@ class GameServer{
                 console.log("message received from not existing client!",evt.senderID);
                 return;
             }
+
+            if(!this.clientManager.verificateClient(evt.senderID,evt.token)){
+                console.warn("User sends unverificated messages!",evt.senderID,socket.handshake.address,Packages.PROTOCOL.CLIENT.CLIENT_VALUE_UPDATE);
+                return;
+            }
+
             var valid = this._processClientValueUpdates(evt);
             if(valid) {
                 this._boradcast(    // if the change was valid, send everyone the new information
@@ -114,6 +120,11 @@ class GameServer{
             }
             if(!this.clientManager.doesClientExist(evt.senderID)){
                 console.log("message received from not existing client!",evt.senderID);
+                return;
+            }
+
+            if(!this.clientManager.verificateClient(evt.senderID,evt.token)){
+                console.warn("User sends unverificated messages!",evt.senderID,socket.handshake.address,Packages.PROTOCOL.CHAT.CLIENT_CHAT_MSG);
                 return;
             }
 
@@ -140,6 +151,12 @@ class GameServer{
                 console.log("disconnect: no data received");
                 return;
             }
+
+            if(!this.clientManager.doesClientExist(socket.id)){
+                console.log("user who disconnects does not exist!");
+                return;
+            }
+
             this.entityServerManager.releaseAllContraintsForUser(socket.id);
             this.clientManager.clientDisconnected(socket, data);
             this._boradcastExceptSender(
@@ -162,6 +179,12 @@ class GameServer{
                 console.log("message received from not existing client!",evt.senderID);
                 return;
             }
+
+            if(!this.clientManager.verificateClient(evt.senderID,evt.token)){
+                console.warn("User sends unverificated messages!",evt.senderID,socket.handshake.address,Packages.PROTOCOL.CLIENT.SEND_STATE);
+                return;
+            }
+
             // the received updates are processes everytime before the engine is processed.
             this.receivedUpdateQueue.push(evt.data);
         }.bind(this));
@@ -173,11 +196,6 @@ class GameServer{
      * @private
      */
     _processClientValueUpdates(evt){
-        if(!this.clientManager.doesClientExist(evt.senderID)){
-            console.log("_processClientValueUpdates: client",evt.senderID,"does not exist!");
-            return false;
-        }
-
         var result = false;
         for(var i=0; i<evt.data.length;i++) {
             var cur = evt.data[i];

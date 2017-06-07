@@ -5,10 +5,16 @@
 
 module.exports =
 {
-    createEvent:function (id,data) {
+    createEvent:function (id,data,token) {
         if(!data)
             console.warn("sending event to ",id," without data");
-        return {senderID:id,data:data || {},timeStamp:new Date().getTime()};
+        var result = {
+            senderID:id,
+            data:data || {},
+            timeStamp:new Date().getTime()
+        };
+        if(token) result.token = token;
+        return result;
     },
     PROTOCOL: {
         CHAT:{

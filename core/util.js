@@ -314,7 +314,7 @@ class Util {
         htmlNode.addEventListener("mouseup", (e)=>e.stopPropagation(), true);
         htmlNode.addEventListener("keydown", (e)=>e.stopPropagation(), true);
         htmlNode.addEventListener("keyup", (e)=>e.stopPropagation(), true);
-        htmlNode.addEventListener("click", (e)=>e.stopPropagation(), true);
+      //  htmlNode.addEventListener("click", (e)=>e.stopPropagation(), true);
     }
 }
 

@@ -541,6 +541,7 @@ a {
   margin-top: auto;
   margin-bottom: auto;
   flex-grow: 1;
+  border-radius: 10px;
 }
 
 .player-item .player-name-container{

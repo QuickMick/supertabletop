@@ -80,6 +80,16 @@ class ColorChooser extends PIXI.Container{
         for(let j=0;j<this.colorPiclerPositions.length;j++){
             this._createSinglePicker(assignments,j,size);
         }
+
+
+        var currentColor = this.playerManager.currentPlayer.color;
+
+        if(currentColor || currentColor >= 0){
+            // show abort butten, if user already has chosen a color
+
+
+        }
+
     }
 
     _createSinglePicker(assignments,j,size){

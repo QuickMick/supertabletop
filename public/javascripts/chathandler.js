@@ -40,7 +40,7 @@ class ChatHandler extends EventEmitter3 {
         this._rootContainer.classList.add("show");
 
         // prevent, that input from chat is fowarded to the gampelay - e.g. mousehweel must be blocked
-        Util.stopPropagation(this._rootContainer);
+
        /* this._rootContainer.addEventListener("mousewheel", (e)=>e.stopPropagation(), true);
         this._rootContainer.addEventListener("mousemove", (e)=>e.stopPropagation(), true);
         this._rootContainer.addEventListener("mousedown", (e)=>e.stopPropagation(), true);
@@ -58,6 +58,8 @@ class ChatHandler extends EventEmitter3 {
         // for sending
         this._inputText = this._rootContainer.getElementsByClassName("chat-input-field")[0];
         this._sendButton = this._rootContainer.getElementsByClassName("chat-send btn")[0];
+
+        Util.stopPropagation(this._rootContainer);
 
         // prepare the sending listeners
         this._sendButton.onclick = this._sendMessage.bind(this);

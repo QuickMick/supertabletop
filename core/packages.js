@@ -59,6 +59,7 @@ module.exports =
            CLIENT_MOUSE_MOVE: "CLIENT_MOUSE_MOVE"*/
        },
        SERVER: {
+           ERROR:"ERROR",
            /**
             * server sends this to the client, when he connects,
             * packags contains all necessary information about the client

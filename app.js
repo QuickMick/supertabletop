@@ -10,8 +10,9 @@ var users = require('./routes/users');
 var editorRoute = require('./routes/editor_route');
 var gameListRoute = require('./routes/gamelist_route');
 
+//compile all templates in the /view/fragments folder
 var LayoutTemplatesCompilter = require('./views/fragments/compilelayouts');
-new LayoutTemplatesCompilter().compile(); //compile all templates in the /view/fragments folder
+new LayoutTemplatesCompilter().compile();
 
 var Globals = require('./server/globals');
 Globals.ROOT= __dirname;

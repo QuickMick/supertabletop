@@ -8,7 +8,7 @@ var app = require('../app');
 var debug = require('debug')('tabletop:server');
 var http = require('http');
 
-var GameServer = require('./../server/gameserver');
+var ConnectionHandler = require('./../server/connectionhandler');
 
 
 
@@ -27,8 +27,8 @@ var server = http.createServer(app);
 
 
 var io = require('socket.io')(server);
-var gameServer = new GameServer(io);
-gameServer.start();
+var ConnectionHandler = new ConnectionHandler(io);
+//gameServer.start();
 
 
 

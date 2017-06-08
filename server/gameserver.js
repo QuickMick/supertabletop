@@ -18,7 +18,7 @@ var ClientManager = require('./clientmanager');
 
 class GameServer{
     constructor(io){
-        this.io = io;
+       // this.io = io;
         this.ID = uuidV1();
         this.clientManager = new ClientManager();
         this.updateQueue =  new UpdateQueue();
@@ -31,14 +31,28 @@ class GameServer{
          * @type {Array}
          */
         this.receivedUpdateQueue = [];
+
+        setInterval(this._sendEntityUpdates.bind(this), Ticks.SERVER_UPDATE_INTERVAL);
+
+        this.entityServerManager.loadGame("mick","codewords"); //TODO nicht statisch machen und durch user triggern lassen
+
+        /**
+         * contains all sockets of the connected clients
+         * necessary for broadcast
+         * @type {Array}
+         */
+        this.allSockets = [];
     }
 
+
+/*
     start(){
         this.io.on('connection', this._onConnectionReceived.bind(this));
         setInterval(this._sendEntityUpdates.bind(this), Ticks.SERVER_UPDATE_INTERVAL);
 
         this.entityServerManager.loadGame("mick","codewords"); //TODO nicht statisch machen und durch user triggern lassen
-    }
+
+    }*/
 
     /**
      * processes the received updates
@@ -67,24 +81,57 @@ class GameServer{
         );
     }
 
+    get currentConnectionCount(){
+        return this.clientManager.currentConnectionCount;
+    }
+
+    get isServerFull(){
+        return this.clientManager.currentConnectionCount >= Ticks.MAX_PLAYERS;
+    }
+
     /**
      * is called once for every client who connects,
      * everything necessary for the gameplay / client is initialized here
      * @param socket of the connected client
      * @private
      */
-    _onConnectionReceived(socket) {
-        console.log("connection received from:"+socket.handshake.address);
-
+    onConnectionReceived(socket) {
         // disconnect a new connection, when server is full
-        if(this.clientManager.currentConnectionCount >= Ticks.MAX_PLAYERS){
+        if(this.isServerFull){
             console.warn("player limit reached, new request has to be prohibited");
             socket.disconnect();
             return;
         }
 
       //  if(socket.handshake.address.includes("109.193.174.201")) return;
+        this.allSockets.push(socket);
         this._initClient(socket);
+
+        //removes this client from the serverclient list and broadcasts the information to all remaining clients
+        socket.on('disconnect', function (data) {
+            if(!data){
+                console.log("disconnect: no data received");
+                return;
+            }
+
+            if(!this.clientManager.doesClientExist(socket.id)){
+                console.log("user who disconnects does not exist!");
+                return;
+            }
+
+            this.allSockets = Util.removeByValue(this.allSockets,socket);
+
+            this.entityServerManager.releaseAllContraintsForUser(socket.id);
+            this.clientManager.clientDisconnected(socket, data);
+            this._boradcastExceptSender(
+                socket,
+                Packages.PROTOCOL.SERVER.CLIENT_DISCONNECTED,
+                Packages.createEvent(
+                    this.ID,
+                    {id: socket.id}
+                )
+            );
+        }.bind(this));
 
         socket.on(Packages.PROTOCOL.CLIENT.CLIENT_VALUE_UPDATE, function (evt) {
             if(!evt || !evt.data){
@@ -155,30 +202,6 @@ class GameServer{
                         type:"user",
                         message: evt.data.message
                     }
-                )
-            );
-        }.bind(this));
-
-        //removes this client from the serverclient list and broadcasts the information to all remaining clients
-        socket.on('disconnect', function (data) {
-            if(!data){
-                console.log("disconnect: no data received");
-                return;
-            }
-
-            if(!this.clientManager.doesClientExist(socket.id)){
-                console.log("user who disconnects does not exist!");
-                return;
-            }
-
-            this.entityServerManager.releaseAllContraintsForUser(socket.id);
-            this.clientManager.clientDisconnected(socket, data);
-            this._boradcastExceptSender(
-                socket,
-                Packages.PROTOCOL.SERVER.CLIENT_DISCONNECTED,
-                Packages.createEvent(
-                    this.ID,
-                    {id: socket.id}
                 )
             );
         }.bind(this));
@@ -396,11 +419,18 @@ class GameServer{
 
 
     _boradcast(type,msg){
-        this.io.sockets.emit(type,msg);
+        for(var i=0; i<this.allSockets.length;i++){
+            this._sendToClient(this.allSockets[i],type,msg);
+        }
+        //this.io.sockets.emit(type,msg);
     }
 
     _boradcastExceptSender(senderSocket,type,msg){
-        senderSocket.broadcast.emit(type,msg);
+        for(var i=0; i<this.allSockets.length;i++){
+            var cur = this.allSockets[i];
+            if(cur == senderSocket) continue;
+            this._sendToClient(cur,type,msg);
+        }
     }
 
     _sendToClient(clientConnectionSocket,type,msg){

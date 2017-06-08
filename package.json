@@ -6,7 +6,7 @@
     "start": "node ./bin/www",
     "watch-js": "cmd /k watchify public/javascripts/main.js -o public/js/game.js -v -d",
     "editor-watch-js": "cmd /k watchify editor/editormain.js -o public/js/editor.js -v -d",
-    "compile-name-list":"node compilenames.js source=random_names.txt target=core/random_names.json",
+    "compile-name-list": "node compilenames.js source=random_names.txt target=core/random_names.json",
     "test": "mocha",
     "debug": "node --inspect --debug-brk ./bin/www"
   },
@@ -15,6 +15,7 @@
     "watchify": "*"
   },
   "dependencies": {
+    "bad-words": "^1.5.1",
     "bcrypt": "^1.0.2",
     "body-parser": "~1.16.0",
     "cookie-parser": "~1.4.3",

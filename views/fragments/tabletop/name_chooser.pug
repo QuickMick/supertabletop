@@ -1,9 +1,9 @@
 div.overlay
     div.name-chooser-content.overlay-content
         div.caption #{I18N.choose_name}
-        div.label.valid sdaf saf sd
-        -var currentName = oldName;
+        div.label
+        -var currentName = name;
         input.name-chooser-input(placeholder=currentName)
-        div.name-chooser-input
-            div.btn #{I18N.confirm}
-            div.btn #{I18N.cancel}
+        div.name-chooser-buttons
+            div.btn(data-action="confirm") #{I18N.confirm}
+            div.btn(data-action="cancel") #{I18N.cancel}

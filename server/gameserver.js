@@ -101,8 +101,8 @@ class GameServer{
                 return;
             }
 
-            var valid = this._processClientValueUpdates(evt);
-            if(valid) {
+            var violations = this._processClientValueUpdates(evt);
+            if(violations.length <=0) {
                 this._boradcast(    // if the change was valid, send everyone the new information
                     Packages.PROTOCOL.SERVER.CLIENT_VALUE_UPDATE,
                     Packages.createEvent(
@@ -110,6 +110,17 @@ class GameServer{
                         {
                             clientID: evt.senderID,
                             changes: evt.data
+                        }
+                    )
+                );
+            }else{  // otherwise send the rejection reasons
+                this._sendToClient(
+                    socket,
+                    Packages.PROTOCOL.SERVER.CLIENT_VALUE_UPDATE_REJECTED,
+                    Packages.createEvent(
+                        this.ID,
+                        {
+                            violations: violations
                         }
                     )
                 );
@@ -195,20 +206,28 @@ class GameServer{
 
     /**
      *
-     * @returns {boolean} true, if accepted/ valid change
+     * @returns {[]} returns an empty array, if everything is valid, otherwise, an array with rejection reasons is returned
      * @private
      */
     _processClientValueUpdates(evt){
-        var result = false;
+        var result = [];
         for(var i=0; i<evt.data.length;i++) {
             var cur = evt.data[i];
+            var rejectionReason = null;
             switch (cur.key) {
                 case Packages.PROTOCOL.CLIENT_VALUE_UPDATE.COLOR:
-                    result=this.clientManager.updateClientColor(evt.senderID, cur.value);
+                    rejectionReason=this.clientManager.updateClientColor(evt.senderID, cur.value);
                     break;
                 case Packages.PROTOCOL.CLIENT_VALUE_UPDATE.PLAYER_INDEX:
-                    result = this.clientManager.updateClientIndex(evt.senderID, cur.value);
+                    rejectionReason = this.clientManager.updateClientIndex(evt.senderID, cur.value);
                     break;
+                case Packages.PROTOCOL.CLIENT_VALUE_UPDATE.NAME:
+                    rejectionReason = this.clientManager.updateClientName(evt.senderID, cur.value);
+                    break;
+            }
+
+            if(rejectionReason){
+                result.push({key:cur.key,reason:rejectionReason});
             }
         }
 

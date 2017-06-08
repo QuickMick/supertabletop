@@ -29,7 +29,8 @@ module.exports =
         },
         CLIENT_VALUE_UPDATE:{
             COLOR:"color",
-            PLAYER_INDEX:"playerIndex"
+            PLAYER_INDEX:"playerIndex",
+            NAME:"name"
         },
        CLIENT: {
            /**
@@ -69,7 +70,11 @@ module.exports =
             */
            CLIENT_CONNECTED: "CLIENT_CONNECTED",
 
-
+           /**
+            * a client wanted to change a vlaue, but the server rejects the change
+            * package looks like{CLIENT_VALUE_UPDATE_NAME,reason}
+            */
+           CLIENT_VALUE_UPDATE_REJECTED: "CLIENT_VALUE_UPDATE_REJECTED",
            /**
             * a client changes a value of himselfe, for example, the color
             */

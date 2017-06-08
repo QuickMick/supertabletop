@@ -13,6 +13,7 @@
     "player_disconnected":"Player {0} disconnected",
     "player_color_changed":"Player {0} has changed his color",
     "player_seat_changed":"Player {0} has changed his seat",
+    "player_name_changed":"{0} is from now on called {1}",
     "minimize_maximize":"minimize/maximize",
     "you":"YOU",
 
@@ -21,6 +22,10 @@
     "change_color":"change color",
     "change_seat":"change seat",
     "keep_seat":"keep\nseat",
+    "incorrect_name_length":"The name must at least have {0} and at maximum {1} characters!",
+    "incorrect_name_characters":"The name must only consist of letters and digits!",
+    "chosen_name_is_forbidden":"Chosen name is forbidden!",
+    "name_already_occupied":"Name is already used from somebody else",
 
     "choose_name":"Choose your name",
     "choose_color":"Choose your color",
@@ -47,6 +52,7 @@
     "player_disconnected":"Spieler {0} hat die verbindung abgebrochen",
     "player_color_changed":"Spieler {0} hat die Farbe gewechselt",
     "player_seat_changed":"Spieler {0} hat den Platz gewechselt",
+    "player_name_changed":"{0} heißt nun {1}",
     "minimize_maximize":"minimieren/maximieren",
     "you":"DU",
 
@@ -55,6 +61,10 @@
     "change_color":"Farbe wechseln",
     "change_seat":"Sitzplatz wechseln",
     "keep_seat": "Sitzplatz\nbehalten",
+    "incorrect_name_length":"Der Name muss mindestens {0} und maximal {1} Zeichen lang sein!",
+    "incorrect_name_characters":"Der Name darf nur aus Buchstaben und Zahlen bestehen!",
+    "chosen_name_is_forbidden":"Gewählter name ist verboten",
+    "name_already_occupied": "Name wird bereits von jemand anderem verwendet",
 
     "choose_name":"Wähle deinen Namen",
     "choose_color":"Wähle deine Farbe",

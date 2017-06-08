@@ -7,16 +7,19 @@ const Ticks = require('./../../core/ticks.json');
 var Packages = require("./../../core/packages");
 var UpdateQueue = require('./../../core/updatequeue');
 
+var EventEmitter3 = require('eventemitter3');
+
 //var GameState = require("./gamestate");
 
 //var EntityManager = require("./entitymanager");
 
-
+var EVT_NAME_REJECTED = "namerejected";
 /**
  * Receives all data from the server and changed data from the client and distributes it.
  */
-class Synchronizer{
+class Synchronizer extends EventEmitter3{
     constructor(gameManager){
+        super();
         this.socket = null;
 
         /**
@@ -175,9 +178,32 @@ class Synchronizer{
             this.chatHandler.pushMessage(evt.data.message,evt.data.type,evt.timeStamp, from);
         }.bind(this));
 
+        // if value reject from serveris received
+        this.socket.on(Packages.PROTOCOL.SERVER.CLIENT_VALUE_UPDATE_REJECTED, function (evt) {
+            if(!this._vertifyServer(evt.senderID)){console.log("message is not from server"); return; }
+            this._handleValueRejections(evt.data);
+        }.bind(this));
+
         this.socket.on('disconnect',function (evt) {
            console.log("DISCONNECT",evt);
         });
+    }
+
+    /**
+     * handles value rejectsions from the server
+     * @param evt
+     * @private
+     */
+    _handleValueRejections(evt){
+
+        for(var i=0; i<evt.violations.length;i++) {
+            var reason = evt.violations[i];
+            switch (reason.key) {
+                case Packages.PROTOCOL.CLIENT_VALUE_UPDATE.NAME:
+                    this.emit(EVT_NAME_REJECTED, {reason: reason.reason});
+                    break;
+            }
+        }
     }
 
     /**

@@ -5,6 +5,10 @@
 
 const Util = require('./../core/util');
 const Ticks = require('./../core/ticks.json');
+const SharedConfig = require('./../core/sharedconfig.json');
+
+var BadwordsFilter = require('bad-words');
+
 const uuidV1 = require('uuid/v1');
 
 var Rights = require('./../core/rights');
@@ -76,13 +80,16 @@ class ClientManager{
         this.assignedColors = {};
 
         /**
-         * contains all names, which are already used by another player
+         * contains all names, which are already used by another player.
+         * NOTE: names are just stored in lowercase!
          * @type {{name,id}}
          */
         this.assignedNames = {};
 
 
         this._currentConnectionCount = 0;
+
+        this.badWordsFilter = new BadwordsFilter();
     }
 
     get currentConnectionCount(){
@@ -111,7 +118,7 @@ class ClientManager{
             clientInfo.color = -1;
         }
 
-        this.assignedNames[clientInfo.name] = socket.id;
+        this.assignedNames[clientInfo.name.toLowerCase()] = socket.id;
 
         if(clientInfo.playerIndex >=0){
             this.assignedPlayerIndexes[clientInfo.playerIndex] = clientInfo.playerIndex;
@@ -148,19 +155,19 @@ class ClientManager{
      * updates the color of an client
      * @param id
      * @param color
-     * @returns {boolean}
+     * @returns {string}
      */
     updateClientColor(id,color){
         if(!this.doesClientExist(id)){
             console.log("client",id,"does not exist");
-            return false;
+            return "client_does_not_exist";
         }
 
         var c =Util.parseColor(color);
 
         if(this.assignedColors[c]){
             console.log("color",c,"already chosen by",this.assignedColors[c],"cannot be chosen from",id);
-            return false;
+            return "color_already_chosen";
         }
 
         console.log("updated client",id," color:",color);
@@ -173,29 +180,29 @@ class ClientManager{
 
         this.clients[id].color = c;
         this.assignedColors[c] = id;
-        return true;
+        return "";
     }
 
     /**
      * updates the playerindex of a client (aka the seat)
      * @param id
      * @param index
-     * @returns {boolean}
+     * @returns {string} reson of rejection
      */
     updateClientIndex(id,index){
         if(!this.doesClientExist(id)){
             console.log("updateClientIndex: client",id,"does not exist");
-            return false;
+            return "client_does_not_exist";
         }
 
         if(index >=Ticks.MAX_PLAYERS){
             console.log("updateClientIndex: client",id,"wants an index which is higher than the maximum player count",index);
-            return false;
+            return "player_index_out_of_range";
         }
 
         if(this.assignedPlayerIndexes[index]){
             console.log("updateClientIndex: seat",index,"already chosen by",this.assignedPlayerIndexes[index],"cannot be chosen from",id);
-            return false;
+            return "seat_already_occupied";
         }
 
         // release old index
@@ -207,7 +214,66 @@ class ClientManager{
         console.log("updated client",id,"player index index:",index);
         this.clients[id].playerIndex = index;
         this.assignedPlayerIndexes[index] = id; // seat is now taken
-        return true;
+        return "";
+    }
+
+
+    /**
+     * changes the clients name
+     * @param id
+     * @param name
+     * @returns {string}
+     */
+    updateClientName(id,name){
+        if(!this.doesClientExist(id)){
+            console.log("updateClientIndex: client",id,"does not exist");
+            return "client_does_not_exist";
+        }
+
+        if(!name){
+            console.log("updateClientIndex: client",id," cannot have an empty name");
+            return "no_name";
+        }
+console.log("name",name);
+        name = name || "";
+        name = name.trim();
+
+        // checkif name has correct langth
+        if(!name
+            || name.length <SharedConfig.MIN_NAME_LENGTH
+            || name.length > SharedConfig.MAX_NAME_LENGTH
+        ){
+            return "incorrect_name_length";
+        }
+
+        // check just consists letters and digits
+        if(!/^\w+$/.test(name)){
+            return "incorrect_name_characters";
+        }
+
+        if(this.assignedNames[name]){
+            return "name_already_occupied";
+        }
+
+        var curClient = this.getClient(id);
+        var old = curClient.name;
+
+        if(old == name){
+            console.log("updateClientName: no change, now name equals old name");
+            return "";
+        }
+        if(this.badWordsFilter.isProfane(name)){
+            console.log("updateClientName: ",id," tried to chose a profane name");
+            return "chosen_name_is_forbidden";
+        }
+        old = old.toLowerCase();
+        // release old name TODO: evtl drin lassn?
+        if(this.assignedNames[old]){
+            delete this.assignedNames[old];
+            this.assignedNames[name.toLowerCase()] = curClient.ID;
+        }
+
+        return "";
     }
 
     /**
@@ -252,7 +318,6 @@ class ClientManager{
     }
 
     clientDisconnected(socket,data){
-
         console.log("disconnect: "+socket.id+" Users left: "+this._currentConnectionCount);
 
         //this.boradcastExceptSender(clientSocket,Packages.PROTOCOL.SERVER.CLIENT_DISCONNECTED,{msg:"",data:{id:clientSocket.id}});
@@ -321,7 +386,7 @@ class ClientManager{
             result = RANDOM_NAMES[Math.floor(Math.random()*RANDOM_NAMES.length)]+"-"+RANDOM_NAMES[Math.floor(Math.random()*RANDOM_NAMES.length)];
         }
 
-        if(this.assignedNames[result]){
+        if(this.assignedNames[result.toLowerCase()]){
             i++;
             return this.getRandomName(i);
         }

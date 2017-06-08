@@ -69,7 +69,6 @@ class SeatChooser extends PIXI.Container{
         currentSeat.id = seat.id;
         this.addChild(currentSeat);
 
-
         this._getLerp(currentSeat, this.lerpManager, this, seat.id);
 
         var oldTint = currentSeat.tint;

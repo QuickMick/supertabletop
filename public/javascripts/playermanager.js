@@ -12,8 +12,8 @@ const Config = require('./../resources/config.json');
 
 var CursorLibrary = require('./../resources/resources.json').cursors.content;
 
-
-var EVT_COLOR_CHANGES='colorchanged';
+var EVT_PLAYER_NAME_CHANGED='namechanged';
+var EVT_PLAYER_COLOR_CHANGED='colorchanged';
 var EVT_PLAYER_INDEX_CHANGED='playerindexchanged';
 var EVT_PLAYER_DISCONNECTED ='playerdisconnected';
 var EVT_PLAYER_CONNECTED ='playerconnected';
@@ -246,7 +246,7 @@ class PlayerManager extends PIXI.Container {
                     }
 
                     // emit color change event
-                    this.emit(EVT_COLOR_CHANGES,{
+                    this.emit(EVT_PLAYER_COLOR_CHANGED,{
                         player:this.players[id],
                         oldColor:old,
                         newColor:newColor
@@ -285,6 +285,26 @@ class PlayerManager extends PIXI.Container {
                         player:this.players[id],
                         oldPlayerIndex:old,
                         newPlayerIndex:value
+                    });
+                    return;
+                case Packages.PROTOCOL.CLIENT_VALUE_UPDATE.NAME:
+                    if(!value) return; // return, if no value
+
+                    var old = this.players[id].name || "";
+
+                    if(old == value) return;    // return if no change
+
+                    this.players[id].name = value;
+                    // update player list
+                    var playerItem = document.getElementById(id);
+                    var nameNode = playerItem.getElementsByClassName("player-name")[0];
+                    nameNode.textContent = value;
+
+
+                    this.emit(EVT_PLAYER_NAME_CHANGED,{
+                        player:this.players[id],
+                        oldName:old,
+                        newName:value
                     });
                     return;
             }

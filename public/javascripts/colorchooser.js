@@ -173,11 +173,8 @@ class ColorChooser extends PIXI.Container{
             return; // no input possible, if color is already assigned
         }
 
-
         currentColor.mouseover = (e) => currentColor.scale.set(oldScale+PERCENT_PADDING);
         currentColor.mouseout = (e) => currentColor.scale.set(oldScale);
-
-
 
         currentColor.on('click',function(){
             // do not send, if nothing has changed
@@ -189,7 +186,6 @@ class ColorChooser extends PIXI.Container{
             this.emit(EVT_COLOR_SELECTED,{color:color});
         }.bind(this),true);
     }
-
 
     getUnselectedTexture(){
         var graphics = new PIXI.Graphics();

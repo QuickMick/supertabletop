@@ -12,7 +12,7 @@ var DefaultGame = require('./../resources/default_game.json');
 var Resources = require('./../resources/resources.json');
 var Entity = require('./entity');
 var GameTable = require('./gametable');
-
+const Packages = require('./../../core/packages');
 var LerpManager = require('./lerpmanager');
 var EntityManager = require('./entitymanager');
 var PlayerManager = require('./playermanager');
@@ -23,7 +23,7 @@ var CursorManager = require('./cursormanager');
 
 var ChatHandler = require('./chathandler');
 
-
+var NameChooser = require('./dialogs/namechooser');
 var ChooserSelectorDialog = require('./dialogs/chooserselectordialog');
 
 var SeatChooser = require('./seatchooser');
@@ -83,7 +83,7 @@ class GameManager extends EventEmitter3{
 
         this.chatHandler = new ChatHandler("game-chat");
 /*
-        var EVT_COLOR_CHANGES='colorchanged';
+        var EVT_PLAYER_COLOR_CHANGED='colorchanged';
         var EVT_PLAYER_INDEX_CHANGED='playerindexchanged';
         var EVT_PLAYER_DISCONNECTED ='playerdisconnected';
         var EVT_PLAYER_CONNECTED ='playerconnected';
@@ -98,6 +98,9 @@ class GameManager extends EventEmitter3{
         this.playerManager.on('playerdisconnected',(evt) => this.chatHandler.pushMessage(I18N.translate("player_disconnected",evt.player.name),"system"));
         this.playerManager.on('colorchanged',(evt) => this.chatHandler.pushMessage(I18N.translate("player_color_changed",evt.player.name),"system"));
         this.playerManager.on('playerindexchanged',(evt) => this.chatHandler.pushMessage(I18N.translate("player_seat_changed",evt.player.name),"system"));
+        this.playerManager.on('namechanged',(evt) => this.chatHandler.pushMessage(I18N.translate("player_name_changed",evt.oldName,evt.newName),"system"));
+
+        this.synchronizer = new Synchronizer(this);     // initialize socket-connection/synchronizer
 
 
         this.playerManager.on('configchangerequest',(evt)=>{
@@ -107,10 +110,24 @@ class GameManager extends EventEmitter3{
 
             selector.on('opencolorchooser',(e)=>this.showColorChooser());
             selector.on('openseatchooser',(e)=>this.showSeatChooser());
+            selector.on('opennamechooser',(e)=>{
+                var nc = new NameChooser(this.playerManager.currentPlayer);
+                // add listener and remove listener
+                nc.on('onconfirm',(e)=>{
+                    this.synchronizer.sendPlayerUpdate([
+                        {key:Packages.PROTOCOL.CLIENT_VALUE_UPDATE.NAME,value:e.name}
+                    ]);
+                });
+                this.playerManager.on('namechanged',nc.onNameChanged.bind(nc));
+                this.synchronizer.on('namerejected',nc.onNameRejected.bind(nc));
+                nc.on('onclose',(e)=>{
+                    this.synchronizer.removeListener('namerejected',nc.onNameRejected.bind(nc));
+                    this.playerManager.removeListener('namechanged',nc.onNameChanged.bind(nc));
+                });
+            });
         });
 
 
-        this.synchronizer = new Synchronizer(this);     // initialize socket-connection/synchronizer
 
         this.chatHandler.on('send',this.synchronizer.sendChatMessage.bind(this.synchronizer));
 

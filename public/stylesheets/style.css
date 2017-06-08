@@ -87,6 +87,7 @@ a {
 }
 
 .btn{
+  border: 2px solid darkgrey;
   border: none;
   background-color: #cfcfcf;
   padding: 5px;
@@ -125,7 +126,7 @@ a {
 
 .overlay-content {
   margin: auto;
-  background-color: red;
+  background-color: beige;
   text-align: center;
   padding: 10px;
 }
@@ -202,6 +203,9 @@ a {
 /*----------- END CHOOSER SELECTOR ----------*/
 
 /*----------- NAME CHOOSER ------------------*/
+.name-chooser-content{
+  width: 300px;
+}
 .name-chooser-content .caption {
   font-size: 25px;
 }
@@ -212,19 +216,29 @@ a {
 
 .name-chooser-content .label{
   margin-top: 5px;
+  display: none;
+  -moz-transition: box-shadow 0.5s ease;
+  -webkit-transition: box-shadow 0.5s ease ;
+  -o-transition: box-shadow 0.5s ease;
+  transition: box-shadow 0.5s ease ;
+  box-shadow: green 0 0 0px;
 }
 
 .name-chooser-content .label.valid{
-  color:green
+  color:green;
+  display: block;
 }
-
 
 .name-chooser-content .label.invalid{
-  color:red
+  color:red;
+  display:block;
 }
 
-.name-chooser-content .label.hidden{
-  display: none;
+.name-chooser-content .label.invalid.feedback{
+  box-shadow: red 0 0 10px;
+}
+.name-chooser-content .label.valid.feedback{
+  box-shadow: green 0 0 10px;
 }
 
 .name-chooser-content .name-chooser-input{

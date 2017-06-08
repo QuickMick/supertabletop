@@ -118,13 +118,17 @@ class ClientManager{
             clientInfo.color = -1;
         }
 
-        this.assignedNames[clientInfo.name.toLowerCase()] = socket.id;
+
 
         if(clientInfo.playerIndex >=0){
             this.assignedPlayerIndexes[clientInfo.playerIndex] = clientInfo.playerIndex;
         }
 
         this.clients[socket.id] = new Client(socket,clientInfo);
+        // if the name is not unique, make it unique
+        this.clients[socket.id].name = this.getAlternativeNameIfOccupied(this.clients[socket.id].name);
+        this.assignedNames[this.clients[socket.id].name.toLowerCase()] = socket.id;
+     //   this.assignedNames[clientInfo.name.toLowerCase()] = socket.id;
     }
 
     doesClientExist(id){
@@ -234,7 +238,7 @@ class ClientManager{
             console.log("updateClientIndex: client",id," cannot have an empty name");
             return "no_name";
         }
-console.log("name",name);
+
         name = name || "";
         name = name.trim();
 
@@ -272,6 +276,8 @@ console.log("name",name);
             delete this.assignedNames[old];
             this.assignedNames[name.toLowerCase()] = curClient.ID;
         }
+
+        console.log("updateClientName: player",id,"changed name from",old,"to",name);
 
         return "";
     }
@@ -374,6 +380,23 @@ console.log("name",name);
         return true;
     }
 
+
+    /**
+     * checks if the passed name is already occupied, if yes, create a new name
+     * with just breakets and a number in them, e.g. mick (1)
+     * @param name
+     * @param i
+     * @returns {string} the uniq name
+     */
+    getAlternativeNameIfOccupied(name){
+        var result = name;
+        var i=1;
+        while(this.assignedNames[result.toLowerCase()]){
+            result = name+" ("+i+")";
+            i++;
+        }
+        return result;
+    }
 
     /**
      * get a random name. If the name is already assigned, take another one

@@ -17,6 +17,9 @@
     "minimize_maximize":"minimize/maximize",
     "you":"YOU",
 
+    "choose_game":"Choose game",
+    "start_game":"start game",
+
     "what_to_change":"What do you want to change?",
     "change_name":"change name",
     "change_color":"change color",
@@ -27,10 +30,13 @@
     "chosen_name_is_forbidden":"Chosen name is forbidden!",
     "name_already_occupied":"Name is already used from somebody else",
 
+    "no_description":"no description available",
+
     "choose_name":"Choose your name",
     "choose_color":"Choose your color",
     "confirm":"ok",
     "cancel":"cancel",
+    "close":"close",
     "back":"back",
     "name_too_long":"chosen name is too long, max {0} characters are allowed",
     "name_forbidden":"chosen name contains forbidden words",
@@ -56,6 +62,9 @@
     "minimize_maximize":"minimieren/maximieren",
     "you":"DU",
 
+    "choose_game":"Spiel wählen",
+    "start_game":"Spiel starten",
+
     "what_to_change":"Was möchtest du ändern?",
     "change_name":"Name ändern",
     "change_color":"Farbe wechseln",
@@ -63,13 +72,16 @@
     "keep_seat": "Sitzplatz\nbehalten",
     "incorrect_name_length":"Der Name muss mindestens {0} und maximal {1} Zeichen lang sein!",
     "incorrect_name_characters":"Der Name darf nur aus Buchstaben und Zahlen bestehen!",
-    "chosen_name_is_forbidden":"Gewählter name ist verboten",
+    "chosen_name_is_forbidden":"Gewählter Name ist verboten",
     "name_already_occupied": "Name wird bereits von jemand anderem verwendet",
+
+    "no_description":"Keine Beschreibung verfügbar",
 
     "choose_name":"Wähle deinen Namen",
     "choose_color":"Wähle deine Farbe",
     "confirm":"ok",
     "cancel":"abbrechen",
+    "close":"schließen",
     "back":"zurück",
     "name_too_long":"Der Name ist zu lang, es sind maximal {0} Buchstaben erlaubt",
     "name_forbidden":"Der gewählte Name enthält verbotene Wörter",

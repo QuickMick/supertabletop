@@ -1,0 +1,10 @@
+div.item
+    div.info
+        div.name.text-selectable #{name}
+        div.creator.text-selectable #{creator}
+        div.rating #{rating}
+    div.details
+        -var thumb = thumbnail
+        img.thumbnail(src=thumb)
+        div.description.text-selectable #{description}
+        div.btn.play(data-action="play") #{I18N.start_game}

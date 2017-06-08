@@ -25,6 +25,7 @@ var ChatHandler = require('./chathandler');
 
 var NameChooser = require('./dialogs/namechooser');
 var ChooserSelectorDialog = require('./dialogs/chooserselectordialog');
+var GameChooserDialog = require('./dialogs/gamechooserdialog');
 
 var SeatChooser = require('./seatchooser');
 var ColorChooser = require('./colorchooser');
@@ -103,6 +104,7 @@ class GameManager extends EventEmitter3{
         this.synchronizer = new Synchronizer(this);     // initialize socket-connection/synchronizer
 
 
+        // open the menu selection dialog
         this.playerManager.on('configchangerequest',(evt)=>{
             // do not open selector chooser, if a dialog is already open
             if(this.seatChooser || this.colorChooser) return;
@@ -127,6 +129,10 @@ class GameManager extends EventEmitter3{
             });
         });
 
+        document.getElementById("open-game-chooser").onclick = function(){
+           var x= new GameChooserDialog();
+            x.show();
+        }.bind(this);
 
 
         this.chatHandler.on('send',this.synchronizer.sendChatMessage.bind(this.synchronizer));

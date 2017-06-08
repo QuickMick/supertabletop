@@ -1,0 +1,6 @@
+div.stars
+    form
+        each i in [5,4,3,2,1]
+            -var ids = "star"+i;
+            lable(for=ids class="label-star")
+                input.input-star(type="radio" id=ids name="star" value=i)

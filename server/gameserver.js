@@ -108,123 +108,145 @@ class GameServer{
         this._initClient(socket);
 
         //removes this client from the serverclient list and broadcasts the information to all remaining clients
-        socket.on('disconnect', function (data) {
-            if(!data){
-                console.log("disconnect: no data received");
-                return;
-            }
+        socket.on('disconnect', this._onDisconnect.bind({self:this,socket:socket}));
 
-            if(!this.clientManager.doesClientExist(socket.id)){
-                console.log("user who disconnects does not exist!");
-                return;
-            }
+        socket.on(Packages.PROTOCOL.CLIENT.CLIENT_VALUE_UPDATE, this._onValueUpdateReceived.bind({self:this,socket:socket}));
 
-            this.allSockets = Util.removeByValue(this.allSockets,socket);
+        socket.on(Packages.PROTOCOL.CHAT.CLIENT_CHAT_MSG, this._onChatMessageReceived.bind({self:this,socket:socket}));
 
-            this.entityServerManager.releaseAllContraintsForUser(socket.id);
-            this.clientManager.clientDisconnected(socket, data);
-            this._boradcastExceptSender(
-                socket,
-                Packages.PROTOCOL.SERVER.CLIENT_DISCONNECTED,
+        // server receives client entity updates in this event
+        socket.on(Packages.PROTOCOL.CLIENT.SEND_STATE, this._onClientStateUpdate.bind({self:this,socket:socket}));
+    }
+
+    /** removes all listeners */
+    onConnectionLost(socket){
+        socket.removeListener('disconnect', this._onDisconnect.bind({self:this,socket:socket}));
+
+        socket.removeListener(Packages.PROTOCOL.CLIENT.CLIENT_VALUE_UPDATE, this._onValueUpdateReceived.bind({self:this,socket:socket}));
+
+        socket.removeListener(Packages.PROTOCOL.CHAT.CLIENT_CHAT_MSG, this._onChatMessageReceived.bind({self:this,socket:socket}));
+
+        // server receives client entity updates in this event
+        socket.removeListener(Packages.PROTOCOL.CLIENT.SEND_STATE, this._onClientStateUpdate.bind({self:this,socket:socket}));
+    }
+
+    _onDisconnect (data) {
+        if(!data){
+            console.log("disconnect: no data received");
+            return;
+        }
+
+        this.self.onConnectionLost(this.socket);
+
+        if(!this.self.clientManager.doesClientExist(this.socket.id)){
+            console.log("user who disconnects does not exist!");
+            return;
+        }
+
+        this.self.allSockets = Util.removeByValue(this.self.allSockets,this.socket);
+
+        this.self.entityServerManager.releaseAllContraintsForUser(this.socket.id);
+        this.self.clientManager.clientDisconnected(this.socket, data);
+        this.self._boradcastExceptSender(
+            this.socket,
+            Packages.PROTOCOL.SERVER.CLIENT_DISCONNECTED,
+            Packages.createEvent(
+                this.self.ID,
+                {id: this.socket.id}
+            )
+        );
+    }
+
+    _onValueUpdateReceived (evt) {
+        if(!evt || !evt.data){
+            console.log("CLIENT_VALUE_UPDATE: no data received");
+            return;
+        }
+        if(!this.self.clientManager.doesClientExist(evt.senderID)){
+            console.log("message received from not existing client!",evt.senderID);
+            return;
+        }
+
+        if(!this.self.clientManager.verificateClient(evt.senderID,evt.token)){
+            console.warn("User sends unverificated messages!",evt.senderID,this.socket.handshake.address,Packages.PROTOCOL.CLIENT.CLIENT_VALUE_UPDATE);
+            return;
+        }
+
+        var violations = this.self._processClientValueUpdates(evt);
+        if(violations.length <=0) {
+            this.self._boradcast(    // if the change was valid, send everyone the new information
+                Packages.PROTOCOL.SERVER.CLIENT_VALUE_UPDATE,
                 Packages.createEvent(
-                    this.ID,
-                    {id: socket.id}
-                )
-            );
-        }.bind(this));
-
-        socket.on(Packages.PROTOCOL.CLIENT.CLIENT_VALUE_UPDATE, function (evt) {
-            if(!evt || !evt.data){
-                console.log("CLIENT_VALUE_UPDATE: no data received");
-                return;
-            }
-            if(!this.clientManager.doesClientExist(evt.senderID)){
-                console.log("message received from not existing client!",evt.senderID);
-                return;
-            }
-
-            if(!this.clientManager.verificateClient(evt.senderID,evt.token)){
-                console.warn("User sends unverificated messages!",evt.senderID,socket.handshake.address,Packages.PROTOCOL.CLIENT.CLIENT_VALUE_UPDATE);
-                return;
-            }
-
-            var violations = this._processClientValueUpdates(evt);
-            if(violations.length <=0) {
-                this._boradcast(    // if the change was valid, send everyone the new information
-                    Packages.PROTOCOL.SERVER.CLIENT_VALUE_UPDATE,
-                    Packages.createEvent(
-                        this.ID,
-                        {
-                            clientID: evt.senderID,
-                            changes: evt.data
-                        }
-                    )
-                );
-            }else{  // otherwise send the rejection reasons
-                this._sendToClient(
-                    socket,
-                    Packages.PROTOCOL.SERVER.CLIENT_VALUE_UPDATE_REJECTED,
-                    Packages.createEvent(
-                        this.ID,
-                        {
-                            violations: violations
-                        }
-                    )
-                );
-            }
-        }.bind(this));
-
-        socket.on(Packages.PROTOCOL.CHAT.CLIENT_CHAT_MSG, function (evt) {
-            if(!evt || !evt.data){
-                console.log("CLIENT_CHAT_MSG: no data received");
-                return;
-            }
-            if(!this.clientManager.doesClientExist(evt.senderID)){
-                console.log("message received from not existing client!",evt.senderID);
-                return;
-            }
-
-            if(!this.clientManager.verificateClient(evt.senderID,evt.token)){
-                console.warn("User sends unverificated messages!",evt.senderID,socket.handshake.address,Packages.PROTOCOL.CHAT.CLIENT_CHAT_MSG);
-                return;
-            }
-
-            if(!evt.data.message){
-                return; // no chat message to share
-            }
-
-            this._boradcast(    // if the change was valid, send everyone the new information
-                Packages.PROTOCOL.CHAT.SERVER_CHAT_MSG,
-                Packages.createEvent(
-                    this.ID,
+                    this.self.ID,
                     {
                         clientID: evt.senderID,
-                        type:"user",
-                        message: evt.data.message
+                        changes: evt.data
                     }
                 )
             );
-        }.bind(this));
+        }else{  // otherwise send the rejection reasons
+            this.self._sendToClient(
+                this.socket,
+                Packages.PROTOCOL.SERVER.CLIENT_VALUE_UPDATE_REJECTED,
+                Packages.createEvent(
+                    this.self.ID,
+                    {
+                        violations: violations
+                    }
+                )
+            );
+        }
+    }
 
-        // server receives client entity updates in this event
-        socket.on(Packages.PROTOCOL.CLIENT.SEND_STATE, function (evt) {
-            if(!evt || !evt.data){
-                console.log("SEND_STATE: no data received");
-                return;
-            }
-            if(!this.clientManager.doesClientExist(evt.senderID)){
-                console.log("message received from not existing client!",evt.senderID);
-                return;
-            }
+    _onChatMessageReceived (evt) {
+        if(!evt || !evt.data){
+            console.log("CLIENT_CHAT_MSG: no data received");
+            return;
+        }
+        if(!this.self.clientManager.doesClientExist(evt.senderID)){
+            console.log("message received from not existing client!",evt.senderID);
+            return;
+        }
 
-            if(!this.clientManager.verificateClient(evt.senderID,evt.token)){
-                console.warn("User sends unverificated messages!",evt.senderID,socket.handshake.address,Packages.PROTOCOL.CLIENT.SEND_STATE);
-                return;
-            }
+        if(!this.self.clientManager.verificateClient(evt.senderID,evt.token)){
+            console.warn("User sends unverificated messages!",evt.senderID,this.socket.handshake.address,Packages.PROTOCOL.CHAT.CLIENT_CHAT_MSG);
+            return;
+        }
 
-            // the received updates are processes everytime before the engine is processed.
-            this.receivedUpdateQueue.push(evt.data);
-        }.bind(this));
+        if(!evt.data.message){
+            return; // no chat message to share
+        }
+
+        this.self._boradcast(    // if the change was valid, send everyone the new information
+            Packages.PROTOCOL.CHAT.SERVER_CHAT_MSG,
+            Packages.createEvent(
+                this.self.ID,
+                {
+                    clientID: evt.senderID,
+                    type:"user",
+                    message: evt.data.message
+                }
+            )
+        );
+    }
+
+    _onClientStateUpdate(evt) {
+        if(!evt || !evt.data){
+            console.log("SEND_STATE: no data received");
+            return;
+        }
+        if(!this.self.clientManager.doesClientExist(evt.senderID)){
+            console.log("message received from not existing client!",evt.senderID);
+            return;
+        }
+
+        if(!this.self.clientManager.verificateClient(evt.senderID,evt.token)){
+            console.warn("User sends unverificated messages!",evt.senderID,this.socket.handshake.address,Packages.PROTOCOL.CLIENT.SEND_STATE);
+            return;
+        }
+
+        // the received updates are processes everytime before the engine is processed.
+        this.self.receivedUpdateQueue.push(evt.data);
     }
 
     /**

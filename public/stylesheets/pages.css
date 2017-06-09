@@ -1,0 +1,345 @@
+body,html {
+    padding: 0;
+    margin: 0;
+    width: 100%;
+    height: 100%;
+    font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+    --header-height:50px; /* variable which is used in other classes */
+}
+
+.color-base-text { color: #CF3E3E }	/* Main Primary color */
+.color-highlight-text { color: #FF9898 }
+.color-light-text { color: #ED6666 }
+.color-dark-text { color: #AF2020 }
+.color-darkest-text { color: #890707 }
+
+.color-base { background-color: #CF3E3E }	/* Main Primary color */
+.color-highlight { background-color: #FF9898 }
+.color-light { background-color: #ED6666 }
+.color-dark { background-color: #AF2020 }
+.color-darkest { background-color: #890707 }
+
+.color-base-border { border-color: #CF3E3E }	/* Main Primary color */
+.color-highlight-border { border-color: #FF9898 }
+.color-light-border { border-color: #ED6666 }
+.color-dark-border { border-color: #AF2020 }
+.color-darkest-border { border-color: #890707 }
+
+.test{
+    padding: 10px;
+    height: 25px;
+    border: 1px solid black;
+}
+
+.test-box{
+    display: flex;
+    flex-direction: row;
+}
+
+#header{
+    margin: 0;
+    height: var(--header-height);
+    display: flex;
+    flex-direction: row;
+}
+
+.separator {
+    height: 80%;
+    background-color: grey;
+    width: 2px;
+    margin-left: 10px;
+    margin-right: 10px;
+    margin-top: auto;
+    margin-bottom: auto;
+}
+
+.separator.horizontal{
+    width: 80%;
+    background-color: grey;
+    height: 2px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+h1{
+    margin: 0;
+}
+.title{
+    margin: 0;
+    font-size: 30px;
+}
+.text-selectable{
+    -webkit-touch-callout: default;  /* iOS Safari */
+    -webkit-user-select: text; /* Safari */
+    -khtml-user-select: text; /* Konqueror HTML */
+    -moz-user-select: text; /* Firefox */
+    -ms-user-select: text; /* Internet Explorer/Edge */
+    user-select: text; /* Non-prefixed version, currently */
+}
+
+.text-unselectable{
+    -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+    -khtml-user-select: none; /* Konqueror HTML */
+    -moz-user-select: none; /* Firefox */
+    -ms-user-select: none; /* Internet Explorer/Edge */
+    user-select: none; /* Non-prefixed version, currently
+                                  supported by Chrome and Opera */
+}
+
+#main{
+    padding: 0;
+    margin:0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    position: relative;
+    flex-direction: column;
+}
+
+.content{
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: row;
+}
+
+.btn{
+    border: 2px solid darkgrey;
+    border: none;
+    background-color: #cfcfcf;
+    padding: 5px;
+    text-align: center;
+    text-decoration: none;
+    /* display: table-cell;*/
+    vertical-align: middle;
+    cursor:pointer;
+    font-weight: bold;
+    -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+    -khtml-user-select: none; /* Konqueror HTML */
+    -moz-user-select: none; /* Firefox */
+    -ms-user-select: none; /* Internet Explorer/Edge */
+    user-select: none; /* Non-prefixed version, currently */
+}
+
+.btn:hover{
+    background-color: #9c9c9c;
+}
+.btn:active{
+    background-color: #808080;
+}
+
+.overlay{
+    display:none;
+    /* margin: auto;*/
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    position: absolute;
+    display:flex;
+    z-index: 1000;
+    background-color: rgba(0, 0, 0, 0.85);
+}
+
+.overlay-content {
+    margin: auto;
+    background-color: beige;
+    text-align: center;
+    padding: 10px;
+}
+
+
+#lobby-chat-container{
+    width: 33%;
+    height: 100%;
+    min-width: 250px;
+}
+
+/*----------- GAME LIST ---------------------*/
+.game-list-container{
+    flex-grow: 1;
+    margin: 20px;
+}
+
+.game-list-container .game-list-header{
+    display: flex;
+    flex-direction: row;
+}
+
+.game-list-container .game-list-header .caption{
+
+    flex-grow: 1;
+}
+
+.game-list-container .game-list-header .refresh.btn{
+
+    width: 15px;
+
+    height: 15px;
+}
+
+.game-list-container .game-list-item{
+
+    width: 100%;
+
+    /* margin: 20px; */
+
+    margin-bottom: 10px;
+}
+
+.game-list-container .game-list-item .game-list-item-content{
+
+    display: flex;
+
+    flex-direction: row;
+
+    /* flex-grow: 1; */
+
+    /* width: 100%; */
+
+    justify-content: space-between;
+
+    padding: 5px;
+}
+
+.game-list-container .game-list-item .game-list-item-content .title{
+
+    font-size: 20px;
+
+    /* margin: 10px; */
+
+    /* padding: 10px; */
+}
+
+.game-list-container .game-list-item .game-list-item-content .title .name{
+
+}
+
+.game-list-container .game-list-item .game-list-item-content .title .fill{
+
+}
+
+.game-list-container .game-list-item .game-list-item-content .title .creator{
+
+}
+
+.game-list-container .game-list-item .game-list-item-content .details{
+}
+
+.game-list-container .game-list-item .game-list-item-content .details .users{
+
+}
+
+.game-list-container .game-list-item .game-list-item-content .details .join{
+
+}
+
+/*----------- GAME LIST END -----------------*/
+
+/*----------- CHAT --------------------------*/
+
+.chat-container{
+    display: flex;
+    flex-direction: column;
+    border-left-width: 5px;
+    border-left-style: solid;
+}
+
+.chat-container.show{
+
+}
+
+.chat-content{
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.chat-container.show .chat-content .chat-output{
+    flex-grow: 1;
+    background-color: gainsboro;
+    margin: 10px 0 10px 10px;
+    display: flex;
+    flex-direction: column;
+    overflow-y: scroll;
+    overflow-x: hidden;
+}
+
+.chat-container.show .chat-content .chat-output .message{
+    margin:3px 10px;
+
+}
+
+.chat-container.show .chat-content .chat-output .message.system{
+    font-style:italic;
+    text-align: center;
+}
+.chat-container.show .chat-content .chat-output .message.system.error{
+    color: #e20000;
+}
+
+.chat-container.show .chat-content .chat-output .message .user-message-time {
+    font-weight: bold;
+    margin-right: 5px;
+}
+.chat-container.show .chat-content .chat-output .message .user-message-prefix {
+    font-weight: bold;
+    margin-right: 3px;
+}
+
+.chat-container.show .chat-content .chat-output .message .user-message-prefix.admin {
+    color: #e20000;
+}
+
+.chat-container.show .chat-content .chat-output .message .user-message-name {
+    font-weight: bold;
+    margin-right: 5px;
+}
+
+.chat-container.show .chat-content .chat-output .message .user-message-content {
+
+}
+
+.chat-container.show .chat-content .chat-input{
+    height: 25px;
+    min-height: 25px;
+    display: flex;
+    flex-direction: row;
+    margin: 0 10px 10px 10px;
+}
+
+.chat-container.show .chat-content .chat-input .chat-input-field{
+    flex-grow: 1;
+    margin-right: 10px;
+}
+
+.chat-container.show .chat-content .chat-input .chat-send.btn{
+
+}
+
+.chat-container.hide .chat-content *{
+    margin: 0;
+    padding: 0;
+    height: 0px;
+    max-height:0;
+    opacity: 1;
+}
+
+.chat-container.no-content.show .chat-content *,
+.chat-container.no-content .chat-content *{
+    display: none;
+    opacity: 0;
+}
+
+@media (min-width: 0em) and (max-width: 40em) {
+    .chat-container{
+        width: 250px;
+        height: 100px;
+    }
+}
+
+/*----------- CHAT END ----------------------*/

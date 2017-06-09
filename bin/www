@@ -27,7 +27,9 @@ var server = http.createServer(app);
 
 
 var io = require('socket.io')(server);
-var ConnectionHandler = new ConnectionHandler(io);
+//var ConnectionHandler = new ConnectionHandler(io);
+ConnectionHandler.start(io);
+
 //gameServer.start();
 
 

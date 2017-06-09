@@ -10,6 +10,8 @@ var users = require('./routes/users');
 var editorRoute = require('./routes/editor_route');
 var gameListRoute = require('./routes/gamelist_route');
 
+var lobbyRoute = require('./routes/lobby_route');
+
 //compile all templates in the /view/fragments folder
 var LayoutTemplatesCompilter = require('./views/fragments/compilelayouts');
 new LayoutTemplatesCompilter().compile();
@@ -32,6 +34,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', index);
+app.use('/lobby',lobbyRoute);
 app.use('/hacking', users);
 app.use('/editor', editorRoute);
 app.use('/games',gameListRoute);

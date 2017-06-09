@@ -6,10 +6,10 @@ var I18N_GAME = require('./../core/i18n_game.json');
 /* GET home page. */
 router.get('/', function (req, res, next) {
 
-    // req.query.id
     if (!req.query.id) {
         res.status(404);
-        res.send("game_not_found");
+        res.send("game_not_found  - neuer link ist jetz http://92.219.114.19:3000/?id=testID&lang=en-EN (lang kann auch auf de-DE gesetzt werden)");
+        //TODO: redirekt zur lobby mit meldung
         return;
     }
     // load the correct language and pass it to the jade

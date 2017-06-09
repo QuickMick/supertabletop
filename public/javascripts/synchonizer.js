@@ -123,6 +123,8 @@ class Synchronizer extends EventEmitter3{
     _initHandlers(){
         // get clientdata of this client
         this.socket.on(Packages.PROTOCOL.SERVER.RESPONSE_CLIENT_ACCEPTED, function(evt) {
+            if(this.CLIENT_INFO) return;    // another received package could be from another game, to which the client is connected
+
             this.CLIENT_INFO = evt.data.clientInfo;
             console.log("Clientdata received");
             this.playerManager.initCurrentPlayer(this.CLIENT_INFO);

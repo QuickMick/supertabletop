@@ -11,8 +11,7 @@ var GameServer = require('./gameserver');
 class ConnectionHandler {
 
     constructor(io) {
-        this.io = io;
-        this.io.on('connection', this._onConnectionReceived.bind(this));
+
 
 
         /**
@@ -21,7 +20,12 @@ class ConnectionHandler {
          */
         this.runningGames = {};
 
-        this.startGame();
+        this.startGame();       //TODO: sollte von spielenr aufgerufenwerden
+    }
+
+    start(io){
+        this.io = io;
+        this.io.on('connection', this._onConnectionReceived.bind(this));
     }
 
     _onConnectionReceived(socket){
@@ -30,7 +34,7 @@ class ConnectionHandler {
         var gameID = socket.handshake.query.gameid;
 
         if(!gameID || !this.runningGames[gameID]) {
-            socket.emit(Packages.PROTOCOL.SERVER.ERROR, {msg: "game_not_found - neuer link ist jetz http://92.219.114.19:3000/?id=testID&lang=en-EN (lang kann auch auf e-DE gesetzt werden)"});       //TODO: entfernen
+            socket.emit(Packages.PROTOCOL.SERVER.ERROR, {msg: "game_not_found"});       //TODO: entfernen
             console.log(socket.handshake.address,"wants to connect to an invalid seassion:",gameID);
             socket.disconnect();
             return;
@@ -48,7 +52,6 @@ class ConnectionHandler {
         game.onConnectionReceived(socket);
     }
 
-
     startGame(){
         var gameID = "testID"; // uuidV1();
         console.log("starting new game with id",gameID);
@@ -56,7 +59,6 @@ class ConnectionHandler {
 
         return gameID;
     }
-
 }
 
-module.exports = ConnectionHandler;
+module.exports = new ConnectionHandler();

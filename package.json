@@ -5,6 +5,7 @@
   "scripts": {
     "start": "node ./bin/www",
     "watch-js": "cmd /k watchify public/javascripts/main.js -o public/js/game.js -v -d",
+    "page-watch-js": "cmd /k watchify page/page.js -o public/js/page.js -v -d",
     "editor-watch-js": "cmd /k watchify editor/editormain.js -o public/js/editor.js -v -d",
     "compile-name-list": "node compilenames.js source=random_names.txt target=core/random_names.json",
     "test": "mocha",

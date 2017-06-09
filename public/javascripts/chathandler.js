@@ -26,8 +26,9 @@ class ChatHandler extends EventEmitter3 {
      * @param chatRootID ID of the container, which is the "home" of the chat
      * @param maxLogLength maximum of displayed messages
      */
-    constructor(chatRootID, maxLogLength = 50) {
+    constructor(chatRootID, isMinimizable=true, maxLogLength = 50) {
         super();
+        this.isMinimizable = isMinimizable;
         this.maxLogLength = maxLogLength;
         this._rootContainer = document.getElementById(chatRootID);
 
@@ -35,20 +36,9 @@ class ChatHandler extends EventEmitter3 {
             throw "chat container does not exist!";
 
         // load and insert the chat template to the passed rootID
-        this._rootContainer.innerHTML = window.chatTemplate({I18N: I18N.completeLanguageData});
+        this._rootContainer.innerHTML = window.chatTemplate({I18N: I18N.completeLanguageData,isMinimizable});
         this._rootContainer.classList.add("chat-container");
         this._rootContainer.classList.add("show");
-
-        // prevent, that input from chat is fowarded to the gampelay - e.g. mousehweel must be blocked
-
-       /* this._rootContainer.addEventListener("mousewheel", (e)=>e.stopPropagation(), true);
-        this._rootContainer.addEventListener("mousemove", (e)=>e.stopPropagation(), true);
-        this._rootContainer.addEventListener("mousedown", (e)=>e.stopPropagation(), true);
-        this._rootContainer.addEventListener("mouseup", (e)=>e.stopPropagation(), true);
-        this._rootContainer.addEventListener("keydown", (e)=>e.stopPropagation(), true);
-        this._rootContainer.addEventListener("keyup", (e)=>e.stopPropagation(), true);
-*/
-
 
         // get the required html elements
         // for expanding/inflating
@@ -59,6 +49,7 @@ class ChatHandler extends EventEmitter3 {
         this._inputText = this._rootContainer.getElementsByClassName("chat-input-field")[0];
         this._sendButton = this._rootContainer.getElementsByClassName("chat-send btn")[0];
 
+        // prevent, that input from chat is fowarded to the gampelay - e.g. mousehweel must be blocked
         Util.stopPropagation(this._rootContainer);
 
         // prepare the sending listeners
@@ -74,14 +65,19 @@ class ChatHandler extends EventEmitter3 {
 
         this._isMinimized = false;
 
-        this._expanderButton.onclick = this._toggleVisibility.bind(this);
+        if(this._expanderButton) {  //if it is minimizable, then there is a button
+            this._expanderButton.onclick = this._toggleVisibility.bind(this);
+        }
     }
 
     get isMinimized() {
+        if(!this.isMinimizable) return false; // it can just be maximized, if the chat is not minimizable
         return this._isMinimized;
     }
 
     _toggleVisibility() {
+        if(!this.isMinimizable) return; // if chat is not minimizable, nothing to do here
+
         if (this._rootContainer.classList.contains("show")) {
             this._rootContainer.classList.remove("show");
             this._rootContainer.classList.add("hide");
@@ -90,7 +86,8 @@ class ChatHandler extends EventEmitter3 {
         } else if (this._rootContainer.classList.contains("hide")) {
             this._rootContainer.classList.remove("hide");
             this._rootContainer.classList.add("show");
-            this._expanderButton.classList.remove("unseen-message");    // new messages are now visible
+            if(this._expanderButton)
+                this._expanderButton.classList.remove("unseen-message");    // new messages are now visible
             this._isMinimized = false;
             // remove the content method, when panel is shown, otherwize the content is build up wrongly
             setTimeout(() => {
@@ -150,7 +147,7 @@ class ChatHandler extends EventEmitter3 {
                 local.prefix = I18N.translate(sender.userStatus || "");
                 local.name = sender.name || "name-not-found";
                 local.color = Util.intToColorString(sender.color);
-                if (this._isMinimized) {    // when minimazed, give user a hint, that there is a new message hidden
+                if (this._isMinimized && this._expanderButton) {    // when minimazed, give user a hint, that there is a new message hidden
                     this._expanderButton.classList.add("unseen-message");
                 }
 

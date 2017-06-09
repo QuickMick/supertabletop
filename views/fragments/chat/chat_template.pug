@@ -1,5 +1,7 @@
 -var t = I18N.minimize_maximize
-div.chat-expander.btn(title=t)
+-var minimizable = isMinimizable
+if(minimizable)
+    div.chat-expander.btn(title=t)
 div.chat-content
     div.chat-output
     div.chat-input

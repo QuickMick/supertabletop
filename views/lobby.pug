@@ -1,0 +1,38 @@
+html
+    head
+        title #{I18N_LAYOUT.title}
+        link(rel='stylesheet', href='/stylesheets/pages.css')
+    body
+        div#main.color-light
+            div#header.color-base
+                p.title #{I18N_LAYOUT.title}
+                div.separator
+                div#player-details
+                div.test-box
+                    div.test.color-base base
+                    div.test.color-highlight highlight
+                    div.test.color-light light
+                    div.test.color-dark dark
+                    div.test.color-darkest darkest
+            div.content
+
+                div.game-list-container
+                    div.game-list-header
+                        div.caption Current Sessions
+                        div.refresh.btn o
+                    div.game-list-item.color-base
+                        div.game-list-item-content
+                            div.title
+                                span.name Codenames
+                                span.fill by
+                                span.creator Mick
+                            div.details
+                                span.users players 5/8
+                                span.password Password [x]
+                            div.btn.join join
+                div#lobby-chat-container.color-light.color-highlight-border
+            script.
+                var I18N_DATA = !{I18N_DATA};
+                var GAME_ID = "!{gameID}";
+    script(src='/js/templates.js')
+    script(src='/js/page.js')

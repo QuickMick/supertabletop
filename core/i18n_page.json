@@ -1,0 +1,22 @@
+{
+  "en-EN":{
+    "timeformat":"h:MM:ss",
+    "title":"Super Tabletop",
+    "send":"send",
+    "guest":"Guest",
+    "admin":"Admin",
+    "registered":"Registered",
+    "mod":"Mod",
+    "seat":"Seat"
+    },
+
+  "de-DE":{
+    "timeformat":"HH:MM:ss",
+    "title":"Super Tabletop",
+    "send":"senden",
+    "guest":"Gast",
+    "admin":"Admin",
+    "mod":"Mod",
+    "registered":"Registriert"
+  }
+}

@@ -34,7 +34,7 @@ class ConnectionHandler {
         var gameID = socket.handshake.query.gameid;
 
         if(!gameID || !this.runningGames[gameID]) {
-            socket.emit(Packages.PROTOCOL.SERVER.ERROR, {msg: "game_not_found"});       //TODO: entfernen
+            socket.emit(Packages.PROTOCOL.SERVER.ERROR, {data:{reason:Packages.PROTOCOL.GAME_SERVER_ERRORS.GAME_NOT_FOUND}});       //TODO: entfernen
             console.log(socket.handshake.address,"wants to connect to an invalid seassion:",gameID);
             socket.disconnect();
             return;
@@ -43,7 +43,7 @@ class ConnectionHandler {
         var game = this.runningGames[gameID];
 
         if(game.isServerFull){
-            socket.emit(Packages.PROTOCOL.SERVER.ERROR, {msg: "server_full"});
+            socket.emit(Packages.PROTOCOL.SERVER.ERROR, {data:{reason:Packages.PROTOCOL.GAME_SERVER_ERRORS.NO_FREE_SLOT_AVAILABLE}});
             console.log(socket.handshake.address,"wants to connect to a full server:",gameID);
             socket.disconnect();
             return;

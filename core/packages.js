@@ -5,101 +5,105 @@
 
 module.exports =
 {
-    createEvent:function (id,data,token) {
-        if(!data)
-            console.warn("sending event to ",id," without data");
+    createEvent: function (id, data, token) {
+        if (!data)
+            console.warn("sending event to ", id, " without data");
         var result = {
-            senderID:id,
-            data:data || {},
-            timeStamp:new Date().getTime()
+            senderID: id,
+            data: data || {},
+            timeStamp: new Date().getTime()
         };
-        if(token) result.token = token;
+        if (token) result.token = token;
         return result;
     },
     PROTOCOL: {
-        CHAT:{
+        CHAT: {
             /**
              * the client wants to post a chat message
              */
-            CLIENT_CHAT_MSG:"CLIENT_CHAT_MSG",
+            CLIENT_CHAT_MSG: "CLIENT_CHAT_MSG",
             /**
              * a message from the server which should be postet in the chat window
              */
-            SERVER_CHAT_MSG:"SERVER_CHAT_MSG"
+            SERVER_CHAT_MSG: "SERVER_CHAT_MSG"
         },
-        CLIENT_VALUE_UPDATE:{
-            COLOR:"color",
-            PLAYER_INDEX:"playerIndex",
-            NAME:"name"
+        CLIENT_VALUE_UPDATE: {
+            COLOR: "color",
+            PLAYER_INDEX: "playerIndex",
+            NAME: "name"
         },
-       CLIENT: {
-           /**
-            * used to notify server about changes (position, rotation,...) of entityies
-            * from this client
+        CLIENT: {
+            /**
+             * used to notify server about changes (position, rotation,...) of entityies
+             * from this client
+             */
+            SEND_STATE: "send_state",
+            //SEND_CLIENT_SESSION:"send_client_session",
+
+
+            /**
+             * a client changes a value of himselfe, for example, the color
+             */
+            CLIENT_VALUE_UPDATE: "CLIENT_VALUE_UPDATE",
+
+            /**
+             * used to change configurations like the player color
+             */
+            SEND_CONFIG_CHANGE: "send_config_change"
+
+            /*   CMD_RESULT: "cmd_result",
+             DRAG_START: "DRAG_START",
+             DRAG_MOVE: "DRAG_MOVE",
+             DRAG_END: "DRAG_END",
+             TURN_CARD: "TURN_CARD",
+             CLIENT_MOUSE_MOVE: "CLIENT_MOUSE_MOVE"*/
+        },
+        GAME_SERVER_ERRORS: {
+            NO_FREE_SLOT_AVAILABLE: "NO_FREE_SLOT_AVAILABLE",
+            GAME_NOT_FOUND: "GAME_NOT_FOUND"
+        },
+        SERVER: {
+            ERROR: "ERROR",
+            /**
+             * server sends this to the client, when he connects,
+             * packags contains all necessary information about the client
+             * package looks like {clientInfo:<object of client info>,serverID:<string, id of server>
             */
-           SEND_STATE: "send_state",
-           //SEND_CLIENT_SESSION:"send_client_session",
+            RESPONSE_CLIENT_ACCEPTED: "RESPONSE_CLIENT_ACCEPTED",
+            /**
+             * broadcasts public information about a newly connected client
+             */
+            CLIENT_CONNECTED: "CLIENT_CONNECTED",
+
+            /**
+             * a client wanted to change a vlaue, but the server rejects the change
+             * package looks like{CLIENT_VALUE_UPDATE_NAME,reason}
+             */
+            CLIENT_VALUE_UPDATE_REJECTED: "CLIENT_VALUE_UPDATE_REJECTED",
+            /**
+             * a client changes a value of himselfe, for example, the color
+             */
+            CLIENT_VALUE_UPDATE: "CLIENT_VALUE_UPDATE",
+
+            /**
+             * broadcasts that one client has disconnected
+             */
+            CLIENT_DISCONNECTED: "CLIENT_DISCONNECTED",
+            UPDATE_STATE: "update_state",
+            INIT_GAME: "init_game",
+            RESPONSE_CONFIG_CHANGE: "response_config_change",
+
+            RESPONSE_CLIENT_REJECTED: "RESPONSE_CLIENT_REJECTED"
 
 
-           /**
-            * a client changes a value of himselfe, for example, the color
-            */
-           CLIENT_VALUE_UPDATE: "CLIENT_VALUE_UPDATE",
+            /*     EXECUTE_CMD: "execute_cmd",
+             POSITION_UPDATE: "position_update",
+             REMOVE_ENTITY: "remove_entity",
+             ADD_ENTITY: "add_entity",
 
-           /**
-            * used to change configurations like the player color
-            */
-           SEND_CONFIG_CHANGE:"send_config_change"
-
-        /*   CMD_RESULT: "cmd_result",
-           DRAG_START: "DRAG_START",
-           DRAG_MOVE: "DRAG_MOVE",
-           DRAG_END: "DRAG_END",
-           TURN_CARD: "TURN_CARD",
-           CLIENT_MOUSE_MOVE: "CLIENT_MOUSE_MOVE"*/
-       },
-       SERVER: {
-           ERROR:"ERROR",
-           /**
-            * server sends this to the client, when he connects,
-            * packags contains all necessary information about the client
-            * package looks like {clientInfo:<object of client info>,serverID:<string, id of server>
-            */
-           RESPONSE_CLIENT_ACCEPTED: "RESPONSE_CLIENT_ACCEPTED",
-           /**
-            * broadcasts public information about a newly connected client
-            */
-           CLIENT_CONNECTED: "CLIENT_CONNECTED",
-
-           /**
-            * a client wanted to change a vlaue, but the server rejects the change
-            * package looks like{CLIENT_VALUE_UPDATE_NAME,reason}
-            */
-           CLIENT_VALUE_UPDATE_REJECTED: "CLIENT_VALUE_UPDATE_REJECTED",
-           /**
-            * a client changes a value of himselfe, for example, the color
-            */
-           CLIENT_VALUE_UPDATE: "CLIENT_VALUE_UPDATE",
-
-           /**
-            * broadcasts that one client has disconnected
-            */
-           CLIENT_DISCONNECTED: "CLIENT_DISCONNECTED",
-           UPDATE_STATE: "update_state",
-           INIT_GAME: "init_game",
-           RESPONSE_CONFIG_CHANGE:"response_config_change",
-
-           RESPONSE_CLIENT_REJECTED: "RESPONSE_CLIENT_REJECTED"
-
-
-      /*     EXECUTE_CMD: "execute_cmd",
-           POSITION_UPDATE: "position_update",
-           REMOVE_ENTITY: "remove_entity",
-           ADD_ENTITY: "add_entity",
-
-           VANISH: "VANISH",
-           */
-       },
+             VANISH: "VANISH",
+             */
+        },
         GAME_STATE: {
             ENTITY: {
                 /**
@@ -127,7 +131,7 @@ module.exports =
                  * a user wants to copy an entity
                  * package looks like (copyRequest:[enityID,position])
                  */
-                USER_COPY_ENTITY:"USER_COPY_ENTITY",
+                USER_COPY_ENTITY: "USER_COPY_ENTITY",
 
                 /**
                  * is posted by server, when an entity is deleted,
@@ -153,7 +157,7 @@ module.exports =
                  * is posted by a user, who wants to draw a card,
                  * package looks like  {stackIDs:<ids of stacks from which the user wants to draw a card>}
                  */
-                USER_DRAW_ENTITY:"USER_DRAW_ENTITY",
+                USER_DRAW_ENTITY: "USER_DRAW_ENTITY",
 
                 /**
                  * user wants to stack two entities,
@@ -173,12 +177,12 @@ module.exports =
                  * works basically like the replacer of the entity loader,
                  * event data contains the entity IDs as key and the updated data paths as value (e.g. {"enitty1":{changes:{"surface.0":<data>}}}
                  */
-                SERVER_ENTITY_VALUE_CHANGED:"SERVER_ENTITY_VALUE_CHANGED",
+                SERVER_ENTITY_VALUE_CHANGED: "SERVER_ENTITY_VALUE_CHANGED",
 
                 /**
                  * reject a user aciton, e.g. claim
                  */
-                SERVER_REJECT_ACTION:"SERVER_REJECT_ACTION",
+                SERVER_REJECT_ACTION: "SERVER_REJECT_ACTION",
 
                 /**
                  * is posted by server, when the state of the entity changes
@@ -187,14 +191,14 @@ module.exports =
                  * the data of this event contains the time, when it was changed,
                  * so just the newest update should be used
                  */
-                STATE_CHANGE:"STATE_CHANGE",
+                STATE_CHANGE: "STATE_CHANGE",
 
-                STATES:{
-                    ENTITY_CLAIMED:"ENTITY_CLAIMED",
-                    ENTITY_DEFAULT_STATE:"ENTITY_DEFAULT_STATE"
+                STATES: {
+                    ENTITY_CLAIMED: "ENTITY_CLAIMED",
+                    ENTITY_DEFAULT_STATE: "ENTITY_DEFAULT_STATE"
                 }
             },
-            CLIENT:{
+            CLIENT: {
                 /**
                  * is posted by client, when he moves the mouse
                  * the package contains the new cursor position,
@@ -212,14 +216,13 @@ module.exports =
                 /**
                  * is posted by server, if any of the clients moves the mouse
                  */
-                SERVER_CLIENT_POSITION_UPDATE:"SERVER_CLIENT_POSITION_UPDATE"
+                SERVER_CLIENT_POSITION_UPDATE: "SERVER_CLIENT_POSITION_UPDATE"
             }
 
 
             /**
              * aka mouse position update
              */
-
 
 
         }

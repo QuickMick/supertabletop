@@ -99,6 +99,17 @@ class GameServer{
         // disconnect a new connection, when server is full
         if(this.isServerFull){
             console.warn("player limit reached, new request has to be prohibited");
+            //TODO: sollte zu lobby redirecten und nicht disconnecten
+
+            this._sendToClient(
+                socket,
+                Packages.PROTOCOL.SERVER.ERROR,
+                Packages.createEvent(
+                    this.ID,
+                    {reason: Packages.PROTOCOL.GAME_SERVER_ERRORS.NO_FREE_SLOT_AVAILABLE}
+                )
+            );
+
             socket.disconnect();
             return;
         }

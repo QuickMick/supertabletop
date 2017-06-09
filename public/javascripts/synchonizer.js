@@ -122,80 +122,142 @@ class Synchronizer extends EventEmitter3{
      */
     _initHandlers(){
         // get clientdata of this client
-        this.socket.on(Packages.PROTOCOL.SERVER.RESPONSE_CLIENT_ACCEPTED, function(evt) {
-            if(this.connectedServerID) return;    // another received package could be from another game, to which the client is connected
-            this.connectedServerID = evt.data.serverID;
-            this.CLIENT_INFO = evt.data.clientInfo;
-            console.log("Clientdata received");
-            this.playerManager.initCurrentPlayer(this.CLIENT_INFO);
-            this.gameTable.initCurrentPlayer(this.CLIENT_INFO);
-
-            if(this.CLIENT_INFO.playerIndex <0 || this.CLIENT_INFO.color <0){
-                this.gameManager.showSeatChooser();
-            }
-
-
-            this._startUpdating();
-            window.hideLoadingDialog();
-        }.bind(this));
+        this.socket.on(Packages.PROTOCOL.SERVER.RESPONSE_CLIENT_ACCEPTED, this._onClientAccepted.bind(this));
 
         // receive data about the dame (after initialisation, or gamechange
-        this.socket.on(Packages.PROTOCOL.SERVER.INIT_GAME, function (evt) {
-            if(!this._vertifyServer(evt.senderID)){console.log("message is not from server"); return; }
-            this.chatHandler.pushMessage(I18N.translate("load_game",evt.data.name,evt.data.creator),"system",evt.timeStamp);
-            this.gameManager.initGame(evt.data);
-            this.lastGameStateUpdateEventTimeStamp=this.lastGameStateUpdateTimeStamp = new Date().getTime();
-        }.bind(this));
+        this.socket.on(Packages.PROTOCOL.SERVER.INIT_GAME, this._onInitGame.bind(this));
 
         // receive game updates
-        this.socket.on(Packages.PROTOCOL.SERVER.UPDATE_STATE, function (evt) {
-            if(!this._vertifyServer(evt.senderID)){console.log("message is not from server"); return; }
-            if(evt.timeStamp < this.lastGameStateUpdateEventTimeStamp) return;    // if update is old, do not apply it
-            var currentTime = new Date().getTime();
-            this.processServerUpdates(evt.data,currentTime-this.lastGameStateUpdateTimeStamp);
-            this.lastGameStateUpdateEventTimeStamp = evt.timeStamp;
-            this.lastGameStateUpdateTimeStamp = currentTime;
-        }.bind(this));
+        this.socket.on(Packages.PROTOCOL.SERVER.UPDATE_STATE, this._onStateUpdate.bind(this));
 
         // another player connected
-        this.socket.on(Packages.PROTOCOL.SERVER.CLIENT_CONNECTED, function (evt) {
-            if(!this._vertifyServer(evt.senderID)){console.log("message is not from server"); return; }
-            this.playerManager.addPlayers(evt.data);
-        }.bind(this));
+        this.socket.on(Packages.PROTOCOL.SERVER.CLIENT_CONNECTED, this._onClientConnected.bind(this));
 
         // an client disconnects
-        this.socket.on(Packages.PROTOCOL.SERVER.CLIENT_DISCONNECTED, function (evt) {
-            if(!this._vertifyServer(evt.senderID)){console.log("message is not from server"); return; }
-            this.playerManager.removePlayer(evt.data.id)
-        }.bind(this));
+        this.socket.on(Packages.PROTOCOL.SERVER.CLIENT_DISCONNECTED, this._onClientDisconnected.bind(this));
 
         // a value of a client/player has changed
-        this.socket.on(Packages.PROTOCOL.SERVER.CLIENT_VALUE_UPDATE, function (evt) {
-            if(!this._vertifyServer(evt.senderID)){console.log("message is not from server"); return; }
-            this.playerManager.updatePlayerValue(evt.data.clientID,evt.data.changes);
-        }.bind(this));
+        this.socket.on(Packages.PROTOCOL.SERVER.CLIENT_VALUE_UPDATE, this._onClientValueUpdate.bind(this));
 
         // if chat message from server is received
-        this.socket.on(Packages.PROTOCOL.CHAT.SERVER_CHAT_MSG, function (evt) {
-            if(!this._vertifyServer(evt.senderID)){console.log("message is not from server"); return; }
-            var from = this.playerManager.getPlayer(evt.data.clientID);
-            this.chatHandler.pushMessage(evt.data.message,evt.data.type,evt.timeStamp, from);
-        }.bind(this));
+        this.socket.on(Packages.PROTOCOL.CHAT.SERVER_CHAT_MSG, this._onChatMessageReceived.bind(this));
 
         // if value reject from serveris received
-        this.socket.on(Packages.PROTOCOL.SERVER.CLIENT_VALUE_UPDATE_REJECTED, function (evt) {
-            if(!this._vertifyServer(evt.senderID)){console.log("message is not from server"); return; }
-            this._handleValueRejections(evt.data);
-        }.bind(this));
+        this.socket.on(Packages.PROTOCOL.SERVER.CLIENT_VALUE_UPDATE_REJECTED, this._onClientValueUpdateRejected.bind(this));
 
-        this.socket.on('disconnect',function (evt) {
-            console.log("DISCONNECT",evt);
-        });
+        this.socket.on('disconnect', this._onDisconnect.bind(this));
 
-        this.socket.on(Packages.PROTOCOL.SERVER.ERROR,function (evt) {
-           alert(evt.msg);
-            //TODO: redirect to lobby
-        });
+        this.socket.on(Packages.PROTOCOL.SERVER.ERROR,this._onServerError.bind(this));
+    }
+
+    _remmoveHandlers(){
+        // get clientdata of this client
+        this.socket.removeListener(Packages.PROTOCOL.SERVER.RESPONSE_CLIENT_ACCEPTED, this._onClientAccepted.bind(this));
+
+        // receive data about the dame (after initialisation, or gamechange
+        this.socket.removeListener(Packages.PROTOCOL.SERVER.INIT_GAME, this._onInitGame.bind(this));
+
+        // receive game updates
+        this.socket.removeListener(Packages.PROTOCOL.SERVER.UPDATE_STATE, this._onStateUpdate.bind(this));
+
+        // another player connected
+        this.socket.removeListener(Packages.PROTOCOL.SERVER.CLIENT_CONNECTED, this._onClientConnected.bind(this));
+
+        // an client disconnects
+        this.socket.removeListener(Packages.PROTOCOL.SERVER.CLIENT_DISCONNECTED, this._onClientDisconnected.bind(this));
+
+        // a value of a client/player has changed
+        this.socket.removeListener(Packages.PROTOCOL.SERVER.CLIENT_VALUE_UPDATE, this._onClientValueUpdate.bind(this));
+
+        // if chat message from server is received
+        this.socket.removeListener(Packages.PROTOCOL.CHAT.SERVER_CHAT_MSG, this._onChatMessageReceived.bind(this));
+
+        // if value reject from serveris received
+        this.socket.removeListener(Packages.PROTOCOL.SERVER.CLIENT_VALUE_UPDATE_REJECTED, this._onClientValueUpdateRejected.bind(this));
+
+        this.socket.removeListener('disconnect', this._onDisconnect.bind(this));
+
+        this.socket.removeListener(Packages.PROTOCOL.SERVER.ERROR,this._onServerError.bind(this));
+    }
+
+    _onClientAccepted(evt) {
+        if(this.connectedServerID) return;    // another received package could be from another game, to which the client is connected
+        this.connectedServerID = evt.data.serverID;
+        this.CLIENT_INFO = evt.data.clientInfo;
+        console.log("Clientdata received");
+        this.playerManager.initCurrentPlayer(this.CLIENT_INFO);
+        this.gameTable.initCurrentPlayer(this.CLIENT_INFO);
+
+        if(this.CLIENT_INFO.playerIndex <0 || this.CLIENT_INFO.color <0){
+            this.gameManager.showSeatChooser();
+        }
+
+        this._startUpdating();
+        window.hideLoadingDialog();
+    }
+
+    _onInitGame (evt) {
+        if(!this._vertifyServer(evt.senderID)){console.log("message is not from server"); return; }
+        this.chatHandler.pushMessage(I18N.translate("load_game",evt.data.name,evt.data.creator),"system",evt.timeStamp);
+        this.gameManager.initGame(evt.data);
+        this.lastGameStateUpdateEventTimeStamp=this.lastGameStateUpdateTimeStamp = new Date().getTime();
+    }
+
+    _onStateUpdate (evt) {
+        if(!this._vertifyServer(evt.senderID)){console.log("message is not from server"); return; }
+        if(evt.timeStamp < this.lastGameStateUpdateEventTimeStamp) return;    // if update is old, do not apply it
+        var currentTime = new Date().getTime();
+        this.processServerUpdates(evt.data,currentTime-this.lastGameStateUpdateTimeStamp);
+        this.lastGameStateUpdateEventTimeStamp = evt.timeStamp;
+        this.lastGameStateUpdateTimeStamp = currentTime;
+    }
+
+    _onClientConnected (evt) {
+        if(!this._vertifyServer(evt.senderID)){console.log("message is not from server"); return; }
+        this.playerManager.addPlayers(evt.data);
+    }
+
+    _onClientDisconnected (evt) {
+        if(!this._vertifyServer(evt.senderID)){console.log("message is not from server"); return; }
+        this.playerManager.removePlayer(evt.data.id)
+    }
+
+    _onClientValueUpdate (evt) {
+        if(!this._vertifyServer(evt.senderID)){console.log("message is not from server"); return; }
+        this.playerManager.updatePlayerValue(evt.data.clientID,evt.data.changes);
+    }
+
+    _onChatMessageReceived (evt) {
+        if(!this._vertifyServer(evt.senderID)){console.log("message is not from server"); return; }
+        var from = this.playerManager.getPlayer(evt.data.clientID);
+        this.chatHandler.pushMessage(evt.data.message,evt.data.type,evt.timeStamp, from);
+    }
+
+    _onClientValueUpdateRejected (evt) {
+        if(!this._vertifyServer(evt.senderID)){console.log("message is not from server"); return; }
+        this._handleValueRejections(evt.data);
+    }
+
+    _onDisconnect(evt) {
+        console.log("DISCONNECT",evt);
+        // disconnect kann nur ein error sein
+        this._remmoveHandlers();
+    }
+
+
+    _onServerError(evt){
+        alert(evt.data.reason);
+        if(!this._vertifyServer(evt.senderID)){console.log("message is not from server"); return; }
+
+        if(evt.data.reason == Packages.PROTOCOL.GAME_SERVER_ERRORS.NO_FREE_SLOT_AVAILABLE){
+            // TODO: redirect to lobby
+        }
+        if(evt.data.reason == Packages.PROTOCOL.GAME_SERVER_ERRORS.GAME_NOT_FOUND){
+            // TODO: redirect to lobby
+        }
+
+        //TODO: redirect to lobby
+        this._remmoveHandlers();
     }
 
     /**

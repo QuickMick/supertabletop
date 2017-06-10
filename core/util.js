@@ -20,7 +20,7 @@ class Util {
      * @returns {Number} color as int
      */
     static parseColor(colorString) {
-        if (!colorString) return 0xFFFFFF;
+        if (!colorString && colorString != 0) return 0xFFFFFF;
 
         if (typeof colorString == "number") {
             return Math.round(colorString);

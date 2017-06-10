@@ -717,7 +717,7 @@ class ToolManager{
                     this.gameManager.app.renderer.width,
                     this.gameManager.app.renderer.height,
                     10,
-                    this.playerManager.players[stateUpdate.claimedBy].rawPlayerData.color || 0xFFFFFF
+                    this.playerManager.players[stateUpdate.claimedBy].color || 0xFFFFFF
                 );
 
                 curEntity.addFilter(selectionFilter);

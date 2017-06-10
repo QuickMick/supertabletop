@@ -24,6 +24,8 @@ TODO: IMPORTANT: detect outside mouse ups
 
 TODO: IMPORTANT : IMMER TO STRING MACHN
 
+wenn farben geänder wurden, dann werden die "onclick" shader farben nicht richtig mehr gestzt
+
 
 #####################################################  TODOS  ##########################################################
 - table boundaries

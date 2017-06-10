@@ -99,6 +99,11 @@ class BaseEntityData {
         var result = [];
         for(var i=0; i< text.length; i++){
             var cur = text[i];
+
+            var pos = cur.position || {};
+            pos.x = pos.x || 0;
+            pos.y = pos.y || 0;
+
             result.push({
                 content: cur.content || "",
                 fontSize: cur.fontSize || 12,
@@ -106,7 +111,8 @@ class BaseEntityData {
                 fontFamily: cur.fontFamily || "monospace",
                 align: cur.align || "center",
                 fontWeight: cur.fontWeight || "bold",
-                letterSpacing: (cur.letterSpacing && cur.letterSpacing !=0)? 1 : cur.letterSpacing
+                letterSpacing: (cur.letterSpacing && cur.letterSpacing !=0)? 1 : cur.letterSpacing,
+                position:cur.position
             });
         }
 

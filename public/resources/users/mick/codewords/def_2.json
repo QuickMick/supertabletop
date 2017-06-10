@@ -1,7 +1,7 @@
 {
   "name":"codewords",
   "creator":"mick",
-  "resources":["back.png","blue.png","red.png","q1.png",
+  "resources":["back.png","wordcard.png","blue.png","red.png","q1.png",
     "q2.png",
     "q3.png",
     "q4.png",
@@ -583,6 +583,32 @@
         },
         "surfaces.0": {"texture":"redblue.png","color":"0xFFFFFF"},
         "surfaces.1": {"texture":"bluered.png","color":"0xFFFFFF"}
+      }
+    },
+    {
+      "type": "wordcard",
+      "overwrite": {
+        "position": {
+          "x": 200,
+          "y": 200
+        },
+        "surfaceIndex": 0,
+        "surfaces.0": {
+          "texture": "wordcard.png",
+          "text": [
+            {
+              "position": {
+                "x": -40,
+                "y": -7
+              },
+              "content": "Yogalehrer",
+              "fontSize": 12,
+              "color": "0x000000",
+              "fontFamily": "arial",
+              "align":"left"
+            }
+          ]
+        }
       }
     }
   ]

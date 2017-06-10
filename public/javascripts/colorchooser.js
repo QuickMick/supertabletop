@@ -54,22 +54,22 @@ class ColorChooser extends PIXI.Container{
 
     redrawChooser(evt){
         var center={
-            x:evt.width/2,
-            y:evt.height/2
+            x:(evt.width/PIXI.RESOLUTION)/2,
+            y:(evt.height/PIXI.RESOLUTION)/2
         };
 
         this.removeAll();
 
         var bg = new PIXI.Sprite(this.backgroundTexture);
-        bg.width = evt.width;
-        bg.height = evt.height;
+        bg.width = evt.width/PIXI.RESOLUTION;
+        bg.height = evt.height/PIXI.RESOLUTION;
         bg.interactive=true;
         bg.mousemove =  (e) => e.stopped = true;//e.stopPropegation();
         this.addChild(bg);
 
 
         // calculate the positions of the picker buttons depending on screensize
-        var radius = Math.min(evt.width,evt.height)/4;
+        var radius = Math.min(evt.width/PIXI.RESOLUTION,evt.height/PIXI.RESOLUTION)/4;
         this.colorPiclerPositions = Util.pointsOfCircle(
             center.x,
             center.y,

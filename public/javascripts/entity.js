@@ -223,7 +223,7 @@ class Entity extends PIXI.Sprite {
                 fontWeight:weight,
                 letterSpacing:letterSpacing
             });
-            cText.resolution = 5;
+            //cText.resolution = 2;
             if (cText.position) {    // set offset ofs the text
                 cPixiText.position.x = cText.position.x || 0;
                 cPixiText.position.y = cText.position.y || 0;

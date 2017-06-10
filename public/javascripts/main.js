@@ -59,6 +59,7 @@ window.I18N = new i18n(I18N_DATA);
 };*/
 
 
+
 window.showLoadingDialog=function(){
     document.getElementById("loading-overlay").style.display=""; //"flex";
 };
@@ -75,6 +76,7 @@ window.onload = function() {
         e.preventDefault();
     };
 
+    PIXI.RESOLUTION = 2;
     var app = new PIXI.Application(800, 600, {backgroundColor : 0x1099bb, antialising:true,autoResize:true});
     screen.appendChild(app.view);
 

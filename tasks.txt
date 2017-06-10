@@ -18,7 +18,12 @@ playerSnapzones sollten nur aktive player affectieren?
 
 wenn wer connected, un den namen gibts schon, dann (1) uws hinten ran machn
 
+wenn chat minimiert, dann beim maximieren der chat nach unten scrollen
+
 TODO: IMPORTANT: detect outside mouse ups
+
+TODO: IMPORTANT : IMMER TO STRING MACHN
+
 
 #####################################################  TODOS  ##########################################################
 - table boundaries
@@ -47,8 +52,9 @@ TODO: snapzone -> rotation/orientation -> angle
 functions:
 -rotate view
 -touch support --> evlt hammerjs benutzen https://www.npmjs.com/package/hammerjs
-
+-kick function
 -polygon shapes
+-leerzeichen in namen
 
 -refactor every dependency to context or events?
 

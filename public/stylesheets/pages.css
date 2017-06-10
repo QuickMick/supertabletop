@@ -163,6 +163,9 @@ h1{
 .game-list-container{
     flex-grow: 1;
     margin: 20px;
+    /* width: 30%; */
+    border-width: 2px;
+    border-style:solid;
 }
 
 .game-list-container .game-list-header{
@@ -171,24 +174,25 @@ h1{
 }
 
 .game-list-container .game-list-header .caption{
-
     flex-grow: 1;
+    text-align: center;
+    font-size: 30px;
+    background-color: #AF2020;
+    margin-bottom: 10px;
 }
 
 .game-list-container .game-list-header .refresh.btn{
-
     width: 15px;
-
     height: 15px;
 }
 
 .game-list-container .game-list-item{
-
-    width: 100%;
-
+    /* width: 100%; */
     /* margin: 20px; */
-
     margin-bottom: 10px;
+    /* margin: 0 10px; */
+    margin-left: 10px;
+    margin-right: 10px;
 }
 
 .game-list-container .game-list-item .game-list-item-content{
@@ -202,43 +206,90 @@ h1{
     /* width: 100%; */
 
     justify-content: space-between;
+    border-bottom-style: solid;
+    border-bottom-width: 4px;
 
     padding: 5px;
 }
 
 .game-list-container .game-list-item .game-list-item-content .title{
-
-    font-size: 20px;
-
+    display: flex;
+    flex-direction: column;
     /* margin: 10px; */
-
     /* padding: 10px; */
+    flex-grow: 1;
+}
+.game-list-container .game-list-item .game-list-item-content .title .room-name{
+    font-size: 20px;
+    font-weight: bold;
 }
 
-.game-list-container .game-list-item .game-list-item-content .title .name{
-
+.game-list-container .game-list-item .game-list-item-content .title .title-details{
+    display: flex;
+    flex-direction: row;
+    /* width: 500px; */
+}
+.game-list-container .game-list-item .game-list-item-content .title .title-details .played-game{
+    flex-grow: 1;
 }
 
-.game-list-container .game-list-item .game-list-item-content .title .fill{
-
+.game-list-container .game-list-item .game-list-item-content .title .title-details .played-game .game-name{
+    font-size: 18px;
 }
 
-.game-list-container .game-list-item .game-list-item-content .title .creator{
-
+.game-list-container .game-list-item .game-list-item-content .title .title-details .played-game .fill{
+    padding-left: 10px;
+    padding-right: 10px;
+    font-size: 18px;
+    line-height: 18px;
 }
 
-.game-list-container .game-list-item .game-list-item-content .details{
+.game-list-container .game-list-item .game-list-item-content .title .title-details .played-game .creator{
+    font-size: 18px;
 }
 
-.game-list-container .game-list-item .game-list-item-content .details .users{
-
+.game-list-container .game-list-item .game-list-item-content .room-details{
+    font-size: 15px;
+    /* margin-left: auto; */
+    /* right:0; */
+    margin-right: 15px;
+    margin-left: 10px;
 }
 
-.game-list-container .game-list-item .game-list-item-content .details .join{
+.game-list-container .game-list-item .game-list-item-content .room-details .users{
+    margin-right: 10px;
+}
 
+.game-list-container .game-list-item .game-list-item-content .btn.join{
+    margin-top: auto;
+    margin-bottom: auto;
+}
+
+.game-list-container .game-list-item .game-list-item-players {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    padding: 10px;
+    border-left-width: 2px;
+    border-right-width: 2px;
+    border-bottom-width:2px;
+    border-left-style:solid;
+    border-right-style:solid;
+    border-bottom-style:solid;
+}
+
+.game-list-container .game-list-item .game-list-item-players .player {
+    padding: 0 10px;
+}
+
+.game-list-container .game-list-item .game-list-item-players .player.host {
+    font-weight: bold;
+    padding: 0 10px;
 }
 
 /*----------- GAME LIST END -----------------*/
+
 
 /*----------- CHAT --------------------------*/
 

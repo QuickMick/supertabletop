@@ -44,6 +44,16 @@ class GameServer{
         this.allSockets = [];
     }
 
+    get currentGame(){
+        return {
+            SESSION_NAME:"micks krasser game raum",
+            PASSWORD:"hash pw",
+            CURRENT_GAME_ID:"test",
+            CURRENT_GAME_NAME:"test",
+            CURRENT_GAME_CREATOR:"TEST",
+            CURRENT_PLAYERS:this.currentConnectionCount // TODO hier names
+        }
+    }
 
 /*
     start(){

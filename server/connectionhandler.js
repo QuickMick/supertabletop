@@ -11,9 +11,6 @@ var GameServer = require('./gameserver');
 class ConnectionHandler {
 
     constructor(io) {
-
-
-
         /**
          * contains all game instances
          * @type {{id:GameServer}}

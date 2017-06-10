@@ -1,0 +1,14 @@
+div.game-list-item.color-base
+    div.game-list-item-content.color-dark-border
+        div.title
+            span.room-name #{roomName}
+            div.title-details.color-dark-border
+                div.played-game
+                    span.game-name #{gameName}
+                    span.fill !{I18N.by}
+                    span.creator #{userName}
+                div.room-details
+                    span.users !{I18N.players} 5/8
+                    span.password !{I18N.password} [x]
+        div.btn.join join
+    div.game-list-item-players.color-highlight.color-dark-border

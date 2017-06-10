@@ -16,20 +16,32 @@ html
                     div.test.color-darkest darkest
             div.content
 
-                div.game-list-container
+                div.game-list-container.color-darkest-border
                     div.game-list-header
                         div.caption Current Sessions
                         div.refresh.btn o
                     div.game-list-item.color-base
-                        div.game-list-item-content
+                        div.game-list-item-content.color-dark-border
                             div.title
-                                span.name Codenames
-                                span.fill by
-                                span.creator Mick
-                            div.details
-                                span.users players 5/8
-                                span.password Password [x]
+                                span.room-name Micks supergeiler Room
+                                div.title-details.color-dark-border
+                                    div.played-game
+                                        span.game-name Codenames
+                                        span.fill by
+                                        span.creator Mick
+                                    div.room-details
+                                        span.users players 5/8
+                                        span.password Password [x]
                             div.btn.join join
+                        div.game-list-item-players.color-highlight.color-dark-border
+                            span.player.host sdfasf
+                            span.player sdfsadfdfff
+                            span.player ssafdfsdfff
+                            span.player sdfsdfsgsddfff
+                            span.player sdfsdfff
+                            span.player sdsgdsfsdfff
+                            span.player sdffsgsdfff
+                            span.player sdfsdfgsdfff
                 div#lobby-chat-container.color-light.color-highlight-border
             script.
                 var I18N_DATA = !{I18N_DATA};

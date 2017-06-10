@@ -238,6 +238,11 @@ class ClientManager{
             console.log("updateClientIndex: client",id," cannot have an empty name");
             return "no_name";
         }
+        name = name.toString();
+        // check just consists letters and digits
+        if(!/^\w+$/.test(name)){
+            return "incorrect_name_characters";
+        }
 
         name = name || "";
         name = name.trim();
@@ -250,10 +255,6 @@ class ClientManager{
             return "incorrect_name_length";
         }
 
-        // check just consists letters and digits
-        if(!/^\w+$/.test(name)){
-            return "incorrect_name_characters";
-        }
 
         if(this.assignedNames[name]){
             return "name_already_occupied";

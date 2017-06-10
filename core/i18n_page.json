@@ -7,7 +7,10 @@
     "admin":"Admin",
     "registered":"Registered",
     "mod":"Mod",
-    "seat":"Seat"
+    "seat":"Seat",
+    "by":"by",
+    "password":"Password",
+    "players":"Players"
     },
 
   "de-DE":{
@@ -17,6 +20,9 @@
     "guest":"Gast",
     "admin":"Admin",
     "mod":"Mod",
-    "registered":"Registriert"
+    "registered":"Registriert",
+    "by":"von",
+    "passowrd":"Passwort",
+    "players":"Spieler"
   }
 }

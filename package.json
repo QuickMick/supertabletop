@@ -8,6 +8,7 @@
     "page-watch-js": "cmd /k watchify page/page.js -o public/js/page.js -v -d",
     "editor-watch-js": "cmd /k watchify editor/editormain.js -o public/js/editor.js -v -d",
     "compile-name-list": "node compilenames.js source=random_names.txt target=core/random_names.json",
+    "compile-word-list": "node compilecards.js source=wortliste.txt target=wordstack_content.json",
     "test": "mocha",
     "debug": "node --inspect --debug-brk ./bin/www"
   },

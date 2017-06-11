@@ -20,38 +20,53 @@ html
                 div.sign-in-out
                     div.switch.logged-in sign out
             div.content
-                div#lobby-chat-container.color-light.color-highlight-border
-                div.game-list-container
-                    div.game-list-header.color-dark-text
-                        div.caption Current Sessions
-                        div.refresh.btn &#x21bb;
-                    div.game-list-content
-                        - for (var i = 0; i < 10; ++i)
-                            div.game-list-item.color-base
-                                div.game-list-item-content
-                                    div.title.color-highlight-text
-                                        span.room-name Micks supergeiler Room
-                                        div.title-details
-                                            div.played-game
-                                                span.game-name PlayedGame
-                                                span.fill by
-                                                span.creator Creator
-                                            div.room-details
-                                                span.users players 5/8
-                                                span.password.used Password
-                                    div.btn.join join
-                                div.game-list-item-players.color-highlight.color-dark-text
-                                    span.player.host sdfasf
-                                    span.player sdfsadfdfff
-                                    span.player ssafdfsdfff
-                                    span.player sdfsdfsgsddfff
-                                    span.player sdfsdfff
-                                    span.player sdsgdsfsdfff
-                                    span.player sdffsgsdfff
-                                    span.player sdfsdfgsdfff
+                div.chat.text-unselectable
+                    div.player-list-caption Online Players
+                    div#player-lobby-list.text-unselectable
+                        div.online-player [admin] player 1
+                        div.online-player [guest] player 2
+                        div.online-player [mod] player 3
+                    div#lobby-chat-container
+                div.right-side
 
-            script.
-                var I18N_DATA = !{I18N_DATA};
-                var GAME_ID = "!{gameID}";
+                    div.create-session.text-unselectable
+                        div.caption Create session
+                        div.create-session-content
+                            div.input-section
+                                input.input-field.game-room-name(placeholder="name of the game room")
+                                input.input-field.game-room-password(placeholder="if desired, enter a password here or leave empty")
+                            div.btn.create create
+
+                    div.game-list-container.text-unselectable
+                        div.game-list-header.color-dark-text
+                            div.caption Current Sessions
+                            div.refresh.btn &#x21bb;
+                        div.game-list-content
+                            - for (var i = 0; i < 10; ++i)
+                                div.game-list-item.color-base
+                                    div.game-list-item-content
+                                        div.title.color-highlight-text
+                                            span.room-name Micks supergeiler Room
+                                            div.title-details
+                                                div.played-game
+                                                    span.game-name PlayedGame
+                                                    span.fill by
+                                                    span.creator Creator
+                                                div.room-details
+                                                    span.users players 5/8
+                                                    span.password.used Password
+                                        div.btn.join join
+                                    div.game-list-item-players.color-highlight.color-dark-text
+                                        span.player.host sdfasf
+                                        span.player sdfsadfdfff
+                                        span.player ssafdfsdfff
+                                        span.player sdfsdfsgsddfff
+                                        span.player sdfsdfff
+                                        span.player sdsgdsfsdfff
+                                        span.player sdffsgsdfff
+                                        span.player sdfsdfgsdfff
+    script.
+        var I18N_DATA = !{I18N_DATA};
+        var GAME_ID = "!{gameID}";
     script(src='/js/templates.js')
     script(src='/js/page.js')

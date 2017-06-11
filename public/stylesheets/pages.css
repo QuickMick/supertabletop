@@ -23,6 +23,16 @@ body,html {
     --color-highlight: #739ab3;
 }
 
+.color-schema-green {
+    --color-base: #27ae60;
+    --color-darkest: #95a5a6;
+    --color-dark: #27ae60;
+    --color-light: #E8F5E9;
+    --color-highlight: #ecf0f1;
+}
+
+
+
 .color-base-text { color: var(--color-base); }
 .color-highlight-text { color: var(--color-highlight); }
 .color-light-text { color: var(--color-light); }
@@ -110,7 +120,7 @@ body,html {
 
 .separator.horizontal{
     width: 80%;
-    background-color: grey;
+    background-color: var(--color-darkest);
     height: 2px;
     margin-top: 10px;
     margin-bottom: 10px;
@@ -166,7 +176,7 @@ h1{
 }
 
 .btn{
-    color: var(--color-dark);
+    color: var(--color-darkest);
     border: 2px solid darkgrey;
     border: none;
     background-color: var(--color-highlight) ;
@@ -188,9 +198,12 @@ h1{
 
 .btn:hover{
     background-color: var(--color-light);
+    color:var(--color-dark);
 }
+
 .btn:active{
-    background-color:var(--color-base);
+    background-color:var(--color-dark);
+    color:var(--color-light);
 }
 
 .overlay{
@@ -291,7 +304,7 @@ h1{
     margin-right: 10px;
     /*margin-right: 10px;*/
 
-    box-shadow: var(--color-darkest) 0 0 10px;
+    box-shadow: rgba(0,0,0,0.3) 0 0 10px;
 }
 
 .game-list-container .game-list-item .game-list-item-content:first-child{
@@ -299,7 +312,7 @@ h1{
 }
 
 .game-list-container .game-list-item:hover {
-    box-shadow: var(--color-highlight) 0 0 15px;
+    box-shadow: rgba(0,0,0,0.3) 0 0 20px;
    /* margin-left: 5px;
     margin-right: 5px;*/
 }
@@ -386,7 +399,11 @@ h1{
 .game-list-container .game-list-item .game-list-item-content .btn.join{
     margin-top: auto;
     margin-bottom: auto;
-    box-shadow: var(--color-darkest) 0 0 5px;
+    box-shadow: rgba(0, 0, 0, 0.3) 0 0 10px;
+}
+
+.game-list-container .game-list-item .game-list-item-content .btn.join:active{
+    box-shadow: none;
 }
 
 .game-list-container .game-list-item .game-list-item-players {
@@ -514,7 +531,7 @@ h1{
 .chat-container.show .chat-content .chat-input .chat-input-field:focus{
     border-bottom: solid 2px var(--color-darkest);
     outline: none;
-    box-shadow: var(--color-darkest) 0 0 5px;
+    box-shadow: rgba(0,0,0,0.3) 0 0 5px;
 }
 
 
@@ -524,7 +541,7 @@ h1{
 
 
 .chat-container.show .chat-content .chat-input .chat-send.btn{
-    box-shadow: var(--color-darkest) 0 0 5px;
+    box-shadow: rgba(0,0,0,0.3) 0 0 5px;
 }
 
 .chat-container.hide .chat-content *{

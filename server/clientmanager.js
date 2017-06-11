@@ -14,6 +14,7 @@ const uuidV1 = require('uuid/v1');
 var Rights = require('./../core/rights');
 
 const RANDOM_NAMES = require('./../core/random_names.json');
+const ADJECTIVES = require('./../core/adjectives.json');
 
 class Client{
     constructor(socket,clientInfo){
@@ -407,7 +408,9 @@ class ClientManager{
         var result = RANDOM_NAMES[Math.floor(Math.random()*RANDOM_NAMES.length)];
 
         if(i>5){    // if it is called mare then 5 times recursively, then combine two random names
-            result = RANDOM_NAMES[Math.floor(Math.random()*RANDOM_NAMES.length)]+"-"+RANDOM_NAMES[Math.floor(Math.random()*RANDOM_NAMES.length)];
+            result = ADJECTIVES[Math.floor(Math.random()*RANDOM_NAMES.length)]+"-"+RANDOM_NAMES[Math.floor(Math.random()*RANDOM_NAMES.length)];
+        }else if(i>10){
+            return this.getAlternativeNameIfOccupied(result);
         }
 
         if(this.assignedNames[result.toLowerCase()]){

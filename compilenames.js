@@ -23,10 +23,10 @@ if(!source || !target){
 console.log("staring - file in:",source,"file out:",target);
 var fs = require('fs');
 var result = [];
-var array = fs.readFileSync('random_names.txt').toString().split("\n");
+var array = fs.readFileSync(source).toString().split("\n");
 for(var i in array) {
     if(array[i].includes(" ")) continue; //just take names wihtout whitespace
     result.push(array[i].trim());
 }
 console.log(result.length,"names written");
-fs.writeFileSync("./core/random_names.json", JSON.stringify(result));
+fs.writeFileSync(target, JSON.stringify(result));

@@ -2,7 +2,7 @@ html
     head
         title #{I18N_LAYOUT.title}
         link(rel='stylesheet', href='/stylesheets/pages.css')
-    body
+    body.color-schema-blue
         div#main.color-light
             div#header.color-base
                 p.title.color-highlight-text #{I18N_LAYOUT.title}
@@ -15,6 +15,8 @@ html
                     div.test.color-dark dark
                     div.test.color-darkest darkest
                 div.current-user-info
+                    div.name Mick
+
                 div.sign-in-out
                     div.switch.logged-in sign out
             div.content
@@ -23,51 +25,30 @@ html
                     div.game-list-header.color-dark-text
                         div.caption Current Sessions
                         div.refresh.btn &#x21bb;
-                    div.game-list-item.color-base
-                        div.game-list-item-content
-                            div.title.color-highlight-text
-                                span.room-name Micks supergeiler Room
-                                div.title-details
-                                    div.played-game
-                                        span.game-name PlayedGame
-                                        span.fill by
-                                        span.creator Creator
-                                    div.room-details
-                                        span.users players 5/8
-                                        span.password.used Password
-                            div.btn.join join
-                        div.game-list-item-players.color-highlight.color-dark-text
-                            span.player.host sdfasf
-                            span.player sdfsadfdfff
-                            span.player ssafdfsdfff
-                            span.player sdfsdfsgsddfff
-                            span.player sdfsdfff
-                            span.player sdsgdsfsdfff
-                            span.player sdffsgsdfff
-                            span.player sdfsdfgsdfff
-
-                    div.game-list-item.color-base
-                        div.game-list-item-content
-                            div.title.color-highlight-text
-                                span.room-name Micks supergeiler Room
-                                div.title-details
-                                    div.played-game
-                                        span.game-name PlayedGame
-                                        span.fill by
-                                        span.creator Creator
-                                    div.room-details
-                                        span.users players 5/8
-                                        span.password.used Password
-                            div.btn.join join
-                        div.game-list-item-players.color-highlight.color-dark-text
-                            span.player.host sdfasf
-                            span.player sdfsadfdfff
-                            span.player ssafdfsdfff
-                            span.player sdfsdfsgsddfff
-                            span.player sdfsdfff
-                            span.player sdsgdsfsdfff
-                            span.player sdffsgsdfff
-                            span.player sdfsdfgsdfff
+                    div.game-list-content
+                        - for (var i = 0; i < 10; ++i)
+                            div.game-list-item.color-base
+                                div.game-list-item-content
+                                    div.title.color-highlight-text
+                                        span.room-name Micks supergeiler Room
+                                        div.title-details
+                                            div.played-game
+                                                span.game-name PlayedGame
+                                                span.fill by
+                                                span.creator Creator
+                                            div.room-details
+                                                span.users players 5/8
+                                                span.password.used Password
+                                    div.btn.join join
+                                div.game-list-item-players.color-highlight.color-dark-text
+                                    span.player.host sdfasf
+                                    span.player sdfsadfdfff
+                                    span.player ssafdfsdfff
+                                    span.player sdfsdfsgsddfff
+                                    span.player sdfsdfff
+                                    span.player sdsgdsfsdfff
+                                    span.player sdffsgsdfff
+                                    span.player sdfsdfgsdfff
 
             script.
                 var I18N_DATA = !{I18N_DATA};

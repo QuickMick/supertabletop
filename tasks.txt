@@ -30,6 +30,8 @@ wenn farben geänder wurden, dann werden die "onclick" shader farben nicht richt
 #####################################################  TODOS  ##########################################################
 - table boundaries
 
+TODO: name generator auslagern in eigene klasse, die von der lobby gemanaged wird, dass auf dem ganzen server der name einzigartig ist.
+
 TODO: compilen von pug templates als gulp task
 
 popup, wenn versucht wird ein dialog zu öffnen, obwohl schon einer offen ist

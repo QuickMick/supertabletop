@@ -5,7 +5,7 @@ html
     body
         div#main.color-light
             div#header.color-base
-                p.title #{I18N_LAYOUT.title}
+                p.title.color-highlight-text #{I18N_LAYOUT.title}
                 div.separator
                 div#player-details
                 div.test-box
@@ -14,26 +14,29 @@ html
                     div.test.color-light light
                     div.test.color-dark dark
                     div.test.color-darkest darkest
+                div.current-user-info
+                div.sign-in-out
+                    div.switch.logged-in sign out
             div.content
-
-                div.game-list-container.color-darkest-border
-                    div.game-list-header
+                div#lobby-chat-container.color-light.color-highlight-border
+                div.game-list-container
+                    div.game-list-header.color-dark-text
                         div.caption Current Sessions
-                        div.refresh.btn o
+                        div.refresh.btn &#x21bb;
                     div.game-list-item.color-base
-                        div.game-list-item-content.color-dark-border
-                            div.title
+                        div.game-list-item-content
+                            div.title.color-highlight-text
                                 span.room-name Micks supergeiler Room
-                                div.title-details.color-dark-border
+                                div.title-details
                                     div.played-game
-                                        span.game-name Codenames
+                                        span.game-name PlayedGame
                                         span.fill by
-                                        span.creator Mick
+                                        span.creator Creator
                                     div.room-details
                                         span.users players 5/8
-                                        span.password Password [x]
+                                        span.password.used Password
                             div.btn.join join
-                        div.game-list-item-players.color-highlight.color-dark-border
+                        div.game-list-item-players.color-highlight.color-dark-text
                             span.player.host sdfasf
                             span.player sdfsadfdfff
                             span.player ssafdfsdfff
@@ -42,7 +45,30 @@ html
                             span.player sdsgdsfsdfff
                             span.player sdffsgsdfff
                             span.player sdfsdfgsdfff
-                div#lobby-chat-container.color-light.color-highlight-border
+
+                    div.game-list-item.color-base
+                        div.game-list-item-content
+                            div.title.color-highlight-text
+                                span.room-name Micks supergeiler Room
+                                div.title-details
+                                    div.played-game
+                                        span.game-name PlayedGame
+                                        span.fill by
+                                        span.creator Creator
+                                    div.room-details
+                                        span.users players 5/8
+                                        span.password.used Password
+                            div.btn.join join
+                        div.game-list-item-players.color-highlight.color-dark-text
+                            span.player.host sdfasf
+                            span.player sdfsadfdfff
+                            span.player ssafdfsdfff
+                            span.player sdfsdfsgsddfff
+                            span.player sdfsdfff
+                            span.player sdsgdsfsdfff
+                            span.player sdffsgsdfff
+                            span.player sdfsdfgsdfff
+
             script.
                 var I18N_DATA = !{I18N_DATA};
                 var GAME_ID = "!{gameID}";

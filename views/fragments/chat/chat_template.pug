@@ -5,5 +5,6 @@ if(minimizable)
 div.chat-content
     div.chat-output
     div.chat-input
-        input.chat-input-field
+        -var ph = I18N.your_message;
+        input.chat-input-field(placeholder=ph)
         div.chat-send.btn #{I18N.send}

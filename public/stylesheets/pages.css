@@ -5,25 +5,46 @@ body,html {
     height: 100%;
     font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
     --header-height:50px; /* variable which is used in other classes */
+
+    /* red style */
+   /* --color-highlight:#FF9898;
+    --color-light:#ED6666;
+    --color-base:#CF3E3E;
+    --color-dark:#AF2020;
+    --color-darkest:#890707;*/
+
+    --color-base:#29526D     ;
+    --color-darkest:#062539   ;
+    --color-dark:#143A53   ;
+
+
+    --color-light:#446C86  ;
+    --color-highlight:#678AA0  ;
+
+
+
+
+
+
 }
 
-.color-base-text { color: #CF3E3E }	/* Main Primary color */
-.color-highlight-text { color: #FF9898 }
-.color-light-text { color: #ED6666 }
-.color-dark-text { color: #AF2020 }
-.color-darkest-text { color: #890707 }
+.color-base-text { color: var(--color-base); }
+.color-highlight-text { color: var(--color-highlight); }
+.color-light-text { color: var(--color-light); }
+.color-dark-text { color: var(--color-dark); }
+.color-darkest-text { color: var(--color-darkest); }
 
-.color-base { background-color: #CF3E3E }	/* Main Primary color */
-.color-highlight { background-color: #FF9898 }
-.color-light { background-color: #ED6666 }
-.color-dark { background-color: #AF2020 }
-.color-darkest { background-color: #890707 }
+.color-base { background-color: var(--color-base);}
+.color-highlight { background-color: var(--color-highlight); }
+.color-light { background-color: var(--color-light); }
+.color-dark { background-color: var(--color-dark); }
+.color-darkest { background-color: var(--color-darkest); }
 
-.color-base-border { border-color: #CF3E3E }	/* Main Primary color */
-.color-highlight-border { border-color: #FF9898 }
-.color-light-border { border-color: #ED6666 }
-.color-dark-border { border-color: #AF2020 }
-.color-darkest-border { border-color: #890707 }
+.color-base-border { border-color: var(--color-base);}
+.color-highlight-border { border-color: var(--color-highlight); }
+.color-light-border { border-color: var(--color-light); }
+.color-dark-border { border-color: var(--color-dark); }
+.color-darkest-border { border-color: var(--color-darkest); }
 
 .test{
     padding: 10px;
@@ -45,7 +66,7 @@ body,html {
 
 .separator {
     height: 80%;
-    background-color: grey;
+    background-color: var(--color-darkest);
     width: 2px;
     margin-left: 10px;
     margin-right: 10px;
@@ -66,9 +87,13 @@ body,html {
 h1{
     margin: 0;
 }
-.title{
+
+#header .title{
     margin: 0;
     font-size: 30px;
+    line-height: var(--header-height);
+    margin-left: 10px;
+    font-weight: bold;
 }
 .text-selectable{
     -webkit-touch-callout: default;  /* iOS Safari */
@@ -107,9 +132,10 @@ h1{
 }
 
 .btn{
+    color: var(--color-dark);
     border: 2px solid darkgrey;
     border: none;
-    background-color: #cfcfcf;
+    background-color: var(--color-highlight) ;
     padding: 5px;
     text-align: center;
     text-decoration: none;
@@ -117,6 +143,7 @@ h1{
     vertical-align: middle;
     cursor:pointer;
     font-weight: bold;
+
     -webkit-touch-callout: none; /* iOS Safari */
     -webkit-user-select: none; /* Safari */
     -khtml-user-select: none; /* Konqueror HTML */
@@ -126,10 +153,10 @@ h1{
 }
 
 .btn:hover{
-    background-color: #9c9c9c;
+    background-color: var(--color-light);
 }
 .btn:active{
-    background-color: #808080;
+    background-color:var(--color-base);
 }
 
 .overlay{
@@ -154,18 +181,59 @@ h1{
 
 
 #lobby-chat-container{
-    width: 33%;
+    width: 20%;
     height: 100%;
     min-width: 250px;
 }
 
+
+/*--------- HEADER --------------------------*/
+
+#header .current-user-info{
+    flex-grow: 1;
+}
+
+#header .sign-in-out .switch{
+    line-height: var(--header-height);
+    font-size: 17px;
+    margin-right: 15px;
+    color:var(--color-highlight);
+}
+
+/*!
+ *  Font Awesome 4.7.0 by @davegandy - http://fontawesome.io - @fontawesome
+ *  License - http://fontawesome.io/license (Font: SIL OFL 1.1, CSS: MIT License)
+ */
+/* FONT PATH
+ * -------------------------- */
+@font-face {
+    font-family: 'FontAwesome';
+    src: url('../fonts/fontawesome-webfont.eot?v=4.7.0');
+    src: url('../fonts/fontawesome-webfont.eot?#iefix&v=4.7.0') format('embedded-opentype'), url('../fonts/fontawesome-webfont.woff2?v=4.7.0') format('woff2'), url('../fonts/fontawesome-webfont.woff?v=4.7.0') format('woff'), url('../fonts/fontawesome-webfont.ttf?v=4.7.0') format('truetype'), url('../fonts/fontawesome-webfont.svg?v=4.7.0#fontawesomeregular') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+
+#header .sign-in-out .switch.logged-in:after{
+    font-family: "FontAwesome";
+    content: "\f090";
+    margin: 0 5px;
+}
+
+#header .sign-in-out .switch.logged-out:after{
+    font-family: "FontAwesome";
+    content: "\f08b";
+    margin: 0 5px;
+}
+
+/*--------- HEADER END ----------------------*/
+
 /*----------- GAME LIST ---------------------*/
 .game-list-container{
-    flex-grow: 1;
+    /* flex-grow: 1; */
     margin: 20px;
-    /* width: 30%; */
-    border-width: 2px;
-    border-style:solid;
+    width: 35%;
+    min-width: 500px;
 }
 
 .game-list-container .game-list-header{
@@ -177,39 +245,32 @@ h1{
     flex-grow: 1;
     text-align: center;
     font-size: 30px;
-    background-color: #AF2020;
     margin-bottom: 10px;
 }
 
 .game-list-container .game-list-header .refresh.btn{
-    width: 15px;
-    height: 15px;
+    /* width: 15px; */
+    /* height: 15px; */
+    background-color: transparent;
+    font-size: 30px;
 }
 
 .game-list-container .game-list-item{
     /* width: 100%; */
     /* margin: 20px; */
-    margin-bottom: 10px;
+    margin-bottom: 25px;
     /* margin: 0 10px; */
     margin-left: 10px;
-    margin-right: 10px;
+    /*margin-right: 10px;*/
+
+    box-shadow: var(--color-darkest) 0 0 10px;
 }
 
 .game-list-container .game-list-item .game-list-item-content{
-
     display: flex;
-
     flex-direction: row;
-
-    /* flex-grow: 1; */
-
-    /* width: 100%; */
-
     justify-content: space-between;
-    border-bottom-style: solid;
-    border-bottom-width: 4px;
-
-    padding: 5px;
+    padding: 5px 15px;
 }
 
 .game-list-container .game-list-item .game-list-item-content .title{
@@ -231,21 +292,31 @@ h1{
 }
 .game-list-container .game-list-item .game-list-item-content .title .title-details .played-game{
     flex-grow: 1;
+    margin-left: 30px;
+    font-size: 18px;
+}
+
+.game-list-container .game-list-item .game-list-item-content .title .title-details .played-game:before{
+    content:"\2514\2500";
+    position: absolute;
+    transform: translateX(-100%);
+    font-size: 18px;
+    padding-right: 4px;
 }
 
 .game-list-container .game-list-item .game-list-item-content .title .title-details .played-game .game-name{
-    font-size: 18px;
+    /* font-size: 18px; */
 }
 
 .game-list-container .game-list-item .game-list-item-content .title .title-details .played-game .fill{
     padding-left: 10px;
     padding-right: 10px;
-    font-size: 18px;
+    /* font-size: 18px; */
     line-height: 18px;
 }
 
 .game-list-container .game-list-item .game-list-item-content .title .title-details .played-game .creator{
-    font-size: 18px;
+    /* font-size: 18px; */
 }
 
 .game-list-container .game-list-item .game-list-item-content .room-details{
@@ -253,16 +324,31 @@ h1{
     /* margin-left: auto; */
     /* right:0; */
     margin-right: 15px;
-    margin-left: 10px;
 }
 
+.game-list-container .game-list-item .game-list-item-content .room-details *{
+    margin-left:10px
+}
+
+.game-list-container .game-list-item .game-list-item-content .room-details .password.used:after{
+     content: "\2611";
+     margin-left: 3px;
+ }
+
+.game-list-container .game-list-item .game-list-item-content .room-details .password.unused:after{
+    content: "\2612";
+    margin-left: 3px;
+}
+
+/*
 .game-list-container .game-list-item .game-list-item-content .room-details .users{
     margin-right: 10px;
-}
+}*/
 
 .game-list-container .game-list-item .game-list-item-content .btn.join{
     margin-top: auto;
     margin-bottom: auto;
+    box-shadow: var(--color-darkest) 0 0 5px;
 }
 
 .game-list-container .game-list-item .game-list-item-players {
@@ -271,12 +357,6 @@ h1{
     flex-wrap: wrap;
     justify-content: space-around;
     padding: 10px;
-    border-left-width: 2px;
-    border-right-width: 2px;
-    border-bottom-width:2px;
-    border-left-style:solid;
-    border-right-style:solid;
-    border-bottom-style:solid;
 }
 
 .game-list-container .game-list-item .game-list-item-players .player {
@@ -296,8 +376,9 @@ h1{
 .chat-container{
     display: flex;
     flex-direction: column;
-    border-left-width: 5px;
-    border-left-style: solid;
+    border-right-width: 3px;
+    border-right-style: solid;
+
 }
 
 .chat-container.show{
@@ -312,12 +393,13 @@ h1{
 
 .chat-container.show .chat-content .chat-output{
     flex-grow: 1;
-    background-color: gainsboro;
-    margin: 10px 0 10px 10px;
+    background-color: var(--color-highlight);
+    margin: 0px 0 10px 10px;
     display: flex;
     flex-direction: column;
     overflow-y: scroll;
     overflow-x: hidden;
+    color:var(--color-dark);
 }
 
 .chat-container.show .chat-content .chat-output .message{
@@ -366,10 +448,45 @@ h1{
 .chat-container.show .chat-content .chat-input .chat-input-field{
     flex-grow: 1;
     margin-right: 10px;
+
+    font-size: 16px;
+    border: none;
+    border-bottom: solid 2px var(--color-base);
+    transition: all 0.3s;
+    background-color: transparent;
+    color:var(--color-dark);
 }
 
-.chat-container.show .chat-content .chat-input .chat-send.btn{
+.chat-container.show .chat-content .chat-input .chat-input-field::-webkit-input-placeholder {
+    color:    var(--color-base);
+}
+.chat-container.show .chat-content .chat-input .chat-input-field:-moz-placeholder {
+    /* FF 4-18 */
+    color:    var(--color-base);
+}
+.chat-container.show .chat-content .chat-input .chat-input-field::-moz-placeholder {
+    /* FF 19+ */
+    color:    var(--color-base);
+}
+.chat-container.show .chat-content .chat-input .chat-input-field:-ms-input-placeholder {
+    /* IE 10+ */
+    color:    var(--color-base);
+}
 
+.chat-container.show .chat-content .chat-input .chat-input-field:focus{
+    border-bottom: solid 2px var(--color-darkest);
+    outline: none;
+    box-shadow: var(--color-darkest) 0 0 5px;
+}
+
+
+
+
+
+
+
+.chat-container.show .chat-content .chat-input .chat-send.btn{
+    box-shadow: var(--color-darkest) 0 0 5px;
 }
 
 .chat-container.hide .chat-content *{

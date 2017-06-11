@@ -10,7 +10,8 @@
     "seat":"Seat",
     "by":"by",
     "password":"Password",
-    "players":"Players"
+    "players":"Players",
+    "your_message":"your message"
     },
 
   "de-DE":{
@@ -23,6 +24,7 @@
     "registered":"Registriert",
     "by":"von",
     "passowrd":"Passwort",
-    "players":"Spieler"
+    "players":"Spieler",
+    "your_message":"deine Nachricht"
   }
 }

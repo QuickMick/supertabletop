@@ -3,9 +3,9 @@ html
         title #{I18N_LAYOUT.title}
         link(rel='stylesheet', href='/stylesheets/pages.css')
     body.color-schema-green
-        div#main.color-light
-            div#header.color-base
-                p.title.color-highlight-text #{I18N_LAYOUT.title}
+        div#main
+            div#header
+                p.title #{I18N_LAYOUT.title}
                 div.separator
                 div#player-details
                 div.test-box
@@ -38,15 +38,15 @@ html
                                 input.input-field.game-room-password(placeholder="if desired, enter a password here or leave empty")
                             div.btn.create create
 
-                    div.game-list-container.text-unselectable
-                        div.game-list-header.color-dark-text
+                    div#game-list-container.text-unselectable
+                        div.game-list-header
                             div.caption Current Sessions
                             div.refresh.btn &#x21bb;
                         div.game-list-content
                             - for (var i = 0; i < 10; ++i)
-                                div.game-list-item.color-base
+                                div.game-list-item
                                     div.game-list-item-content
-                                        div.title.color-highlight-text
+                                        div.title
                                             span.room-name Micks supergeiler Room
                                             div.title-details
                                                 div.played-game
@@ -57,7 +57,7 @@ html
                                                     span.users players 5/8
                                                     span.password.used Password
                                         div.btn.join join
-                                    div.game-list-item-players.color-highlight.color-dark-text
+                                    div.game-list-item-players
                                         span.player.host sdfasf
                                         span.player sdfsadfdfff
                                         span.player ssafdfsdfff

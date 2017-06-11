@@ -30,6 +30,11 @@ class CompileLayouts {
         tabletop += this._add('tabletop/game_chooser_template.pug',"gameChooserTemplate");
         tabletop += this._add('tabletop/game_list_item.pug',"gameListItem");
 
+        var lobby = "";
+        tabletop += this._add('tabletop/lobby_game_list_item.pug',"lobbyGameListItem");
+        tabletop += this._add('tabletop/lobby_list_player_item.pug',"lobbyListPlayerItem");
+
+
         console.log("WRITE TEMPLATES");
         fs.writeFileSync("./public/js/templates.js", chat+tabletop);
     }

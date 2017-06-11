@@ -110,7 +110,7 @@ body,html {
 
 .separator {
     height: 80%;
-    background-color: var(--color-darkest);
+    background-color: var(--color-dark);
     width: 2px;
     margin-left: 10px;
     margin-right: 10px;
@@ -120,7 +120,7 @@ body,html {
 
 .separator.horizontal{
     width: 80%;
-    background-color: var(--color-darkest);
+    background-color: var(--color-dark);
     height: 2px;
     margin-top: 10px;
     margin-bottom: 10px;
@@ -314,6 +314,7 @@ h1{
     margin: auto 0;
     background-color: var(--color-base);
     color:var(--color-highlight);
+    box-shadow: rgba(0,0,0,0.3) 0 0 5px;
 }
 
 .create-session .create-session-content  .btn.create:hover{
@@ -323,6 +324,7 @@ h1{
 .create-session .create-session-content  .btn.create:active{
     background-color: var(--color-light);
     color:var(--color-dark);
+    box-shadow:none;
 }
 
 .create-session .create-session-content .input-section .input-field{

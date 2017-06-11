@@ -397,6 +397,13 @@ h1{
     background-color: transparent;
     font-size: 30px;
 }
+.game-list-container .game-list-header .refresh.btn:active{
+    color:var(--color-base);
+}
+
+.game-list-container .game-list-header .refresh.btn:active{
+    color:var(--color-darkest);
+}
 
 .game-list-container .game-list-item{
     /* width: 100%; */

@@ -31,10 +31,8 @@ class LobbyConnectionHandler extends EventEmitter3{
         this.CLIENT_INFO = {};
     }
 
-    init(){
-        this.socket = require('socket.io-client').connect({
-            query:"gameid="+GAME_ID
-        });
+    start(){
+        this.socket = require('socket.io-client').connect(Packages.NAMESPACES.LOBBY);
 
         this._initHandlers();
     }
@@ -57,12 +55,11 @@ class LobbyConnectionHandler extends EventEmitter3{
         this.connectedServerID = evt.data.serverID;
         this.CLIENT_INFO = evt.data.clientInfo;
 
-        if(this.connectedServerID) return;
-
         console.log("Clientdata received");
 
-
         window.hideLoadingDialog();
+
+        if(this.connectedServerID) return;
     }
 
 

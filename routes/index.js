@@ -1,8 +1,7 @@
 var express = require('express');
 var router = express.Router();
 
-var I18N_GAME = require('./../core/i18n_game.json');
-var I18N_PAGE = require('./../core/i18n_page.json');
+var I18N = require('./../core/i18n_game.json');
 
 /* GET home page. */
 router.get('/', function (req, res, next) {
@@ -15,18 +14,18 @@ router.get('/', function (req, res, next) {
     }
 
 
-        //TODO: checken ob game exists
+    //TODO: checken ob game exists
 
 
     // load the correct language and pass it to the jade
     var language = "en-EN";
 
     // load language from the request
-    if(I18N_GAME[req.query.lang || ""]){
+    if(I18N[req.query.lang || ""]){
         language = req.query.lang;
     }
 
-    var i18n = I18N_GAME[language] || {};
+    var i18n = I18N[language] || {};
 
     res.render('index',
         {
@@ -39,11 +38,11 @@ function(errormsg, req, res, next) {
     var language = "en-EN";
 
     // load language from the request
-    if(req.query && I18N_PAGE[req.query.lang || ""]){
+    if(req.query && I18N[req.query.lang || ""]){
         language = req.query.lang;
     }
 
-    var i18n = I18N_PAGE[language] || {};
+    var i18n = I18N[language] || {};
 
     res.render('lobby',
         {

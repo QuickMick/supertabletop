@@ -42,6 +42,10 @@
     "name_forbidden":"chosen name contains forbidden words",
     "name_already_taken":"chosen name is already taken",
     "name_contains_prohibited_characters":"chosen name contains prohibited characters, just letters and numbers are allowed!",
+
+    "by":"by",
+    "password":"Password",
+    "players":"Players",
     "your_message":"your message"
   },
 
@@ -88,6 +92,10 @@
     "name_forbidden":"Der gewählte Name enthält verbotene Wörter",
     "name_already_taken":"Der gewählte Name ist bereits belegt",
     "name_contains_prohibited_characters":"Der gewählte Name enthält verbotene Zeichen, nur Buchstaben und Zahlen sind erlaubt!",
+
+    "by":"von",
+    "passowrd":"Passwort",
+    "players":"Spieler",
     "your_message":"deine Nachricht"
   }
 }

@@ -88,7 +88,7 @@ class Synchronizer extends EventEmitter3{
         this.gameTable = this.gameManager.gameTable;
         this.chatHandler = this.gameManager.chatHandler;
 
-        this.socket = require('socket.io-client').connect({
+        this.socket = require('socket.io-client').connect(Packages.NAMESPACES.GAME, {
             query:"gameid="+GAME_ID
         });
         this._initHandlers();

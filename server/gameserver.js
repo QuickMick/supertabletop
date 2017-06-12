@@ -17,9 +17,9 @@ var EntityServerManager = require('./entityservermanager');
 var ClientManager = require('./clientmanager');
 
 class GameServer{
-    constructor(io){
-       // this.io = io;
-        this.ID = uuidV1();
+    constructor(io,gameID){
+        this.io = io;
+        this.ID = gameID || uuidV1();
         this.clientManager = new ClientManager();
         this.updateQueue =  new UpdateQueue();
         this.entityServerManager = new EntityServerManager(60,this.updateQueue,this.clientManager,this);
@@ -42,6 +42,8 @@ class GameServer{
          * @type {Array}
          */
         this.allSockets = [];
+
+        console.log("GameServer started, ID:",this.ID);
     }
 
     get currentGame(){
@@ -57,7 +59,7 @@ class GameServer{
 
 /*
     start(){
-        this.io.on('connection', this._onConnectionReceived.bind(this));
+        this.io.on('connection', this._onGameConnectionReceived.bind(this));
         setInterval(this._sendEntityUpdates.bind(this), Ticks.SERVER_UPDATE_INTERVAL);
 
         this.entityServerManager.loadGame("mick","codewords"); //TODO nicht statisch machen und durch user triggern lassen
@@ -460,7 +462,7 @@ class GameServer{
         );
     }
 
-
+/*
     _boradcast(type,msg){
         for(var i=0; i<this.allSockets.length;i++){
             this._sendToClient(this.allSockets[i],type,msg);
@@ -478,7 +480,21 @@ class GameServer{
 
     _sendToClient(clientConnectionSocket,type,msg){
         clientConnectionSocket.emit(type,msg);
+    }*/
+
+    _boradcast(type,msg){
+      //  this.io.sockets.emit(type,msg);
+        this.io.to(this.ID).emit(type,msg);
     }
+
+    _boradcastExceptSender(senderSocket,type,msg){
+        senderSocket.broadcast.to(this.ID).emit(type,msg);
+    }
+
+    _sendToClient(clientConnectionSocket,type,msg){
+        clientConnectionSocket.emit(type,msg);
+    }
+
 }
 
 module.exports = GameServer;

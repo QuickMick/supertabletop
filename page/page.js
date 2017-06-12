@@ -8,7 +8,6 @@ window.I18N = new i18n(I18N_DATA);
 
 var LobbyHandler = require('./lobbyhandler');
 
-
 class Page
 {
 
@@ -26,6 +25,16 @@ class Page
     }
 
 }
+
+
+window.showLoadingDialog=function(){
+    document.getElementById("loading-overlay").style.display=""; //"flex";
+};
+
+window.hideLoadingDialog=function(){
+    document.getElementById("loading-overlay").style.display="none";
+};
+
 window.onload = function() {
     new Page();
 };

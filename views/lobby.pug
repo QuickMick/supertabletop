@@ -43,29 +43,11 @@ html
                             div.caption Current Sessions
                             div.refresh.btn &#x21bb;
                         div.game-list-content
-                            - for (var i = 0; i < 10; ++i)
-                                div.game-list-item
-                                    div.game-list-item-content
-                                        div.title
-                                            span.room-name Micks supergeiler Room
-                                            div.title-details
-                                                div.played-game
-                                                    span.game-name PlayedGame
-                                                    span.fill by
-                                                    span.creator Creator
-                                                div.room-details
-                                                    span.users players 5/8
-                                                    span.password.used Password
-                                        div.btn.join join
-                                    div.game-list-item-players
-                                        span.player.host sdfasf
-                                        span.player sdfsadfdfff
-                                        span.player ssafdfsdfff
-                                        span.player sdfsdfsgsddfff
-                                        span.player sdfsdfff
-                                        span.player sdsgdsfsdfff
-                                        span.player sdffsgsdfff
-                                        span.player sdfsdfgsdfff
+            div#loading-overlay.overlay
+                div.loading-content
+                    div.spinner
+                        div.dot1
+                        div.dot2
     script.
         var I18N_DATA = !{I18N_DATA};
         var GAME_ID = "!{gameID}";

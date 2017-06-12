@@ -16,6 +16,10 @@ module.exports =
         if (token) result.token = token;
         return result;
     },
+    NAMESPACES:{
+        GAME:"/game",
+        LOBBY:"/lobby"
+    },
     PROTOCOL: {
         CHAT: {
             /**

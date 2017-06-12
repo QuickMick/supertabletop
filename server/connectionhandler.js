@@ -4,58 +4,33 @@
 
 'use strict';
 var Packages = require('./../core/packages');
-const uuidV1 = require('uuid/v1');
 
-var GameServer = require('./gameserver');
+
+
+var GameConnectionHandler = require('./gameconnectionhandler');
+var LobbyConnectionHandler = require('./lobbyconnectionhandler');
 
 class ConnectionHandler {
 
     constructor(io) {
-        /**
-         * contains all game instances
-         * @type {{id:GameServer}}
-         */
-        this.runningGames = {};
+        this.gameNsp = null;
+        this.lobbyNsp = null;
 
-        this.startGame();       //TODO: sollte von spielenr aufgerufenwerden
+
     }
 
     start(io){
         this.io = io;
-        this.io.on('connection', this._onConnectionReceived.bind(this));
+        this.gameNsp = this.io.of(Packages.NAMESPACES.GAME);
+        this.lobbyNsp = this.io.of(Packages.NAMESPACES.LOBBY);
+
+        this.gameConnectionHandler = new GameConnectionHandler(this.gameNsp);
+        this.lobbyConnectionHandler = new LobbyConnectionHandler(this.lobbyNsp);
+
+      /*  this.gameNsp.on('connection', this.gameConnectionHandler._onConnectionReceived.bind(this.gameConnectionHandler));
+        this.lobbyNsp.on('connection',this.lobbyConnectionHandler._onConnectionReceived.bind(this.lobbyConnectionHandler));*/
     }
 
-    _onConnectionReceived(socket){
-        console.log("connection received from:"+socket.handshake.address);
-
-        var gameID = socket.handshake.query.gameid;
-
-        if(!gameID || !this.runningGames[gameID]) {
-            socket.emit(Packages.PROTOCOL.SERVER.ERROR, {data:{reason:Packages.PROTOCOL.GAME_SERVER_ERRORS.GAME_NOT_FOUND}});       //TODO: entfernen
-            console.log(socket.handshake.address,"wants to connect to an invalid seassion:",gameID);
-            socket.disconnect();
-            return;
-        }
-
-        var game = this.runningGames[gameID];
-
-        if(game.isServerFull){
-            socket.emit(Packages.PROTOCOL.SERVER.ERROR, {data:{reason:Packages.PROTOCOL.GAME_SERVER_ERRORS.NO_FREE_SLOT_AVAILABLE}});
-            console.log(socket.handshake.address,"wants to connect to a full server:",gameID);
-            socket.disconnect();
-            return;
-        }
-
-        game.onConnectionReceived(socket);
-    }
-
-    startGame(){
-        var gameID = "testID"; // uuidV1();
-        console.log("starting new game with id",gameID);
-        this.runningGames[gameID] = new GameServer();
-
-        return gameID;
-    }
 }
 
 

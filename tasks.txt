@@ -21,6 +21,7 @@ wenn wer connected, un den namen gibts schon, dann (1) uws hinten ran machn
 wenn chat minimiert, dann beim maximieren der chat nach unten scrollen
 
 TODO: IMPORTANT: detect outside mouse ups
+TODO: IMPORTANT: client nicht mehr als socket id referenzeiren, sondern eigene id generieren
 
 TODO: IMPORTANT : IMMER TO STRING MACHN
 

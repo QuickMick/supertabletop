@@ -326,7 +326,7 @@ class ClientManager{
     }
 
     clientDisconnected(socket,data){
-        console.log("disconnect: "+socket.id+" Users left: "+this._currentConnectionCount);
+
 
         //this.boradcastExceptSender(clientSocket,Packages.PROTOCOL.SERVER.CLIENT_DISCONNECTED,{msg:"",data:{id:clientSocket.id}});
 
@@ -339,7 +339,7 @@ class ClientManager{
         }
 
         this._currentConnectionCount = Object.keys(this.clients).length;
-
+        console.log("disconnect: "+socket.id+" Users left: "+this._currentConnectionCount);
         // change addmin
         if(this.admin == socket.id){
             this.admin = null;

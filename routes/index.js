@@ -10,7 +10,7 @@ router.get('/', function (req, res, next) {
     if (!req.query || !req.query.id) {
        // res.status(404);
         //res.send("game_not_found  - neuer link ist jetz http://92.219.114.19:3000/?id=testID&lang=en-EN (lang kann auch auf de-DE gesetzt werden)");
-        next(""); // no game passed
+        next("200"); // no game passed
         return;
     }
 
@@ -49,7 +49,7 @@ function(errormsg, req, res, next) {
         {
             I18N_DATA: JSON.stringify(i18n),  // json-object is sent to the client
             I18N_LAYOUT: i18n,                 // the object is just jused to generate the template
-            ERROR:errormsg
+            ERROR:errormsg=="200"?"":errormsg
         });
 }
 );

@@ -21,7 +21,7 @@ html
                 div.sign-in-out
                     div.switch.logged-in sign out
             div.content
-                div.chat.text-unselectable
+                div.chat.text-unselectable.round-box
                     div.player-list-caption Online Players
                     div#player-lobby-list.text-unselectable
                         div.online-player [admin] player 1
@@ -30,7 +30,7 @@ html
                     div#lobby-chat-container
                 div.right-side
 
-                    div.create-session.text-unselectable
+                    div.create-session.text-unselectable.round-box
                         div.caption Create session
                         div.create-session-content
                             div.input-section
@@ -38,11 +38,32 @@ html
                                 input.input-field.game-room-password(placeholder="if desired, enter a password here or leave empty")
                             div.btn.create create
 
-                    div#game-list-container.text-unselectable
+                    div#game-list-container.text-unselectable.round-box
                         div.game-list-header
                             div.caption Current Sessions
                             div.refresh.btn &#x21bb;
                         div.game-list-content
+
+                            -for(var i=0; i<10;i++)
+                                div.game-list-item
+                                    div.game-list-item-content
+                                        div.title
+                                            span.room-name Mics geiler room
+                                            div.title-details
+                                                div.played-game
+                                                    span.game-name Codenames
+                                                    span.fill by
+                                                    span.creator Mick
+                                                div.room-details
+                                                    span.users palyers 3/8
+                                                    span.password.unused !{I18N_LAYOUT.password}
+                                        div.btn.join join
+                                    div.game-list-item-players
+                                        span.player [admin] sdfsdf sdfsd
+                                        span.player [admin] sdfsdf sdfsd
+                                        span.player [admin] sdfsdf
+
+
             div#loading-overlay.overlay
                 div.loading-content
                     div.spinner

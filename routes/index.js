@@ -50,7 +50,8 @@ function(errormsg, req, res, next) {
         {
             I18N_DATA: JSON.stringify(i18n),  // json-object is sent to the client
             I18N_LAYOUT: i18n,                 // the object is just jused to generate the template
-            ERROR:errormsg=="200"?"":errormsg
+            ERROR:errormsg=="200"?"":errormsg,
+            isAuthenticated:req.isAuthenticated()
         });
 }
 );

@@ -19,7 +19,12 @@ html
                     div.prefix [admin]
                     div.name Mick
                 div.sign-in-out
-                    div.switch.logged-in sign out
+                    -if(!isAuthenticated)
+                        div.switch.logged-out
+                            a(href="/login") sign in
+                    -else
+                        div.switch.logged-in
+                            a(href="/logout") sign out
             div.content
                 div.chat.text-unselectable.round-box
                     div.player-list-caption Online Players
@@ -43,27 +48,6 @@ html
                             div.caption Current Sessions
                             div.refresh.btn &#x21bb;
                         div.game-list-content
-
-                            -for(var i=0; i<10;i++)
-                                div.game-list-item
-                                    div.game-list-item-content
-                                        div.title
-                                            span.room-name Mics geiler room
-                                            div.title-details
-                                                div.played-game
-                                                    span.game-name Codenames
-                                                    span.fill by
-                                                    span.creator Mick
-                                                div.room-details
-                                                    span.users palyers 3/8
-                                                    span.password.unused !{I18N_LAYOUT.password}
-                                        div.btn.join join
-                                    div.game-list-item-players
-                                        span.player [admin] sdfsdf sdfsd
-                                        span.player [admin] sdfsdf sdfsd
-                                        span.player [admin] sdfsdf
-
-
             div#loading-overlay.overlay
                 div.loading-content
                     div.spinner

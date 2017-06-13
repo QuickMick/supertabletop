@@ -6,11 +6,24 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
 var helmet = require('helmet');
+var uuidv1 = require('uuid/v1');
+
+var Flash = require('connect-flash');
+
+var passport = require('passport');
+var expressSession = require('express-session');
+
+
 
 var index = require('./routes/index');
 var users = require('./routes/users');
 var editorRoute = require('./routes/editor_route');
 var gameListRoute = require('./routes/gamelist_route');
+var userManagementRoute = require('./routes/user_management_route')(passport);
+
+var UserManager = require('./server/distributed/usermanager');
+
+
 
 //var lobbyRoute = require('./routes/lobby_route');
 
@@ -25,6 +38,20 @@ var app = express();
 
 app.use(helmet());
 
+var secret = uuidv1();
+app.use(expressSession({secret: secret}));
+app.use(passport.initialize());
+app.use(passport.session());
+
+var userManager = new UserManager(passport);
+
+
+// Using the flash middleware provided by connect-flash to store messages in session
+// and displaying in templates
+
+app.use(Flash());
+
+
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
@@ -37,7 +64,26 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+
+
+/* GET Home Page */
+/*router.get('/home', isAuthenticated, function(req, res){
+  res.render('home', { user: req.user });
+});*/
+
+// As with any middleware it is quintessential to call next()
+// if the user is authenticated
+var isAuthenticatedMiddleware = function (req, res, next) {
+  if (req.isAuthenticated())
+    return next();
+  res.redirect('/');
+};
+
+
+
 app.use('/', index);
+
+app.use('/',userManagementRoute);
 //app.use('/lobby',lobbyRoute);
 app.use('/hacking', users);
 app.use('/editor', editorRoute);

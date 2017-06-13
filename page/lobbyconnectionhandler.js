@@ -7,6 +7,8 @@
 var EventEmitter3 = require('eventemitter3');
 var Packages = require('./../core/packages');
 
+const EVT_CHATMESSAGE_RECEIVED = 'chatmessagereceived';
+
 class LobbyConnectionHandler extends EventEmitter3{
 
     constructor() {
@@ -43,16 +45,21 @@ class LobbyConnectionHandler extends EventEmitter3{
 
     _initHandlers(){
         this.socket.on(Packages.PROTOCOL.SERVER.RESPONSE_CLIENT_ACCEPTED, this._onClientAccepted.bind(this));
+        // if chat message from server is received
+        this.socket.on(Packages.PROTOCOL.CHAT.SERVER_CHAT_MSG, this._onChatMessageReceived.bind(this));
     }
 
     _removeHandlers(){
-        this.socket.on(Packages.PROTOCOL.SERVER.RESPONSE_CLIENT_ACCEPTED, this._onClientAccepted.bind(this));
+        this.socket.removeListener(Packages.PROTOCOL.SERVER.RESPONSE_CLIENT_ACCEPTED, this._onClientAccepted.bind(this));
+
+        // if chat message from server is received
+        this.socket.removeListener(Packages.PROTOCOL.CHAT.SERVER_CHAT_MSG, this._onChatMessageReceived.bind(this));
     }
 
 
     _onClientAccepted(evt) {
         if(this.connectedServerID && this.CLIENT_INFO) return;    // another received package could be from another game, to which the client is connected
-        this.connectedServerID = evt.data.serverID;
+            this.connectedServerID = evt.data.serverID;
         this.CLIENT_INFO = evt.data.clientInfo;
 
         console.log("Clientdata received");
@@ -62,7 +69,12 @@ class LobbyConnectionHandler extends EventEmitter3{
         if(this.connectedServerID) return;
     }
 
-
+    _onChatMessageReceived (evt) {
+        if(!this._vertifyServer(evt.senderID)){console.log("message is not from server"); return; }
+       // var from = this.playerManager.getPlayer(evt.data.clientID);
+        //this.chatHandler.pushMessage(evt.data.message,evt.data.type,evt.timeStamp, from);
+        this.emit(EVT_CHATMESSAGE_RECEIVED,evt.data);
+    }
 
     /**
      * checks if id is the current server
@@ -84,6 +96,15 @@ class LobbyConnectionHandler extends EventEmitter3{
             Packages.createEvent(this.CLIENT_INFO.id,{message:msg},this.CLIENT_INFO.token)
         );
     }
+
+
+    sendChatMessage(msg){
+        this.socket.emit(
+            Packages.PROTOCOL.CHAT.CLIENT_CHAT_MSG,
+            Packages.createEvent(this.CLIENT_INFO.id,{message:msg},this.CLIENT_INFO.token)
+        );
+    }
+
 }
 
 module.exports = LobbyConnectionHandler;

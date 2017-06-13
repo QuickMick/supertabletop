@@ -42,6 +42,8 @@ function(errormsg, req, res, next) {
         language = req.query.lang;
     }
 
+    console.log("isAut",req.isAuthenticated());
+
     var i18n = I18N[language] || {};
 
     res.render('lobby',

@@ -3,11 +3,27 @@
  */
 
 'use strict';
+const DBs = require('./db.json');
 var bCrypt = require('bcrypt');
+var mongoose = require('mongoose');
+
 
 class UserDataManager {
 
     constructor() {
+
+        var options = { server: { socketOptions: { keepAlive: 300000, connectTimeoutMS: 30000 } },
+            replset: { socketOptions: { keepAlive: 300000, connectTimeoutMS : 30000 } } };
+
+        mongoose.connect(DBs.userDB.old, options);
+       // mongoose.auth(DBs.userDB.user,DBs.userDB.pw);
+        var conn = mongoose.connection;
+
+        conn.on('error', console.error.bind(console, 'connection error:'));
+
+        conn.once('open', function() {
+            // Wait for the database connection to establish, then start the app.
+        });
 
     }
 

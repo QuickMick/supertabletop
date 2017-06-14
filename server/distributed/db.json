@@ -1,0 +1,8 @@
+{
+  "userDB":{
+    "url":"mongodb://ds123662.mlab.com:23662/supertabletop",
+    "user":"user",
+    "pw":"userpw1",
+    "old":"mongodb://user:userpw1@ds123662.mlab.com:23662/supertabletop"
+  }
+}

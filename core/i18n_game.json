@@ -64,7 +64,11 @@
     "continue_without_login":"continue without logging in",
     "create_account":"create account",
     "user_login_successfully":"login was successful",
-    "mail_is_trashmail":"The e-mail-address, provided by you is not accepted!"
+
+    "mail_is_trashmail":"The e-mail-address, provided by you is not accepted!",
+    "string_is_not_a_mail":"Input is not a valid e-mail-address",
+    "invalid_characters_name": "The name is just allowed to contain digits and letters.",
+    "incorrect_password_length":"The password has to be at least {0} characters long"
   },
   "de":{
     "timeformat":"HH:MM:ss",
@@ -133,6 +137,10 @@
     "create_account":"Benutzerkonto erstellen",
 
     "user_login_successfully":"Anmeldung war erfolgreich",
-    "mail_is_trashmail":"Die von Ihnen eingegebene E-Mail-Adresse wird nicht akzeptiert!"
+    "mail_is_trashmail":"Die von Ihnen eingegebene E-Mail-Adresse wird nicht akzeptiert!",
+    "string_is_not_a_mail":"Eingabe ist keine valide E-Mail-Adresse",
+    "invalid_characters_name": "Der Name darf nur aus Buchstaben und Zahlen bestehen.",
+    "incorrect_password_length":"Das Passwort muss mindestens {0} Zeichen lang sein."
+
   }
 }

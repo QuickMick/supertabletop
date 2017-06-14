@@ -15,7 +15,6 @@ class UserManager {
 
 
 
-
         this._initRoutes(passport);
     }
 

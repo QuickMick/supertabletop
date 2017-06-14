@@ -29,7 +29,7 @@ class UserDataManager {
 
         conn.once('open', function() {
             // Wait for the database connection to establish, then start the app.
-            this.createUser("test@web.de","test","mick",0x9242f4,"de");
+            this.createUser("test@web.com","1234qwer","mick",0x9242f4,"de");
         }.bind(this));
 
     }
@@ -72,12 +72,12 @@ class UserDataManager {
 
         var user = new UserAccountDataModel({
             id                  : newUserID,
-            email               : mail,
-            hash                : password,
-            displayName         : displayName,
+            email               : mail || undefined,
+            hash                : password || undefined,
+            displayName         : displayName || undefined,
             color               : color,
-            preferredLanguage   : language,
-            linkedAccounts      : account,
+            preferredLanguage   : language || undefined,
+            linkedAccounts      : accounts,
             verifiedOn          : accounts.length <=1?null:Date.now // if there are more accounts, then it is google or fb or something else, then set as verified.
         });
 
@@ -85,7 +85,16 @@ class UserDataManager {
             user.save().then(function (v) {
                 console.log("created account", v);
             }, function (err) {
-                console.log("error:", err);
+                var errors = [];
+                for(var k in err.errors){
+                    if(!err.errors.hasOwnProperty([k])) continue;
+                    var cur = err.errors[k];
+                    errors.push({type:k,message:cur.message});
+                }
+
+                if(err.code || err.code == 0){
+                    errors.push({type:"code",message:err.code});
+                }
             });
         });
     }

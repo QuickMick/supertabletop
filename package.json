@@ -10,6 +10,7 @@
     "compile-name-list": "node compilenames.js source=random_names.txt target=core/random_names.json",
     "compile-adjectives-list": "node compilenames.js source=adjectives.txt target=core/adjectives.json",
     "compile-word-list": "node compilecards.js source=wortliste.txt target=wordstack_content.json",
+    "compile-trashmail-list": "node compiletrashmails.js target=server/trashmails.json",
     "test": "mocha",
     "debug": "node --inspect --debug-brk ./bin/www"
   },
@@ -43,6 +44,7 @@
     "serve-favicon": "~2.3.2",
     "socket.io": "*",
     "socket.io-client": "*",
-    "uuid": "^3.0.1"
+    "uuid": "^3.0.1",
+    "xml2json": "^0.11.0"
   }
 }

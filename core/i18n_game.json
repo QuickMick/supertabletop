@@ -63,7 +63,8 @@
     "login_to_app":"Log in with your user credentials",
     "continue_without_login":"continue without logging in",
     "create_account":"create account",
-    "user_login_successfully":"login was successful"
+    "user_login_successfully":"login was successful",
+    "mail_is_trashmail":"The e-mail-address, provided by you is not accepted!"
   },
   "de":{
     "timeformat":"HH:MM:ss",
@@ -131,6 +132,7 @@
     "continue_without_login":"ohne Anmeldung fortfahren",
     "create_account":"Benutzerkonto erstellen",
 
-    "user_login_successfully":"Anmeldung war erfolgreich"
+    "user_login_successfully":"Anmeldung war erfolgreich",
+    "mail_is_trashmail":"Die von Ihnen eingegebene E-Mail-Adresse wird nicht akzeptiert!"
   }
 }

@@ -38,6 +38,7 @@ var strongerOrEqual = function (a,b) {
 
 module.exports = {
     RIGHTS:RIGHTS,
+    RIGHTS_STRENGTH:RIGHTS_STRENGTH,
     strongerOrEqual:strongerOrEqual,
     strength:strength,
     STRONGEST_STRENGTH:RIGHTS_STRENGTH.length

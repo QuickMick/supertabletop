@@ -7,6 +7,12 @@ const DBs = require('./db.json');
 var bCrypt = require('bcrypt');
 var mongoose = require('mongoose');
 
+var UserEntry = require('./model/useraccountdatamodel');
+var AccountLinkDataModel = UserEntry.AccountLinkModel;
+var UserAccountDataModel = UserEntry.UserAccountModel;
+var ACCOUNT_TYPE_ENUM = UserEntry.ACCOUNT_TYPE_ENUM;
+
+var uuidv1 = require('uuid/V1');
 
 class UserDataManager {
 
@@ -23,7 +29,8 @@ class UserDataManager {
 
         conn.once('open', function() {
             // Wait for the database connection to establish, then start the app.
-        });
+            this.createUser("test@web.de","test","mick",0x9242f4,"de");
+        }.bind(this));
 
     }
 
@@ -43,6 +50,48 @@ class UserDataManager {
         return {
             username:user
         };
+    }
+
+
+    createUser(mail, password, displayName, color, language,linkedAccounts){
+
+        var newUserID = uuidv1();
+        var accounts = [];
+
+        // create local account
+        accounts.push(new AccountLinkDataModel({
+            id: uuidv1(),
+            type: ACCOUNT_TYPE_ENUM[0],
+            userID: newUserID
+        }));
+
+        // TODO: add google, facebook, etc. later.
+        if(linkedAccounts){
+
+        }
+
+        var user = new UserAccountDataModel({
+            id                  : newUserID,
+            email               : mail,
+            hash                : password,
+            displayName         : displayName,
+            color               : color,
+            preferredLanguage   : language,
+            linkedAccounts      : account,
+            verifiedOn          : accounts.length <=1?null:Date.now // if there are more accounts, then it is google or fb or something else, then set as verified.
+        });
+
+        process.nextTick(function() {
+            user.save().then(function (v) {
+                console.log("created account", v);
+            }, function (err) {
+                console.log("error:", err);
+            });
+        });
+    }
+
+    linkAccount(userID){
+
     }
 
     /**

@@ -13,6 +13,9 @@ class UserManager {
     constructor(passport) {
         this.userDataManager = new UserDataManager();
 
+
+
+
         this._initRoutes(passport);
     }
 

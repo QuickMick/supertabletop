@@ -49,9 +49,16 @@ html
                             div.refresh.btn &#x21bb;
                         div.game-list-content
 
-                if(message && message.length > 0)
+                if(messages || errors)
                     #message
-                        div.error-message #{I18N_LAYOUT[message]}
+                        if(errors.length > 0)
+                            div.error-message
+                                each v in errors
+                                    p #{I18N_LAYOUT[v]}
+                        if(messages.length > 0)
+                            div.info-message
+                                each v in messages
+                                    p #{I18N_LAYOUT[v]}
 
             div#loading-overlay.overlay
                 div.loading-content

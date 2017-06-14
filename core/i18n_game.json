@@ -62,7 +62,8 @@
 
     "login_to_app":"Log in with your user credentials",
     "continue_without_login":"continue without logging in",
-    "create_account":"create account"
+    "create_account":"create account",
+    "user_login_successfully":"login was successful"
   },
   "de":{
     "timeformat":"HH:MM:ss",
@@ -128,6 +129,8 @@
 
     "login_to_app":"Melde dich mit deinen Nutzerdaten an",
     "continue_without_login":"ohne Anmeldung fortfahren",
-    "create_account":"Benutzerkonto erstellen"
+    "create_account":"Benutzerkonto erstellen",
+
+    "user_login_successfully":"Anmeldung war erfolgreich"
   }
 }

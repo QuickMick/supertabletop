@@ -14,14 +14,15 @@ module.exports = function(passport){
     router.get('/login',
         LanguageMiddleware,
         function(data,req, res,next){
-console.log("dat",data);
+
         if (req.isAuthenticated()) {    // no need for logging in again
             res.redirect('/');
             return;
         }
 
         res.render('login',{
-            message: req.flash('message'),
+            messages: req.flash('message'),
+            errors:req.flash('error'),
             I18N:data.i18n
         });
     });
@@ -48,7 +49,11 @@ console.log("dat",data);
     /* Handle Logout */
     router.get('/logout', function(req, res) {
         req.logout();
-        res.redirect('/');
+        req.flash('message', "logged out");
+
+        req.session.destroy(function (err) {
+            res.redirect('/'); //Inside a callback… bulletproof!
+        });
     });
 
 

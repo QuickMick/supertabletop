@@ -72,19 +72,19 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // As with any middleware it is quintessential to call next()
 // if the user is authenticated
-var isAuthenticatedMiddleware = function (req, res, next) {
+var ensureAuthenticatedMiddleware = function (req, res, next) {
   if (req.isAuthenticated())
     return next();
-  res.redirect('/');
+  res.redirect('/login');
 };
 
 
-
+app.use('/',userManagementRoute);
 app.use('/', index);
 
-app.use('/',userManagementRoute);
+
 //app.use('/lobby',lobbyRoute);
-app.use('/hacking', users);
+app.use('/profile',ensureAuthenticatedMiddleware, users);
 app.use('/editor', editorRoute);
 app.use('/games',gameListRoute);
 

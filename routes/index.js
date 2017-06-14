@@ -21,29 +21,19 @@ router.get('/',
                 I18N_DATA: data.i18n_stringified,  // json-object is sent to the client
                 I18N_LAYOUT: data.i18n,                 // the object is just jused to generate the template
                 gameID:req.query.id,
-                message: req.flash('message')
+                messages: req.flash('message'),
+                errors:req.flash('error')
             });
     },
 
     function(data, req, res, next) {
-       // var language = lang || "en-US";
-
-        // load language from the request
-       /* if(req.query && I18N[req.query.lang || ""]){
-            language = req.query.lang;
-        }*/
-
-        console.log("isAut",req.isAuthenticated());
-
-        //var i18n = I18N[language] || {};
-
         res.render('lobby',
             {
                 I18N_DATA: JSON.stringify(data.i18n),  // json-object is sent to the client
                 I18N_LAYOUT: data.i18n,                 // the object is just jused to generate the template
-                ERROR: data.error || "",
                 isAuthenticated: req.isAuthenticated(),
-                message: req.flash('message')
+                messages: req.flash('message'),
+                errors:req.flash('error')
             });
     }
 );

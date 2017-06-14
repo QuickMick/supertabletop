@@ -253,6 +253,31 @@ h1{
     flex-direction: column;
 }
 
+.info-message,
+.error-message{
+    text-align: center;
+    font-size: 15px;
+    margin: 10px 0px;
+    border-radius: 10px;
+}
+
+.error-message{
+    color: red;
+    background-color: rgba(255, 0, 0, 0.09);
+    border: red 2px solid;
+}
+
+.info-message{
+    color: green;
+    background-color: rgba(0, 255, 0, 0.09);
+    border: green 2px solid;
+}
+
+.info-message p,
+.error-message p{
+    margin: 5px;
+}
+
 
 /*--------- HEADER --------------------------*/
 

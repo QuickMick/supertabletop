@@ -40,7 +40,6 @@ module.exports = function(req, res,next) {
 
     }
     lang = lang || req.acceptsLanguages('en', 'de');
-    console.log(lang);
     next({
         i18n: I18N[lang] || I18N["en"],
         i18n_stringified: I18N_STRINGIFIED[lang] || I18N_STRINGIFIED["en"]

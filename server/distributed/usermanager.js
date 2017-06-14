@@ -33,10 +33,9 @@ class UserManager {
                 passReqToCallback: true
             },
             function (req, username, password, done) {
-
                 if(typeof username != "string" || typeof password != "string"){
                     return done(null, false,
-                        req.flash('message', 'wrong_input_format'));
+                        req.flash('error', 'wrong_input_format'));
                 }
 
                 var user = this.userDataManager.login(username,password);
@@ -44,10 +43,10 @@ class UserManager {
                 if(!user){
                     console.log('User Not Found with username ' + username);
                     return done(null, false,
-                        req.flash('message', 'user_or_pw_wrong'));
+                        req.flash('error', 'user_or_pw_wrong'));
                 }
-
-                return done(null, user);
+                req.flash('message', 'user_login_successfully');
+                return done(null, user,req);
 
                 // check in mongo if a user with username exists or not
                 /*User.findOne({'username': username},

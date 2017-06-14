@@ -1,5 +1,5 @@
 {
-  "en-EN":{
+  "en":{
     "timeformat":"h:MM:ss",
     "title":"Super Tabletop",
     "send":"send",
@@ -45,11 +45,26 @@
 
     "by":"by",
     "password":"Password",
+    "email":"e-mail",
     "players":"Players",
-    "your_message":"your message"
-  },
+    "your_message":"your message",
 
-  "de-DE":{
+    "user_or_pw_wrong": "Your username or your password is wrong",
+
+    "log_in":"log in",
+    "log_out":"log out",
+    "online_players":"Online Players",
+    "create_session":"Create Session",
+    "create":"create",
+    "running_sessions":"Running Sessions",
+    "name_of_your_room":"Name of your room",
+    "enter_password":"Enter password if desired",
+
+    "login_to_app":"Log in with your user credentials",
+    "continue_without_login":"continue without logging in",
+    "create_account":"create account"
+  },
+  "de":{
     "timeformat":"HH:MM:ss",
     "title":"Super Tabletop",
     "send":"senden",
@@ -94,8 +109,25 @@
     "name_contains_prohibited_characters":"Der gewählte Name enthält verbotene Zeichen, nur Buchstaben und Zahlen sind erlaubt!",
 
     "by":"von",
-    "passowrd":"Passwort",
+    "password":"Passwort",
+    "email":"E-Mail",
     "players":"Spieler",
-    "your_message":"deine Nachricht"
+    "your_message":"deine Nachricht",
+
+    "user_or_pw_wrong": "Dein Name oder dein Passwort ist falsch",
+
+
+    "log_in":"Anmelden",
+    "log_out":"Abmelden",
+    "online_players":"Online Spieler",
+    "create_session":"Spiel starten",
+    "create":"erstellen",
+    "running_sessions":"Laufende Spiele",
+    "name_of_your_room":"Name deines Raumes",
+    "enter_password":"Passwort eingeben, falls gewünscht",
+
+    "login_to_app":"Melde dich mit deinen Nutzerdaten an",
+    "continue_without_login":"ohne Anmeldung fortfahren",
+    "create_account":"Benutzerkonto erstellen"
   }
 }

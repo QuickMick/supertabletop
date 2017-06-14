@@ -7,16 +7,23 @@
 var express = require('express');
 var router = express.Router();
 
+var LanguageMiddleware = require('./LanguageMiddleware');
+
 module.exports = function(passport){
 
-    router.get('/login', function(req, res){
-
+    router.get('/login',
+        LanguageMiddleware,
+        function(data,req, res,next){
+console.log("dat",data);
         if (req.isAuthenticated()) {    // no need for logging in again
             res.redirect('/');
             return;
         }
 
-        res.render('login',{message: req.flash('message')});
+        res.render('login',{
+            message: req.flash('message'),
+            I18N:data.i18n
+        });
     });
 
     /* Handle Login POST */

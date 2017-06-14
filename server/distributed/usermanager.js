@@ -34,12 +34,17 @@ class UserManager {
             },
             function (req, username, password, done) {
 
+                if(typeof username != "string" || typeof password != "string"){
+                    return done(null, false,
+                        req.flash('message', 'wrong_input_format'));
+                }
+
                 var user = this.userDataManager.login(username,password);
 
                 if(!user){
                     console.log('User Not Found with username ' + username);
                     return done(null, false,
-                        req.flash('message', 'User Not found.'));
+                        req.flash('message', 'user_or_pw_wrong'));
                 }
 
                 return done(null, user);

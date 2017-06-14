@@ -21,33 +21,38 @@ html
                 div.sign-in-out
                     -if(!isAuthenticated)
                         div.switch.logged-out
-                            a(href="/login") sign in
+                            a(href="/login") #{I18N_LAYOUT.log_in}
                     -else
                         div.switch.logged-in
-                            a(href="/logout") sign out
+                            a(href="/logout") #{I18N_LAYOUT.log_out}
             div.content
                 div.chat.text-unselectable.round-box
-                    div.player-list-caption Online Players
+                    div.player-list-caption #{I18N_LAYOUT.online_players}
                     div#player-lobby-list.text-unselectable
                         div.online-player [admin] player 1
                         div.online-player [guest] player 2
                         div.online-player [mod] player 3
                     div#lobby-chat-container
                 div.right-side
-
                     div.create-session.text-unselectable.round-box
-                        div.caption Create session
+                        div.caption #{I18N_LAYOUT.create_session}
                         div.create-session-content
                             div.input-section
-                                input.input-field.game-room-name(placeholder="name of the game room")
-                                input.input-field.game-room-password(placeholder="if desired, enter a password here or leave empty")
-                            div.btn.create create
-
+                                -var room_name =I18N_LAYOUT.name_of_your_room;
+                                input.input-field.game-room-name(placeholder=room_name)
+                                -var room_password =I18N_LAYOUT.enter_password;
+                                input.input-field.game-room-password(placeholder=room_password)
+                            div.btn.create #{I18N_LAYOUT.create}
                     div#game-list-container.text-unselectable.round-box
                         div.game-list-header
-                            div.caption Current Sessions
+                            div.caption #{I18N_LAYOUT.running_sessions}
                             div.refresh.btn &#x21bb;
                         div.game-list-content
+
+                if(message && message.length > 0)
+                    #message
+                        div.error-message #{I18N_LAYOUT[message]}
+
             div#loading-overlay.overlay
                 div.loading-content
                     div.spinner

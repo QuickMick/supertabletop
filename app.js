@@ -14,7 +14,6 @@ var passport = require('passport');
 var expressSession = require('express-session');
 
 
-
 var index = require('./routes/index');
 var users = require('./routes/users');
 var editorRoute = require('./routes/editor_route');

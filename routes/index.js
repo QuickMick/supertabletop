@@ -28,15 +28,23 @@ router.get('/',
 
     function(data, req, res, next) {
 
-        console.log(req.session);
+        var isAutenticated = req.isAuthenticated();
+        var user = {};
+        if(isAutenticated) {
+            user.email = req.user.email;
+            user.color = req.user.email;
+            user.verifiedOn = req.user.verifiedOn;
+            user.displayName = req.user.displayName;
+        }
 
         res.render('lobby',
             {
                 I18N_DATA: JSON.stringify(data.i18n),  // json-object is sent to the client
                 I18N_LAYOUT: data.i18n,                 // the object is just jused to generate the template
-                isAuthenticated: req.isAuthenticated(),
+                isAuthenticated: isAutenticated,
                 messages: req.flash('message'),
-                errors:req.flash('error')
+                errors:req.flash('error'),
+                user:user
             });
     }
 );

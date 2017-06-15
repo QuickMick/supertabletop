@@ -44,7 +44,6 @@ class UserManager {
                     done(err, user);
                 }
             );
-
            // done(null,this.userDataManager.getUser("id",id));        //TODO: error
         }.bind(this));
 

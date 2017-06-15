@@ -10,6 +10,7 @@ var bcrypt = require('bcrypt');
 
 var Rights = require('./../../../core/rights');
 var SharedConfig = require('./../../../core/sharedconfig.json');
+var Colors = require('./../../../public/resources/colors.json');
 var uniqueValidator = require('mongoose-unique-validator');
 
 const ACCOUNT_TYPE_ENUM = ["local", "facebook", "google"];
@@ -67,11 +68,23 @@ var UserAccountDataModel = new Schema({
         maxlength: [SharedConfig.MAX_NAME_LENGTH, 'incorrect_name_length'],
         minlength: [SharedConfig.MIN_NAME_LENGTH, 'incorrect_name_length']
     },
-    color: {type: Number, required: true},
+    color: {
+        type: Number,
+        min:[-1,"invalid_color"],
+        max:[Colors.PLAYERS_COLORS.length, "invalid_color"],
+        required: true
+    },
     cursor: {type: String, required: true, default:DEFAULT_CURSOR},
     preferredLanguage: {type: String, enum: SUPPORTED_LANGUAGES, lowercase: true, default: DEFAULT_LANGUAGE},
     linkedAccounts: {type: [AccountLinkDataModel], lowercase: true, required: true}, // at least local type is required
-    status: {type: String, required: true, enum: Rights.RIGHTS_STRENGTH, default: Rights.RIGHTS.registered},
+    status: {
+        type: String,
+        required: true,
+        //  enum: Rights.RIGHTS_STRENGTH,
+        min: [0, "invalid_status"],
+        max: [Rights.RIGHTS_STRENGTH.length - 1, "invalid_status"],
+        default: Rights.RIGHTS_STRENGTH_MAP[Rights.RIGHTS.registered]
+    },
     verifiedOn: {type: Date},  // set the account as verifie - all accounts which are not verified, are deleted after 24h. and cannot upload something.
     agreedTAC: {type: Boolean, required:true,validate: {validator: function(v){return v}, message: 'terms_and_conditions_not_agreed'}}
 }, {timestamps: true});

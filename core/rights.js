@@ -22,6 +22,14 @@ const RIGHTS_STRENGTH=[
     RIGHTS.admin
 ];
 
+const RIGHTS_STRENGTH_MAP={
+    [RIGHTS.guest]:0,
+    [RIGHTS.registered]: 1,
+    [RIGHTS.mod]:2,
+    [RIGHTS.admin]:3
+};
+
+
 var strength = function (right) {
     return RIGHTS_STRENGTH.indexOf(right);
 };
@@ -41,5 +49,6 @@ module.exports = {
     RIGHTS_STRENGTH:RIGHTS_STRENGTH,
     strongerOrEqual:strongerOrEqual,
     strength:strength,
-    STRONGEST_STRENGTH:RIGHTS_STRENGTH.length
+    STRONGEST_STRENGTH:RIGHTS_STRENGTH.length,
+    RIGHTS_STRENGTH_MAP:RIGHTS_STRENGTH_MAP
 };

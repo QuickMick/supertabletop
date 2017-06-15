@@ -63,6 +63,24 @@ a {
     border-top-left-radius: 0;
     border-top-right-radius: 0;
 }
+
+/*
+.color-option{
+}
+.color-option::before {
+    content: " ";
+    margin-right: 3px;
+    height: 15px;
+    width: 15px;
+    border-radius: 5px;
+    display: inline-block;
+}
+.color-option.red {background: #c00;}
+
+.color-option.red:before { background: #c00; }
+.color-option.green:before { background: #0c0; }
+.color-option.blue:before { background: #00c; }
+*/
 .content{
     width: 400px;
     /* margin-top: 20px; */

@@ -97,6 +97,10 @@ class UserManager {
                         return done(null, false,req.flash('error', 'terms_and_conditions_not_agreed'));
                     }
 
+                    if(color < 0){
+                        return done(null, false,req.flash('error', 'no_color_chosen'));
+                    }
+
                     this.userDataManager.createUser(
                         mail,
                         password,

@@ -38,7 +38,7 @@ var app = express();
 app.use(helmet());
 
 var secret = uuidv1();
-app.use(expressSession({secret: secret}));
+app.use(expressSession({secret: secret /*, cookie:{maxAge:6000}*/ }));
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -49,8 +49,16 @@ var userManager = new UserManager(passport);
 // and displaying in templates
 
 app.use(Flash());
+/*
+app.use(function(req, res, next) {
+  // if now() is after `req.session.cookie.expires`
+  //   regenerate the session
 
+  if()
+  next();
+});
 
+*/
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');

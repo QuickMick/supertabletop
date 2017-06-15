@@ -10,5 +10,15 @@
     "0xa359ff",
     "0xff3fd5"
   ],
+  "PLAYERS_COLOR_NAMES":[
+    "red",
+    "orange",
+    "yellow",
+    "green",
+    "cyan",
+    "blue",
+    "purple",
+    "magenta"
+  ],
   "SEAT_DEFAULT_COLOR":"0xa5a5a5"
 }

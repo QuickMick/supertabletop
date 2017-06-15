@@ -18,6 +18,15 @@
     "minimize_maximize":"minimize/maximize",
     "you":"YOU",
 
+    "red":"red",
+    "orange":"orange",
+    "yellow":"yellow",
+    "green":"green",
+    "cyan":"cyan",
+    "blue":"blue",
+    "purple":"purple",
+    "magenta":"magenta",
+
     "choose_game":"Choose game",
     "start_game":"start game",
 
@@ -72,6 +81,8 @@
     "sign_up_for_app":"Registrieren",
     "agree_terms_and_conditions":"I have read and agree the terms and conditions",
     "terms_and_conditions_not_agreed":"You have to agree the terms and conditions to use this service",
+    "choose_default_color":"choose your default color",
+    "no_color_chosen":"you have not chosen a color",
 
     "mail_is_trashmail":"The e-mail-address, provided by you is not accepted!",
     "string_is_not_a_mail":"Input is not a valid e-mail-address",
@@ -98,6 +109,15 @@
     "player_name_changed":"{0} heißt nun {1}",
     "minimize_maximize":"minimieren/maximieren",
     "you":"DU",
+
+    "red":"rot",
+    "orange":"orange",
+    "yellow":"gelb",
+    "green":"grün",
+    "cyan":"cyan",
+    "blue":"blau",
+    "purple":"lila",
+    "magenta":"magenta",
 
     "choose_game":"Spiel wählen",
     "start_game":"Spiel starten",
@@ -154,6 +174,8 @@
     "sign_up_for_app":"Registrieren",
     "agree_terms_and_conditions":"Ich habe die AGBs gelesen und stimme ihnen zu",
     "terms_and_conditions_not_agreed":"Du musst den AGBs zustimmen, um diesen Service nutzen zu können.",
+    "choose_default_color":"Wähle deine Standardfarbe",
+    "no_color_chosen":"Du musst eine Farbe wählen",
 
     "mail_is_trashmail":"Die von Ihnen eingegebene E-Mail-Adresse wird nicht akzeptiert!",
     "string_is_not_a_mail":"Eingabe ist keine valide E-Mail-Adresse",

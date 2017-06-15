@@ -9,6 +9,16 @@ var router = express.Router();
 
 var LanguageMiddleware = require('./LanguageMiddleware');
 
+var Util = require('./../core/util');
+
+const Colors = require('./../public/resources/colors.json');
+
+var HTML_COLORS = [];
+// convert the player colors to html colors
+for(var i=0; i< Colors.PLAYERS_COLORS.length;i++){
+    HTML_COLORS.push(Util.intToColorString(parseInt(Colors.PLAYERS_COLORS[i])));
+}
+
 module.exports = function(passport){
 
     router.get('/login',
@@ -45,6 +55,8 @@ module.exports = function(passport){
                 I18N:data.i18n,
                 LANGUAGES:data.languages,
                 languageID:data.languageID,
+                COLOR_NAMES:Colors.PLAYERS_COLOR_NAMES,
+                COLOR_VALUES:HTML_COLORS,
                 fs: {
                         translate:data.translate
                     }

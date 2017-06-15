@@ -115,7 +115,7 @@ class UserDataManager {
         process.nextTick(function () {
             user.save().then(function (v) {
                 if (successCallback) {
-                    successCallback(v);
+                    successCallback(user);
                 }
             }, function (err) {
                 if (!failCallback)return;
@@ -128,6 +128,7 @@ class UserDataManager {
                     var r = "";
                     switch(cur.properties.type){
                         case 'required' : r="value_require"; break;
+                        case 'enum' : r="value_not_defined"; break;
                         default: r=cur.message; break;
                     }
                     errors[k] = r;

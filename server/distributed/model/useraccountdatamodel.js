@@ -69,21 +69,18 @@ var UserAccountDataModel = new Schema({
     preferredLanguage: {type: String, enum: SUPPORTED_LANGUAGES, lowercase: true, default: DEFAULT_LANGUAGE},
     linkedAccounts: {type: [AccountLinkDataModel], lowercase: true, required: true}, // at least local type is required
     status: {type: String, required: true, enum: Rights.RIGHTS_STRENGTH, default: Rights.RIGHTS.registered},
-    verifiedOn: {type: Date}  // set the account as verifie - all accounts which are not verified, are deleted after 24h. and cannot upload something.
-
+    verifiedOn: {type: Date},  // set the account as verifie - all accounts which are not verified, are deleted after 24h. and cannot upload something.
+    agreedTAC: {type: Boolean, required:true,validate: {validator: function(v){return v}, message: 'terms_and_conditions_not_agreed'}}
 }, {timestamps: true});
 
 // methods ======================
-// generating a hash
-/*UserAccountDataModel.methods.generateHash = function(password) {
- return bcrypt.hashSync(password, bcrypt.genSaltSync(8), null);
- };*/
 
 // checking if password is valid
 UserAccountDataModel.methods.validatePassword = function (password) {
     return bcrypt.compareSync(password, this.hash);
 };
 
+// check if the user has vertified his mail
 UserAccountDataModel.methods.isVerified = function () {
     return this.verifiedOn ? true : false;
 };

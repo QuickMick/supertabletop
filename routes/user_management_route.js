@@ -14,17 +14,18 @@ module.exports = function(passport){
     router.get('/login',
         LanguageMiddleware,
         function(data,req, res,next){
-
-        if (req.isAuthenticated()) {    // no need for logging in again
-            res.redirect('/');
-            return;
+            if (req.isAuthenticated()) {    // no need for logging in again
+                res.redirect('/');
+                return;
+            }
+            res.render('login',{
+                messages: req.flash('message'),
+                errors:req.flash('error'),
+                I18N:data.i18n
+                }
+            );
         }
-        res.render('login',{
-            messages: req.flash('message'),
-            errors:req.flash('error'),
-            I18N:data.i18n
-        });
-    });
+    );
 
     /* Handle Login POST */
     router.post('/login', passport.authenticate('login', {
@@ -34,13 +35,23 @@ module.exports = function(passport){
     }));
 
     /* GET Registration Page */
-    router.get('/signup', function(req, res){
-        res.render('register',{message: req.flash('message')});
-    });
+    router.get('/signup',
+        LanguageMiddleware,
+        function(data,req, res,next){
+            res.render('signup',{
+                messages: req.flash('message'),
+                errors:req.flash('error'),
+                I18N:data.i18n,
+                LANGUAGES:data.languages,
+                languageID:data.languageID
+                }
+            );
+        }
+    );
 
     /* Handle Registration POST */
     router.post('/signup', passport.authenticate('signup', {
-        successRedirect: '/home',
+        successRedirect: '/',
         failureRedirect: '/signup',
         failureFlash : true
     }));
@@ -48,10 +59,10 @@ module.exports = function(passport){
     /* Handle Logout */
     router.get('/logout', function(req, res) {
         req.logout();
-        req.flash('message', "logged out");
+        req.flash('message', "log_out");
 
         req.session.destroy(function (err) {
-            res.redirect('/'); //Inside a callback… bulletproof!
+            res.redirect('/'); //Inside a callback… bulletproof! //TODO: redirect to logout page
         });
     });
 

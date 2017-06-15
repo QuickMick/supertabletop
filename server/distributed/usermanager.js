@@ -35,15 +35,13 @@ class UserManager {
             },
             function (req, username, password, done) {
                 if(typeof username != "string" || typeof password != "string"){
-                    return done(null, false,
-                        req.flash('error', 'wrong_input_format'));
+                    return done(null, false, req.flash('error', 'wrong_input_format'));
                 }
 
                 this.userDataManager.login(
                     username,
                     password,
                     function (err,user) {
-                    console.log(err);
                         if(!user){
                             console.log('User Not Found with username ' + username);
                             return done(null, false,

@@ -1,5 +1,6 @@
 {
   "en":{
+    "_LANG":"English",
     "timeformat":"h:MM:ss",
     "title":"Super Tabletop",
     "send":"send",
@@ -45,7 +46,9 @@
 
     "by":"by",
     "password":"Password",
+    "confirm_password": "Confirm password",
     "email":"e-mail",
+    "name":"name",
     "players":"Players",
     "your_message":"your message",
 
@@ -64,6 +67,10 @@
     "continue_without_login":"continue without logging in",
     "create_account":"create account",
     "user_login_successfully":"login was successful",
+    "register":"register",
+    "back_to_login":"back to login",
+    "sign_up_for_app":"Registrieren",
+    "agree_terms_and_conditions":"I have read and agree the terms and conditions",
 
     "mail_is_trashmail":"The e-mail-address, provided by you is not accepted!",
     "string_is_not_a_mail":"Input is not a valid e-mail-address",
@@ -71,6 +78,7 @@
     "incorrect_password_length":"The password has to be at least {0} characters long"
   },
   "de":{
+    "_LANG":"Deutsch",
     "timeformat":"HH:MM:ss",
     "title":"Super Tabletop",
     "send":"senden",
@@ -116,7 +124,9 @@
 
     "by":"von",
     "password":"Passwort",
+    "confirm_password": "Passwort bestätigen",
     "email":"E-Mail",
+    "name":"Name",
     "players":"Spieler",
     "your_message":"deine Nachricht",
 
@@ -135,12 +145,15 @@
     "login_to_app":"Melde dich mit deinen Nutzerdaten an",
     "continue_without_login":"ohne Anmeldung fortfahren",
     "create_account":"Benutzerkonto erstellen",
-
     "user_login_successfully":"Anmeldung war erfolgreich",
+    "register":"registrieren",
+    "back_to_login":"zurück zum Login",
+    "sign_up_for_app":"Registrieren",
+    "agree_terms_and_conditions":"Ich habe die AGBs gelesen und stimme ihnen zu",
+
     "mail_is_trashmail":"Die von Ihnen eingegebene E-Mail-Adresse wird nicht akzeptiert!",
     "string_is_not_a_mail":"Eingabe ist keine valide E-Mail-Adresse",
     "invalid_characters_name": "Der Name darf nur aus Buchstaben und Zahlen bestehen.",
     "incorrect_password_length":"Das Passwort muss mindestens {0} Zeichen lang sein."
-
   }
 }

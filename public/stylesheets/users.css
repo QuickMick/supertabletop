@@ -50,16 +50,12 @@ a {
     border: 1px solid grey;
 }
 
+.form-signin select,
+.form-signin input[type="password"],
 .form-signin input[type="text"]{
     margin-bottom: 5px;
     border-bottom-left-radius: 0;
     border-bottom-right-radius: 0;
-
-}
-.form-signin input[type="password"]{
-    margin-bottom: 10px;
-    border-top-left-radius: 0;
-    border-top-right-radius: 0;
 
 }
 .form-signin input[type="password"].nomargin{
@@ -71,7 +67,7 @@ a {
     width: 400px;
     /* margin-top: 20px; */
     margin: 0 auto;
-    padding: 40px 0px 20px 0px;
+    padding: 20px 0px 20px 0px;
     background-color: #f7f7f7;
     -moz-box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
     -webkit-box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
@@ -94,4 +90,10 @@ a {
 
 .error-message p{
     margin: 5px;
+}
+
+.terms-and-conditions{
+    display: flex;
+    flex-direction: row;
+    margin: 20px 0px;
 }

@@ -2,10 +2,6 @@ html
     head
         title #{I18N.title} - #{I18N.register}
         link(rel='stylesheet', href='/stylesheets/users.css')
-        style(type='text/css').
-            .ui-title {
-                margin: 0.6em 10% 0.8em !important;
-            }
     body
         div.container
             h1.login-title #{I18N.sign_up_for_app}
@@ -43,6 +39,5 @@ html
                         input(type="checkbox", name="agree", required)
                         | #{I18N.agree_trems_and_conditions} #{I18N.agree_terms_and_conditions}
                     button(class='btn btn-lg btn-primary btn-block', type='submit') #{I18N.register}
-
 
                 a.link(href='/login') #{I18N.back_to_login}

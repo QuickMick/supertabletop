@@ -35,12 +35,17 @@ class UserManager {
 
     _initRoutes(passport) {
         passport.serializeUser(function(user, done) {
-            console.log("serializeUser",user);
-            done(null, user);
+            done(null, user.id);
         });
 
         passport.deserializeUser(function(id, done) {
-            done(null,this.userDataManager.getUser(id));        //TODO: error
+            this.userDataManager.getUser("id",id,
+                (err,user) =>{
+                    done(err, user);
+                }
+            );
+
+           // done(null,this.userDataManager.getUser("id",id));        //TODO: error
         }.bind(this));
 
         // passport/login.js
@@ -124,10 +129,6 @@ class UserManager {
                 }.bind(this)
             )
         );
-
-
-
-
     }
 }
 

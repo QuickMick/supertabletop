@@ -13,7 +13,7 @@ var UserAccountDataModel = UserEntry.UserAccountModel;
 var ACCOUNT_TYPE_ENUM = UserEntry.ACCOUNT_TYPE_ENUM;
 
 var uuidv1 = require('uuid/V1');
-
+//TODO use memcached und des heir eigentlich als service -> die classe connectet zum service beim laden, aber saved alles im memcached
 class UserDataManager {
 
     constructor() {
@@ -41,22 +41,22 @@ class UserDataManager {
      * logs in a user
      * @param email
      * @param password
+     * @param callback @type{function}
      * @returns the user object, if login credentials were corectly, or null, if they were not correctly
      */
     login(email, password,callback) {
-        UserAccountDataModel.findOne({'email': email},
-            function (err, user) {
-                // In case of any error, return using the done method
+        this.getUser("email",email,
+            (err,user)=>{
                 if (err) {
                     callback(err,null);
                     return null;
                 }
-                // Username does not exist, log error & redirect back
-                if (!user) {
-                    console.log('User Not Found with username ' + email);
-                    callback(err,null);
-                    return null;
+
+                if(!user){
+                    callback({message:"user_not_found"},null);
+                    return;
                 }
+
                 // User exists but wrong password, log the error
                 if (!user.validatePassword(password)) {
                     console.log('Invalid Password');
@@ -165,14 +165,41 @@ class UserDataManager {
 
     /**
      * gets public user data based on id
-     * @param id
+     * @param key @type{String} name of the field, e.g. email, or id
+     * @param value @type{String} value the field should have.
+     * @param callback @type{function} the value will be passed as 2nd parameter to the callback, first parameter is the error
      */
-    getUser(user) {
+    getUser(key,value,callback) {
+        console.log("getUser",key, value);
+        if(!key || typeof key != "string"
+            || !value){
+            callback({message:"wrong_input_parameters"},null);
+            return;
+        }
+
+        UserAccountDataModel.findOne({[key]:value}, //{'id': id},
+            function (err, user) {
+                // In case of any error, return using the done method
+                if (err) {
+                    callback(err,null);
+                    return null;
+                }
+                // Username does not exist, log error & redirect back
+                if (!user) {
+             //       console.log('User Not Found with username ' + email);
+                    callback(err,null);
+                    return null;
+                }
+                callback(err,user);
+                return user;
+            }
+        );
+/*
         console.log("getUser", user);
         //TODO: impl
         return {
             username: user.username
-        };
+        };*/
     }
 }
 

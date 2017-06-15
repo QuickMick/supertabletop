@@ -19,7 +19,6 @@ module.exports = function(passport){
             res.redirect('/');
             return;
         }
-
         res.render('login',{
             messages: req.flash('message'),
             errors:req.flash('error'),

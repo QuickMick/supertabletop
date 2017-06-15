@@ -80,7 +80,7 @@ var UserAccountDataModel = new Schema({
  };*/
 
 // checking if password is valid
-UserAccountDataModel.methods.validPassword = function (password) {
+UserAccountDataModel.methods.validatePassword = function (password) {
     return bcrypt.compareSync(password, this.hash);
 };
 

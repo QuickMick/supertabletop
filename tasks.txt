@@ -36,7 +36,7 @@ TODO: name generator auslagern in eigene klasse, die von der lobby gemanaged wir
 TODO: compilen von pug templates als gulp task
 
 popup, wenn versucht wird ein dialog zu öffnen, obwohl schon einer offen ist
-
+cookie expire
 kamera
 touch support
 

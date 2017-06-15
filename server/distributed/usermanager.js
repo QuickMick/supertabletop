@@ -13,14 +13,13 @@ class UserManager {
     constructor(passport) {
         this.userDataManager = new UserDataManager();
 
-
-
-        this._initRoutes(passport);
+        this.userDataManager.init(
+            (e) => this._initRoutes(passport),
+            (e) => console.error("ERROR DB CONNECT",e)
+        );
     }
 
     _initRoutes(passport) {
-
-
         passport.serializeUser(function(user, done) {
             console.log("serializeUser",user);
             done(null, user);
@@ -40,39 +39,20 @@ class UserManager {
                         req.flash('error', 'wrong_input_format'));
                 }
 
-                var user = this.userDataManager.login(username,password);
-
-                if(!user){
-                    console.log('User Not Found with username ' + username);
-                    return done(null, false,
-                        req.flash('error', 'user_or_pw_wrong'));
-                }
-                req.flash('message', 'user_login_successfully');
-                return done(null, user,req);
-
-                // check in mongo if a user with username exists or not
-                /*User.findOne({'username': username},
-                    function (err, user) {
-                        // In case of any error, return using the done method
-                        if (err)
-                            return done(err);
-                        // Username does not exist, log error & redirect back
-                        if (!user) {
+                this.userDataManager.login(
+                    username,
+                    password,
+                    function (err,user) {
+                    console.log(err);
+                        if(!user){
                             console.log('User Not Found with username ' + username);
                             return done(null, false,
-                                req.flash('message', 'User Not found.'));
+                                req.flash('error', 'user_or_pw_wrong'));
                         }
-                        // User exists but wrong password, log the error
-                        if (!isValidPassword(user, password)) {
-                            console.log('Invalid Password');
-                            return done(null, false,
-                                req.flash('message', 'Invalid Password'));
-                        }
-                        // User and password both match, return user from
-                        // done method which will be treated like success
-                        return done(null, user);
+                        req.flash('message', 'user_login_successfully');
+                        return done(null, user,req);
                     }
-                );*/
+                );
             }.bind(this)));
 
 

@@ -316,6 +316,14 @@ h1{
     margin: auto 10px;
 }
 
+#header .not-logged-in-sign{
+    font-size: 15px;
+    margin: auto 0;
+}
+#header .not-logged-in-sign a{
+    text-decoration: underline;
+    color:inherit;
+}
 
 
 #header .sign-in-out .switch{
@@ -764,14 +772,27 @@ h1{
     box-shadow: rgba(0,0,0,0.3) 0 0 5px;
 }
 
-
-
-
-
-
+/*
 
 .chat-container.show .chat-content .chat-input .chat-send.btn{
     box-shadow: rgba(0,0,0,0.3) 0 0 5px;
+}*/
+
+.chat-container.show .chat-content .chat-input .chat-send.btn{
+    margin: auto 0;
+    background-color: var(--color-base);
+    color:var(--color-highlight);
+    box-shadow: rgba(0,0,0,0.3) 0 0 5px;
+}
+
+.chat-container.show .chat-content .chat-input .chat-send.btn:hover{
+    background-color: var(--color-dark);
+}
+
+.chat-container.show .chat-content .chat-input .chat-send.btn:active{
+    background-color: var(--color-light);
+    color:var(--color-dark);
+    box-shadow:none;
 }
 
 .chat-container.hide .chat-content *{

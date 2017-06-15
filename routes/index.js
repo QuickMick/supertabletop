@@ -2,6 +2,10 @@ var express = require('express');
 var router = express.Router();
 var LanguageMiddleware = require('./LanguageMiddleware');
 
+var Rights = require('./../core/rights');
+var Util = require('./../core/util');
+
+var Colors = require('./../public/resources/colors.json');
 
 /* GET home page. */
 router.get('/',
@@ -29,12 +33,16 @@ router.get('/',
     function(data, req, res, next) {
 
         var isAutenticated = req.isAuthenticated();
-        var user = {};
+        var user = {
+            color:"green"   // default color for lobby view
+        };
         if(isAutenticated) {
             user.email = req.user.email;
-            user.color = req.user.email;
+            user.displayName = user.displayName;
+            user.color = Colors.PLAYERS_COLOR_NAMES[req.user.color];
             user.verifiedOn = req.user.verifiedOn;
             user.displayName = req.user.displayName;
+            user.status = Rights.RIGHTS_STRENGTH[req.user.status];
         }
 
         res.render('lobby',
@@ -44,7 +52,10 @@ router.get('/',
                 isAuthenticated: isAutenticated,
                 messages: req.flash('message'),
                 errors:req.flash('error'),
-                user:user
+                user:user,
+                fs: {
+                    translate:data.translate
+                }
             });
     }
 );

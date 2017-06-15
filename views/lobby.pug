@@ -2,22 +2,28 @@ html
     head
         title #{I18N_LAYOUT.title}
         link(rel='stylesheet', href='/stylesheets/pages.css')
-    body.color-schema-green
+    body(class="color-schema-"+user.color)
         div#main
             div#header
                 p.title #{I18N_LAYOUT.title}
-                div.separator
-                div#player-details
                 div.test-box
                     div.test.color-base base
                     div.test.color-highlight highlight
                     div.test.color-light light
                     div.test.color-dark dark
                     div.test.color-darkest darkest
+                div.separator
                 div.current-user-info
-                    img.current-user-image
-                    div.prefix [admin]
-                    div.name Mick
+                    -if(isAuthenticated)
+                            img.current-user-image
+                            div.prefix [#{I18N_LAYOUT[user.status]}]
+                            div.name #{user.displayName}
+                    -else
+                        div.not-logged-in-sign
+                            span  #{I18N_LAYOUT.not_logged_in}
+                            a(href="/signup") #{I18N_LAYOUT.create_account}
+                            span ?
+
                 div.sign-in-out
                     -if(!isAuthenticated)
                         div.switch.logged-out
@@ -54,11 +60,13 @@ html
                         if(errors.length > 0)
                             div.error-message
                                 each v in errors
-                                    p #{I18N_LAYOUT[v]}
+                                    -var msg=fs.translate(I18N_LAYOUT,v);
+                                    p #{msg}
                         if(messages.length > 0)
                             div.info-message
                                 each v in messages
-                                    p #{I18N_LAYOUT[v]}
+                                    -var msg=fs.translate(I18N_LAYOUT,v);
+                                    p #{msg}
 
             div#loading-overlay.overlay
                 div.loading-content

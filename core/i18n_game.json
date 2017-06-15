@@ -74,7 +74,8 @@
 
     "login_to_app":"Log in with your user credentials",
     "continue_without_login":"continue without logging in",
-    "create_account":"create account",
+    "not_logged_in":"You are not logged in, do you want to",
+    "create_account":"create an account",
     "user_login_successfully":"login was successful",
     "register":"register",
     "back_to_login":"back to login",
@@ -83,6 +84,7 @@
     "terms_and_conditions_not_agreed":"You have to agree the terms and conditions to use this service",
     "choose_default_color":"choose your default color",
     "no_color_chosen":"you have not chosen a color",
+
 
     "mail_is_trashmail":"The e-mail-address, provided by you is not accepted!",
     "string_is_not_a_mail":"Input is not a valid e-mail-address",
@@ -167,6 +169,7 @@
 
     "login_to_app":"Melde dich mit deinen Nutzerdaten an",
     "continue_without_login":"ohne Anmeldung fortfahren",
+    "not_logged_in":"Du bist nicht eingeloggt, möchtest du ein ",
     "create_account":"Benutzerkonto erstellen",
     "user_login_successfully":"Anmeldung war erfolgreich",
     "register":"registrieren",
@@ -176,6 +179,8 @@
     "terms_and_conditions_not_agreed":"Du musst den AGBs zustimmen, um diesen Service nutzen zu können.",
     "choose_default_color":"Wähle deine Standardfarbe",
     "no_color_chosen":"Du musst eine Farbe wählen",
+
+
 
     "mail_is_trashmail":"Die von Ihnen eingegebene E-Mail-Adresse wird nicht akzeptiert!",
     "string_is_not_a_mail":"Eingabe ist keine valide E-Mail-Adresse",

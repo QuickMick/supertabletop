@@ -29,6 +29,8 @@ html
                         div.switch.logged-out
                             a(href="/login") #{I18N_LAYOUT.log_in}
                     -else
+                        div.update-profile
+                            span #{I18N_LAYOUT.edit_profile}
                         div.switch.logged-in
                             a(href="/logout") #{I18N_LAYOUT.log_out}
             div.content

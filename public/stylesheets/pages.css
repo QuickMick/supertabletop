@@ -31,6 +31,16 @@ body,html {
     --color-highlight: #ecf0f1;
 }
 
+.color-schema-cyan {
+    --color-base: #00c0b6;
+    --color-darkest: #95a5a6;
+    --color-dark: #009a8f;
+    --color-light: #dcf3f5;
+    --color-highlight: #ecf0f1;
+}
+
+
+
 .color-base-text { color: var(--color-base); }
 .color-highlight-text { color: var(--color-highlight); }
 .color-light-text { color: var(--color-light); }
@@ -326,29 +336,59 @@ h1{
 }
 
 
+#header .sign-in-out{
+    display: flex;
+    flex-direction: row;
+}
+
+#header .sign-in-out .update-profile{
+
+}
+
+#header .sign-in-out .update-profile,
 #header .sign-in-out .switch{
     line-height: var(--header-height);
     font-size: 17px;
     margin-right: 15px;
     color:var(--color-highlight);
+    cursor: pointer;
+
+}
+
+#header .sign-in-out .update-profile span:hover,
+#header .sign-in-out .switch a:hover{
+    text-decoration: underline;
+}
+
+#header .sign-in-out .update-profile{
 
 }
 
 #header .sign-in-out .switch a{
     text-decoration: none;
-    color:var(--color-highlight);
+    color:inherit;
 }
 
 #header .sign-in-out .switch.logged-in:after{
     font-family: "FontAwesome";
     content: "\f090";
     margin: 0 5px;
+    text-decoration: none;
 }
 
 #header .sign-in-out .switch.logged-out:before{
     font-family: "FontAwesome";
     content: "\f08b";
     margin: 0 5px;
+    text-decoration: none;
+}
+
+
+#header .sign-in-out .update-profile:after {
+    font-family: "FontAwesome";
+    content: "\f044";
+    margin: 0 5px;
+    text-decoration: none;
 }
 
 /*--------- HEADER END ----------------------*/

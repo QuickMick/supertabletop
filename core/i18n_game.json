@@ -65,6 +65,7 @@
 
     "log_in":"log in",
     "log_out":"log out",
+    "edit_profile":"edit profile",
     "online_players":"Online Players",
     "create_session":"Create Session",
     "create":"create",
@@ -160,6 +161,7 @@
 
     "log_in":"Anmelden",
     "log_out":"Abmelden",
+    "edit_profile":"Profil bearbeiten",
     "online_players":"Online Spieler",
     "create_session":"Spiel starten",
     "create":"erstellen",

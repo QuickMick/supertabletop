@@ -71,11 +71,14 @@
     "back_to_login":"back to login",
     "sign_up_for_app":"Registrieren",
     "agree_terms_and_conditions":"I have read and agree the terms and conditions",
+    "terms_and_conditions_not_agreed":"You have to agree the terms and conditions to use this service",
 
     "mail_is_trashmail":"The e-mail-address, provided by you is not accepted!",
     "string_is_not_a_mail":"Input is not a valid e-mail-address",
     "invalid_characters_name": "The name is just allowed to contain digits and letters.",
-    "incorrect_password_length":"The password has to be at least {0} characters long"
+    "incorrect_password_length":"The password ist too short",
+    "password_confirmation_wrong":"You have to type in the password two times. The confirmation of your password is wrong",
+    "name_or_mail_already_exists":"An account with your name or e-mail already exists."
   },
   "de":{
     "_LANG":"Deutsch",
@@ -150,10 +153,13 @@
     "back_to_login":"zurück zum Login",
     "sign_up_for_app":"Registrieren",
     "agree_terms_and_conditions":"Ich habe die AGBs gelesen und stimme ihnen zu",
+    "terms_and_conditions_not_agreed":"Du musst den AGBs zustimmen, um diesen Service nutzen zu können.",
 
     "mail_is_trashmail":"Die von Ihnen eingegebene E-Mail-Adresse wird nicht akzeptiert!",
     "string_is_not_a_mail":"Eingabe ist keine valide E-Mail-Adresse",
     "invalid_characters_name": "Der Name darf nur aus Buchstaben und Zahlen bestehen.",
-    "incorrect_password_length":"Das Passwort muss mindestens {0} Zeichen lang sein."
+    "incorrect_password_length":"Das Passwort ist zu kurz",
+    "password_confirmation_wrong":"Du musst zwei mal das selbe Passwort eingeben. Die Passwortbestätigung war falsch.",
+    "name_or_mail_already_exists":"Name oder E-Mail wird bereits verwendet."
   }
 }

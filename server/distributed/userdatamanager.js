@@ -83,7 +83,7 @@ class UserDataManager {
      * @param successCallback @type{function]
      * @param failCallback @type{function]  returns: {{fieldName:errorMessage}} also can contain a field called "code" with an errorcode
      */
-    createUser(mail, password, displayName, color, language, linkedAccounts, successCallback, failCallback) {
+    createUser(mail, password, displayName, color, language, agreed, linkedAccounts, successCallback, failCallback) {
 
         var newUserID = uuidv1();
         var accounts = [];
@@ -108,6 +108,7 @@ class UserDataManager {
             color: color,
             preferredLanguage: language || undefined,
             linkedAccounts: accounts,
+            agreedTAC:agreed,
             verifiedOn: accounts.length <= 1 ? null : Date.now // if there are more accounts, then it is google or fb or something else, then set as verified.
         });
 
@@ -119,17 +120,25 @@ class UserDataManager {
             }, function (err) {
                 if (!failCallback)return;
                 var errors = {};
+                console.log(err.errors);
                 for (var k in err.errors) {
                     if (!err.errors.hasOwnProperty([k])) continue;
                     var cur = err.errors[k];
                     // errors.push({type:k,message:cur.message});
-                    errors[k] = cur.message;
+                    var r = "";
+                    switch(cur.properties.type){
+                        case 'required' : r="value_require"; break;
+                        default: r=cur.message; break;
+                    }
+                    errors[k] = r;
+
+
                 }
 
                 if (err.code || err.code == 0) {
                     // see https://github.com/mongodb/mongo/blob/master/src/mongo/base/error_codes.err
                     // errors.push({type:"code",message:err.code});
-                    errors.code = err.code;
+                    errors.code = err.code+"";
                 }
 
                 failCallback(errors);

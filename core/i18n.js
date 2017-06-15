@@ -24,7 +24,7 @@ class I18N {
     }
 
     translate(key){
-        if(!key || !this._languageData[key]) return "!NOT_FOUND";
+        if(!key || !this._languageData[key]) return "!"+(key || "UNKNOWN");
 
         var result = this._languageData[key] || "!"+key;
         if(arguments.length > 1){   // replace keywords, if there are more arguments passed

@@ -11,12 +11,14 @@ html
                         if(errors.length > 0)
                             div.error-message
                                 each v in errors
-                                    p #{I18N[v]}
+                                    -var msg=fs.translate(I18N,v);
+                                    p #{msg}
                         if(messages.length > 0)
                             div.info-message
                                 each v in messages
-                                    p #{I18N[v]}
-                form.form-signin(action='/login', method='POST')
+                                    -var msg=fs.translate(I18N,v);
+                                    p #{msg}
+                form.form-signin(action='/signup-local', method='POST')
                     -var mail = I18N.email;
                     input.form-control(type='text', name='username', placeholder=mail,required, autofocus)
                     -var name = I18N.name;
@@ -38,4 +40,4 @@ html
                     button(class='btn btn-lg btn-primary btn-block', type='submit') #{I18N.register}
 
 
-                a.link(href='/signup') #{I18N.back_to_login}
+                a.link(href='/login') #{I18N.back_to_login}

@@ -10,12 +10,14 @@ var bcrypt = require('bcrypt');
 
 var Rights = require('./../../../core/rights');
 var SharedConfig = require('./../../../core/sharedconfig.json');
+var uniqueValidator = require('mongoose-unique-validator');
 
 const ACCOUNT_TYPE_ENUM = ["local", "facebook", "google"];
 
 const TRASHMAILS = require('./../../trashmails.json');
 const SUPPORTED_LANGUAGES = Object.keys(require('./../../../core/i18n_game.json'));
 const DEFAULT_LANGUAGE = "en";
+const DEFAULT_CURSOR = "default";
 
 var AccountLinkDataModel = new Schema({
     id: {type: String},
@@ -50,8 +52,8 @@ var UserAccountDataModel = new Schema({
     },
     hash: {
         type: String,
-        maxlength: [SharedConfig.MAX_PASSWORD_LENGTH, 'incorrect_password_lengthTOO'],
-        minlength: [SharedConfig.MIN_PASSWORD_LENGTH, 'incorrect_password_lengthSML'],
+        maxlength: [SharedConfig.MAX_PASSWORD_LENGTH, 'incorrect_password_length'],
+        minlength: [SharedConfig.MIN_PASSWORD_LENGTH, 'incorrect_password_length'],
         required: true,
         set: generateHash
     },
@@ -66,12 +68,15 @@ var UserAccountDataModel = new Schema({
         minlength: [SharedConfig.MIN_NAME_LENGTH, 'incorrect_name_length']
     },
     color: {type: Number, required: true},
+    cursor: {type: String, required: true, default:DEFAULT_CURSOR},
     preferredLanguage: {type: String, enum: SUPPORTED_LANGUAGES, lowercase: true, default: DEFAULT_LANGUAGE},
     linkedAccounts: {type: [AccountLinkDataModel], lowercase: true, required: true}, // at least local type is required
     status: {type: String, required: true, enum: Rights.RIGHTS_STRENGTH, default: Rights.RIGHTS.registered},
     verifiedOn: {type: Date},  // set the account as verifie - all accounts which are not verified, are deleted after 24h. and cannot upload something.
     agreedTAC: {type: Boolean, required:true,validate: {validator: function(v){return v}, message: 'terms_and_conditions_not_agreed'}}
 }, {timestamps: true});
+
+UserAccountDataModel.plugin(uniqueValidator, { message: 'name_or_mail_already_exists' });
 
 // methods ======================
 
@@ -84,6 +89,17 @@ UserAccountDataModel.methods.validatePassword = function (password) {
 UserAccountDataModel.methods.isVerified = function () {
     return this.verifiedOn ? true : false;
 };
+
+
+AccountLinkDataModel.pre('findOneAndUpdate', function(next) {
+    this.options.runValidators = true;
+    next();
+});
+
+UserAccountDataModel.pre('findOneAndUpdate', function(next) {
+    this.options.runValidators = true;
+    next();
+});
 
 var acclink = mongoose.model('AccountLink', AccountLinkDataModel);
 var uacc = mongoose.model('UserAccount', UserAccountDataModel);

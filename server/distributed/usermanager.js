@@ -7,6 +7,7 @@
 
 var LocalStrategy = require('passport-local').Strategy;
 var UserDataManager = require('./userdatamanager');
+var SharedConfig = require('./../../core/sharedconfig.json');
 
 class UserManager {
 
@@ -19,6 +20,19 @@ class UserManager {
         );
     }
 
+    lookup(obj, field) {
+        if (!obj) { return null; }
+        var chain = field.split(']').join('').split('[');
+        for (var i = 0, len = chain.length; i < len; i++) {
+            var prop = obj[chain[i]];
+            if (typeof(prop) === 'undefined') { return null; }
+            if (typeof(prop) !== 'object') { return prop; }
+            obj = prop;
+        }
+        return null;
+    };
+
+
     _initRoutes(passport) {
         passport.serializeUser(function(user, done) {
             console.log("serializeUser",user);
@@ -30,80 +44,80 @@ class UserManager {
         }.bind(this));
 
         // passport/login.js
-        passport.use('login', new LocalStrategy({
-                passReqToCallback: true
-            },
-            function (req, username, password, done) {
-                if(typeof username != "string" || typeof password != "string"){
-                    return done(null, false, req.flash('error', 'wrong_input_format'));
-                }
-
-                this.userDataManager.login(
-                    username,
-                    password,
-                    function (err,user) {
-                        if(!user){
-                            console.log('User Not Found with username ' + username);
-                            return done(null, false,
-                                req.flash('error', 'user_or_pw_wrong'));
-                        }
-                        req.flash('message', 'user_login_successfully');
-                        return done(null, user,req);
+        passport.use('login', new LocalStrategy(
+                {
+                    passReqToCallback: true
+                },
+                function (req, username, password, done) {
+                    if(typeof username != "string" || typeof password != "string"){
+                        return done(null, false, req.flash('error', 'wrong_input_format'));
                     }
-                );
-            }.bind(this)));
 
+                    this.userDataManager.login(
+                        username,
+                        password,
+                        function (err,user) {
+                            if(!user){
+                                console.log('User Not Found with username ' + username);
+                                return done(null, false,
+                                    req.flash('error', 'user_or_pw_wrong'));
+                            }
+                            req.flash('message', 'user_login_successfully');
+                            return done(null, user,req);
+                        }
+                    );
+                }.bind(this)
+            )
+        );
 
-
-
-
-        passport.use('signup',
-            new LocalStrategy(
+        passport.use('signup-local',
+            new LocalStrategy(  //TODO create own stragedy
                 {
                     passReqToCallback : true
                 },
                 function(req, username, password, done) {
-                    /*var findOrCreateUser = function(){
-                        // find a user in Mongo with provided username
-                        User.findOne({'username':username},function(err, user) {
-                            // In case of any error return
-                            if (err){
-                                console.log('Error in SignUp: '+err);
-                                return done(err);
-                            }
-                            // already exists
-                            if (user) {
-                                console.log('User already exists');
-                                return done(null, false,
-                                    req.flash('message','User Already Exists'));
-                            } else {
-                                // if there is no user with that email
-                                // create the user
-                                var newUser = new User();
-                                // set the user's local credentials
-                                newUser.username = username;
-                                newUser.password = createHash(password);
-                                newUser.email = req.param('email');
-                                newUser.firstName = req.param('firstName');
-                                newUser.lastName = req.param('lastName');
+                    var mail = username;
+                    var displayname = this.lookup(req.body, "displayname") || this.lookup(req.query, "displayname");
+                    var confirmpassword = this.lookup(req.body, "confirmpassword") || this.lookup(req.query, "confirmpassword");
+                    var language = this.lookup(req.body, "language") || this.lookup(req.query, "language");
+                    var color = this.lookup(req.body, "color") || this.lookup(req.query, "color");
+                    var agreed = this.lookup(req.body, "agree") || this.lookup(req.query, "agree");
 
-                                // save the user
-                                newUser.save(function(err) {
-                                    if (err){
-                                        console.log('Error in Saving user: '+err);
-                                        throw err;
-                                    }
-                                    console.log('User Registration succesful');
-                                    return done(null, newUser);
-                                });
-                            }
-                        });
-                    };
+                    if(!password
+                        || password.length < SharedConfig.MIN_PASSWORD_LENGTH
+                        || password.length > SharedConfig.MAX_PASSWORD_LENGTH){
+                        return done(null, false,req.flash('error', 'incorrect_password_length'));
+                    }
 
-                    // Delay the execution of findOrCreateUser and execute
-                    // the method in the next tick of the event loop
-                    process.nextTick(findOrCreateUser);*/
-                }
+                    if(password != confirmpassword){
+                        return done(null, false,req.flash('error', 'password_confirmation_wrong'));
+                    }
+
+                    if(!agreed){
+                        return done(null, false,req.flash('error', 'terms_and_conditions_not_agreed'));
+                    }
+
+                    this.userDataManager.createUser(
+                        mail,
+                        password,
+                        displayname,
+                        color,
+                        language,
+                        agreed,
+                        null,
+                        (user)=>{
+                            req.flash('message', 'user_created_successfully');
+                            return done(null, user,req);
+                        },
+                        (e) =>{
+                            for (var k in e) {
+                                if (!e.hasOwnProperty([k])) continue;
+                                req.flash('error', e[k]);
+                            }
+                            return done(null, false,req);
+                        }
+                    );
+                }.bind(this)
             )
         );
 

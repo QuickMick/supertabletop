@@ -18,6 +18,7 @@ module.exports = function(passport){
                 res.redirect('/');
                 return;
             }
+
             res.render('login',{
                 messages: req.flash('message'),
                 errors:req.flash('error'),
@@ -43,14 +44,17 @@ module.exports = function(passport){
                 errors:req.flash('error'),
                 I18N:data.i18n,
                 LANGUAGES:data.languages,
-                languageID:data.languageID
+                languageID:data.languageID,
+                fs: {
+                        translate:data.translate
+                    }
                 }
             );
         }
     );
 
     /* Handle Registration POST */
-    router.post('/signup', passport.authenticate('signup', {
+    router.post('/signup-local', passport.authenticate('signup-local', {
         successRedirect: '/',
         failureRedirect: '/signup',
         failureFlash : true

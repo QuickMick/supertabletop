@@ -6,6 +6,28 @@
 
 const Util = require('./../core/util');
 
+
+function avoidDuplicaes(children,messages){
+    var m = [];
+    var valid = true;
+    for (var i = 0; i < messages.length; i++) {
+        var curMsg = messages[i];
+        valid = true;
+        for (var j = 0; j < children.length; j++) {
+            var node = children[j];
+            if (node.dataset.message = curMsg) {
+                valid = false;
+                break;
+            }
+        }
+
+        if (valid) {
+            m.push(curMsg);
+        }
+    }
+    return m;
+}
+
 module.exports = function (rootNode,messages,errors,clean) {
     if(!rootNode || (!errors && !messages)) return;
 
@@ -15,42 +37,10 @@ module.exports = function (rootNode,messages,errors,clean) {
     var m = [];
     var e = [];
 
-
     if(!clean) {
         var children = rootNode.childNodes;
-        var valid = true;
-
-        for (var i = 0; i < messages.length; i++) {
-            var curMsg = messages[i];
-            valid = true;
-            for (var j = 0; j < children.length; j++) {
-                var node = children[j];
-                if (node.dataset.message = curMsg) {
-                    valid = false;
-                    break;
-                }
-            }
-
-            if (valid) {
-                m.push(curMsg);
-            }
-        }
-
-        for (var i = 0; i < errors.length; i++) {
-            var curMsg = errors[i];
-            valid = true;
-            for (var j = 0; j < children.length; j++) {
-                var node = children[j];
-                if (node.dataset.error = curMsg) {
-                    valid = false;
-                    break;
-                }
-            }
-
-            if (valid) {
-                e.push(curMsg);
-            }
-        }
+        m=avoidDuplicaes(children,messages);
+        e=avoidDuplicaes(children,errors);
     }else{
         m = messages;
         e = errors;

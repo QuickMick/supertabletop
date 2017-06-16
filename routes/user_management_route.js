@@ -50,9 +50,9 @@ module.exports = function(passport){
     ));*/
 
     router.post('/login', function(req, res, next) {
-        passport.authenticate('login',{
+        passport.authenticate('login',/*{
             successRedirect: '/'
-        }, function(error, user, info) {
+        },*/ function(error, user, info) {
             var isAjaxCall = req.body.async;
 
             if(error || !user) {
@@ -120,11 +120,81 @@ module.exports = function(passport){
     );
 
     /* Handle Registration POST */
-    router.post('/signup-local', passport.authenticate('signup-local', {
+  /*  router.post('/signup-local', passport.authenticate('signup-local', {
         successRedirect: '/',
         failureRedirect: '/signup',
         failureFlash : true
     }));
+*/
+
+    router.post('/signup-local', function(req, res, next) {
+        passport.authenticate('signup-local',/*{
+            successRedirect: '/'
+        },*/ function(error, user, info) {
+            var isAjaxCall = req.body.async;
+
+            if(error || !user) {
+                res.status(550);
+                if(!isAjaxCall){
+                    res.redirect('/signup');
+                    return res;
+                }
+
+                return res.json({
+                        messages: req.flash('message'),
+                        errors:req.flash('error')
+                    }
+                );
+            }
+
+            req.logIn(user, function(err) {
+                if (err) {
+                    res.status(400);
+                    if(!isAjaxCall){
+                        res.redirect('/login');
+                        return res;
+                    }
+
+                    return res.json({
+                        messages: req.flash('message'),
+                        errors:req.flash('error')
+                    });
+                }
+
+                res.status(200);
+
+                if(!isAjaxCall){
+                    res.redirect('/');
+                    return res;
+                }
+                return res.json({
+                    messages: req.flash('message'),
+                    errors:req.flash('error'),
+                    success:true
+                });
+            });
+
+        })(req, res, next);
+    });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     /* Handle Logout */
     router.get('/logout', function(req, res) {

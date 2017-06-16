@@ -27,8 +27,8 @@ html
 
                 div.sign-in-out
                     -if(!isAuthenticated)
-                        div.switch.logged-out
-                            span#log-in #{I18N_LAYOUT.log_in}
+                        div#log-in.switch.logged-out
+                            span #{I18N_LAYOUT.log_in}
                     -else
                         div.update-profile
                             span #{I18N_LAYOUT.edit_profile}

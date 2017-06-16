@@ -23,18 +23,57 @@ class LoginDialog extends BaseDialog{
         );
 
         this.messagesContainer = this.fragment.querySelectorAll(".login-messages")[0];
-       // this._content = this.fragment.querySelectorAll(".dialog-content")[0];
 
-       /// this._requestPage();
+        this.form = this.fragment.querySelectorAll("form")[0];
 
+        // add "login" listener to every input (so login is called, when enter is pressed)+
+        for(var i=0; i< this.form.length;i++) {
+            this.form[i].onkeypress = function (e) {
+                if (!e) e = window.event;
+                var keyCode = e.keyCode || e.which;
+                if (keyCode == '13') {  // Enter pressed
+                    this._click("login");
+                    return false;
+                }
+            }.bind(this);
 
-        this.btns["login"].onsubmit= function() {
-            console.log(this);
-            return false;
-        };
+        }
+
     }
 
+    _checkValidity(){
+        var valid =true;
+        for(var i=0; i< this.form.length;i++){
+            var cur = this.form[i];
 
+            if(!cur.value){
+                cur.classList.add("invalid");
+                valid = false;
+            }else{
+                cur.classList.remove("invalid");
+            }
+        }
+
+        if(!valid){
+            messageFlasher(this.messagesContainer,[],["required_fields_are_empty"]);
+        }
+
+        return valid;
+    }
+
+    _getValueString(){
+        var rList = [
+            "async=true"        // set to find out if it is an async, or a login page request
+        ];
+
+
+        for(var i=0; i< this.form.length;i++) {
+            var cur = this.form[i];
+
+            rList.push(cur.name+"="+cur.value);
+        }
+        return rList.join("&");
+    }
 
     _post(){
         this.disableButton("login");
@@ -54,45 +93,20 @@ class LoginDialog extends BaseDialog{
 
             var result = JSON.parse(xhttp.response);
             messageFlasher(this.messagesContainer,result.messages,result.errors,true);
+
+            if(result.errors && result.errors.length >0) {
+                this.form[0].classList.add("invalid");
+                this.form[1].classList.add("invalid");
+            }
             if(result.success){
                 this.close();
+                location.reload();
             }
-           // document.getElementById("demo").innerHTML = xhttp.responseText;
-
         }.bind(this);
         xhttp.open("POST", "login", true);
         xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-        xhttp.send("username=mick@mic1k.de&password=12134qwer");
+        xhttp.send(this._getValueString());
     }
-
-  /*  _requestPage(){
-        var request = new XMLHttpRequest();
-        request.open("GET","login");
-
-        request.addEventListener('load', function(event) {
-            if (request.status >= 200 && request.status < 300) {
-                //  console.log(request.responseText);
-                this._setListContent(request.response);
-            } else {
-                // console.warn(request.statusText, request.responseText);
-                this._showError(request.responseText);
-            }
-        }.bind(this));
-        request.send();
-    }
-
-    _setListContent(response){
-        if(!response){
-            this._showError("unknown_error");
-            return;
-        }
-        //this._content.innerHTML = response;
-        this._content.contentWindow.document.write(response);
-    }
-
-    _showError(error){
-
-    }*/
 
     /**
      * @Override
@@ -100,14 +114,17 @@ class LoginDialog extends BaseDialog{
      * @private
      */
     _click(action){
-        if(this.disabledButtons) return;
         super._click(action);
 
         switch (action){
             case "close": this.close(); break;
-            case "back":  break;
-            case "forward":  break;
-            case "login": this._post(); break;
+            case "login":
+                var valid = this._checkValidity();
+
+                if(valid) {
+                    this._post();
+                }
+                break;
 
             default: return;
         }

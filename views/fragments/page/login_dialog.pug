@@ -3,14 +3,14 @@ div.overlay
         h1.login-title #{I18N.login_to_app}
         div.input-content
             img.profile-img(src='https://lh5.googleusercontent.com/-b0-k99FZlyE/AAAAAAAAAAI/AAAAAAAAAAA/eu7opA4byxI/photo.jpg?sz=120')
-            form.form-signin()
+            form.form-signin(name="login_form")
                 -var mail = I18N.email;
                 input.form-control(type='text', name='username', placeholder=mail,required, autofocus)
                 -var pw = I18N.password;
                 input.form-control(type='password', name='password', placeholder=pw, required)
-                button.btn.login-btn(data-action="login" , type='submit') #{I18N.log_in}
+                div.action.btn.login-btn(data-action="login") #{I18N.log_in}
             .login-messages
 
-            a.link(href='/') #{I18N.continue_without_login}
-        a.link(href='/signup') #{I18N.create_account}
+            div.text-link.action(data-action="close") #{I18N.continue_without_login}
+        div.text-link.action #{I18N.create_account}
 

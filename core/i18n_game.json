@@ -92,7 +92,8 @@
     "invalid_characters_name": "The name is just allowed to contain digits and letters.",
     "incorrect_password_length":"The password ist too short",
     "password_confirmation_wrong":"You have to type in the password two times. The confirmation of your password is wrong",
-    "name_or_mail_already_exists":"An account with your name or e-mail already exists."
+    "name_or_mail_already_exists":"An account with your name or e-mail already exists.",
+    "required_fields_are_empty":"Required fields are empty, please fill them."
   },
   "de":{
     "_LANG":"Deutsch",
@@ -189,6 +190,7 @@
     "invalid_characters_name": "Der Name darf nur aus Buchstaben und Zahlen bestehen.",
     "incorrect_password_length":"Das Passwort ist zu kurz",
     "password_confirmation_wrong":"Du musst zwei mal das selbe Passwort eingeben. Die Passwortbestätigung war falsch.",
-    "name_or_mail_already_exists":"Name oder E-Mail wird bereits verwendet."
+    "name_or_mail_already_exists":"Name oder E-Mail wird bereits verwendet.",
+    "required_fields_are_empty":"Bitte füllen sie alle benötigten felder aus."
   }
 }

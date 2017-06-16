@@ -54,6 +54,7 @@ module.exports = function(passport){
             successRedirect: '/'
         }, function(error, user, info) {
 
+            console.log("T:",req.body.a);
 
            // console.log(error,user,info);
             if(error || !user) {

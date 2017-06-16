@@ -15,7 +15,7 @@ class BaseDialog extends EventEmitter3{
         this.fragment = Util.htmlStringToNode(window[layout](layoutLocals || {}));
 
         Util.stopPropagation(this.fragment);  //override listeners, so nothing passes to the game
-        var btnsArry= this.fragment.querySelectorAll(".btn");//this._rootContainer.querySelectorAll("btn");
+        var btnsArry= this.fragment.querySelectorAll(".action");//this._rootContainer.querySelectorAll("btn");
 
         this.btns = {};
         // add listeners to the buttons, if there are some
@@ -71,7 +71,7 @@ class BaseDialog extends EventEmitter3{
     }
 
     _click(action){
-
+        if(this.btns[action] && this.btns[action].isDisabled) return;
     }
 
     close(){

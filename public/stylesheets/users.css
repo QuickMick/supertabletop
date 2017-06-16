@@ -50,14 +50,22 @@ a {
     border: 1px solid grey;
 }
 
+.form-signin input.invalid{
+    border: 1px solid red;
+    box-shadow: red 0 0 10px;
+
+}
+
+
 .form-signin select,
 .form-signin input[type="password"],
 .form-signin input[type="text"]{
     margin-bottom: 5px;
     border-bottom-left-radius: 0;
     border-bottom-right-radius: 0;
-
 }
+
+
 .form-signin input[type="password"].nomargin{
     margin-bottom: 0px;
     border-top-left-radius: 0;
@@ -122,4 +130,10 @@ a {
     margin: 0 20px;
     max-height: 100px;
     overflow-y: auto;
+}
+
+.text-link{
+    color:blue;
+    cursor:pointer;
+    text-decoration: underline;
 }

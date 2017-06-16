@@ -9,7 +9,7 @@ const Util = require('./../../../core/util');
 
 var GAMES_PER_SITE = 10;
 
-class gamechooserdialog extends BaseDialog{
+class GameChooserDialog extends BaseDialog{
 
     constructor() {
         super(
@@ -94,4 +94,4 @@ class gamechooserdialog extends BaseDialog{
 
 }
 
-module.exports = gamechooserdialog;
+module.exports = GameChooserDialog;

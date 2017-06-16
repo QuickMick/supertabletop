@@ -38,20 +38,18 @@ class BaseDialog extends EventEmitter3{
         this._rootNode = this.fragment.childNodes[0];
     }
     
-  /*  _disableAllButtons(){
-       // this.disabledButtons = true;
+    disableAllButtons(){
         for(var k in this.btns){
             if(!this.btns.hasOwnProperty(k)) continue;
-            this.btns[i].classList.add("disabled");
+            this.btns[k].classList.add("disabled");
         }
     }
-    _enableAllButtons(){
-     //   this.disabledButtons = false;
+    enableAllButtons(){
         for(var k in this.btns){
             if(!this.btns.hasOwnProperty(k)) continue;
-            this.btns[i].classList.remove("disabled");
+            this.btns[k].classList.remove("disabled");
         }
-    }*/
+    }
 
     disableButton(action){
         if(!action || !this.btns[action]) return;

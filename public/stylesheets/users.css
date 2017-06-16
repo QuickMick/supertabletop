@@ -143,8 +143,12 @@ a {
     overflow-y: auto;
 }
 
-.text-link{
-    color:blue;
-    cursor:pointer;
+.text-link {
+    color: blue;
+    cursor: pointer;
     text-decoration: underline;
+}
+
+.text-link.disabled{
+    color:grey;
 }

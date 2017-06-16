@@ -1,8 +1,10 @@
 if(errors.length > 0)
     div.error-message
         each v in errors
-            p #{I18N[v]}
+            -var e = v;
+            p(data-error=e) #{I18N[v]}
 if(messages.length > 0)
     div.info-message
         each v in messages
-            p #{I18N[v]}
+            -var m = v;
+            p(data-message=m) #{I18N[v]}

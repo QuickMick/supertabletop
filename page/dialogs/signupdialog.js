@@ -8,18 +8,38 @@ var BaseDialog = require('./../../public/javascripts/dialogs/basedialog');
 
 var messageFlasher = require('./../messageflasher');
 
+const Colors = require('./../../public/resources/colors.json');
+
+const Util = require('./../../core/util');
+
+var HTML_COLORS = [];
+// convert the player colors to html colors
+for(var i=0; i< Colors.PLAYERS_COLORS.length;i++){
+    HTML_COLORS.push(Util.intToColorString(parseInt(Colors.PLAYERS_COLORS[i])));
+}
+
+
+
+
+
 class LoginDialog extends BaseDialog{
 
     constructor() {
-        super("loginDialog",
-            {
-                messages: [],
-                errors:[],
-                I18N:I18N.completeLanguageData
-            }
+        super("signupDialog",{
+            messages: [],
+            errors: [],
+            I18N:I18N.completeLanguageData,
+            LANGUAGES:I18N.languages,
+            languageID:I18N.selectedLanguage,
+            COLOR_NAMES:Colors.PLAYERS_COLOR_NAMES,
+            COLOR_VALUES:HTML_COLORS,
+            fs: {
+            translate:I18N.translateRaw
+        }
+    }
         );
 
-        this.messagesContainer = this.fragment.querySelectorAll(".login-messages")[0];
+        this.messagesContainer = this.fragment.querySelectorAll(".signup-messages")[0];
 
         this.form = this.fragment.querySelectorAll("form")[0];
 
@@ -91,16 +111,16 @@ class LoginDialog extends BaseDialog{
             var result = JSON.parse(xhttp.response);
             messageFlasher(this.messagesContainer,result.messages,result.errors,true);
 
-            if(result.errors && result.errors.length >0) {
+           /* if(result.errors && result.errors.length >0) {
                 this.form[0].classList.add("invalid");
                 this.form[1].classList.add("invalid");
-            }
+            }*/
             if(result.success){
                 this.close();
                 location.reload();
             }
         }.bind(this);
-        xhttp.open("POST", "login", true);
+        xhttp.open("POST", "signup-local", true);
         xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
         xhttp.send(this._getValueString());
     }
@@ -115,12 +135,12 @@ class LoginDialog extends BaseDialog{
 
         switch (action){
             case "close": this.close(); break;
-            case "open_signup":
+            case "open_login":
                 this.close();
-                this.emit("open_signup",this);
+                this.emit("open_login",this);
                 break;
 
-            case "login":
+            case "signup":
                 var valid = this._checkValidity();
 
                 if(valid) {

@@ -7,8 +7,11 @@
 
 class I18N {
 
-    constructor(languageData) {
+    constructor(languageData,languages,selectedLanguage) {
         this._languageData = languageData;
+
+        this.languages = languages;
+        this.selectedLanguage = selectedLanguage;
     }
 
     /**
@@ -34,7 +37,7 @@ class I18N {
         return result;
     }
 
-    translate (i18n,key){
+    static translateRaw (i18n,key){
         if(!key || !i18n[key]) return "!"+(key || "UNKNOWN");
 
         var result = i18n[key] || "!"+key;

@@ -1,0 +1,28 @@
+div.overlay
+    div.overlay-content
+        h1.login-title #{I18N.sign_up_for_app}
+        div.input-content
+            .signup-messages
+            form.form-signin(name="signup_form")
+                -var mail = I18N.email;
+                input.form-control(type='text', name='username', placeholder=mail,required, autofocus)
+                -var name = I18N.name;
+                input.form-control(type='text', name='displayname', placeholder=name,required)
+                -var pw = I18N.password;
+                input.form-control(type='password', name='password', placeholder=pw, required)
+                -var pwc = I18N.confirm_password;
+                input.form-control(type='password', name='confirmpassword', placeholder=pwc, required)
+                select(name="language", required)
+                    each e in LANGUAGES
+                        -var k = e.key
+                        option(value=k selected= (e.key==languageID) ) #{e.name}
+                select(name="color", required)
+                    option(value=-1 selected=true ) --- #{I18N.choose_default_color} ---
+                    each e,i in COLOR_NAMES
+                        option(value=i class="color-option "+e style="background-color :"+COLOR_VALUES[i]) #{I18N[e]}
+                div.terms-and-conditions
+                    input(type="checkbox", name="agree", required)
+                    | #{I18N.agree_trems_and_conditions} #{I18N.agree_terms_and_conditions}
+                div.action.btn(data-action="signup")  #{I18N.register}
+            div.text-link.action(data-action="open_login") #{I18N.back_to_login}
+            div.text-link.action(data-action="close") #{I18N.continue_without_account}

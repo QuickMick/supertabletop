@@ -4,7 +4,11 @@
 
 'use strict';
 var i18n =require('./../core/i18n');
-window.I18N = new i18n(I18N_DATA);
+window.I18N = new i18n(_I18N_DATA,_LANGUAGES,_LANGUAGE_ID);
+/*delete _I18N_DATA;
+delete _LANGUAGES;
+delete _LANGUAGE_ID;*/
+
 
 var LobbyHandler = require('./lobbyhandler');
 

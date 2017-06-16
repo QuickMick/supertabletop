@@ -86,7 +86,7 @@
     "choose_default_color":"choose your default color",
     "no_color_chosen":"you have not chosen a color",
 
-
+    "continue_without_account":"Continue without account",
     "mail_is_trashmail":"The e-mail-address, provided by you is not accepted!",
     "string_is_not_a_mail":"Input is not a valid e-mail-address",
     "invalid_characters_name": "The name is just allowed to contain digits and letters.",
@@ -184,7 +184,7 @@
     "no_color_chosen":"Du musst eine Farbe wählen",
 
 
-
+    "continue_without_account":"Ohne Account fortfahren",
     "mail_is_trashmail":"Die von Ihnen eingegebene E-Mail-Adresse wird nicht akzeptiert!",
     "string_is_not_a_mail":"Eingabe ist keine valide E-Mail-Adresse",
     "invalid_characters_name": "Der Name darf nur aus Buchstaben und Zahlen bestehen.",

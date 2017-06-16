@@ -8,9 +8,9 @@ div.overlay
                 input.form-control(type='text', name='username', placeholder=mail,required, autofocus)
                 -var pw = I18N.password;
                 input.form-control(type='password', name='password', placeholder=pw, required)
-                div.action.btn.login-btn(data-action="login") #{I18N.log_in}
+                div.action.btn(data-action="login") #{I18N.log_in}
             .login-messages
 
             div.text-link.action(data-action="close") #{I18N.continue_without_login}
-        div.text-link.action #{I18N.create_account}
+        div.text-link.action(data-action="open_signup") #{I18N.create_account}
 

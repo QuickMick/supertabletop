@@ -317,7 +317,6 @@ h1{
     margin: 5px;
 }
 
-
 /*--------- HEADER --------------------------*/
 
 #header .current-user-info{
@@ -359,9 +358,10 @@ h1{
     font-size: 15px;
     margin: auto 0;
 }
-#header .not-logged-in-sign a{
+#header .not-logged-in-sign .a{
     text-decoration: underline;
     color:inherit;
+    cursor: pointer;
 }
 
 

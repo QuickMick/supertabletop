@@ -49,6 +49,8 @@ router.get('/',
             {
                 I18N_DATA: JSON.stringify(data.i18n),  // json-object is sent to the client
                 I18N_LAYOUT: data.i18n,                 // the object is just jused to generate the template
+                LANGUAGES:JSON.stringify(data.languages),
+                LANGUAGE_ID:JSON.stringify(data.languageID),
                 isAuthenticated: isAutenticated,
                 messages: req.flash('message'),
                 errors:req.flash('error'),

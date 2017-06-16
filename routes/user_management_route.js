@@ -53,7 +53,23 @@ module.exports = function(passport){
         passport.authenticate('login',/*{
             successRedirect: '/'
         },*/ function(error, user, info) {
+
             var isAjaxCall = req.body.async;
+             if(req.isAuthenticated()){  // if already logged in, redirect to lobby
+                res.status(400);
+
+                req.flash('message',"already_logged_in");
+
+                if(!isAjaxCall){
+                    res.redirect('/');
+                    return res;
+                }
+
+                return res.json({
+                    messages: req.flash('message'),
+                    errors:req.flash('error')
+                });
+            }
 
             if(error || !user) {
                 res.status(550);
@@ -103,6 +119,11 @@ module.exports = function(passport){
     router.get('/signup',
         LanguageMiddleware,
         function(data,req, res,next){
+
+            if(req.isAuthenticated()){  // if already logged in, redirect to lobby
+                res.redirect("/");
+            }
+
             res.render('signup',{
                 messages: req.flash('message'),
                 errors:req.flash('error'),
@@ -119,19 +140,28 @@ module.exports = function(passport){
         }
     );
 
-    /* Handle Registration POST */
-  /*  router.post('/signup-local', passport.authenticate('signup-local', {
-        successRedirect: '/',
-        failureRedirect: '/signup',
-        failureFlash : true
-    }));
-*/
+
 
     router.post('/signup-local', function(req, res, next) {
         passport.authenticate('signup-local',/*{
             successRedirect: '/'
         },*/ function(error, user, info) {
             var isAjaxCall = req.body.async;
+            if(req.isAuthenticated()){  // if already logged in, redirect to lobby
+                res.status(400);
+
+                req.flash('message',"already_logged_in");
+
+                if(!isAjaxCall){
+                    res.redirect('/');
+                    return res;
+                }
+
+                return res.json({
+                    messages: req.flash('message'),
+                    errors:req.flash('error')
+                });
+            }
 
             if(error || !user) {
                 res.status(550);

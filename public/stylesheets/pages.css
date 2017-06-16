@@ -548,8 +548,10 @@ h1{
     /* height: 15px; */
     background-color: transparent;
     font-size: 30px;
+    box-shadow: none;
+    color: var(--color-dark);
 }
-#game-list-container .game-list-header .refresh.btn:active{
+#game-list-container .game-list-header .refresh.btn:hover{
     color:var(--color-base);
 }
 

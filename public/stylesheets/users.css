@@ -105,21 +105,32 @@ a {
     text-align: center;
 }
 
-/*
+.info-message,
 .error-message{
-    color: red;
     text-align: center;
     font-size: 15px;
-    margin: 0 20px;
-    background-color: rgba(255, 0, 0, 0.09);
+    margin: 10px 0px;
     border-radius: 10px;
+}
+
+.error-message{
+    color: red;
+    background-color: rgba(255, 0, 0, 0.09);
     border: red 2px solid;
 }
 
+.info-message{
+    color: green;
+    background-color: rgba(0, 255, 0, 0.09);
+    border: green 2px solid;
+}
+
+.info-message p,
 .error-message p{
     margin: 5px;
 }
-*/
+
+
 .terms-and-conditions{
     display: flex;
     flex-direction: row;

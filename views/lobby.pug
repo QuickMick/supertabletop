@@ -2,6 +2,7 @@ html
     head
         title #{I18N_LAYOUT.title}
         link(rel='stylesheet', href='/stylesheets/pages.css')
+        link(rel='stylesheet', href='/stylesheets/users.css')
     body(class="color-schema-"+user.color)
         div#main
             div#header
@@ -27,7 +28,7 @@ html
                 div.sign-in-out
                     -if(!isAuthenticated)
                         div.switch.logged-out
-                            a(href="/login") #{I18N_LAYOUT.log_in}
+                            span#log-in #{I18N_LAYOUT.log_in}
                     -else
                         div.update-profile
                             span #{I18N_LAYOUT.edit_profile}

@@ -7,6 +7,8 @@
 var ChatHandler = require('./../public/javascripts/chathandler');
 var LobbyConnectionHandler = require('./lobbyconnectionhandler');
 
+var LoginDialog = require('./dialogs/logindialog');
+
 class LobbyHandler {
 
     constructor() {
@@ -14,6 +16,11 @@ class LobbyHandler {
         this.lobbyConnectionHandler = new LobbyConnectionHandler();
 
         this.chatHandler = new ChatHandler("lobby-chat-container",false,150);
+
+        var log_in_btn = document.getElementById("log-in");
+        if(log_in_btn){
+            log_in_btn.onclick = () => { new LoginDialog().show();}
+        }
     }
 
     show(){

@@ -30,11 +30,9 @@ class CompileLayouts {
         tabletop += this._add('tabletop/game_chooser_template.pug',"gameChooserTemplate");
         tabletop += this._add('tabletop/game_list_item.pug',"gameListItem");
 
-        var lobby = "";
-        tabletop += this._add('tabletop/lobby_game_list_item.pug',"lobbyGameListItem");
-        tabletop += this._add('tabletop/lobby_list_player_item.pug',"lobbyListPlayerItem");
-
-
+        tabletop += this._add('page/login_dialog.pug',"loginDialog");
+        tabletop += this._add('page/empty_dialog.pug',"emptyDialog");
+        tabletop += this._add('page/messages.pug',"messages");
         console.log("WRITE TEMPLATES");
         fs.writeFileSync("./public/js/templates.js", chat+tabletop);
     }

@@ -196,10 +196,15 @@ h1{
 }
 
 .btn{
+ /*   margin: auto 0;*/
+    background-color: var(--color-base);
+    color:var(--color-highlight);
+    box-shadow: rgba(0,0,0,0.3) 0 0 5px;
+   /*
     color: var(--color-darkest);
     border: 2px solid darkgrey;
-    border: none;
-    background-color: var(--color-highlight) ;
+    border: none;*/
+   /* background-color: var(--color-highlight) ;*/
     padding: 5px;
     text-align: center;
     text-decoration: none;
@@ -217,14 +222,38 @@ h1{
 }
 
 .btn:hover{
-    background-color: var(--color-light);
-    color:var(--color-dark);
+  /*  background-color: var(--color-light);
+    color:var(--color-dark);*/
+    background-color: var(--color-dark);
 }
 
 .btn:active{
-    background-color:var(--color-base);
-    color:var(--color-light);
+   /* background-color:var(--color-base);
+    color:var(--color-light);*/
+
+   /* background-color: var(--color-light);
+    color:var(--color-dark);*/
+
+    background-color: inherit !important;
+    color: inherit !important;
+    box-shadow:none;
 }
+
+.btn.disabled{
+    background-color: var(--color-darkest) !important;
+    color:var(--color-light) !important;
+}
+
+.btn.disabled:hover{
+    background-color: var(--color-darkest) !important;
+    color:var(--color-light) !important;
+}
+
+.btn.disabled:active{
+    background-color: var(--color-darkest) !important;
+    color:var(--color-light) !important;
+}
+
 
 .overlay{
     display:none;
@@ -241,7 +270,7 @@ h1{
 
 .overlay-content {
     margin: auto;
-    background-color: beige;
+    background-color: var(--color-light);;
     text-align: center;
     padding: 10px;
 }
@@ -434,11 +463,11 @@ h1{
 
 .create-session .create-session-content  .btn.create{
     margin: auto 0;
-    background-color: var(--color-base);
+  /*  background-color: var(--color-base);
     color:var(--color-highlight);
-    box-shadow: rgba(0,0,0,0.3) 0 0 5px;
+    box-shadow: rgba(0,0,0,0.3) 0 0 5px;*/
 }
-
+/*
 .create-session .create-session-content  .btn.create:hover{
     background-color: var(--color-dark);
 }
@@ -447,7 +476,7 @@ h1{
     background-color: var(--color-light);
     color:var(--color-dark);
     box-shadow:none;
-}
+*/
 
 .create-session .create-session-content .input-section .input-field{
     flex-grow: 1;
@@ -820,11 +849,11 @@ h1{
 
 .chat-container.show .chat-content .chat-input .chat-send.btn{
     margin: auto 0;
-    background-color: var(--color-base);
+  /*  background-color: var(--color-base);
     color:var(--color-highlight);
-    box-shadow: rgba(0,0,0,0.3) 0 0 5px;
+    box-shadow: rgba(0,0,0,0.3) 0 0 5px;*/
 }
-
+/*
 .chat-container.show .chat-content .chat-input .chat-send.btn:hover{
     background-color: var(--color-dark);
 }
@@ -833,7 +862,7 @@ h1{
     background-color: var(--color-light);
     color:var(--color-dark);
     box-shadow:none;
-}
+}*/
 
 .chat-container.hide .chat-content *{
     margin: 0;

@@ -1,11 +1,11 @@
-body {
+/*body {
     padding: 50px;
     font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
 }
 
 a {
     color: #00B7FF;
-}
+}*/
 .login-title{
     color: #555;
     font-size: 18px;
@@ -81,7 +81,7 @@ a {
 .color-option.green:before { background: #0c0; }
 .color-option.blue:before { background: #00c; }
 */
-.content{
+.input-content{
     width: 400px;
     /* margin-top: 20px; */
     margin: 0 auto;
@@ -96,6 +96,8 @@ a {
     margin-top: 10px;
     text-align: center;
 }
+
+/*
 .error-message{
     color: red;
     text-align: center;
@@ -109,9 +111,15 @@ a {
 .error-message p{
     margin: 5px;
 }
-
+*/
 .terms-and-conditions{
     display: flex;
     flex-direction: row;
     margin: 20px 0px;
+}
+
+.login-messages{
+    margin: 0 20px;
+    max-height: 100px;
+    overflow-y: auto;
 }

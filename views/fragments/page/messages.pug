@@ -1,0 +1,8 @@
+if(errors.length > 0)
+    div.error-message
+        each v in errors
+            p #{I18N[v]}
+if(messages.length > 0)
+    div.info-message
+        each v in messages
+            p #{I18N[v]}

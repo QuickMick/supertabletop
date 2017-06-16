@@ -20,7 +20,7 @@ for(var i=0; i< Colors.PLAYERS_COLORS.length;i++){
 }
 
 module.exports = function(passport){
-
+/*
     router.get('/login',
         LanguageMiddleware,
         function(data,req, res,next){
@@ -37,13 +37,64 @@ module.exports = function(passport){
             );
         }
     );
+    */
 
     /* Handle Login POST */
-    router.post('/login', passport.authenticate('login', {
-        successRedirect: '/',
-        failureRedirect: '/login',
-        failureFlash : true
-    }));
+   /* router.post('/login', passport.authenticate('login',
+        {
+            successRedirect: '/',
+            failureRedirect: '/login',
+            failureFlash : true
+        }
+
+    ));*/
+
+    router.post('/login', function(req, res, next) {
+        passport.authenticate('login',{
+            successRedirect: '/'
+        }, function(error, user, info) {
+
+
+           // console.log(error,user,info);
+            if(error || !user) {
+                return res.status(550).json({
+                        messages: req.flash('message'),
+                        errors:req.flash('error')
+                    }
+                );
+            }
+
+            req.logIn(user, function(err) {
+                if (err) {
+                    return res.status(400).json({
+                        /*messages: [],
+                        errors:["error_while_logging_in"]*/
+                        messages: req.flash('message'),
+                        errors:req.flash('error')
+                    });
+                }
+
+                return res.status(400).json({
+                    /*messages: [],
+                     errors:["error_while_logging_in"]*/
+                    messages: req.flash('message'),
+                    errors:req.flash('error'),
+                    success:true
+                });
+
+               // res.redirect('/');
+               // return res;
+            });
+
+          //  console.log("aut:",req.isAuthenticated());
+
+           // if (req.isAuthenticated()) {    // no need for logging in again
+
+           // }
+
+          //  res.json(user);
+        })(req, res, next);
+    });
 
     /* GET Registration Page */
     router.get('/signup',

@@ -12,23 +12,57 @@ const EVT_ONCLOSE = "onclose";
 class BaseDialog extends EventEmitter3{
     constructor(layout,layoutLocals) {
         super();
-        this.fragment = Util.htmlStringToNode(window[layout](layoutLocals));
+        this.fragment = Util.htmlStringToNode(window[layout](layoutLocals || {}));
 
         Util.stopPropagation(this.fragment);  //override listeners, so nothing passes to the game
-        var btns= this.fragment.querySelectorAll(".btn");//this._rootContainer.querySelectorAll("btn");
+        var btnsArry= this.fragment.querySelectorAll(".btn");//this._rootContainer.querySelectorAll("btn");
 
+        this.btns = {};
         // add listeners to the buttons, if there are some
-        if(btns) {
-            for (let i = 0; i < btns.length; i++) {
-                if (!btns[i] || !btns[i].dataset || !btns[i].dataset.action)
+        if(btnsArry) {
+            for (let i = 0; i < btnsArry.length; i++) {
+                let cur = btnsArry[i];
+
+                if (!cur || !cur.dataset || !cur.dataset.action)
                     continue;
 
-                btns[i].onclick = (e)=>this._click(btns[i].dataset.action);
+                this.btns[cur.dataset.action] = cur;
+
+                cur.onclick = (e)=>{
+                    if(cur.isDisabled) return;
+                    this._click(cur.dataset.action);
+                };
             }
         }
 
         this._rootNode = this.fragment.childNodes[0];
+    }
+    
+  /*  _disableAllButtons(){
+       // this.disabledButtons = true;
+        for(var k in this.btns){
+            if(!this.btns.hasOwnProperty(k)) continue;
+            this.btns[i].classList.add("disabled");
+        }
+    }
+    _enableAllButtons(){
+     //   this.disabledButtons = false;
+        for(var k in this.btns){
+            if(!this.btns.hasOwnProperty(k)) continue;
+            this.btns[i].classList.remove("disabled");
+        }
+    }*/
 
+    disableButton(action){
+        if(!action || !this.btns[action]) return;
+        this.btns[action].isDisabled = true;
+        this.btns[action].classList.add("disabled");
+    }
+
+    enableButton(action){
+        if(!action || !this.btns[action]) return;
+        delete this.btns[action].isDisabled;
+        this.btns[action].classList.remove("disabled");
     }
 
     show(rootContainer){

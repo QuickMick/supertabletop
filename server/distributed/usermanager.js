@@ -20,6 +20,20 @@ class UserManager {
         );
     }
 
+    /**
+     * body: { username: 'adsfasdf',
+  displayname: 'asdfasdf',
+  password: 'asdfsadf',
+  confirmpassword: 'asdfasdf',
+  language: 'de',
+  color: '4',
+  agree: 'on' }
+     query: {}
+     * @param obj
+     * @param field
+     * @returns {*}
+     */
+
     lookup(obj, field) {
         if (!obj) { return null; }
         var chain = field.split(']').join('').split('[');
@@ -80,6 +94,7 @@ class UserManager {
                     passReqToCallback : true
                 },
                 function(req, username, password, done) {
+
                     var mail = username;
                     var displayname = this.lookup(req.body, "displayname") || this.lookup(req.query, "displayname");
                     var confirmpassword = this.lookup(req.body, "confirmpassword") || this.lookup(req.query, "confirmpassword");

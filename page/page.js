@@ -8,6 +8,7 @@ window.I18N = new i18n(I18N_DATA);
 
 var LobbyHandler = require('./lobbyhandler');
 
+
 class Page
 {
 
@@ -16,6 +17,8 @@ class Page
         this.lobbyHandler = new LobbyHandler();
 
         this.show(this.lobbyHandler);
+
+
     }
 
 

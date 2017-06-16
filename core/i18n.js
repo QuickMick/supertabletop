@@ -34,6 +34,20 @@ class I18N {
         return result;
     }
 
+    translate (i18n,key){
+        if(!key || !i18n[key]) return "!"+(key || "UNKNOWN");
+
+        var result = i18n[key] || "!"+key;
+        if(arguments.length > 2){   // replace keywords, if there are more arguments passed
+            Array.prototype.shift.apply(arguments);
+            arguments[0] = result;
+
+            console.log(arguments);
+            result = _replace(...arguments);
+        }
+        return result;
+    }
+
     _replace(format) {
         var args = Array.prototype.slice.call(arguments, 1);
         return format.replace(/{(\d+)}/g, function(match, number) {

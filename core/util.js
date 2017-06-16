@@ -219,8 +219,7 @@ class Util {
     }
 
     /**
-     * converst a string to html nodes,
-     * string must contain just ONE root note
+     * converst a string to html nodes
      * @param string {string}
      * @returns {NodeList}
      */

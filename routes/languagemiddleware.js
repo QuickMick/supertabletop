@@ -48,13 +48,27 @@ function _replace(format) {
             : match;
     });
 }
-
+/*
 function translate (i18n,key){
     if(!key || !i18n[key]) return "!"+(key || "UNKNOWN");
 
     var result = i18n[key] || "!"+key;
     if(arguments.length > 1){   // replace keywords, if there are more arguments passed
         arguments[0] = result;
+        result = _replace(...arguments);
+    }
+    return result;
+}*/
+
+function translate (i18n,key){
+    if(!key || !i18n[key]) return "!"+(key || "UNKNOWN");
+
+    var result = i18n[key] || "!"+key;
+    if(arguments.length > 2){   // replace keywords, if there are more arguments passed
+        Array.prototype.shift.apply(arguments);
+        arguments[0] = result;
+
+        console.log(arguments);
         result = _replace(...arguments);
     }
     return result;

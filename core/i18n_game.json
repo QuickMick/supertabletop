@@ -1,7 +1,10 @@
 {
   "en":{
     "_LANG":"English",
-    "timeformat":"h:MM:ss",
+    "timeformat":"h:MM:ss TT",
+    "dateformat":"mm/dd/yyyy",
+    "datetimeformat":"mm/dd/yyyy, HH:MM",
+
     "title":"Super Tabletop",
     "send":"send",
     "guest":"Guest",
@@ -63,6 +66,7 @@
 
     "user_or_pw_wrong": "Your username or your password is wrong",
 
+    "profile":"Profile",
     "log_in":"log in",
     "log_out":"log out",
     "edit_profile":"edit profile",
@@ -72,6 +76,9 @@
     "running_sessions":"Running Sessions",
     "name_of_your_room":"Name of your room",
     "enter_password":"Enter password if desired",
+    "save":"save",
+    "verified_on":"verified on",
+    "verification_outstanding":"verification outstanding",
 
     "login_to_app":"Log in with your user credentials",
     "continue_without_login":"continue without logging in",
@@ -101,6 +108,9 @@
   "de":{
     "_LANG":"Deutsch",
     "timeformat":"HH:MM:ss",
+    "dateformat":"dd.mm.yyyy",
+    "datetimeformat":"mm.dd.yy, HH:MM",
+
     "title":"Super Tabletop",
     "send":"senden",
     "guest":"Gast",
@@ -162,7 +172,7 @@
 
     "user_or_pw_wrong": "Dein Name oder dein Passwort ist falsch",
 
-
+    "profile":"Profil",
     "log_in":"Anmelden",
     "log_out":"Abmelden",
     "edit_profile":"Profil bearbeiten",
@@ -172,6 +182,9 @@
     "running_sessions":"Laufende Spiele",
     "name_of_your_room":"Name deines Raumes",
     "enter_password":"Passwort eingeben, falls gewünscht",
+    "save":"speichern",
+    "verified_on":"verifiziert am",
+    "verification_outstanding":"verifizierung ausstehend",
 
     "login_to_app":"Melde dich mit deinen Nutzerdaten an",
     "continue_without_login":"ohne Anmeldung fortfahren",

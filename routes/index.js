@@ -34,17 +34,21 @@ router.get('/',
 
         var isAutenticated = req.isAuthenticated();
         var user = {
-            color:"green"   // default color for lobby view
+            color:"green",   // default color for lobby view
+            default:true
         };
         if(isAutenticated) {
-            user.email = req.user.email;
-            user.color = Colors.PLAYERS_COLOR_NAMES[req.user.color];
-            user.verifiedOn = req.user.verifiedOn;
-            user.displayName = req.user.name;
-            user.language = req.user.preferredLanguage;
-            user.status = Rights.RIGHTS_STRENGTH[req.user.status];
+            var u = req.user;
+            user.email = u.email;
+            user.color = Colors.PLAYERS_COLOR_NAMES[u.color];
+            user.verifiedOn = u.verifiedOn;
+            user.name = u.name;
+            user.displayName = u.displayName;
+            user.language = u.preferredLanguage;
+            user.status = Rights.RIGHTS_STRENGTH[u.status];
+            delete user.default;
         }
-console.log(user,req.user);
+
         var currentLanguage = data.queryLanguage || user.language || data.languageID;
 
         res.render('lobby',

@@ -3,6 +3,7 @@
  */
 
 'use strict';
+var dateFormat = require('dateformat');
 
 var BaseFormularDialog = require('./baseformulardialog');
 
@@ -25,11 +26,13 @@ class ProfileDialog extends BaseFormularDialog{
             "profileDialog",{
                 messages: [],
                 errors: [],
+                user: CURRENT_USER,
                 I18N:I18N.completeLanguageData,
                 LANGUAGES:I18N.languages,
-                languageID:I18N.selectedLanguage,
+               // languageID:I18N.selectedLanguage,
                 COLOR_NAMES:Colors.PLAYERS_COLOR_NAMES,
                 COLOR_VALUES:HTML_COLORS,
+                verificationDate: CURRENT_USER.verifiedOn?dateFormat(new Date(CURRENT_USER.verifiedOn),I18N.datetimeformat) : null,
                 fs: {
                     translate:I18N.translateRaw
                 }

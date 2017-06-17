@@ -58,6 +58,8 @@ class BaseFormularDialog extends BaseDialog{
         ];
         for(var i=0; i< this.form.length;i++) {
             var cur = this.form[i];
+            console.log(cur);
+            if(cur.ignore) continue;
             // depending on the type, we have to chose other values
             switch(cur.type){
                 case "checkbox":

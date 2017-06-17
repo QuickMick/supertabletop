@@ -1,30 +1,28 @@
 div.overlay
     div.overlay-content
         div.input-content
-            div.formular-title #{I18N.sign_up_for_app}
+            -var heading = user.name.endsWith("s")?user.name+"'": user.name+"'s";
+            div.formular-title #{heading} #{I18N.profile}
             .flash-messages
             form.form-signin(name="updateprofile_form")
-                | UPDATE
+                | UPDATE sada sdsd
                 -var mail = I18N.email;
-                input.form-control(type='text', name='username', placeholder=mail,required, autofocus)
-                -var name = I18N.name;
-                input.form-control(type='text', name='displayname', placeholder=name,required)
-                -var pw = I18N.password;
-                input.form-control(type='password', name='password', placeholder=pw, required)
-                -var pwc = I18N.confirm_password;
-                input.form-control(type='password', name='confirmpassword', placeholder=pwc, required)
-                select.form-control(name="language", required)
+                input.form-control(type='text', name='email', placeholder=mail,required,value=""+user.email)
+                -if(typeof verificationDate == "string")
+                    span.verification #{I18N.vertified_on} #{vertificationDate}
+                -else
+                    span.verification.outstanding #{I18N.verification_outstanding}
+                select.form-control(name="language")
                     each e in LANGUAGES
                         -var k = e.key
-                        option(value=k selected= (e.key==languageID) ) #{e.name}
-                select.form-control(name="color", required)
-                    option(value=-1 selected=true ) --- #{I18N.choose_default_color} ---
+                        option(value=k selected= (e.key == user.language) ) #{e.name}
+                select.form-control(name="color")
                     each e,i in COLOR_NAMES
-                        option(value=i class="color-option "+e style="background-color :"+COLOR_VALUES[i]) #{I18N[e]}
-                div.terms-and-conditions
-                    input(type="checkbox", name="agree", required)
-                    | #{I18N.agree_trems_and_conditions} #{I18N.agree_terms_and_conditions}
-                div.action.btn(data-action="post")  #{I18N.register}
-            span.text-link.action(data-action="open_login") #{I18N.back_to_login}
-            br
-            span.text-link.action(data-action="close") #{I18N.continue_without_account}
+                        option(value=i selected= (i == user.color) class="color-option " + e style="background-color :" + COLOR_VALUES[i]) #{I18N[e]}
+
+                -var pw = I18N.password;
+                input.form-control(type='password', name='password', placeholder=pw)
+                -var pwc = I18N.confirm_password;
+                input.form-control(type='password', name='confirmpassword', data-confirm="password" placeholder=pwc)
+
+                div.action.btn(data-action="post")  #{I18N.save}

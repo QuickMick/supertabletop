@@ -76,12 +76,27 @@ var UserAccountDataModel = new Schema({
     name: {
         type: String,
         required: true,
+        lowercase:true,
         unique: true,
         index: true,
         trim: true,
         match: [/^\w+$/, "invalid_characters_name"],
         maxlength: [SharedConfig.MAX_NAME_LENGTH, 'incorrect_name_length'],
         minlength: [SharedConfig.MIN_NAME_LENGTH, 'incorrect_name_length']
+    },
+    displayName: {
+        type: String,
+        required: true,
+        unique: true,
+        index: true,
+        trim: true,
+        match: [/^\w+$/, "invalid_characters_name"],
+        maxlength: [SharedConfig.MAX_NAME_LENGTH, 'incorrect_name_length'],
+        minlength: [SharedConfig.MIN_NAME_LENGTH, 'incorrect_name_length']
+    },
+    locked:{
+        type: Boolean,
+        default:false
     },
     color: {
         type: Number,

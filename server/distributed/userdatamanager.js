@@ -117,6 +117,7 @@ class UserDataManager {
             email: mail || undefined,
             hash: password || undefined,
             name: name || undefined,
+            displayName: name || undefined,
             color: color,
             preferredLanguage: language || undefined,
             linkedAccounts: accounts,

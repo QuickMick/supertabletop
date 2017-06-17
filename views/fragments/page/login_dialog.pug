@@ -1,8 +1,8 @@
 div.overlay
     div.overlay-content
-        h1.login-title #{I18N.login_to_app}
         div.input-content
-            img.profile-img(src='https://lh5.googleusercontent.com/-b0-k99FZlyE/AAAAAAAAAAI/AAAAAAAAAAA/eu7opA4byxI/photo.jpg?sz=120')
+            div.formular-title #{I18N.login_to_app}
+            //img.profile-img(src='https://lh5.googleusercontent.com/-b0-k99FZlyE/AAAAAAAAAAI/AAAAAAAAAAA/eu7opA4byxI/photo.jpg?sz=120')
             form.form-signin(name="login_form")
                 -var mail = I18N.email;
                 input.form-control(type='text', name='username', placeholder=mail,required, autofocus)
@@ -11,6 +11,6 @@ div.overlay
                 div.action.btn(data-action="post") #{I18N.log_in}
             .flash-messages
 
-            div.text-link.action(data-action="close") #{I18N.continue_without_login}
-        div.text-link.action(data-action="open_signup") #{I18N.create_account}
+            span.text-link.action(data-action="close") #{I18N.continue_without_login}
+        span.text-link.action(data-action="open_signup") #{I18N.create_account}
 

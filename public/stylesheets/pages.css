@@ -273,6 +273,7 @@ h1{
     background-color: var(--color-light);;
     text-align: center;
     padding: 10px;
+    border-radius: 2%;
 }
 
 
@@ -315,6 +316,14 @@ h1{
 .info-message p,
 .error-message p{
     margin: 5px;
+}
+
+.formular-title{
+    color: var(--color-dark);
+    font-size: 18px;
+    font-weight: 400;
+    display: block;
+    text-align: center;
 }
 
 /*--------- HEADER --------------------------*/

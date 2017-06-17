@@ -77,16 +77,21 @@ function translate (i18n,key){
 
 
 module.exports = function(req, res,next) {
-    var lang = "";
+    var queryLang = "";
     if(req.query && req.query.lang){
-        lang = mapLanguageCode(req.query.lang);
+        queryLang = mapLanguageCode(req.query.lang);
     }
-    lang = lang || req.acceptsLanguages('en', 'de');
+    console.log("QLANG: ",queryLang);
+    var lang = queryLang || req.acceptsLanguages('en', 'de');
     next({
         i18n: I18N[lang] || I18N[DEFAULT_LANG],
         i18n_stringified: I18N_STRINGIFIED[lang] || I18N_STRINGIFIED[DEFAULT_LANG],
         languageID:lang || DEFAULT_LANG,
         languages:LANGUAGES,
+        queryLanguage:queryLang,
+        getLanguage:function(languageID) {
+            return I18N[languageID];
+        },
         translate: translate
     });
 };

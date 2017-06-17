@@ -42,15 +42,18 @@ router.get('/',
             user.color = Colors.PLAYERS_COLOR_NAMES[req.user.color];
             user.verifiedOn = req.user.verifiedOn;
             user.displayName = req.user.displayName;
+            user.language = req.user.preferredLanguage;
             user.status = Rights.RIGHTS_STRENGTH[req.user.status];
         }
 
+        var currentLanguage = data.queryLanguage || user.language || data.languageID;
+
         res.render('lobby',
             {
-                I18N_DATA: JSON.stringify(data.i18n),  // json-object is sent to the client
-                I18N_LAYOUT: data.i18n,                 // the object is just jused to generate the template
+                I18N_DATA: JSON.stringify(data.getLanguage(currentLanguage)),  // json-object is sent to the client
+                I18N_LAYOUT: data.getLanguage(currentLanguage),                 // the object is just jused to generate the template
                 LANGUAGES:JSON.stringify(data.languages),
-                LANGUAGE_ID:JSON.stringify(data.languageID),
+                LANGUAGE_ID:JSON.stringify(currentLanguage),
                 isAuthenticated: isAutenticated,
                 messages: req.flash('message'),
                 errors:req.flash('error'),

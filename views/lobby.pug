@@ -5,7 +5,7 @@ html
         link(rel='stylesheet', href='/stylesheets/users.css')
     body(class="color-schema-"+user.color)
         div#main
-            div#header
+            div#header.text-unselectable
                 p.title #{I18N_LAYOUT.title}
                 div.test-box
                     div.test.color-base base
@@ -27,8 +27,8 @@ html
 
                 div.sign-in-out
                     -if(!isAuthenticated)
-                        div#log-in.switch.logged-out
-                            span #{I18N_LAYOUT.log_in}
+                        div.switch.logged-out
+                            span#log-in #{I18N_LAYOUT.log_in}
                     -else
                         div.update-profile
                             span #{I18N_LAYOUT.edit_profile}

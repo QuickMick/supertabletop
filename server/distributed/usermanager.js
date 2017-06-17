@@ -102,6 +102,8 @@ class UserManager {
                     var color = this.lookup(req.body, "color") || this.lookup(req.query, "color");
                     var agreed = this.lookup(req.body, "agree") || this.lookup(req.query, "agree");
 
+                    agreed = (agreed === "true");
+
                     if(!password
                         || password.length < SharedConfig.MIN_PASSWORD_LENGTH
                         || password.length > SharedConfig.MAX_PASSWORD_LENGTH){

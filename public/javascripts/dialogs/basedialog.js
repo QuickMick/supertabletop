@@ -69,8 +69,12 @@ class BaseDialog extends EventEmitter3{
     }
 
     _click(action){
-        if(this.btns[action] && this.btns[action].isDisabled) return;
+     //   if(this.btns[action] && this.btns[action].isDisabled) return;
     }
+  /*
+    _click(action){
+
+    }*/
 
     close(){
         if(!this._rootNode.parentNode) return;

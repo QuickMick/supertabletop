@@ -380,10 +380,14 @@ h1{
     font-size: 17px;
     margin-right: 15px;
     color:var(--color-highlight);
-    cursor: pointer;
-
+   /* cursor: pointer;*/
 }
 
+#header .sign-in-out span{
+    cursor: pointer;
+}
+
+#header .sign-in-out .switch.logged-out span:hover,
 #header .sign-in-out .update-profile span:hover,
 #header .sign-in-out .switch a:hover{
     text-decoration: underline;
@@ -403,6 +407,7 @@ h1{
     content: "\f090";
     margin: 0 5px;
     text-decoration: none;
+    cursor: default;
 }
 
 #header .sign-in-out .switch.logged-out:before{
@@ -410,6 +415,7 @@ h1{
     content: "\f08b";
     margin: 0 5px;
     text-decoration: none;
+    cursor: default;
 }
 
 
@@ -418,6 +424,7 @@ h1{
     content: "\f044";
     margin: 0 5px;
     text-decoration: none;
+    cursor: default;
 }
 
 /*--------- HEADER END ----------------------*/

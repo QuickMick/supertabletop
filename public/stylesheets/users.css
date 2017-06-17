@@ -137,7 +137,7 @@ a {
     margin: 20px 0px;
 }
 
-.login-messages{
+.flash-messages{
     margin: 0 20px;
     max-height: 100px;
     overflow-y: auto;
@@ -152,7 +152,7 @@ a {
 .text-link.disabled{
     color:grey;
 }
-
+/*
 .signup-messages{
     margin: 0 20px;
-}
+}*/

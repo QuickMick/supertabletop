@@ -28,6 +28,21 @@ var AccountLinkDataModel = new Schema({
     userID: {type: String, required: true},
 });
 
+/**
+ * User may change his mail, but save also his old mails
+ */
+var DecrepatedMailDataModel = new Schema({
+    email: {
+        type: String,
+        lowercase: true,
+        required: true,
+        trim: true,
+        match: [/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/, "string_is_not_a_mail"]
+    },
+    vertifiedOn: {type: Date, required: true},
+    decrepationDate: {type: Date, required: true, default: Date.now}
+});
+
 function generateHash(password) {
     return bcrypt.hashSync(password, bcrypt.genSaltSync(8), null);
 }
@@ -77,7 +92,7 @@ var UserAccountDataModel = new Schema({
     },
     cursor: {type: String, required: true, default:DEFAULT_CURSOR},
     preferredLanguage: {type: String, enum: SUPPORTED_LANGUAGES, lowercase: true, default: DEFAULT_LANGUAGE},
-    linkedAccounts: {type: [AccountLinkDataModel], lowercase: true, required: true}, // at least local type is required
+    linkedAccounts: {type: [AccountLinkDataModel],  required: true}, // at least local type is required
     status: {
         type: String,
         required: true,
@@ -87,7 +102,8 @@ var UserAccountDataModel = new Schema({
         default: Rights.RIGHTS_STRENGTH_MAP[Rights.RIGHTS.registered]
     },
     verifiedOn: {type: Date},  // set the account as verifie - all accounts which are not verified, are deleted after 24h. and cannot upload something.
-    agreedTAC: {type: Boolean, required:true,validate: {validator: function(v){return v}, message: 'terms_and_conditions_not_agreed'}}
+    agreedTAC: {type: Boolean, required:true,validate: {validator: function(v){return v}, message: 'terms_and_conditions_not_agreed'}},
+    oldMailAdresses: {type: [DecrepatedMailDataModel]}, // can be empty, if there is no old mail
 }, {timestamps: true});
 
 UserAccountDataModel.plugin(uniqueValidator, { message: 'name_or_mail_already_exists' });

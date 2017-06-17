@@ -2,7 +2,7 @@ div.overlay
     div.overlay-content
         h1.login-title #{I18N.sign_up_for_app}
         div.input-content
-            .signup-messages
+            .flash-messages
             form.form-signin(name="signup_form")
                 -var mail = I18N.email;
                 input.form-control(type='text', name='username', placeholder=mail,required, autofocus)
@@ -23,6 +23,6 @@ div.overlay
                 div.terms-and-conditions
                     input(type="checkbox", name="agree", required)
                     | #{I18N.agree_trems_and_conditions} #{I18N.agree_terms_and_conditions}
-                div.action.btn(data-action="signup")  #{I18N.register}
+                div.action.btn(data-action="post")  #{I18N.register}
             div.text-link.action(data-action="open_login") #{I18N.back_to_login}
             div.text-link.action(data-action="close") #{I18N.continue_without_account}

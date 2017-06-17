@@ -31,7 +31,7 @@ var AccountLinkDataModel = new Schema({
 /**
  * User may change his mail, but save also his old mails
  */
-var DecrepatedMailDataModel = new Schema({
+var DeprecatedMailDataModel = new Schema({
     email: {
         type: String,
         lowercase: true,
@@ -51,7 +51,6 @@ function isNoTrashMail(s) {
     var x = s.replace(/ /g, "").split("@")[1];
     return (!TRASHMAILS[x]) ? true : false;  // if the domain after the @ exists in the list, it is a trashmail
 }
-
 
 // define the schema for our user model
 var UserAccountDataModel = new Schema({
@@ -103,7 +102,7 @@ var UserAccountDataModel = new Schema({
     },
     verifiedOn: {type: Date},  // set the account as verifie - all accounts which are not verified, are deleted after 24h. and cannot upload something.
     agreedTAC: {type: Boolean, required:true,validate: {validator: function(v){return v}, message: 'terms_and_conditions_not_agreed'}},
-    oldMailAdresses: {type: [DecrepatedMailDataModel]}, // can be empty, if there is no old mail
+    oldMailAdresses: {type: [DeprecatedMailDataModel]}, // can be empty, if there is no old mail
 }, {timestamps: true});
 
 UserAccountDataModel.plugin(uniqueValidator, { message: 'name_or_mail_already_exists' });
@@ -133,10 +132,12 @@ UserAccountDataModel.pre('findOneAndUpdate', function(next) {
 
 var acclink = mongoose.model('AccountLink', AccountLinkDataModel);
 var uacc = mongoose.model('UserAccount', UserAccountDataModel);
+var demail = mongoose.model('DeprecatedMail', DeprecatedMailDataModel);
 
 // create the model for users and expose it to our app
 module.exports = {
     UserAccountModel: uacc,
     AccountLinkModel: acclink,
+    DeprecatedMailModel:demail,
     ACCOUNT_TYPE_ENUM: ACCOUNT_TYPE_ENUM
 };

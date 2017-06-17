@@ -18,9 +18,11 @@ var index = require('./routes/index');
 var users = require('./routes/users');
 var editorRoute = require('./routes/editor_route');
 var gameListRoute = require('./routes/gamelist_route');
-var userManagementRoute = require('./routes/user_management_route')(passport);
 
 var UserManager = require('./server/distributed/usermanager');
+
+
+
 
 
 
@@ -43,6 +45,8 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 var userManager = new UserManager(passport);
+var userManagementRoute = require('./routes/user_management_route')(passport,userManager);
+
 
 
 // Using the flash middleware provided by connect-flash to store messages in session

@@ -107,9 +107,9 @@ class UserDataManager {
             userID: newUserID
         }));
 
-        // TODO: add google, facebook, etc. later.
-        if (linkedAccounts) {
 
+        if (linkedAccounts) {
+            // TODO: add google, facebook, etc. later.
         }
 
         var user = new UserAccountDataModel({
@@ -127,52 +127,102 @@ class UserDataManager {
         process.nextTick(function () {
             user.save().then(function (v) {
                 if (successCallback) {
-                    successCallback(user);
+                    successCallback(user,v);
                 }
             }, function (err) {
                 if (!failCallback)return;
-                var errors = {};
-                console.log(err.errors);
-                for (var k in err.errors) {
-                    if (!err.errors.hasOwnProperty([k])) continue;
-                    var cur = err.errors[k];
-                    // errors.push({type:k,message:cur.message});
-                    var r = "";
-                    switch(cur.properties.type){
-                        case 'required' : r="value_require"; break;
-                        case 'enum' : r="value_not_defined"; break;
-                        default: r=cur.message; break;
+                failCallback(this.parseMongoErrors(err));
+            }.bind(this));
+        }.bind(this));
+    }
+
+    /**
+     * parsers the errrors received from mongo
+     * @param err
+     * @returns {{}}
+     */
+    parseMongoErrors(err){
+        var errors = {};
+        for (var k in err.errors) {
+
+            if (!err.errors.hasOwnProperty([k])) continue;
+            var cur = err.errors[k];
+            // errors.push({type:k,message:cur.message});
+            var r = "";
+            switch(cur.properties.type){
+                case 'required' : r="value_require"; break;
+                case 'enum' : r="value_not_defined"; break;
+                default: r=cur.message; break;
+            }
+            errors[k] = r;
+        }
+
+        if (err.code || err.code == 0) {
+            // see https://github.com/mongodb/mongo/blob/master/src/mongo/base/error_codes.err
+            // errors.push({type:"code",message:err.code});
+            errors.code = err.code+"";
+        }
+
+        return errors;
+    }
+
+
+    /**
+     *
+     * @param changes @type{Array} one element contains {key:field, value:newValue}
+     * @param user Userinstance (model) of the user which should be changed
+     * @param successCallback
+     * @param failCallback
+     */
+    updateUser(changes, userID, successCallback, failCallback) {
+
+        if(!changes || changes.length <=0){
+            successCallback({none:"no_changes_detected"});
+        }
+
+        // get the user, update the values, and save it again
+        process.nextTick(function () {
+            UserAccountDataModel.findOne({"id":userID}, //{'id': id},
+                function (err, user) {
+
+                    // Username does not exist, log error & redirect back
+                    if (!user) {
+                        if (!failCallback)return;
+                        failCallback(this.parseMongoErrors(err));
                     }
-                    errors[k] = r;
 
+                    // apply the passed changes to the userobject
+                    for(var i=0; i< changes.length; i++){
+                        var cur = changes[i];
+                        if(!cur || !cur.key)continue; // if the object does not exist, or no key was passed --> continue
 
-                }
+                        if(user[cur.key].$push){
+                            user[cur.key].push(cur.value);
+                        }else {
+                            user[cur.key] = cur.value;
+                        }
+                    }
 
-                if (err.code || err.code == 0) {
-                    // see https://github.com/mongodb/mongo/blob/master/src/mongo/base/error_codes.err
-                    // errors.push({type:"code",message:err.code});
-                    errors.code = err.code+"";
-                }
+                    // set to false, so it is not created as new object
+                    user.isNew = false;
 
-                failCallback(errors);
-            });
+                    process.nextTick(function () {
+                        user.save().then(function (v) {
+                            if (successCallback) {
+                                successCallback(user,v);
+                            }
+                        }, function (err) {
+                            if (!failCallback)return;
+                            failCallback(this.parseMongoErrors(err));
+                        }.bind(this));
+                    }.bind(this));
+                }.bind(this)
+            );
         });
     }
 
     linkAccount(userID) {
         //TODO:
-    }
-
-    updateMail(userID, mail) {
-        //TODO:
-    }
-
-    updateColor(userID, color) {
-        //TODO
-    }
-
-    updateLanguage(userID, color) {
-        //TODO
     }
 
     /**
@@ -186,42 +236,29 @@ class UserDataManager {
      * @param callback @type{function} the value will be passed as 2nd parameter to the callback, first parameter is the error
      */
     getUser(query, callback) {
-        /*  if(!key || typeof key != "string"
-         || !value){
-         callback({message:"wrong_input_parameters"},null);
-         return;
-         }*/
-
-
-
         if (!query) {
             callback({message: "wrong_input_parameters"}, null);
             return;
         }
-
-        UserAccountDataModel.findOne(callback, //{'id': id},
-            function (err, user) {
-                // In case of any error, return using the done method
-                if (err) {
-                    callback(err, null);
-                    return null;
+        process.nextTick(function () {
+            UserAccountDataModel.findOne(query, //{'id': id},
+                function (err, user) {
+                    // In case of any error, return using the done method
+                    if (err) {
+                        callback(err, null);
+                        return null;
+                    }
+                    // Username does not exist, log error & redirect back
+                    if (!user) {
+                        //       console.log('User Not Found with username ' + email);
+                        callback(err, null);
+                        return null;
+                    }
+                    callback(err, user);
+                    return user;
                 }
-                // Username does not exist, log error & redirect back
-                if (!user) {
-                    //       console.log('User Not Found with username ' + email);
-                    callback(err, null);
-                    return null;
-                }
-                callback(err, user);
-                return user;
-            }
-        );
-        /*
-         console.log("getUser", user);
-         //TODO: impl
-         return {
-         username: user.username
-         };*/
+            );
+        });
     }
 }
 

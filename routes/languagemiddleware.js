@@ -81,7 +81,7 @@ module.exports = function(req, res,next) {
     if(req.query && req.query.lang){
         queryLang = mapLanguageCode(req.query.lang);
     }
-    console.log("QLANG: ",queryLang);
+
     var lang = queryLang || req.acceptsLanguages('en', 'de');
     next({
         i18n: I18N[lang] || I18N[DEFAULT_LANG],

@@ -19,7 +19,7 @@ for(var i=0; i< Colors.PLAYERS_COLORS.length;i++){
     HTML_COLORS.push(Util.intToColorString(parseInt(Colors.PLAYERS_COLORS[i])));
 }
 
-module.exports = function(passport){
+module.exports = function(passport,userManager){
 
     router.get('/login',
         LanguageMiddleware,
@@ -38,16 +38,42 @@ module.exports = function(passport){
         }
     );
 
+    /* GET Registration Page */
+    router.get('/signup',
+        LanguageMiddleware,
+        function(data,req, res,next){
 
-    /* Handle Login POST */
-   /* router.post('/login', passport.authenticate('login',
-        {
-            successRedirect: '/',
-            failureRedirect: '/login',
-            failureFlash : true
+            if(req.isAuthenticated()){  // if already logged in, redirect to lobby
+                res.redirect("/");
+            }
+
+            res.render('signup',{
+                    messages: req.flash('message'),
+                    errors:req.flash('error'),
+                    I18N:data.i18n,
+                    LANGUAGES:data.languages,
+                    languageID:data.languageID,
+                    COLOR_NAMES:Colors.PLAYERS_COLOR_NAMES,
+                    COLOR_VALUES:HTML_COLORS,
+                    fs: {
+                        translate:data.translate
+                    }
+                }
+            );
         }
+    );
 
-    ));*/
+
+    /* Handle Logout */
+    router.get('/logout', function(req, res) {
+        req.logout();
+        req.flash('message', "log_out");
+
+        req.session.destroy(function (err) {
+            res.redirect('/'); //Inside a callback… bulletproof! //TODO: redirect to logout page
+        });
+    });
+
 
     router.post('/login', function(req, res, next) {
         passport.authenticate('login',/*{
@@ -115,33 +141,6 @@ module.exports = function(passport){
         })(req, res, next);
     });
 
-    /* GET Registration Page */
-    router.get('/signup',
-        LanguageMiddleware,
-        function(data,req, res,next){
-
-            if(req.isAuthenticated()){  // if already logged in, redirect to lobby
-                res.redirect("/");
-            }
-
-            res.render('signup',{
-                messages: req.flash('message'),
-                errors:req.flash('error'),
-                I18N:data.i18n,
-                LANGUAGES:data.languages,
-                languageID:data.languageID,
-                COLOR_NAMES:Colors.PLAYERS_COLOR_NAMES,
-                COLOR_VALUES:HTML_COLORS,
-                fs: {
-                        translate:data.translate
-                    }
-                }
-            );
-        }
-    );
-
-
-
     router.post('/signup-local', function(req, res, next) {
         passport.authenticate('signup-local',/*{
             successRedirect: '/'
@@ -208,34 +207,38 @@ module.exports = function(passport){
     });
 
 
+    router.post('/update-profile', function(req, res, next) {
+            if(!req.isAuthenticated()){
+                res.status(550);
+                req.flash('error',"not_authenticated");
+                return res.json({
+                    messages: req.flash('message'),
+                    errors:req.flash('error')
+                });
+            }
+            userManager.updateUser(req,
+                (e)=>{
+                    res.json({
+                        messages: req.flash('message'),
+                        errors:req.flash('error'),
+                        success:true
+                    });
+                },
+                (e)=>{
+                    res.json({
+                        messages: req.flash('message'),
+                        errors:req.flash('error'),
+                        success:true
+                    });
+                }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    /* Handle Logout */
-    router.get('/logout', function(req, res) {
-        req.logout();
-        req.flash('message', "log_out");
-
-        req.session.destroy(function (err) {
-            res.redirect('/'); //Inside a callback… bulletproof! //TODO: redirect to logout page
-        });
+            );
+           /* return res.json({
+            messages: req.flash('message'),
+            errors:req.flash('error'),
+            success:true
+        });*/
     });
-
 
     /*
      router.get('/', function(req, res) {

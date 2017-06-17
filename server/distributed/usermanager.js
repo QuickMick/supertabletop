@@ -8,6 +8,9 @@
 var LocalStrategy = require('passport-local').Strategy;
 var UserDataManager = require('./userdatamanager');
 var SharedConfig = require('./../../core/sharedconfig.json');
+var Models = require('./model/useraccountdatamodel');
+var UserAccountModel = Models.UserAccountModel;
+var DeprecatedMailModel = Models.DeprecatedMailModel;
 
 class UserManager {
 
@@ -46,6 +49,86 @@ class UserManager {
         return null;
     };
 
+    /**
+     *
+     * @param req
+     * @param callback {function} (request,user,error);
+     * @returns {*}
+     */
+    updateUser(req,callback){
+
+        var user = req.user;
+
+        var mail = this.lookup(req.body, "email") || this.lookup(req.query, "email");
+        var password = this.lookup(req.body, "password") || this.lookup(req.query, "password");
+        var confirmpassword = this.lookup(req.body, "confirmpassword") || this.lookup(req.query, "confirmpassword");
+        var language = this.lookup(req.body, "language") || this.lookup(req.query, "language");
+        var color = this.lookup(req.body, "color") || this.lookup(req.query, "color");
+
+        var changes = [];
+
+        // password change?
+        if(password || confirmpassword ) {
+            if (!password
+                || password.length < SharedConfig.MIN_PASSWORD_LENGTH
+                || password.length > SharedConfig.MAX_PASSWORD_LENGTH) {
+                return callback(req.flash('error', 'incorrect_password_length'),null,"incorrect_password_length");
+            }
+
+            if (password != confirmpassword) {
+                return callback(req.flash('error', 'password_confirmation_wrong'),null,"password_confirmation_wrong");
+            }
+
+            if(!user.validatePassword(password)){   // if password is not == the old password
+                changes.push({key: "password", value: password});
+            }
+        }
+
+        // color changed?
+        if(typeof color == "number" && color >= 0 && color != user.color){
+            changes.push({key: "color", value: color});
+        }
+
+        // language changed?
+        if(language && language != user.preferredLanguage){
+            changes.push({key: "preferredLanguage", value: language});
+        }
+
+        // mail changed?
+        if(mail && mail != user.email){
+            changes.push({
+                key: "oldMailAdresses",
+                value: new DeprecatedMailModel({
+                    email:user.email,
+                    verifiedOn:user.verifiedOn
+                })
+                , $push:true    // just push, dont delete old mails
+            });
+
+            // the new mail is now not vertified anymore, it has to get vertified again.
+            changes.push({key:"verifiedOn",value:undefined});
+            // also add the new mail
+            changes.push({key:"email",value:email});
+        //TODO: resend vertification mail
+        }
+
+        this.userDataManager.updateUser(
+            changes,
+            user.id,
+            (user)=>{   // success case
+                req.flash('message', 'user_created_successfully');
+                return callback(req, user,null);
+            },
+            (e) =>{ // error case
+                // the ui just shows the message, so just send the messages - field names are not necessary in the ui
+                for (var k in e) {
+                    if (!e.hasOwnProperty([k])) continue;
+                    req.flash('error', e[k]);
+                }
+                return callback(req,null,e);
+            }
+        );
+    }
 
     _initRoutes(passport) {
         passport.serializeUser(function(user, done) {
@@ -145,6 +228,7 @@ class UserManager {
                 }.bind(this)
             )
         );
+
     }
 }
 

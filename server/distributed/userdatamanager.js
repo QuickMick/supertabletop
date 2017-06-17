@@ -45,7 +45,10 @@ class UserDataManager {
      * @returns the user object, if login credentials were corectly, or null, if they were not correctly
      */
     login(email, password,callback) {
-        this.getUser("email",email,
+        if(!email || typeof email != "string" || !password || typeof password != "string"){
+            callback({message:"invalid_input"},null);
+        }
+        this.getUser("email",email.toLowerCase(),
             (err,user)=>{
                 if (err) {
                     callback(err,null);

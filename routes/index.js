@@ -38,14 +38,13 @@ router.get('/',
         };
         if(isAutenticated) {
             user.email = req.user.email;
-            user.displayName = user.displayName;
             user.color = Colors.PLAYERS_COLOR_NAMES[req.user.color];
             user.verifiedOn = req.user.verifiedOn;
-            user.displayName = req.user.displayName;
+            user.displayName = req.user.name;
             user.language = req.user.preferredLanguage;
             user.status = Rights.RIGHTS_STRENGTH[req.user.status];
         }
-
+console.log(user,req.user);
         var currentLanguage = data.queryLanguage || user.language || data.languageID;
 
         res.render('lobby',

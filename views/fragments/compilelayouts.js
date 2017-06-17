@@ -32,6 +32,7 @@ class CompileLayouts {
 
         tabletop += this._add('page/login_dialog.pug',"loginDialog");
         tabletop += this._add('page/signup_dialog.pug',"signupDialog");
+        tabletop += this._add('page/profile_dialog.pug',"profileDialog");
         tabletop += this._add('page/empty_dialog.pug',"emptyDialog");
         tabletop += this._add('page/messages.pug',"messages");
         console.log("WRITE TEMPLATES");

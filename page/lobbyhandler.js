@@ -9,6 +9,7 @@ var LobbyConnectionHandler = require('./lobbyconnectionhandler');
 
 var LoginDialog = require('./dialogs/logindialog');
 var SignupDialog = require('./dialogs/signupdialog');
+var ProfileDialog = require('./dialogs/profiledialog');
 
 class LobbyHandler {
 
@@ -31,6 +32,18 @@ class LobbyHandler {
                 this._createNewSignUpDialog().show();
             }
         }
+
+        var show_profile_btn = document.getElementById("show-profile");
+        if(show_profile_btn){
+            show_profile_btn.onclick = () => {
+                this._createProfileDialog().show();
+            }
+        }
+    }
+
+    _createProfileDialog(){
+        var profileDialog = new ProfileDialog();
+        profileDialog.show();
     }
 
     _createNewLoginDialog(){

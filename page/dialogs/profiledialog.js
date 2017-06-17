@@ -22,7 +22,7 @@ class ProfileDialog extends BaseFormularDialog{
 
     constructor() {
         super("update-profile",
-            "profileDialog",/*{
+            "profileDialog",{
                 messages: [],
                 errors: [],
                 I18N:I18N.completeLanguageData,
@@ -33,10 +33,8 @@ class ProfileDialog extends BaseFormularDialog{
                 fs: {
                     translate:I18N.translateRaw
                 }
-            }*/
-            {}
+            }
         );
-
     }
 
     /**

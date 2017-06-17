@@ -48,7 +48,16 @@ class UserDataManager {
         if(!email || typeof email != "string" || !password || typeof password != "string"){
             callback({message:"invalid_input"},null);
         }
-        this.getUser("email",email.toLowerCase(),
+
+        // check if the passed value is found as mail or as username
+        var x=email.toLowerCase();
+        this.getUser( //{"email":email.toLowerCase()},
+            {
+                $or: [
+                    {email: x},
+                    {displayName: x}
+                ]
+            },
             (err,user)=>{
                 if (err) {
                     callback(err,null);
@@ -168,41 +177,51 @@ class UserDataManager {
 
     /**
      * gets public user data based on id
-     * @param key @type{String} name of the field, e.g. email, or id
-     * @param value @type{String} value the field should have.
+     *
+     * also query is allowed e.g.  {$or: [
+         {email: req.body.email},
+         {phone: req.body.phone}
+         ]}
+     * @param query {object like {key:value}
      * @param callback @type{function} the value will be passed as 2nd parameter to the callback, first parameter is the error
      */
-    getUser(key,value,callback) {
-        console.log("getUser",key, value);
-        if(!key || typeof key != "string"
-            || !value){
-            callback({message:"wrong_input_parameters"},null);
+    getUser(query, callback) {
+        /*  if(!key || typeof key != "string"
+         || !value){
+         callback({message:"wrong_input_parameters"},null);
+         return;
+         }*/
+
+
+
+        if (!query) {
+            callback({message: "wrong_input_parameters"}, null);
             return;
         }
 
-        UserAccountDataModel.findOne({[key]:value}, //{'id': id},
+        UserAccountDataModel.findOne(callback, //{'id': id},
             function (err, user) {
                 // In case of any error, return using the done method
                 if (err) {
-                    callback(err,null);
+                    callback(err, null);
                     return null;
                 }
                 // Username does not exist, log error & redirect back
                 if (!user) {
-             //       console.log('User Not Found with username ' + email);
-                    callback(err,null);
+                    //       console.log('User Not Found with username ' + email);
+                    callback(err, null);
                     return null;
                 }
-                callback(err,user);
+                callback(err, user);
                 return user;
             }
         );
-/*
-        console.log("getUser", user);
-        //TODO: impl
-        return {
-            username: user.username
-        };*/
+        /*
+         console.log("getUser", user);
+         //TODO: impl
+         return {
+         username: user.username
+         };*/
     }
 }
 

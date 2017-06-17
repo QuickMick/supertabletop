@@ -53,7 +53,7 @@ class UserManager {
         });
 
         passport.deserializeUser(function(id, done) {
-            this.userDataManager.getUser("id",id,
+            this.userDataManager.getUser({"id":id},
                 (err,user) =>{
                     done(err, user);
                 }

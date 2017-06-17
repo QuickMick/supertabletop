@@ -85,6 +85,7 @@
     "terms_and_conditions_not_agreed":"You have to agree the terms and conditions to use this service",
     "choose_default_color":"choose your default color",
     "no_color_chosen":"you have not chosen a color",
+    "email_or_username":"e-mail or account name",
 
     "continue_without_account":"Continue without account",
     "mail_is_trashmail":"The e-mail-address, provided by you is not accepted!",
@@ -183,6 +184,7 @@
     "terms_and_conditions_not_agreed":"Du musst den AGBs zustimmen, um diesen Service nutzen zu können.",
     "choose_default_color":"Wähle deine Standardfarbe",
     "no_color_chosen":"Du musst eine Farbe wählen",
+    "email_or_username":"E-Mail oder Accountname",
 
 
     "continue_without_account":"Ohne Account fortfahren",

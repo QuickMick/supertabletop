@@ -55,7 +55,7 @@ class UserDataManager {
             {
                 $or: [
                     {email: x},
-                    {displayName: x}
+                    {name: x}
                 ]
             },
             (err,user)=>{
@@ -88,14 +88,14 @@ class UserDataManager {
      *
      * @param mail @type{string]
      * @param password @type{string]
-     * @param displayName @type{string]
+     * @param name @type{string]
      * @param color @type{number]
      * @param language @type{string]
      * @param linkedAccounts
      * @param successCallback @type{function]
      * @param failCallback @type{function]  returns: {{fieldName:errorMessage}} also can contain a field called "code" with an errorcode
      */
-    createUser(mail, password, displayName, color, language, agreed, linkedAccounts, successCallback, failCallback) {
+    createUser(mail, password, name, color, language, agreed, linkedAccounts, successCallback, failCallback) {
 
         var newUserID = uuidv1();
         var accounts = [];
@@ -116,7 +116,7 @@ class UserDataManager {
             id: newUserID,
             email: mail || undefined,
             hash: password || undefined,
-            displayName: displayName || undefined,
+            name: name || undefined,
             color: color,
             preferredLanguage: language || undefined,
             linkedAccounts: accounts,

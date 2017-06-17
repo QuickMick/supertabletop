@@ -96,7 +96,7 @@ class UserManager {
                 function(req, username, password, done) {
 
                     var mail = username;
-                    var displayname = this.lookup(req.body, "displayname") || this.lookup(req.query, "displayname");
+                    var name = this.lookup(req.body, "name") || this.lookup(req.query, "name");
                     var confirmpassword = this.lookup(req.body, "confirmpassword") || this.lookup(req.query, "confirmpassword");
                     var language = this.lookup(req.body, "language") || this.lookup(req.query, "language");
                     var color = this.lookup(req.body, "color") || this.lookup(req.query, "color");
@@ -125,7 +125,7 @@ class UserManager {
                     this.userDataManager.createUser(
                         mail,
                         password,
-                        displayname,
+                        name,
                         color,
                         language,
                         agreed,

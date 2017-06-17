@@ -73,7 +73,7 @@ var UserAccountDataModel = new Schema({
         required: true,
         set: generateHash
     },
-    displayName: {
+    name: {
         type: String,
         required: true,
         unique: true,

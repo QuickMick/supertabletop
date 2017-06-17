@@ -4,7 +4,7 @@ div.overlay
             div.formular-title #{I18N.login_to_app}
             //img.profile-img(src='https://lh5.googleusercontent.com/-b0-k99FZlyE/AAAAAAAAAAI/AAAAAAAAAAA/eu7opA4byxI/photo.jpg?sz=120')
             form.form-signin(name="login_form")
-                -var mail = I18N.email;
+                -var mail = I18N.email_or_username;
                 input.form-control(type='text', name='username', placeholder=mail,required, autofocus)
                 -var pw = I18N.password;
                 input.form-control(type='password', name='password', placeholder=pw, required)

@@ -217,21 +217,15 @@ module.exports = function(passport,userManager){
                 });
             }
             userManager.updateUser(req,
-                (e)=>{
-                    res.json({
+                (req,user,err)=>{
+                    console.log(err);
+                    console.log(user);
+                    return res.json({
                         messages: req.flash('message'),
                         errors:req.flash('error'),
-                        success:true
-                    });
-                },
-                (e)=>{
-                    res.json({
-                        messages: req.flash('message'),
-                        errors:req.flash('error'),
-                        success:true
+                        success:(!err && !user)
                     });
                 }
-
             );
            /* return res.json({
             messages: req.flash('message'),

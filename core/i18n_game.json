@@ -59,6 +59,7 @@
     "by":"by",
     "password":"Password",
     "confirm_password": "Confirm password",
+    "confirm_mail": "Confirm e-mail",
     "email":"e-mail",
     "name":"name",
     "players":"Players",
@@ -99,11 +100,14 @@
     "string_is_not_a_mail":"Input is not a valid e-mail-address",
     "invalid_characters_name": "The name is just allowed to contain digits and letters.",
     "incorrect_password_length":"The password ist too short",
-    "password_confirmation_wrong":"You have to type in the password two times. The confirmation of your password is wrong",
     "name_or_mail_already_exists":"An account with your name or e-mail already exists.",
     "required_fields_are_empty":"Required fields are empty, please fill them.",
     "user_created_successfully":"Account created successfully.",
-    "not_authenticated":"You are not authenticated!"
+    "not_authenticated":"You are not authenticated!",
+    "passwords_not_match":"The password and its confirmation does not fit.",
+    "emails_not_match":"The e-mail and its confirmation does not fit.",
+    "confirmation_not_fit":"One or more confirmations do not fit.",
+    "user_updated_successfully":"User-data saved successfully"
   },
   "de":{
     "_LANG":"Deutsch",
@@ -165,6 +169,7 @@
     "by":"von",
     "password":"Passwort",
     "confirm_password": "Passwort bestätigen",
+    "confirm_mail": "E-Mail bestätigen",
     "email":"E-Mail",
     "name":"Name",
     "players":"Spieler",
@@ -206,10 +211,13 @@
     "string_is_not_a_mail":"Eingabe ist keine valide E-Mail-Adresse",
     "invalid_characters_name": "Der Name darf nur aus Buchstaben und Zahlen bestehen.",
     "incorrect_password_length":"Das Passwort ist zu kurz",
-    "password_confirmation_wrong":"Du musst zwei mal das selbe Passwort eingeben. Die Passwortbestätigung war falsch.",
     "name_or_mail_already_exists":"Name oder E-Mail wird bereits verwendet.",
     "required_fields_are_empty":"Bitte füllen sie alle benötigten felder aus.",
     "user_created_successfully":"Account wurde erfolgreich erstellt.",
-    "not_authenticated":"Du bist nicht authentifiziert!"
+    "not_authenticated":"Du bist nicht authentifiziert!",
+    "passwords_not_match":"Die Bestätigung des Passworts stimmt nicht mit dem Passwort überein.",
+    "emails_not_match":"Die Bestätigung der E-Mail stimmt nicht mit der E-Mail überein.",
+    "confirmation_not_fit":"Eine oder mehrere Bestätigungen stimmen nicht überein.",
+    "user_updated_successfully":"Benutzerdaten erfolgreich gespeichert"
   }
 }

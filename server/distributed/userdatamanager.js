@@ -180,6 +180,7 @@ class UserDataManager {
         if(!changes || changes.length <=0){
             successCallback({none:"no_changes_detected"});
         }
+        var parseErrors = this.parseMongoErrors; // copy in local variable, because i have no bock to bind se whol scheize
 
         // get the user, update the values, and save it again
         process.nextTick(function () {
@@ -196,9 +197,9 @@ class UserDataManager {
                     for(var i=0; i< changes.length; i++){
                         var cur = changes[i];
                         if(!cur || !cur.key)continue; // if the object does not exist, or no key was passed --> continue
-
-                        if(user[cur.key].$push){
-                            user[cur.key].push(cur.value);
+                        if(cur.$push){
+                            if(!user[cur.key]) user[cur.key]=[];    //if array does not exist, create one
+                            user[cur.key].push(cur.value);          // afterwards push value
                         }else {
                             user[cur.key] = cur.value;
                         }
@@ -207,6 +208,7 @@ class UserDataManager {
                     // set to false, so it is not created as new object
                     user.isNew = false;
 
+
                     process.nextTick(function () {
                         user.save().then(function (v) {
                             if (successCallback) {
@@ -214,10 +216,10 @@ class UserDataManager {
                             }
                         }, function (err) {
                             if (!failCallback)return;
-                            failCallback(this.parseMongoErrors(err));
-                        }.bind(this));
-                    }.bind(this));
-                }.bind(this)
+                            failCallback(parseErrors(err));
+                        });
+                    });
+                }
             );
         });
     }

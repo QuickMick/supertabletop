@@ -11,7 +11,7 @@ div.overlay
                 -else
                     span.verification.outstanding #{I18N.verification_outstanding}
                 input.form-control(type='text', name='email', placeholder=mail,required,value=""+user.email)
-
+                input.form-control(type='text', name='confirmemail',data-confirm="email", data-confirmerror="emails_not_match", placeholder=mail,required,value=""+user.email)
                 select.form-control(name="language")
                     each e in LANGUAGES
                         -var k = e.key
@@ -23,6 +23,7 @@ div.overlay
                 -var pw = I18N.password;
                 input.form-control(type='password', name='password', placeholder=pw)
                 -var pwc = I18N.confirm_password;
-                input.form-control(type='password', name='confirmpassword', data-confirm="password" placeholder=pwc)
+                input.form-control(type='password', name='confirmepassword', data-confirm="password", data-confirmerror="passwords_not_match", placeholder=pwc)
 
                 div.action.btn(data-action="post")  #{I18N.save}
+                div.action.btn(data-action="close")  #{I18N.cancel}

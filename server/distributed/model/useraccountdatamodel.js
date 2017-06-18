@@ -39,8 +39,8 @@ var DeprecatedMailDataModel = new Schema({
         trim: true,
         match: [/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/, "string_is_not_a_mail"]
     },
-    vertifiedOn: {type: Date, required: true},
-    decrepationDate: {type: Date, required: true, default: Date.now}
+    verifiedOn: {type: Date},  // null, when it never was verified
+    deprecationDate: {type: Date, required: true, default: Date.now}
 });
 
 function generateHash(password) {
@@ -117,7 +117,7 @@ var UserAccountDataModel = new Schema({
     },
     verifiedOn: {type: Date},  // set the account as verifie - all accounts which are not verified, are deleted after 24h. and cannot upload something.
     agreedTAC: {type: Boolean, required:true,validate: {validator: function(v){return v}, message: 'terms_and_conditions_not_agreed'}},
-    oldMailAdresses: {type: [DeprecatedMailDataModel]}, // can be empty, if there is no old mail
+    oldMailAdresses: {type: [DeprecatedMailDataModel], default:[]}, // can be empty, if there is no old mail
 }, {timestamps: true});
 
 UserAccountDataModel.plugin(uniqueValidator, { message: 'name_or_mail_already_exists' });

@@ -5,7 +5,7 @@
 'use strict';
 
 var BaseFormularDialog = require('./baseformulardialog');
-
+const SharedConfig = require('./../../core/sharedconfig.json');
 const Colors = require('./../../public/resources/colors.json');
 
 const Util = require('./../../core/util');
@@ -36,6 +36,32 @@ class SignUpDialog extends BaseFormularDialog{
             }
         );
 
+
+        // init validators
+        this.validators = {
+            "password":(e,v,err) =>{
+                if( v.length < SharedConfig.MIN_PASSWORD_LENGTH
+                    || v.length > SharedConfig.MAX_PASSWORD_LENGTH){
+                    err.push('incorrect_password_length');
+                    return false;
+                }
+                return true;
+            },
+            "agree":(e,v,err) =>{
+                if(!v){
+                    err.push('terms_and_conditions_not_agreed');
+                    return false;
+                }
+                return true;
+            },
+            "color":(e,v,err) =>{
+                if(v < 0){
+                    err.push('error', 'no_color_chosen');
+                    return false;
+                }
+                return true;
+            }
+        }
     }
 
     /**

@@ -61,22 +61,16 @@ class UserManager {
 
         var mail = this.lookup(req.body, "email") || this.lookup(req.query, "email");
         var password = this.lookup(req.body, "password") || this.lookup(req.query, "password");
-        var confirmpassword = this.lookup(req.body, "confirmpassword") || this.lookup(req.query, "confirmpassword");
         var language = this.lookup(req.body, "language") || this.lookup(req.query, "language");
         var color = parseInt(this.lookup(req.body, "color") || this.lookup(req.query, "color"));
 
         var changes = [];
 
         // password change?
-        if(password || confirmpassword ) {
-            if (!password
-                || password.length < SharedConfig.MIN_PASSWORD_LENGTH
-                || password.length > SharedConfig.MAX_PASSWORD_LENGTH) {
-                return callback(req.flash('error', 'incorrect_password_length'),null,"incorrect_password_length");
-            }
-
-            if (password != confirmpassword) {
-                return callback(req.flash('error', 'password_confirmation_wrong'),null,"password_confirmation_wrong");
+        if(password) {
+            if(password.length < SharedConfig.MIN_PASSWORD_LENGTH
+                || password.length > SharedConfig.MAX_PASSWORD_LENGTH){
+                return callback(req,null,['incorrect_password_length']);
             }
 
             if(!user.validatePassword(password)){   // if password is not == the old password
@@ -108,7 +102,7 @@ class UserManager {
             // the new mail is now not vertified anymore, it has to get vertified again.
             changes.push({key:"verifiedOn",value:undefined});
             // also add the new mail
-            changes.push({key:"email",value:email});
+            changes.push({key:"email",value:mail});
         //TODO: resend vertification mail
         }
 
@@ -116,10 +110,11 @@ class UserManager {
             changes,
             user.id,
             (user)=>{   // success case
-                req.flash('message', 'user_created_successfully');
+                req.flash('message', 'user_updated_successfully');
                 return callback(req, user,null);
             },
-            (e) =>{ // error case
+            (e) =>{
+                // error case
                 // the ui just shows the message, so just send the messages - field names are not necessary in the ui
                 for (var k in e) {
                     if (!e.hasOwnProperty([k])) continue;
@@ -178,24 +173,21 @@ class UserManager {
                 },
                 function(req, username, password, done) {
 
-                    var mail = username;
-                    var name = this.lookup(req.body, "name") || this.lookup(req.query, "name");
-                    var confirmpassword = this.lookup(req.body, "confirmpassword") || this.lookup(req.query, "confirmpassword");
+                    var mail = this.lookup(req.body, "email") || this.lookup(req.query, "email");
+                    var name = username;
                     var language = this.lookup(req.body, "language") || this.lookup(req.query, "language");
                     var color = this.lookup(req.body, "color") || this.lookup(req.query, "color");
                     var agreed = this.lookup(req.body, "agree") || this.lookup(req.query, "agree");
 
                     agreed = (agreed === "true");
 
+                    // db validation cannot be used, because the hash is stored there, and it is always equally long
                     if(!password
                         || password.length < SharedConfig.MIN_PASSWORD_LENGTH
                         || password.length > SharedConfig.MAX_PASSWORD_LENGTH){
                         return done(null, false,req.flash('error', 'incorrect_password_length'));
                     }
 
-                    if(password != confirmpassword){
-                        return done(null, false,req.flash('error', 'password_confirmation_wrong'));
-                    }
 
                     if(!agreed){
                         return done(null, false,req.flash('error', 'terms_and_conditions_not_agreed'));

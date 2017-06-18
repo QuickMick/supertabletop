@@ -8,6 +8,7 @@ var BaseDialog = require('./../../public/javascripts/dialogs/basedialog');
 var messageFlasher = require('./../messageflasher');
 
 const EVT_ONPOST = 'onpost';
+const EVT_ONRESULT = 'onresult';
 class BaseFormularDialog extends BaseDialog{
 
     constructor(postAction,layout,layoutLocals) {
@@ -18,6 +19,12 @@ class BaseFormularDialog extends BaseDialog{
         this.messagesContainer = this.fragment.querySelectorAll(".flash-messages")[0];
 
         this.form = this.fragment.querySelectorAll("form")[0];
+
+        /**
+         * contains functions mapped to fields, which are calld for validation
+         * @type {{inputname:function(element,value,errorcallback}}
+         */
+        this.validators= {};
 
         // add "login" listener to every input (so login is called, when enter is pressed)+
         for(var i=0; i< this.form.length;i++) {
@@ -33,23 +40,63 @@ class BaseFormularDialog extends BaseDialog{
     }
 
     _checkValidity(){
-        var valid =true;
+        var notEmpty =true;
+        var confirmed = true;
+        var aditionalValidatorsPassed = true;
+        var errorFlash = [];
+
         for(var i=0; i< this.form.length;i++){
             var cur = this.form[i];
+            cur.classList.remove("invalid");
+            // if the field is a field to confirm another one, then perform this behaviour now
+            if(cur.dataset.confirm){
+                var target = this.form[cur.dataset.confirm];
+                if(!target) continue;
+
+                var t = this._getHTMLInputValue(target);
+                var c = this._getHTMLInputValue(cur);
+
+                if(t != c){
+                    errorFlash.push(cur.dataset.confirmerror || "confirmation_not_fit");
+                    confirmed=false;
+                    target.classList.add("invalid");
+                    cur.classList.add("invalid");
+                }
+            }
+
+            var curValue = this._getHTMLInputValue(cur);
+
+            if(curValue && this.validators[cur.name]){
+                // call validator, if it fails, additional validators fail also
+                if(!this.validators[cur.name](cur,curValue,errorFlash)) {
+                    aditionalValidatorsPassed = false;
+                    cur.classList.add("invalid");
+                }
+
+            }
+            // check if a necessary field is not filled out
             if(!cur.required) continue;
-            if(!cur.value){
+            if(!curValue){
                 cur.classList.add("invalid");
-                valid = false;
-            }else{
-                cur.classList.remove("invalid");
+                notEmpty = false;
             }
         }
 
-        if(!valid && this.messagesContainer){
-            messageFlasher(this.messagesContainer,[],["required_fields_are_empty"]);
+        if(!notEmpty){
+            errorFlash.push("required_fields_are_empty");
         }
 
-        return valid;
+        var isValid = notEmpty && confirmed && aditionalValidatorsPassed;
+
+        if(!isValid && this.messagesContainer){
+            messageFlasher(this.messagesContainer,[],errorFlash,true);
+        }
+
+        return isValid;
+    }
+
+    _checkValidityForElement(element){
+
     }
 
     _getValueString(){
@@ -58,26 +105,47 @@ class BaseFormularDialog extends BaseDialog{
         ];
         for(var i=0; i< this.form.length;i++) {
             var cur = this.form[i];
-            console.log(cur);
-            if(cur.ignore) continue;
-            // depending on the type, we have to chose other values
-            switch(cur.type){
-                case "checkbox":
-                    rList.push(cur.name+"="+cur.checked);
-                    break;
-                default:
-                    rList.push(cur.name+"="+cur.value);
-                    break;
-            }
+
+            // ignore confirmation fields, checking for correctnes is done on clientside
+            if(cur.dataset.confirm || cur.dataset.ignore=="true") continue;
+
+            var val = this._getHTMLInputValue(cur);
+
+            if(!val) continue; // no value, nothing to send
+
+            rList.push(cur.name+"="+val);
         }
         return rList.join("&");
+
+        //TODO: ? Send a URLEncoded NUL value (%00) for any thing that you're specifically setting to null. It should be correctly URL Decoded.
     }
+
+
+    /**
+     * depending on the type of the input element, we have to chose other values
+     * @param input
+     * @returns {*}
+     * @private
+     */
+    _getHTMLInputValue(input){
+        switch(input.type){
+            case "checkbox":
+                return input.checked;
+                break;
+            default:
+                return input.value;
+                break;
+        }
+    }
+
 
     _post(){
         this.disableAllButtons();
         window.showLoadingDialog();
         var xhttp = new XMLHttpRequest();
-
+        xhttp.onerror = function (e) {
+            console.log(e);
+        };
         xhttp.onreadystatechange = function() {
             this.enableAllButtons();
             window.hideLoadingDialog();
@@ -93,6 +161,7 @@ class BaseFormularDialog extends BaseDialog{
             if(this.messagesContainer)
                 messageFlasher(this.messagesContainer,result.messages,result.errors,true);
 
+            this.emit(EVT_ONRESULT,{sender:this,result:result});
             this._onResult(result);
         }.bind(this);
         xhttp.open("POST", this._postAction, true);

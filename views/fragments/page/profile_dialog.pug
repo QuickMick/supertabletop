@@ -5,13 +5,13 @@ div.overlay
             div.formular-title #{heading} #{I18N.profile}
             .flash-messages
             form.form-signin(name="updateprofile_form")
-                | UPDATE sada sdsd
                 -var mail = I18N.email;
-                input.form-control(type='text', name='email', placeholder=mail,required,value=""+user.email)
                 -if(typeof verificationDate == "string")
                     span.verification #{I18N.vertified_on} #{vertificationDate}
                 -else
                     span.verification.outstanding #{I18N.verification_outstanding}
+                input.form-control(type='text', name='email', placeholder=mail,required,value=""+user.email)
+
                 select.form-control(name="language")
                     each e in LANGUAGES
                         -var k = e.key

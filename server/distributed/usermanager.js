@@ -63,7 +63,7 @@ class UserManager {
         var password = this.lookup(req.body, "password") || this.lookup(req.query, "password");
         var confirmpassword = this.lookup(req.body, "confirmpassword") || this.lookup(req.query, "confirmpassword");
         var language = this.lookup(req.body, "language") || this.lookup(req.query, "language");
-        var color = this.lookup(req.body, "color") || this.lookup(req.query, "color");
+        var color = parseInt(this.lookup(req.body, "color") || this.lookup(req.query, "color"));
 
         var changes = [];
 
@@ -85,7 +85,7 @@ class UserManager {
         }
 
         // color changed?
-        if(typeof color == "number" && color >= 0 && color != user.color){
+        if(!isNaN(color) && color >= 0 && color != user.color){
             changes.push({key: "color", value: color});
         }
 

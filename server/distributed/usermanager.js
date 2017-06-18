@@ -70,11 +70,12 @@ class UserManager {
         if(password) {
             if(password.length < SharedConfig.MIN_PASSWORD_LENGTH
                 || password.length > SharedConfig.MAX_PASSWORD_LENGTH){
+                req.flash('error', 'incorrect_password_length');
                 return callback(req,null,['incorrect_password_length']);
             }
 
             if(!user.validatePassword(password)){   // if password is not == the old password
-                changes.push({key: "password", value: password});
+                changes.push({key: "hash", value: password});
             }
         }
 

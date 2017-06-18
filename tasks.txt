@@ -24,7 +24,7 @@ TODO: IMPORTANT: detect outside mouse ups
 TODO: IMPORTANT: client nicht mehr als socket id referenzeiren, sondern eigene id generieren
 
 TODO: IMPORTANT : IMMER TO STRING MACHN
-
+TODO: pw change ghet nicht
 wenn farben geänder wurden, dann werden die "onclick" shader farben nicht richtig mehr gestzt
 http://expressjs.com/de/advanced/best-practice-security.html
 

@@ -208,7 +208,6 @@ class UserDataManager {
                     // set to false, so it is not created as new object
                     user.isNew = false;
 
-
                     process.nextTick(function () {
                         user.save().then(function (v) {
                             if (successCallback) {

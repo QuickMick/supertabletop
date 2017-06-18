@@ -218,12 +218,10 @@ module.exports = function(passport,userManager){
             }
             userManager.updateUser(req,
                 (req,user,err)=>{
-                    console.log(err);
-                    console.log(user);
                     return res.json({
                         messages: req.flash('message'),
                         errors:req.flash('error'),
-                        success:(!err && !user)
+                        success:(!err && user)
                     });
                 }
             );

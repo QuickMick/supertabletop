@@ -82,7 +82,8 @@ module.exports = function(passport,userManager){
 
             if(!req.query.t
                 || req.query.t.length <=0
-                || req.flash('request-mail-verification').includes("do_not_verify")){
+              //  || req.flash('request-mail-verification').includes("do_not_verify")
+            ){
                 var m = req.flash('message');
                 var e = req.flash('error');
                 console.log(m,e);
@@ -102,8 +103,6 @@ module.exports = function(passport,userManager){
                 );
                 return res;
             }else
-
-
             userManager.verifyMail(req,
                 (req,success,err)=>{
                     var m = req.flash('message');
@@ -131,10 +130,20 @@ module.exports = function(passport,userManager){
         function(req,res,next){
         userManager.resendVerificationMail(req,
             (req,err,success)=>{
-                console.log(success,err);
-                req.flash("request-mail-verification","do_not_verify");
-                res.redirect("/verify");
-                return res;
+                if(err){
+                    res.status(400);
+                }
+
+                if(req.body.async) {    // if async, just send the result
+                    return res.json({
+                        messages: req.flash('message'),
+                        errors:req.flash('error')
+                    });
+                }else{  // if it is not an async call, then render the verify page
+                //    req.flash("request-mail-verification", "do_not_verify");
+                    res.redirect("/verify");
+                    return res;
+                }
                /* var m = req.flash('message');
                 var e = req.flash('error');
                 console.log(m,e);

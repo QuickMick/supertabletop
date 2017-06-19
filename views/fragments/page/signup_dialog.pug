@@ -7,13 +7,13 @@ div.overlay
                 -var mail = I18N.email;
                 input.form-control(type='text', name='email', placeholder=mail,required, autofocus)
                 -var mailc = I18N.confirm_mail;
-                input.form-control(type='text', name='confirmemail',data-confirm="email", data-confirmerror="emails_not_match", placeholder=mailc,required)
+                input.form-control(type='text', name='confirmemail', autocomplete="off", data-confirm="email", data-confirmerror="emails_not_match", placeholder=mailc,required)
                 -var name = I18N.name;
                 input.form-control(type='text', name='username', placeholder=name,required)
                 -var pw = I18N.password;
                 input.form-control(type='password', name='password', placeholder=pw, required)
                 -var pwc = I18N.confirm_password;
-                input.form-control(type='password', name='confirmpassword', data-confirm="password", data-confirmerror="passwords_not_match", placeholder=pwc, required)
+                input.form-control(type='password', name='confirmpassword',autocomplete="off", data-confirm="password", data-confirmerror="passwords_not_match", placeholder=pwc, required)
                 select.form-control(name="language", required)
                     each e in LANGUAGES
                         -var k = e.key

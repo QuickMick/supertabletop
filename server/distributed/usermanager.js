@@ -88,7 +88,7 @@ class UserManager {
 
                 // setup email data with unicode symbols
                 let mailOptions = {
-                    from: Mails.account.sender, // sender address
+                    from: Hosts.MAIL.sender, // sender address
                     to: user.email, // list of receivers
                     subject: lang.verify_mail_subject, // Subject line
                     text: I18N.replace(lang.verify_mail,Hosts.MAIL_VERIFICATION_LINK+verification.token), // plain text body

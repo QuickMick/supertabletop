@@ -38,6 +38,7 @@ class ProfileDialog extends BaseFormularDialog{
                 }
             }
         );
+
     }
 
     /**
@@ -50,9 +51,9 @@ class ProfileDialog extends BaseFormularDialog{
 
         switch (action){
             case "close": this.close(); break;
-            case "open_login":
-                this.close();
-                this.emit("open_login",this);
+
+            case "resend":
+                this._post("request-mail-verification","async=true&email="+CURRENT_USER.email);
                 break;
 
             case "post":

@@ -6,6 +6,7 @@
 
 
 var I18N = require('./../core/i18n_game.json');
+var translateFunc = require('./../core/i18n').translateRaw;
 
 var I18N_STRINGIFIED = {};
 var LANGUAGES = [];
@@ -36,10 +37,9 @@ var mapLanguageCode = function (lang) {
         default:    // no fallback - use browser instead
             return "";
     }
-
 };
 
-
+/*
 function _replace(format) {
     var args = Array.prototype.slice.call(arguments, 1);
     return format.replace(/{(\d+)}/g, function(match, number) {
@@ -47,7 +47,7 @@ function _replace(format) {
             ? args[number]
             : match;
     });
-}
+}*/
 /*
 function translate (i18n,key){
     if(!key || !i18n[key]) return "!"+(key || "UNKNOWN");
@@ -61,7 +61,7 @@ function translate (i18n,key){
 }*/
 
 function translate (i18n,key){
-    if(!key || !i18n[key]) return "!"+(key || "UNKNOWN");
+   /* if(!key || !i18n[key]) return "!"+(key || "UNKNOWN");
 
     var result = i18n[key] || "!"+key;
     if(arguments.length > 2){   // replace keywords, if there are more arguments passed
@@ -71,7 +71,9 @@ function translate (i18n,key){
         console.log(arguments);
         result = _replace(...arguments);
     }
-    return result;
+    return result;*/
+
+   return translateFunc(...arguments);
 }
 
 

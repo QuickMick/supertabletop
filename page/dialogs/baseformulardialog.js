@@ -139,12 +139,25 @@ class BaseFormularDialog extends BaseDialog{
     }
 
 
-    _post(){
+    _post(postAction, query){
+      /*  if(!postAction){
+            console.log("no post action passed!");
+            return;
+        }
+        // var query = this._getValueString();
+        if(!query){
+            console.log("no query passed");
+            return;
+        }*/
+
+        postAction = postAction || this._postAction;
+        query = query || this._getValueString();
+
         this.disableAllButtons();
         window.showLoadingDialog();
         var xhttp = new XMLHttpRequest();
         xhttp.onerror = function (e) {
-            console.log(e);
+            this.emit(EVT_ONRESULT,{sender:this,result:null,error:e,action:postAction});
         };
         xhttp.onreadystatechange = function() {
             this.enableAllButtons();
@@ -161,12 +174,12 @@ class BaseFormularDialog extends BaseDialog{
             if(this.messagesContainer)
                 messageFlasher(this.messagesContainer,result.messages,result.errors,true);
 
-            this.emit(EVT_ONRESULT,{sender:this,result:result});
+            this.emit(EVT_ONRESULT,{sender:this,result:result,action:postAction,error:null});
             this._onResult(result);
         }.bind(this);
-        xhttp.open("POST", this._postAction, true);
+        xhttp.open("POST", postAction, true);
         xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-        var query = this._getValueString();
+
         xhttp.send(query);
         this.emit(EVT_ONPOST,this,query);
     }

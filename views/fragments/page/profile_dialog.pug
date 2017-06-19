@@ -7,23 +7,24 @@ div.overlay
             form.form-signin(name="updateprofile_form")
                 -var mail = I18N.email;
                 -if(typeof verificationDate == "string")
-                    span.verification #{I18N.vertified_on} #{vertificationDate}
+                    span.verification #{I18N.verified_on} #{verificationDate}
                 -else
                     span.verification.outstanding #{I18N.verification_outstanding}
+                    span.text-link.action.resend(data-action="resend") #{I18N.send_again}
                 input.form-control(type='text', name='email', placeholder=mail,required,value=""+user.email)
-                input.form-control(type='text', name='confirmemail',data-confirm="email", data-confirmerror="emails_not_match", placeholder=mail,required,value=""+user.email)
+                input.form-control(type='text', name='confirmemail',data-confirm="email", data-confirmerror="emails_not_match", autocomplete="off", placeholder=mail,required,value=""+user.email)
                 select.form-control(name="language")
                     each e in LANGUAGES
                         -var k = e.key
                         option(value=k selected= (e.key == user.language) ) #{e.name}
                 select.form-control(name="color")
                     each e,i in COLOR_NAMES
-                        option(value=i selected= (i == user.color) class="color-option " + e style="background-color :" + COLOR_VALUES[i]) #{I18N[e]}
+                        option(value=i selected= (e == user.color) class="color-option " + e style="background-color :" + COLOR_VALUES[i]) #{I18N[e]}
 
                 -var pw = I18N.password;
                 input.form-control(type='password', name='password', placeholder=pw)
                 -var pwc = I18N.confirm_password;
-                input.form-control(type='password', name='confirmepassword', data-confirm="password", data-confirmerror="passwords_not_match", placeholder=pwc)
+                input.form-control(type='password', name='confirmepassword', autocomplete="off",  data-confirm="password", data-confirmerror="passwords_not_match", placeholder=pwc)
 
                 div.action.btn(data-action="post")  #{I18N.save}
                 div.action.btn(data-action="close")  #{I18N.cancel}

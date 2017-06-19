@@ -123,7 +123,8 @@
     "invalid_mail":"Invalid mail address passed.",
     "account_for_email_not_found":"No account was found which uses the e-mail you sent.",
     "error_while_sending_verification":"Error while sending, please try again later.",
-    "verification_successfully_sent":"Verification request successfully sent. Please check your mails."
+    "verification_successfully_sent":"Verification request successfully sent. Please check your mails.",
+    "successfully_logged_out":"Logging out was successfully."
   },
   "de":{
     "_LANG":"Deutsch",
@@ -250,6 +251,7 @@
     "invalid_mail":"Invalide E-Mail-Addresse übergeben.",
     "account_for_email_not_found":"Es wurde kein Account gefunden welcher die E-Mail Addresse, die du eingegebn hast, benutzt.",
     "error_while_sending_verification":"Fehler beim senden, bitte versuche es später erneut.",
-    "verification_successfully_sent":"Verificationsanfrage erfolgreich gesendet. Bitte checke deine Mails."
+    "verification_successfully_sent":"Verificationsanfrage erfolgreich gesendet. Bitte checke deine Mails.",
+    "successfully_logged_out":"Sie haben sich erfolgreich ausgeloggt."
   }
 }

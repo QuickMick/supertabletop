@@ -319,7 +319,7 @@ h1{
 }
 
 .formular-title{
-    color: var(--color-dark);
+    color: var(--color-dark) !important;
     font-size: 18px;
     font-weight: 400;
     display: block;

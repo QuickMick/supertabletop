@@ -63,15 +63,29 @@ module.exports = function(passport,userManager){
         }
     );
 
-
     /* Handle Logout */
-    router.get('/logout', function(req, res) {
-        req.logout();
-        req.flash('message', "log_out");
+    router.get('/logout',
+        LanguageMiddleware,
+        function(data,req, res,next){
 
-        req.session.destroy(function (err) {
-            res.redirect('/'); //Inside a callback… bulletproof! //TODO: redirect to logout page
-        });
+            if(!req.isAuthenticated()){  // if already logged in, redirect to lobby
+                res.redirect("/");
+            }
+
+            req.logout();
+            req.flash('message', "log_out");
+
+            req.session.destroy(function (err) {
+                //res.redirect('/'); //Inside a callback… bulletproof! //TODO: redirect to logout page
+                res.render('logout',{
+                        I18N:data.i18n,
+                        fs: {
+                            translate:data.translate
+                        }
+                    }
+                );
+            }
+        );
     });
 
 

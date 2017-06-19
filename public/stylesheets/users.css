@@ -153,6 +153,14 @@ a {
 .text-link.disabled{
     color:grey;
 }
+
+.btn-row {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    margin-top: 10px;
+}
+
 /*
 .signup-messages{
     margin: 0 20px;

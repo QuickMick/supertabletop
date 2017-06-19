@@ -34,6 +34,7 @@ var MailVerificationDataModel = new Schema({
         match: [/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/, "string_is_not_a_mail"]
     },
     token: {type: String, unique: true, index: true},  //token used in the url to verify
+    language: {type: String, enum: SUPPORTED_LANGUAGES, lowercase: true, default: DEFAULT_LANGUAGE},
     expiresOn: {type: Date, required: true, default: new Date(new Date().getTime()+MAIL_VERIFICATION_EXPIRE_INTERVAL)},
     redeemed: {type:Boolean, required:true,default:false} // was this token used to verify the mail? true if yes
 });
@@ -158,6 +159,10 @@ UserAccountDataModel.methods.isVerified = function () {
     return this.verifiedOn ? true : false;
 };
 
+function createNewExpiration (){
+    return new Date(new Date().getTime()+MAIL_VERIFICATION_EXPIRE_INTERVAL);
+};
+
 
 AccountLinkDataModel.pre('findOneAndUpdate', function(next) {
     this.options.runValidators = true;
@@ -182,5 +187,8 @@ module.exports = {
     UserAccountModel: uacc,
     AccountLinkModel: acclink,
     DeprecatedMailModel:demail,
-    ACCOUNT_TYPE_ENUM: ACCOUNT_TYPE_ENUM
+    ACCOUNT_TYPE_ENUM: ACCOUNT_TYPE_ENUM,
+    helpers:{
+        createNewExpirationDate:createNewExpiration
+    }
 };

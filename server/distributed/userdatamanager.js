@@ -10,7 +10,7 @@ var mongoose = require('mongoose');
 var UserEntry = require('./model/useraccountdatamodel');
 var AccountLinkDataModel = UserEntry.AccountLinkModel;
 var UserAccountDataModel = UserEntry.UserAccountModel;
-var MailVerificationModel = UserEntry.MailVerificationModel;
+var MailVerificationDataModel = UserEntry.MailVerificationModel;
 var ACCOUNT_TYPE_ENUM = UserEntry.ACCOUNT_TYPE_ENUM;
 
 var uuidv1 = require('uuid/V1');
@@ -138,9 +138,10 @@ class UserDataManager {
     }
 
 
-    createVerification(userID, email, successCallback, failCallback) {
-        var verification = new MailVerificationModel({
+    createVerification(userID,language, email, successCallback, failCallback) {
+        var verification = new MailVerificationDataModel({
             userID:userID,
+            language:language,
             email:email,
             token: uuidv1()
         });
@@ -169,7 +170,7 @@ class UserDataManager {
             return;
         }
         process.nextTick(() =>{
-            MailVerificationModel.findOne({token:token}, // first find the database entry for the token
+            MailVerificationDataModel.findOne({token:token}, // first find the database entry for the token
                 (err, mailVerification) => {
                     // In case of any error, return using the done method
                     if (err) {
@@ -233,6 +234,11 @@ class UserDataManager {
      */
     static parseMongoErrors(err){
         var errors = {};
+
+        if(!err){
+            return errors;
+        }
+
         for (var k in err.errors) {
 
             if (!err.errors.hasOwnProperty([k])) continue;
@@ -278,6 +284,7 @@ class UserDataManager {
                     if (!user) {
                         if (!failCallback)return;
                         failCallback(UserDataManager.parseMongoErrors(err));
+                        return;
                     }
 
                     // apply the passed changes to the userobject
@@ -345,6 +352,79 @@ class UserDataManager {
                     }
                     callback(err, user);
                     return user;
+                }
+            );
+        });
+    }
+
+    getVerification(query, callback) {
+        if (!query) {
+            callback({error: "wrong_input_parameters"}, null);
+            return;
+        }
+        process.nextTick(function () {
+            MailVerificationDataModel.findOne(query, //{'id': id},
+                function (err, user) {
+                    // In case of any error, return using the done method
+                    if (err) {
+                        callback(err, null);
+                        return null;
+                    }
+                    // Username does not exist, log error & redirect back
+                    if (!user) {
+                        //       console.log('User Not Found with username ' + email);
+                        callback(err, null);
+                        return null;
+                    }
+                    callback(err, user);
+                    return user;
+                }
+            );
+        });
+    }
+
+    updateVerification(changes, query, successCallback, failCallback) {
+        if(!changes || changes.length <=0){
+            successCallback({none:"no_changes_detected"});
+        }
+
+        // get the user, update the values, and save it again
+        process.nextTick(function () {
+            MailVerificationDataModel.findOne(query, //{'id': id},
+                function (err, verification) {
+
+                    // Username does not exist, log error & redirect back
+                    if (!verification) {
+                        if (!failCallback)return;
+                        failCallback(UserDataManager.parseMongoErrors(err));
+                        return;
+                    }
+
+                    // apply the passed changes to the userobject
+                    for(var i=0; i< changes.length; i++){
+                        var cur = changes[i];
+                        if(!cur || !cur.key)continue; // if the object does not exist, or no key was passed --> continue
+                        if(cur.$push){
+                            if(!verification[cur.key]) verification[cur.key]=[];    //if array does not exist, create one
+                            verification[cur.key].push(cur.value);          // afterwards push value
+                        }else {
+                            verification[cur.key] = cur.value;
+                        }
+                    }
+
+                    // set to false, so it is not created as new object
+                    verification.isNew = false;
+
+                    process.nextTick(function () {
+                        verification.save().then(function (v) {
+                            if (successCallback) {
+                                successCallback(verification,v);
+                            }
+                        }, function (err) {
+                            if (!failCallback)return;
+                            failCallback(UserDataManager.parseMongoErrors(err));
+                        });
+                    });
                 }
             );
         });

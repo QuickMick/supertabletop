@@ -11,6 +11,7 @@ var SharedConfig = require('./../../core/sharedconfig.json');
 var Util = require('./../../core/util');
 var Models = require('./model/useraccountdatamodel');
 var UserAccountModel = Models.UserAccountModel;
+var modelHelpers = Models.helpers;
 var DeprecatedMailModel = Models.DeprecatedMailModel;
 
 var Hosts = require('./hosts.json');
@@ -79,36 +80,12 @@ class UserManager {
      * @param callback {function(error,success)}
      * @private
      */
-    sendVerificationMail(user,callback){
+    handleVerificationCreation(user, callback){
         this.userDataManager.createVerification(user.id,
+            user.preferredLanguage,
             user.email,
             (verification,v)=>{
-                // get language of the user
-                var lang = Mails[user.preferredLanguage || "en"];
-
-                // setup email data with unicode symbols
-                let mailOptions = {
-                    from: Hosts.MAIL.sender, // sender address
-                    to: user.email, // list of receivers
-                    subject: lang.verify_mail_subject, // Subject line
-                    text: I18N.replace(lang.verify_mail,Hosts.MAIL_VERIFICATION_LINK+verification.token), // plain text body
-                    html: I18N.replace(lang.verify_mail_html,Hosts.MAIL_VERIFICATION_LINK+verification.token) // html body
-                };
-
-                // send mail with defined transport object
-                this.mailTransporter.sendMail(mailOptions, (error, info) => {
-                    if (error) {
-                        if(callback){
-                            callback(error,null);
-                        }
-                        return console.log("SendMail:",error);
-                    }
-                    console.log('Message %s sent: %s', info.messageId, info.response);
-                    if(callback){
-                        callback(false,{message:"mail_sent_successfully"});
-                    }
-                });
-
+                this._sendVerificationAsMail(verification,callback);
             },
             (err)=>{
                 console.log("sendVerification",err);
@@ -117,6 +94,41 @@ class UserManager {
                 }
             }
         );
+    }
+
+    /**
+     *
+     * @param verification
+     * @param callback {function(error,success)}
+     * @private
+     */
+    _sendVerificationAsMail(verification,callback){
+        // get language of the user
+        var lang = Mails[verification.language || "en"];
+
+        // setup email data with unicode symbols
+        let mailOptions = {
+            from: Hosts.MAIL.sender, // sender address
+            to: verification.email, // list of receivers
+            subject: lang.verify_mail_subject, // Subject line
+            text: I18N.replace(lang.verify_mail,Hosts.MAIL_VERIFICATION_LINK+verification.token), // plain text body
+            html: I18N.replace(lang.verify_mail_html,Hosts.MAIL_VERIFICATION_LINK+verification.token) // html body
+        };
+
+        // send mail with defined transport object
+        this.mailTransporter.sendMail(mailOptions, (error, info) => {
+            if (error) {
+                if(callback){
+                    callback(error,null);
+                }
+                return console.log("SendMail:",error);
+            }
+            console.log('Message %s sent: %s', info.messageId, info.response);
+            if(callback){
+                callback(false,{message:"mail_sent_successfully"});
+            }
+        });
+
     }
 
     /**
@@ -134,40 +146,75 @@ class UserManager {
             return callback(req,true,null);
         }
 
+        // check if the passed mail is a valid mail
         mailAdress = mailAdress.trim().toLowerCase();
-
         if(!Util.isValidMail(mailAdress)){
             req.flash('error',"invalid_mail");
             return callback(req,true,null);
         }
 
-        this.userDataManager.getUser({"email":mailAdress},
-            (err,user) =>{
-                if(err || !user){
-                    req.flash('error',"account_for_email_not_found");
-                    return callback(req,true,null);
-                }
+        // check if there is already a verification outstanding
+        this.userDataManager.updateVerification(
+            [{expiresOn:modelHelpers.createNewExpirationDate()}],
+            {"email":mailAdress},
 
-                if(user.verifiedOn){
-                    req.flash('message',"mail_already_verified");
-                    return callback(req,null,true);
-                }
 
-                this.sendVerificationMail(user,
-                    (err,success)=>{
-
-                        if(err){
-                            console.log("resendVerificationMail",err);
+            (verification)=>{
+                // if the model was changed, then it was already available,
+                // just send the mail without creating a new db entry
+                this._sendVerificationAsMail(verification,
+                    (error,success)=>{
+                        console.log("SEND",error,success);
+                        if(error){
                             req.flash('error',"error_while_sending_verification");
+                        }else{
+                            req.flash('message',"verification_successfully_sent");
+                        }
+
+                        callback(req,error,success);
+                    }
+                )
+            },
+
+            (err)=>{
+                // if there is no entry, then one has to get created
+                this.userDataManager.getUser({"email":mailAdress},
+                    (err,user) =>{
+                        // check if an account is registered for the passed mail
+                        if(err || !user){
+                            req.flash('error',"account_for_email_not_found");
                             return callback(req,true,null);
                         }
 
-                        req.flash('message',"verification_successfully_sent");
-                        return callback(req,true,null);
+                        // check if the mail is already verified
+                        if(user.verifiedOn){
+                            req.flash('message',"mail_already_verified");
+                            return callback(req,null,true);
+                        }
+
+                        // otherwise create a new verification and send the mail
+                        this.handleVerificationCreation(user,
+                            (err,success)=>{
+
+                                if(err){
+                                    console.log("resendVerificationMail",err);
+                                    req.flash('error',"error_while_sending_verification");
+                                    return callback(req,true,null);
+                                }
+
+                                req.flash('message',"verification_successfully_sent");
+                                return callback(req,null,true);
+                            }
+                        );
                     }
                 );
+
             }
         );
+//TODO: if verificaten, just resend, not recreate
+
+
+
     }
 
     /**
@@ -264,7 +311,7 @@ class UserManager {
             (user)=>{   // success case
                 req.flash('message', 'user_updated_successfully');
                 if(mailChanged){    // mail has to be verificated again, wehn it was changed
-                    this.sendVerificationMail(user);
+                    this.handleVerificationCreation(user);
                 }
                 return callback(req, user,null);
             },
@@ -362,7 +409,7 @@ class UserManager {
                         null,
                         (user)=>{
                             req.flash('message', 'user_created_successfully');
-                            this.sendVerificationMail(user);
+                            this.handleVerificationCreation(user);
                             return done(null, user,req);
                         },
                         (e) =>{

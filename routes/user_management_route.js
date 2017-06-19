@@ -90,8 +90,8 @@ module.exports = function(passport,userManager){
                 res.render('mail_verification',{
                         messages: m,
                         errors:e,
-                        I18N:data.i18n,
-                        forceShowResend:true
+                        I18N:data.i18n
+                        ,forceShowResend:m.length<=0
                         /* LANGUAGES:data.languages,
                          languageID:data.languageID,
                          COLOR_NAMES:Colors.PLAYERS_COLOR_NAMES,

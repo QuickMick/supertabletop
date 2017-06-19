@@ -107,7 +107,16 @@
     "passwords_not_match":"The password and its confirmation does not fit.",
     "emails_not_match":"The e-mail and its confirmation does not fit.",
     "confirmation_not_fit":"One or more confirmations do not fit.",
-    "user_updated_successfully":"User-data saved successfully"
+    "user_updated_successfully":"User-data saved successfully",
+
+    "verification_already_redeemed":"The e-mail address was already verified",
+    "invalid_verification_token":"Incorrect e-mail verification was passed!",
+    "verification_token_invalid":"The verification-token you passed was invalid.",
+    "verification_expired":"The verification token is expired.",
+    "mail_verified":"Your e-mail address was successfully verified.",
+    "send_verification_again":"Shall we send you another verification request?",
+    "continue_to_main_page":"Continue to main page",
+    "click_here":"click here"
   },
   "de":{
     "_LANG":"Deutsch",
@@ -218,6 +227,15 @@
     "passwords_not_match":"Die Bestätigung des Passworts stimmt nicht mit dem Passwort überein.",
     "emails_not_match":"Die Bestätigung der E-Mail stimmt nicht mit der E-Mail überein.",
     "confirmation_not_fit":"Eine oder mehrere Bestätigungen stimmen nicht überein.",
-    "user_updated_successfully":"Benutzerdaten erfolgreich gespeichert"
+    "user_updated_successfully":"Benutzerdaten erfolgreich gespeichert",
+
+    "verification_already_redeemed":"Die E-Mail Adresse wurde bereits bestätigt.",
+    "invalid_verification_token":"Inkorrekte Bestätigung wurde gesendet!",
+    "verification_token_invalid":"Inkorrekte Bestätigung wurde gesendet!",
+    "verification_expired":"Die Besätigung ist abgelaufen",
+    "mail_verified":"Deine E-Mail Adresse wurde erfolgreich vertifiziert.",
+    "send_verification_again":"Sollen wir dir eine neue Bestätigungsanfrage senden?",
+    "continue_to_main_page":"Zurück zur Startseite",
+    "click_here":"Klick hier"
   }
 }

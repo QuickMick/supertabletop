@@ -82,9 +82,12 @@ module.exports = function(passport,userManager){
 
             userManager.verifyMail(req,
                 (req,success,err)=>{
+                    var m = req.flash('message');
+                    var e = req.flash('error');
+                    console.log(m,e);
                     res.render('mail_verification',{
-                            messages: req.flash('message'),
-                            errors:req.flash('error'),
+                            messages: m,
+                            errors:e,
                             I18N:data.i18n,
                         /* LANGUAGES:data.languages,
                        languageID:data.languageID,

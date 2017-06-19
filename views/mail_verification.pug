@@ -1,13 +1,20 @@
+html
+    head
+        title #{I18N.title}
+        link(rel='stylesheet', href='/stylesheets/users.css')
+    body
+        if(errors.length > 0)
+            div.error-message
+                each v in errors
+                    -var e = v;
+                    p(data-message=e) #{I18N[v]}
 
-if(errors.length > 0)
-    div.error-message
-        each v in errors
-            -var e = v;
-            p(data-message=e) #{I18N[v]}
-if(messages.length > 0)
-    div.info-message
-        each v in messages
-            -var m = v;
-            p(data-message=m) #{I18N[v]}
+            span #{I18N.send_verification_again}
+            a(href="/request-verification") #{I18N.click_here}
+        if(messages.length > 0)
+            div.info-message
+                each v in messages
+                    -var m = v;
+                    p(data-message=m) #{I18N[v]}
 
-a(href="/") continue
+        a(href="/") #{I18N.continue_to_main_page}

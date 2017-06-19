@@ -1,0 +1,13 @@
+
+if(errors.length > 0)
+    div.error-message
+        each v in errors
+            -var e = v;
+            p(data-message=e) #{I18N[v]}
+if(messages.length > 0)
+    div.info-message
+        each v in messages
+            -var m = v;
+            p(data-message=m) #{I18N[v]}
+
+a(href="/") continue

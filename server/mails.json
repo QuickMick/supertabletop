@@ -1,0 +1,22 @@
+{
+  "account": {
+    "sender": "Super Tabletop <no-reply@supertabletop.io>",
+    "host": "smtp.example.com",
+    "port": 465,
+    "secure": true,
+    "auth": {
+      "user": "username@example.com",
+      "password": "userpass"
+    }
+  },
+  "en": {
+    "verify_mail_subject": "Mail verification",
+    "verify_mail": "you need to verify your mail, please click the link {0} it is available for 24h.",
+    "verify_mail_html": "<p>mail</p><a>link</a>"
+  },
+  "de": {
+    "verify_mail_subject": "Mail bestätigung",
+    "verify_mail": "Du musst deine Mail bestätigen, bitte klick dafür folgenden link {0} er ist für 24h gültig.",
+    "verify_mail_html": "<p>mail</p><a>link</a>"
+  }
+}

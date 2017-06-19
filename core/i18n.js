@@ -32,7 +32,7 @@ class I18N {
         var result = this._languageData[key] || "!"+key;
         if(arguments.length > 1){   // replace keywords, if there are more arguments passed
             arguments[0] = result;
-            result = this._replace(...arguments);
+            result = I18N.replace(...arguments);
         }
         return result;
     }
@@ -44,14 +44,13 @@ class I18N {
         if(arguments.length > 2){   // replace keywords, if there are more arguments passed
             Array.prototype.shift.apply(arguments);
             arguments[0] = result;
-
-            console.log(arguments);
-            result = _replace(...arguments);
+            result = I18N.replace(...arguments);
         }
+
         return result;
     }
 
-    _replace(format) {
+    static replace(format) {
         var args = Array.prototype.slice.call(arguments, 1);
         return format.replace(/{(\d+)}/g, function(match, number) {
             return typeof args[number] != 'undefined'

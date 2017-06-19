@@ -15,10 +15,28 @@ var uniqueValidator = require('mongoose-unique-validator');
 
 const ACCOUNT_TYPE_ENUM = ["local", "facebook", "google"];
 
+const CURSOR_TYPE_ENUM = ["default"];   //TODO: curser iwo hin auslagern
+
 const TRASHMAILS = require('./../../trashmails.json');
 const SUPPORTED_LANGUAGES = Object.keys(require('./../../../core/i18n_game.json'));
 const DEFAULT_LANGUAGE = "en";
 const DEFAULT_CURSOR = "default";
+
+const MAIL_VERIFICATION_EXPIRE_INTERVAL = 24*60*60*1000;    // expires in one day
+
+var MailVerificationDataModel = new Schema({
+    userID: {type: String, required: true}, // id of the user
+    email: {
+        type: String,
+        lowercase: true,
+        required: true,
+        index: true,
+        match: [/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/, "string_is_not_a_mail"]
+    },
+    token: {type: String, unique: true, index: true},  //token used in the url to verify
+    expiresOn: {type: Date, required: true, default: new Date(new Date().getTime()+MAIL_VERIFICATION_EXPIRE_INTERVAL)},
+    redeemed: {type:Boolean, required:true,default:false} // was this token used to verify the mail? true if yes
+});
 
 var AccountLinkDataModel = new Schema({
     id: {type: String},
@@ -104,7 +122,13 @@ var UserAccountDataModel = new Schema({
         max:[Colors.PLAYERS_COLORS.length, "invalid_color"],
         required: true
     },
-    cursor: {type: String, required: true, default:DEFAULT_CURSOR},
+    cursor: {
+        type: Number,
+        min:[0,"invalid_cursor"],
+        max:[CURSOR_TYPE_ENUM.length, "invalid_cursor"],
+        required: true,
+        default:0
+    },
     preferredLanguage: {type: String, enum: SUPPORTED_LANGUAGES, lowercase: true, default: DEFAULT_LANGUAGE},
     linkedAccounts: {type: [AccountLinkDataModel],  required: true}, // at least local type is required
     status: {
@@ -145,12 +169,16 @@ UserAccountDataModel.pre('findOneAndUpdate', function(next) {
     next();
 });
 
+
+var mailveri = mongoose.model('MailVerification', MailVerificationDataModel);
+
 var acclink = mongoose.model('AccountLink', AccountLinkDataModel);
 var uacc = mongoose.model('UserAccount', UserAccountDataModel);
 var demail = mongoose.model('DeprecatedMail', DeprecatedMailDataModel);
 
 // create the model for users and expose it to our app
 module.exports = {
+    MailVerificationModel:mailveri,
     UserAccountModel: uacc,
     AccountLinkModel: acclink,
     DeprecatedMailModel:demail,

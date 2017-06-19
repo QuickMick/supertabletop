@@ -75,6 +75,31 @@ module.exports = function(passport,userManager){
     });
 
 
+    /* Handle Logout */
+    router.get('/verify',
+        LanguageMiddleware,
+        function(data,req, res,next){
+
+            userManager.verifyMail(req,
+                (req,success,err)=>{
+                    res.render('mail_verification',{
+                            messages: req.flash('message'),
+                            errors:req.flash('error'),
+                            I18N:data.i18n,
+                        /* LANGUAGES:data.languages,
+                       languageID:data.languageID,
+                             COLOR_NAMES:Colors.PLAYERS_COLOR_NAMES,
+                             COLOR_VALUES:HTML_COLORS,
+                             fs: {
+                             translate:data.translate
+                             }*/
+                        }
+                    );
+                }
+            );
+        }
+    );
+
     router.post('/login', function(req, res, next) {
         passport.authenticate('login',/*{
             successRedirect: '/'
@@ -205,7 +230,6 @@ module.exports = function(passport,userManager){
 
         })(req, res, next);
     });
-
 
     router.post('/update-profile', function(req, res, next) {
             if(!req.isAuthenticated()){

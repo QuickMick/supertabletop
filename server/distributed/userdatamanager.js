@@ -10,6 +10,7 @@ var mongoose = require('mongoose');
 var UserEntry = require('./model/useraccountdatamodel');
 var AccountLinkDataModel = UserEntry.AccountLinkModel;
 var UserAccountDataModel = UserEntry.UserAccountModel;
+var MailVerificationModel = UserEntry.MailVerificationModel;
 var ACCOUNT_TYPE_ENUM = UserEntry.ACCOUNT_TYPE_ENUM;
 
 var uuidv1 = require('uuid/V1');
@@ -137,6 +138,92 @@ class UserDataManager {
         }.bind(this));
     }
 
+
+    createVerification(userID, email, successCallback, failCallback) {
+        var verification = new MailVerificationModel({
+            userID:userID,
+            email:email,
+            token: uuidv1()
+        });
+
+        process.nextTick(function () {
+            verification.save().then(function (v) {
+                if (successCallback) {
+                    successCallback(verification,v);
+                }
+            }, function (err) {
+                if (!failCallback)return;
+                failCallback(this.parseMongoErrors(err));
+            }.bind(this));
+        }.bind(this));
+    }
+
+    /**
+     * vertifies a mail account,
+     * redeems a mailVertify token
+     * @param token
+     * @param callback
+     */
+    verifyMail(token,callback){
+        if (!token) {
+            callback({error: "wrong_input_parameters"}, null);
+            return;
+        }
+        process.nextTick(() =>{
+            MailVerificationModel.findOne({token:token}, // first find the database entry for the token
+                (err, mailVerification) => {
+                    // In case of any error, return using the done method
+                    if (err) {
+                        callback(err, null);
+                        return null;
+                    }
+                    // Username does not exist, log error & redirect back
+                    if (!mailVerification) {
+                        callback({error: "verification_token_invalid"}, null);
+                        return null;
+                    }
+
+                    // was already redeemed
+                    if (mailVerification.redeemed) {
+                        callback({error: "verification_already_redeemed"}, null);
+                        return null;
+                    }
+
+                    // verification is expired
+                    if (mailVerification.expiresOn.getTime() < new Date().getTime()) {
+                        callback({error: "verification_expired"}, null);
+                        return null;
+                    }
+
+                    // everything is fine
+                    // update the user, that is mail is verified
+                    this.updateUser({
+                            key:"verifiedOn",
+                            value: new Date()
+                        },
+                        mailVerification.userID,
+                        (s)=>{
+                            // update the mailVerification, that it was redeemed
+                            mailVerification.redeemed = true;
+                            mailVerification.isNew = false;
+                            process.nextTick(function () {
+                                mailVerification.save().then(function (v) {
+                                    // finally, callback, that the mail is verified
+                                    callback(null, {message: "mail_verified"});
+                                }, function (err) {
+                                    callback(err, null);
+                                });
+                            });
+                        },
+                        (err)=>{
+                            callback(err, null);
+                        }
+                    );
+                }
+            );
+        });
+    }
+
     /**
      * parsers the errrors received from mongo
      * @param err
@@ -176,7 +263,6 @@ class UserDataManager {
      * @param failCallback
      */
     updateUser(changes, userID, successCallback, failCallback) {
-
         if(!changes || changes.length <=0){
             successCallback({none:"no_changes_detected"});
         }

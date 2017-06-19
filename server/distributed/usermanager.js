@@ -12,6 +12,15 @@ var Models = require('./model/useraccountdatamodel');
 var UserAccountModel = Models.UserAccountModel;
 var DeprecatedMailModel = Models.DeprecatedMailModel;
 
+const HOST_VERIFICATION = "http://localhost:3000/verify?t=";
+
+var I18N = require('./../../core/i18n');
+
+var uuidv1 = require('uuid/V1');
+
+var Mails = require('./../mails.json');
+const nodemailer = require('nodemailer');
+
 class UserManager {
 
     constructor(passport) {
@@ -21,6 +30,18 @@ class UserManager {
             (e) => this._initRoutes(passport),
             (e) => console.error("ERROR DB CONNECT",e)
         );
+
+
+        // create reusable transporter object using the default SMTP transport
+        this.mailTransporter = nodemailer.createTransport({
+            host: Mails.account.host,
+            port: Mails.account.port,
+            secure: Mails.account.secure, // secure:true for port 465, secure:false for port 587
+            auth: {
+                user: Mails.account.auth.user,
+                pass: Mails.account.auth.password
+            }
+        });
     }
 
     /**
@@ -48,6 +69,70 @@ class UserManager {
         }
         return null;
     };
+
+    /**
+     * sends an email to the user with a verification link it
+     * and also creates a database "mailVerification" entry
+     * @param user @type{User} user who has changed his mail
+     * @private
+     */
+    _sendVerificationMail(user){
+        this.userDataManager.createVerification(user.id,
+            user.email,
+            (verification,v)=>{
+                // get language of the user
+                var lang = Mails[user.preferredLanguage || "en"];
+
+                // setup email data with unicode symbols
+                let mailOptions = {
+                    from: Mails.account.sender, // sender address
+                    to: user.email, // list of receivers
+                    subject: lang.verify_mail_subject, // Subject line
+                    text: I18N.replace(lang.verify_mail,HOST_VERIFICATION+verification.token), // plain text body
+                    html: I18N.replace(lang.verify_mail_html,HOST_VERIFICATION+verification.token) // html body
+                };
+
+                // send mail with defined transport object
+                this.mailTransporter.sendMail(mailOptions, (error, info) => {
+                    if (error) {
+                        return console.log("SendMail:",error);
+                    }
+                    console.log('Message %s sent: %s', info.messageId, info.response);
+                });
+
+            },
+            (err)=>{
+                console.log("sendVerification",err);
+            }
+        );
+    }
+
+    /**
+     *
+     * @param req
+     * @param callback function(request,success,error)
+     */
+    verifyMail(req,callback){
+        var token = this.lookup(req.query,"t");
+
+        if(!token){
+            req.flash('error',"invalid_verification_token");
+            callback(req,false,true);
+        }
+
+        this.userDataManager.verifyMail(token,(e,succes)=>{
+            if(e) {
+                for (var k in e) {
+                    if (!e.hasOwnProperty([k])) continue;
+                    req.flash('error', e[k]);
+                }
+                callback(req,false,true);
+            }else{
+                req.flash('message',"mail_verified");
+                callback(req,true,false);
+            }
+        });
+    }
 
     /**
      *
@@ -88,9 +173,11 @@ class UserManager {
         if(language && language != user.preferredLanguage){
             changes.push({key: "preferredLanguage", value: language});
         }
+        var mailChanged = false;
 
         // mail changed?
         if(mail && mail != user.email){
+            mailChanged=true;
             changes.push({
                 key: "oldMailAdresses",
                 value: new DeprecatedMailModel({
@@ -112,6 +199,9 @@ class UserManager {
             user.id,
             (user)=>{   // success case
                 req.flash('message', 'user_updated_successfully');
+                if(mailChanged){    // mail has to be verificated again, wehn it was changed
+                    this._sendVerificationMail(user);
+                }
                 return callback(req, user,null);
             },
             (e) =>{
@@ -208,6 +298,7 @@ class UserManager {
                         null,
                         (user)=>{
                             req.flash('message', 'user_created_successfully');
+                            this._sendVerificationMail(user);
                             return done(null, user,req);
                         },
                         (e) =>{

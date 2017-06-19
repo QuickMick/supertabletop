@@ -19,7 +19,6 @@ class UserDataManager {
 
     constructor() {
 
-
     }
 
     init(successCallback,errorCallback) {
@@ -133,9 +132,9 @@ class UserDataManager {
                 }
             }, function (err) {
                 if (!failCallback)return;
-                failCallback(this.parseMongoErrors(err));
-            }.bind(this));
-        }.bind(this));
+                failCallback(UserDataManager.parseMongoErrors(err));
+            });
+        });
     }
 
 
@@ -153,9 +152,9 @@ class UserDataManager {
                 }
             }, function (err) {
                 if (!failCallback)return;
-                failCallback(this.parseMongoErrors(err));
-            }.bind(this));
-        }.bind(this));
+                failCallback(UserDataManager.parseMongoErrors(err));
+            });
+        });
     }
 
     /**
@@ -197,10 +196,13 @@ class UserDataManager {
 
                     // everything is fine
                     // update the user, that is mail is verified
-                    this.updateUser({
-                            key:"verifiedOn",
-                            value: new Date()
-                        },
+                    this.updateUser(
+                        [
+                            {
+                                key:"verifiedOn",
+                                value: new Date()
+                            }
+                        ],
                         mailVerification.userID,
                         (s)=>{
                             // update the mailVerification, that it was redeemed
@@ -229,7 +231,7 @@ class UserDataManager {
      * @param err
      * @returns {{}}
      */
-    parseMongoErrors(err){
+    static parseMongoErrors(err){
         var errors = {};
         for (var k in err.errors) {
 
@@ -266,7 +268,6 @@ class UserDataManager {
         if(!changes || changes.length <=0){
             successCallback({none:"no_changes_detected"});
         }
-        var parseErrors = this.parseMongoErrors; // copy in local variable, because i have no bock to bind se whol scheize
 
         // get the user, update the values, and save it again
         process.nextTick(function () {
@@ -276,7 +277,7 @@ class UserDataManager {
                     // Username does not exist, log error & redirect back
                     if (!user) {
                         if (!failCallback)return;
-                        failCallback(this.parseMongoErrors(err));
+                        failCallback(UserDataManager.parseMongoErrors(err));
                     }
 
                     // apply the passed changes to the userobject
@@ -301,7 +302,7 @@ class UserDataManager {
                             }
                         }, function (err) {
                             if (!failCallback)return;
-                            failCallback(parseErrors(err));
+                            failCallback(UserDataManager.parseMongoErrors(err));
                         });
                     });
                 }

@@ -103,6 +103,35 @@ module.exports = function(passport,userManager){
         }
     );
 
+    router.get('/request-verification',
+        LanguageMiddleware,
+        function(data,req, res,next){
+
+        //TODO
+            /*userManager.verifyMail(req,
+                (req,success,err)=>{
+                    var m = req.flash('message');
+                    var e = req.flash('error');
+                    console.log(m,e);
+                    res.render('mail_verification',{
+                            messages: m,
+                            errors:e,
+                            I18N:data.i18n,
+                             // LANGUAGES:data.languages,
+                             // languageID:data.languageID,
+                             // COLOR_NAMES:Colors.PLAYERS_COLOR_NAMES,
+                             // COLOR_VALUES:HTML_COLORS,
+                             // fs: {
+                             // translate:data.translate
+                             // }
+                        }
+                    );
+                }
+            );*/
+        }
+    );
+
+
     router.post('/login', function(req, res, next) {
         passport.authenticate('login',/*{
             successRedirect: '/'

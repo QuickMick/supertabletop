@@ -231,6 +231,17 @@ class Util {
     }
 
     /**
+     * tests if a passed string is a mail
+     * @param mailString {string}
+     * @returns {boolean} true, if passed string is a mail
+     */
+    static isMail(mailString) {
+        if (!mailString)return false;
+        if (typeof mailString != "string") return false;
+        return /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(mailString);
+    }
+
+    /**
      * Shuffles array in place. ES6 version
      * @param {Array} a items The array containing the items.
      */

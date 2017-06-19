@@ -58,7 +58,7 @@ var DeprecatedMailDataModel = new Schema({
         match: [/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/, "string_is_not_a_mail"]
     },
     verifiedOn: {type: Date},  // null, when it never was verified
-    deprecationDate: {type: Date, required: true, default: Date.now}
+    deprecationDate: {type: Date, required: true, default: Date.now}    // when got the mail deprecated?
 });
 
 function generateHash(password) {

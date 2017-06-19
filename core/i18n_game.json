@@ -114,9 +114,16 @@
     "verification_token_invalid":"The verification-token you passed was invalid.",
     "verification_expired":"The verification token is expired.",
     "mail_verified":"Your e-mail address was successfully verified.",
+    "mail_already_verified":"Your mail is already verified, nothing was sent",
     "send_verification_again":"Shall we send you another verification request?",
     "continue_to_main_page":"Continue to main page",
-    "click_here":"click here"
+    "click_here":"click here",
+    "verification_dialog_title":"E-Mail address verification",
+    "send_again":"send again",
+    "invalid_mail":"Invalid mail address passed.",
+    "account_for_email_not_found":"No account was found which uses the e-mail you sent.",
+    "error_while_sending_verification":"Error while sending, please try again later.",
+    "verification_successfully_sent":"Verification request successfully sent. Please check your mails."
   },
   "de":{
     "_LANG":"Deutsch",
@@ -230,12 +237,19 @@
     "user_updated_successfully":"Benutzerdaten erfolgreich gespeichert",
 
     "verification_already_redeemed":"Die E-Mail Adresse wurde bereits bestätigt.",
-    "invalid_verification_token":"Inkorrekte Bestätigung wurde gesendet!",
-    "verification_token_invalid":"Inkorrekte Bestätigung wurde gesendet!",
+    "invalid_verification_token":"Inkorrekter Bestätigungcode wurde gesendet!",
+    "verification_token_invalid":"Inkorrekter Bestätigungcode wurde gesendet!",
     "verification_expired":"Die Besätigung ist abgelaufen",
     "mail_verified":"Deine E-Mail Adresse wurde erfolgreich vertifiziert.",
+    "mail_already_verified":"Deine E-Mail Adresse ist bereits bestätigt. Es wirde nichts gesendet.",
     "send_verification_again":"Sollen wir dir eine neue Bestätigungsanfrage senden?",
     "continue_to_main_page":"Zurück zur Startseite",
-    "click_here":"Klick hier"
+    "click_here":"Klick hier",
+    "verification_dialog_title":"E-Mail Adressen Verifizierung",
+    "send_again":"erneut senden",
+    "invalid_mail":"Invalide E-Mail-Addresse übergeben.",
+    "account_for_email_not_found":"Es wurde kein Account gefunden, welche die E-Mail Addresse, die du eingegebn hast, bentutz.",
+    "error_while_sending_verification":"Fehler beim senden, bitte versuche es später erneut.",
+    "verification_successfully_sent":"Verificationsanfrage erfolgreich gesendet. Bitte checke deine Mails."
   }
 }

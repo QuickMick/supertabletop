@@ -40,7 +40,15 @@ var app = express();
 app.use(helmet());
 
 var secret = uuidv1();
-app.use(expressSession({secret: secret /*, cookie:{maxAge:6000}*/ }));
+var sessionMiddleware = expressSession(
+    {
+      //store: new RedisStore({}),
+      secret: secret /*, cookie:{maxAge:6000}*/
+    }
+);
+app._SESSION_MIDDLEWARE = sessionMiddleware;
+
+app.use(sessionMiddleware);
 app.use(passport.initialize());
 app.use(passport.session());
 

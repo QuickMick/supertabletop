@@ -235,7 +235,7 @@ class Util {
      * @param mailString {string}
      * @returns {boolean} true, if passed string is a mail
      */
-    static isMail(mailString) {
+    static isValidMail(mailString) {
         if (!mailString)return false;
         if (typeof mailString != "string") return false;
         return /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(mailString);

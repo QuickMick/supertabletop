@@ -27,6 +27,9 @@ var server = http.createServer(app);
 
 
 var io = require('socket.io')(server);
+io.use(function (socket,next) {
+  app._SESSION_MIDDLEWARE(socket.request,socket.request.res,next);
+});
 //var ConnectionHandler = new ConnectionHandler(io);
 ConnectionHandler.start(io);
 

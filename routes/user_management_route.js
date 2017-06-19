@@ -80,6 +80,30 @@ module.exports = function(passport,userManager){
         LanguageMiddleware,
         function(data,req, res,next){
 
+            if(!req.query.t
+                || req.query.t.length <=0
+                || req.flash('request-mail-verification').includes("do_not_verify")){
+                var m = req.flash('message');
+                var e = req.flash('error');
+                console.log(m,e);
+                res.render('mail_verification',{
+                        messages: m,
+                        errors:e,
+                        I18N:data.i18n,
+                        forceShowResend:true
+                        /* LANGUAGES:data.languages,
+                         languageID:data.languageID,
+                         COLOR_NAMES:Colors.PLAYERS_COLOR_NAMES,
+                         COLOR_VALUES:HTML_COLORS,
+                         fs: {
+                         translate:data.translate
+                         }*/
+                    }
+                );
+                return res;
+            }else
+
+
             userManager.verifyMail(req,
                 (req,success,err)=>{
                     var m = req.flash('message');
@@ -103,33 +127,27 @@ module.exports = function(passport,userManager){
         }
     );
 
-    router.get('/request-verification',
-        LanguageMiddleware,
-        function(data,req, res,next){
+    router.post('/request-mail-verification',
+        function(req,res,next){
+        userManager.resendVerificationMail(req,
+            (req,err,success)=>{
+                console.log(success,err);
+                req.flash("request-mail-verification","do_not_verify");
+                res.redirect("/verify");
+                return res;
+               /* var m = req.flash('message');
+                var e = req.flash('error');
+                console.log(m,e);
+                res.render('mail_verification',{
+                        messages: m,
+                        errors:e,
+                        I18N:data.i18n,
 
-        //TODO
-            /*userManager.verifyMail(req,
-                (req,success,err)=>{
-                    var m = req.flash('message');
-                    var e = req.flash('error');
-                    console.log(m,e);
-                    res.render('mail_verification',{
-                            messages: m,
-                            errors:e,
-                            I18N:data.i18n,
-                             // LANGUAGES:data.languages,
-                             // languageID:data.languageID,
-                             // COLOR_NAMES:Colors.PLAYERS_COLOR_NAMES,
-                             // COLOR_VALUES:HTML_COLORS,
-                             // fs: {
-                             // translate:data.translate
-                             // }
-                        }
-                    );
-                }
-            );*/
-        }
-    );
+                    }
+                );*/
+            }
+        );
+    });
 
 
     router.post('/login', function(req, res, next) {

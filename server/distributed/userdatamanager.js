@@ -326,7 +326,7 @@ class UserDataManager {
      */
     getUser(query, callback) {
         if (!query) {
-            callback({message: "wrong_input_parameters"}, null);
+            callback({error: "wrong_input_parameters"}, null);
             return;
         }
         process.nextTick(function () {

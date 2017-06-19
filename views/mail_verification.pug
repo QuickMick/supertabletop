@@ -3,18 +3,25 @@ html
         title #{I18N.title}
         link(rel='stylesheet', href='/stylesheets/users.css')
     body
-        if(errors.length > 0)
-            div.error-message
-                each v in errors
-                    -var e = v;
-                    p(data-message=e) #{I18N[v]}
-
-            span #{I18N.send_verification_again}
-            a(href="/request-verification") #{I18N.click_here}
-        if(messages.length > 0)
-            div.info-message
-                each v in messages
-                    -var m = v;
-                    p(data-message=m) #{I18N[v]}
-
-        a(href="/") #{I18N.continue_to_main_page}
+        div.overlay
+            div.overlay-content
+                div.input-content
+                    div.formular-title #{I18N.verification_dialog_title}
+                    .flash-messages
+                        if(errors.length > 0)
+                            div.error-message
+                                each v in errors
+                                    -var e = v;
+                                    p(data-message=e) #{I18N[v]}
+                        if(messages.length > 0)
+                            div.info-message
+                                each v in messages
+                                    -var m = v;
+                                    p(data-message=m) #{I18N[v]}
+                    if(forceShowResend || errors.length > 0)
+                        div.text #{I18N.send_verification_again}
+                        form.form-signin(name="resend_mail_verification_request" action='/request-mail-verification', method='POST')
+                            -var mail = I18N.email;
+                            input.form-control(type='text', name='email', placeholder=mail,required, autofocus)
+                            button(class='btn', type='submit') #{I18N.send_again}
+                a.link(href="/") #{I18N.continue_to_main_page}

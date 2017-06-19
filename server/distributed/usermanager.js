@@ -8,11 +8,13 @@
 var LocalStrategy = require('passport-local').Strategy;
 var UserDataManager = require('./userdatamanager');
 var SharedConfig = require('./../../core/sharedconfig.json');
+var Util = require('./../../core/util');
 var Models = require('./model/useraccountdatamodel');
 var UserAccountModel = Models.UserAccountModel;
 var DeprecatedMailModel = Models.DeprecatedMailModel;
 
-const HOST_VERIFICATION = "http://localhost:3000/verify?t=";
+var Hosts = require('./hosts.json');
+
 
 var I18N = require('./../../core/i18n');
 
@@ -34,12 +36,12 @@ class UserManager {
 
         // create reusable transporter object using the default SMTP transport
         this.mailTransporter = nodemailer.createTransport({
-            host: Mails.account.host,
-            port: Mails.account.port,
-            secure: Mails.account.secure, // secure:true for port 465, secure:false for port 587
+            host: Hosts.MAIL.host,
+            port: Hosts.MAIL.port,
+            secure: Hosts.MAIL.secure, // secure:true for port 465, secure:false for port 587
             auth: {
-                user: Mails.account.auth.user,
-                pass: Mails.account.auth.password
+                user: Hosts.MAIL.auth.user,
+                pass: Hosts.MAIL.auth.password
             }
         });
     }
@@ -74,9 +76,10 @@ class UserManager {
      * sends an email to the user with a verification link it
      * and also creates a database "mailVerification" entry
      * @param user @type{User} user who has changed his mail
+     * @param callback {function(error,success)}
      * @private
      */
-    _sendVerificationMail(user){
+    sendVerificationMail(user,callback){
         this.userDataManager.createVerification(user.id,
             user.email,
             (verification,v)=>{
@@ -88,21 +91,81 @@ class UserManager {
                     from: Mails.account.sender, // sender address
                     to: user.email, // list of receivers
                     subject: lang.verify_mail_subject, // Subject line
-                    text: I18N.replace(lang.verify_mail,HOST_VERIFICATION+verification.token), // plain text body
-                    html: I18N.replace(lang.verify_mail_html,HOST_VERIFICATION+verification.token) // html body
+                    text: I18N.replace(lang.verify_mail,Hosts.MAIL_VERIFICATION_LINK+verification.token), // plain text body
+                    html: I18N.replace(lang.verify_mail_html,Hosts.MAIL_VERIFICATION_LINK+verification.token) // html body
                 };
 
                 // send mail with defined transport object
                 this.mailTransporter.sendMail(mailOptions, (error, info) => {
                     if (error) {
+                        if(callback){
+                            callback(error,null);
+                        }
                         return console.log("SendMail:",error);
                     }
                     console.log('Message %s sent: %s', info.messageId, info.response);
+                    if(callback){
+                        callback(false,{message:"mail_sent_successfully"});
+                    }
                 });
 
             },
             (err)=>{
                 console.log("sendVerification",err);
+                if(callback){
+                    callback(err,null);
+                }
+            }
+        );
+    }
+
+    /**
+     *
+     * @param req
+     * @param callback function(request,error,success)
+     * @returns {*}
+     */
+    resendVerificationMail(req,callback){
+
+        var mailAdress = this.lookup(req.body, "email") || this.lookup(req.query, "email");
+
+        if(!mailAdress || typeof mailAdress != "string"){
+            req.flash('error',"invalid_mail");
+            return callback(req,true,null);
+        }
+
+        mailAdress = mailAdress.trim().toLowerCase();
+
+        if(!Util.isValidMail(mailAdress)){
+            req.flash('error',"invalid_mail");
+            return callback(req,true,null);
+        }
+
+        this.userDataManager.getUser({"email":mailAdress},
+            (err,user) =>{
+                if(err || !user){
+                    req.flash('error',"account_for_email_not_found");
+                    return callback(req,true,null);
+                }
+
+                if(user.verifiedOn){
+                    req.flash('message',"mail_already_verified");
+                    return callback(req,null,true);
+                }
+
+                this.sendVerificationMail(user,
+                    (err,success)=>{
+
+                        if(err){
+                            console.log("resendVerificationMail",err);
+                            req.flash('error',"error_while_sending_verification");
+                            return callback(req,true,null);
+                        }
+
+                        req.flash('message',"verification_successfully_sent");
+                        return callback(req,true,null);
+                    }
+                );
             }
         );
     }
@@ -118,6 +181,7 @@ class UserManager {
         if(!token){
             req.flash('error',"invalid_verification_token");
             callback(req,false,true);
+            return;
         }
 
         this.userDataManager.verifyMail(token,(e,succes)=>{
@@ -200,7 +264,7 @@ class UserManager {
             (user)=>{   // success case
                 req.flash('message', 'user_updated_successfully');
                 if(mailChanged){    // mail has to be verificated again, wehn it was changed
-                    this._sendVerificationMail(user);
+                    this.sendVerificationMail(user);
                 }
                 return callback(req, user,null);
             },
@@ -298,7 +362,7 @@ class UserManager {
                         null,
                         (user)=>{
                             req.flash('message', 'user_created_successfully');
-                            this._sendVerificationMail(user);
+                            this.sendVerificationMail(user);
                             return done(null, user,req);
                         },
                         (e) =>{

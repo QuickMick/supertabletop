@@ -1,0 +1,13 @@
+{
+  "MAIL_VERIFICATION_LINK": "http://localhost:3000/verify?t=",
+  "MAIL": {
+    "sender": "Super Tabletop <no-reply@supertabletop.io>",
+    "host": "smtp.example.com",
+    "port": 465,
+    "secure": true,
+    "auth": {
+      "user": "username@example.com",
+      "password": "userpass"
+    }
+  }
+}

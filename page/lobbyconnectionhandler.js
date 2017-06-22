@@ -96,15 +96,6 @@ class LobbyConnectionHandler extends EventEmitter3{
             Packages.createEvent(this.CLIENT_INFO.id,{message:msg},this.CLIENT_INFO.token)
         );
     }
-
-
-    sendChatMessage(msg){
-        this.socket.emit(
-            Packages.PROTOCOL.CHAT.CLIENT_CHAT_MSG,
-            Packages.createEvent(this.CLIENT_INFO.id,{message:msg},this.CLIENT_INFO.token)
-        );
-    }
-
 }
 
 module.exports = LobbyConnectionHandler;

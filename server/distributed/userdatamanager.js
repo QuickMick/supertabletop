@@ -13,12 +13,16 @@ var UserAccountDataModel = UserEntry.UserAccountModel;
 var MailVerificationDataModel = UserEntry.MailVerificationModel;
 var ACCOUNT_TYPE_ENUM = UserEntry.ACCOUNT_TYPE_ENUM;
 
+const RANDOM_NAMES = require('./../../core/random_names.json');
+const ADJECTIVES = require('./../../core/adjectives.json');
+
+
 var uuidv1 = require('uuid/V1');
 //TODO use memcached und des heir eigentlich als service -> die classe connectet zum service beim laden, aber saved alles im memcached
 class UserDataManager {
 
     constructor() {
-
+        this.allocatedGuestNames = new Set();
     }
 
     init(successCallback,errorCallback) {
@@ -428,6 +432,44 @@ class UserDataManager {
                 }
             );
         });
+    }
+
+
+    getRandomGuestName(){
+        var name = UserDataManager.getRandomName(this.allocatedGuestNames);
+        this.allocatedGuestNames.add(name.toLowerCase());
+        return name;
+    }
+
+
+//TODO: die names in microservice
+
+    /**
+     * get a random name. If the name is already assigned, take another one
+     * @param allocatedNames {Set} contains the allocated names
+     * @returns {*}
+     */
+    static getRandomName(allocatedNames, i=0){
+        var result = RANDOM_NAMES[Math.floor(Math.random()*RANDOM_NAMES.length)];
+
+        if(i>5){    // if it is called mare then 5 times recursively, then combine two random names
+            result = ADJECTIVES[Math.floor(Math.random()*RANDOM_NAMES.length)]+"-"+RANDOM_NAMES[Math.floor(Math.random()*RANDOM_NAMES.length)];
+        }else if(i>10){
+           // return this.getAlternativeNameIfOccupied(result);
+            // force a name, if there is no free one found after 10 tries
+            result = name;
+            var i=1;
+            while(allocatedNames.has(result.toLowerCase())){
+                result = name+" ("+i+")";
+                i++;
+            }
+        }
+
+        if(allocatedNames.has(result.toLowerCase())){
+            i++;
+            return UserDataManager.getRandomName(allocatedNames,i);
+        }
+        return result;
     }
 }
 

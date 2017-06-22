@@ -3,6 +3,7 @@
  */
 
 'use strict';
+//TODO: passwort reset http://sahatyalkabov.com/how-to-implement-password-reset-in-nodejs/
 
 var express = require('express');
 var router = express.Router();
@@ -46,6 +47,8 @@ module.exports = function(passport,userManager){
             if(req.isAuthenticated()){  // if already logged in, redirect to lobby
                 res.redirect("/");
             }
+
+
 
             res.render('signup',{
                     messages: req.flash('message'),
@@ -100,7 +103,7 @@ module.exports = function(passport,userManager){
             ){
                 var m = req.flash('message');
                 var e = req.flash('error');
-                console.log(m,e);
+
                 res.render('mail_verification',{
                         messages: m,
                         errors:e,

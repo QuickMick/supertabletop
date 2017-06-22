@@ -47,6 +47,8 @@ router.get('/',
             user.language = u.preferredLanguage;
             user.status = Rights.RIGHTS_STRENGTH[u.status];
             delete user.default;
+        }else{
+            //TODO set temporary user
         }
 
         var currentLanguage = data.queryLanguage || user.language || data.languageID;

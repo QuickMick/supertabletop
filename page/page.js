@@ -22,7 +22,6 @@ class Page
 
         this.show(this.lobbyHandler);
 
-
     }
 
 

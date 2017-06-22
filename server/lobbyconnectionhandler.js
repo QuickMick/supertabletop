@@ -13,12 +13,11 @@ class LobbyConnectionHandler {
         this.io = io;
         this.ID = uuidV1();
         this.io.on('connection', this._onConnectionReceived.bind(this));
-
-
     }
 
     _onConnectionReceived(socket){
-
+console.log("SESSION",socket.request.session);
+        console.log(socket.request.session.user);
 
         // share info with client (that he is connected and his own info)
         this._sendToClient(

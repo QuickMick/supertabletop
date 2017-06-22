@@ -14,6 +14,8 @@ var passport = require('passport');
 var expressSession = require('express-session');
 
 
+
+
 var index = require('./routes/index');
 var users = require('./routes/users');
 var editorRoute = require('./routes/editor_route');
@@ -53,6 +55,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 var userManager = new UserManager(passport);
+var guestNameMiddleware = require('./routes/guestnamemiddleware')(userManager);
 var userManagementRoute = require('./routes/user_management_route')(passport,userManager);
 
 
@@ -99,6 +102,7 @@ var ensureAuthenticatedMiddleware = function (req, res, next) {
 };
 
 
+app.use('/',guestNameMiddleware);
 app.use('/',userManagementRoute);
 app.use('/', index);
 

@@ -73,6 +73,10 @@ class UserManager {
         return null;
     };
 
+    getRandomGuestName(){
+        return this.userDataManager.getRandomGuestName();
+    }
+
     /**
      * sends an email to the user with a verification link it
      * and also creates a database "mailVerification" entry

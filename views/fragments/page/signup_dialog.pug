@@ -21,7 +21,7 @@ div.overlay
                 select.form-control(name="color", required)
                     option(value=-1 selected=true ) --- #{I18N.choose_default_color} ---
                     each e,i in COLOR_NAMES
-                        option(value=i class="color-option "+e style="background-color :"+COLOR_VALUES[i]) #{I18N[e]}
+                        option(value=i class="color-option "+e, style="background-color :"+COLOR_VALUES[i]) #{I18N[e]}
                 div.terms-and-conditions
                     input(type="checkbox", name="agree", required)
                     | #{I18N.agree_trems_and_conditions} #{I18N.agree_terms_and_conditions}

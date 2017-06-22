@@ -22,7 +22,7 @@ var uuidv1 = require('uuid/V1');
 class UserDataManager {
 
     constructor() {
-        this.allocatedGuestNames = new Set();
+        this.allocatedGuestNames = new Set();   //TODO: in redis store
     }
 
     init(successCallback,errorCallback) {

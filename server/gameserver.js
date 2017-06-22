@@ -170,7 +170,7 @@ class GameServer{
 
         this.self.entityServerManager.releaseAllContraintsForUser(this.socket.id);
         this.self.clientManager.clientDisconnected(this.socket, data);
-        this.self._boradcastExceptSender(
+        this.self._broadcastExceptSender(
             this.socket,
             Packages.PROTOCOL.SERVER.CLIENT_DISCONNECTED,
             Packages.createEvent(
@@ -470,7 +470,7 @@ class GameServer{
         //this.io.sockets.emit(type,msg);
     }
 
-    _boradcastExceptSender(senderSocket,type,msg){
+    _broadcastExceptSender(senderSocket,type,msg){
         for(var i=0; i<this.allSockets.length;i++){
             var cur = this.allSockets[i];
             if(cur == senderSocket) continue;

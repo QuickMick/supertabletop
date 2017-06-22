@@ -10,6 +10,8 @@ var Packages = require('./../core/packages');
 var GameConnectionHandler = require('./gameconnectionhandler');
 var LobbyConnectionHandler = require('./lobbyconnectionhandler');
 
+var ChatModule = require('./servermodules/chatmodule');
+
 class ConnectionHandler {
 
     constructor(io) {
@@ -26,6 +28,8 @@ class ConnectionHandler {
 
         this.gameConnectionHandler = new GameConnectionHandler(this.gameNsp);
         this.lobbyConnectionHandler = new LobbyConnectionHandler(this.lobbyNsp);
+
+        this.lobbyConnectionHandler.use(new ChatModule());
 
       /*  this.gameNsp.on('connection', this.gameConnectionHandler._onConnectionReceived.bind(this.gameConnectionHandler));
         this.lobbyNsp.on('connection',this.lobbyConnectionHandler._onConnectionReceived.bind(this.lobbyConnectionHandler));*/

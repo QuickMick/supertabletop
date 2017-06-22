@@ -19,6 +19,10 @@ class LobbyHandler {
 
         this.chatHandler = new ChatHandler("lobby-chat-container",false,150);
 
+        this.chatHandler.on('send',(msg)=>{
+            this.lobbyConnectionHandler.sendChatMessage(msg);
+        });
+
         var log_in_btn = document.getElementById("log-in");
         if(log_in_btn){
             log_in_btn.onclick = () => {

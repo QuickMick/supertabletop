@@ -4,12 +4,17 @@
 
 'use strict';
 
+var uuidv1 = require('uuid/v1');
+
 module.exports = function(userManager){
 
     /***
      * creates a fame for a guest, if he has not one
      */
     return function(req, res,next) {
+        if(!req.session.USER_ID){
+            req.session.USER_ID = uuidv1();
+        }req
         if(!req.session.guestName && !req.isAuthenticated()){
             req.session.guestName = userManager.getRandomGuestName();
         }else if(req.isAuthenticated() && req.session.guestName){

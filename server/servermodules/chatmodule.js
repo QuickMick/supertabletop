@@ -52,19 +52,21 @@ class ChatModule extends BaseServerModule{
         if(!user){
             user  = {
                 displayName: this.socket.request.session.guestName,
-                userStatus : Rights.RIGHTS.guest
+                userStatus : 0 // 0 is equal to "guest"
             };
         }
-
 
         this.self._broadcast(    // if the change was valid, send everyone the new information
             Packages.PROTOCOL.CHAT.SERVER_CHAT_MSG,
             Packages.createEvent(
-                this.self.ID,
+                this.self.SERVER_ID,
                 {
                     clientID: evt.senderID,
-                    type:user.userStatus,
-                    displayName:user.displayName,
+                    type:"user",
+                    sender:{
+                        name:user.displayName,
+                        userStatus:user.userStatus
+                    },
                     message: evt.data.message
                 }
             )

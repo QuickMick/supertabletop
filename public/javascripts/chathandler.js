@@ -6,6 +6,8 @@
 var EventEmitter3 = require('eventemitter3');
 var Util = require('./../../core/util');
 
+var Rights = require('./../../core/rights');
+
 var dateFormat = require('dateformat');
 
 const EVT_SEND = 'send';
@@ -144,7 +146,7 @@ class ChatHandler extends EventEmitter3 {
                     return;
                 }
                 local.msg = msg;
-                local.prefix = I18N.translate(sender.userStatus || "");
+                local.prefix = I18N.translate(Rights.RIGHTS_STRENGTH[sender.userStatus] || "");
                 local.name = sender.name || "name-not-found";
                 local.color = Util.intToColorString(sender.color);
                 if (this._isMinimized && this._expanderButton) {    // when minimazed, give user a hint, that there is a new message hidden

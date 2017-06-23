@@ -54,7 +54,6 @@ class LobbyConnectionHandler {
             this.serverModules[i].onConnectionReceived(socket);
         }
 
-
         // share info with client (that he is connected and his own info)
         this._sendToClient(
             socket,
@@ -67,7 +66,6 @@ class LobbyConnectionHandler {
                 }
             )
         );
-
     }
 
     _onDisconnect (data) {
@@ -76,8 +74,8 @@ class LobbyConnectionHandler {
             return;
         }
 
-        for(var i=0; i< this.serverModules.length; i++){
-            this.serverModules[i].onConnectionLost(this.socket);
+        for(var i=0; i< this.self.serverModules.length; i++){
+            this.self.serverModules[i].onConnectionLost(this.socket);
         }
 
         this.self.allSockets = Util.removeByValue(this.self.allSockets,this.socket);
@@ -95,7 +93,8 @@ class LobbyConnectionHandler {
 
 
     _broadcast(type,msg){
-        this.io.sockets.emit(type,msg);
+        //this.io.sockets.emit(type,msg);
+        this.io.emit(type,msg);
     }
 
     _broadcastExceptSender(senderSocket, type, msg){

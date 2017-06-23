@@ -23,6 +23,10 @@ class LobbyHandler {
             this.lobbyConnectionHandler.sendChatMessage(msg);
         });
 
+        this.lobbyConnectionHandler.on('chatmessagereceived',(evt)=>
+            this.chatHandler.pushMessage(evt.data.message, evt.data.type, evt.timeStamp, evt.data.sender)
+        );
+
         var log_in_btn = document.getElementById("log-in");
         if(log_in_btn){
             log_in_btn.onclick = () => {

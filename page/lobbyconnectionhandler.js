@@ -73,7 +73,7 @@ class LobbyConnectionHandler extends EventEmitter3{
         if(!this._vertifyServer(evt.senderID)){console.log("message is not from server"); return; }
        // var from = this.playerManager.getPlayer(evt.data.clientID);
         //this.chatHandler.pushMessage(evt.data.message,evt.data.type,evt.timeStamp, from);
-        this.emit(EVT_CHATMESSAGE_RECEIVED,evt.data);
+        this.emit(EVT_CHATMESSAGE_RECEIVED,evt);
     }
 
     /**

@@ -52,7 +52,7 @@ class ChatModule extends BaseServerModule{
 
         if(!user){
             user  = {
-                displayName: this.socket.request.session.guestName,
+                displayName: this.socket.request.session.guestName || "anonymous",
                 status : 0 // 0 is equal to "guest"
             };
         }

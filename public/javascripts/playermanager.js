@@ -151,7 +151,7 @@ class PlayerManager extends PIXI.Container {
             this._createPlayerHTMLItem(
                 this.playerHTMLContainer,
                 player_data.id,
-                player_data.userStatus,
+                Rights.RIGHTS_STRENGTH[player_data.userStatus],
                 player_data.name,
                 player_data.color,
                 player_data.playerIndex
@@ -191,7 +191,7 @@ class PlayerManager extends PIXI.Container {
             this.assignedColors[data.color] = data.id;
         }
 
-        this._createPlayerHTMLItem(this.playerHTMLContainer,data.id,data.userStatus,data.name,data.color,data.playerIndex);
+        this._createPlayerHTMLItem(this.playerHTMLContainer,data.id,Rights.RIGHTS_STRENGTH[data.userStatus],data.name,data.color,data.playerIndex);
 
     }
 

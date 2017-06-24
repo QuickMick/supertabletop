@@ -9,7 +9,7 @@ var Util = require('./../core/util');
 
 const uuidV1 = require('uuid/v1');
 
-
+// TODO: von baseserver ableiten
 class LobbyConnectionHandler {
 
     /**

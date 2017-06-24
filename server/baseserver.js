@@ -11,7 +11,7 @@ const uuidV1 = require('uuid/v1');
 
 
 /**
- * TODO: heiraus alle serer ableiten
+ * TODO: heiraus alle server ableiten, e.g. LobbyConnectionHandler
  */
 class BaseServer {
 

@@ -121,6 +121,7 @@ body,html {
     background-color: var(--color-base);
     display: flex;
     flex-direction: row;
+    flex-shrink: 0;
 }
 
 .separator {
@@ -278,7 +279,8 @@ h1{
 
 
 #lobby-chat-container{
-    width: 20%;
+   /* width: 20%;*/
+    width: 100%;
     height: 100%;
     min-width: 250px;
 }
@@ -729,9 +731,10 @@ h1{
     border-top: var(--color-base) 1px solid;
     display: flex;
     flex-direction: column;
-    margin: 0 10px;
+   /* margin: 0 10px;*/
     font-size:16px;
     height: 40%;
+    overflow-y: auto;
 }
 #player-lobby-list .online-player{
     margin-top: 4px;
@@ -774,7 +777,7 @@ h1{
 .chat-container.show .chat-content .chat-output{
     flex-grow: 1;
 
-    margin: 0px 0 10px 10px;
+    /*margin: 0px 0 10px 10px;*/
     display: flex;
     flex-direction: column;
     overflow-y: scroll;

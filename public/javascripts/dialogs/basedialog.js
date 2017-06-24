@@ -14,7 +14,6 @@ class BaseDialog extends EventEmitter3{
         super();
         this.fragment = Util.htmlStringToNode(window[layout](layoutLocals || {}));
 
-        Util.stopPropagation(this.fragment);  //override listeners, so nothing passes to the game
         var btnsArry= this.fragment.querySelectorAll(".action");//this._rootContainer.querySelectorAll("btn");
 
         this.btns = {};
@@ -34,8 +33,9 @@ class BaseDialog extends EventEmitter3{
                 };
             }
         }
-
         this._rootNode = this.fragment.childNodes[0];
+
+      //  Util.stopPropagation(this._rootNode);  //override listeners, so nothing passes to the game
     }
     
     disableAllButtons(){
@@ -64,9 +64,24 @@ class BaseDialog extends EventEmitter3{
     }
 
     show(rootContainer){
-        (rootContainer || document.body).appendChild(this.fragment);
+        this._container = (rootContainer || document.body);
+        this._container.appendChild(this.fragment);
         delete this.fragment;
+
+        // make dialog closeable with ESC key
+        this._escCloseListener = function(e){
+            if (!e) e = window.event;
+            var keyCode = e.keyCode || e.which;
+            if (keyCode == '27') {  // Enter pressed
+                this.close();
+                return false;
+            }
+        }.bind(this);
+
+        this._container.addEventListener("keyup", this._escCloseListener, true);
     }
+
+
 
     _click(action){
      //   if(this.btns[action] && this.btns[action].isDisabled) return;
@@ -77,6 +92,8 @@ class BaseDialog extends EventEmitter3{
     }*/
 
     close(){
+        this._container.removeEventListener("keyup",this._escCloseListener,true);
+        delete this._escCloseListener;
         if(!this._rootNode.parentNode) return;
         this.emit(EVT_ONCLOSE,this);
         this._rootNode.parentNode.removeChild(this._rootNode);

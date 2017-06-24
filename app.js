@@ -41,18 +41,19 @@ var passportSocketIo = function(cookieParser, sessionStore, passport, cookie){
                     data.session = session;
 
                     if(err || !session || !session.passport || !session.passport.user || !session.passport.user) {
-                        accept(null, true);
-                    }else{
-                        if(data.session && data.session.passport && data.session.passport.user) {
-                            _passport.deserializeUser(data.session.passport.user, data, function (err, user) {
-                                data.user = user;
-                                data.user.logged_in = true;
-                                accept(null, true);
-                            });
-                        }else{
-                            accept(null, true);
-                        }
+                        return accept(null, true);
                     }
+
+                    if(data.session && data.session.passport && data.session.passport.user) {
+                        _passport.deserializeUser(data.session.passport.user, data, function (err, user) {
+                            data.user = user;
+                            data.user.logged_in = true;
+                            accept(null, true);
+                        });
+                    }else{
+                        accept(null, true);
+                    }
+
                 });
             });
         } else {

@@ -48,7 +48,8 @@ router.get('/',
             user.status = Rights.RIGHTS_STRENGTH[u.status];
             delete user.default;
         }else{
-            //TODO set temporary user
+            user.displayName= req.session.guestName;
+            user.status = Rights.RIGHTS.guest;
         }
 
         var currentLanguage = data.queryLanguage || user.language || data.languageID;

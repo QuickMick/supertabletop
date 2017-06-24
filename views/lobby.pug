@@ -15,11 +15,10 @@ html
                     div.test.color-darkest darkest
                 div.separator
                 div.current-user-info
-                    -if(isAuthenticated)
-                            img.current-user-image
-                            div.prefix [#{I18N_LAYOUT[user.status]}]
-                            div.name #{user.displayName}
-                    -else
+                    img(src="resources/default/missing_avatar.png").current-user-image
+                    div.prefix [#{I18N_LAYOUT[user.status]}]
+                    div.name #{user.displayName}
+                    -if(!isAuthenticated)
                         div.not-logged-in-sign
                             span  #{I18N_LAYOUT.not_logged_in}
                             span#sign-up.a #{I18N_LAYOUT.create_account}

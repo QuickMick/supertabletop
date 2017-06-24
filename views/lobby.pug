@@ -19,11 +19,12 @@ html
                     div.prefix [#{I18N_LAYOUT[user.status]}]
                     div.name #{user.displayName}
                     -if(!isAuthenticated)
+                        div.separator
                         div.not-logged-in-sign
                             span  #{I18N_LAYOUT.not_logged_in}
                             span#sign-up.a #{I18N_LAYOUT.create_account}
                             span ?
-
+                div.separator
                 div.sign-in-out
                     -if(!isAuthenticated)
                         div.switch.logged-out

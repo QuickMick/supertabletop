@@ -48,8 +48,6 @@ module.exports = function(passport,userManager){
                 res.redirect("/");
             }
 
-
-
             res.render('signup',{
                     messages: req.flash('message'),
                     errors:req.flash('error'),

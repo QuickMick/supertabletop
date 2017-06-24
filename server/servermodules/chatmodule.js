@@ -47,12 +47,12 @@ class ChatModule extends BaseServerModule{
         }
 
 
-        var user = this.socket.request.session.user;
+        var user = this.socket.request.user;
 
         if(!user){
             user  = {
                 displayName: this.socket.request.session.guestName,
-                userStatus : 0 // 0 is equal to "guest"
+                status : 0 // 0 is equal to "guest"
             };
         }
 
@@ -65,7 +65,7 @@ class ChatModule extends BaseServerModule{
                     type:"user",
                     sender:{
                         name:user.displayName,
-                        userStatus:user.userStatus
+                        userStatus:user.status
                     },
                     message: evt.data.message
                 }

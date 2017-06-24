@@ -81,6 +81,8 @@ class LobbyConnectionHandler {
         this.self.allSockets = Util.removeByValue(this.self.allSockets,this.socket);
 
 
+        if(!this.socket.request.session) return; //TODO: remove
+
         this.self._broadcastExceptSender(
             this.socket,
             Packages.PROTOCOL.SERVER.CLIENT_DISCONNECTED,

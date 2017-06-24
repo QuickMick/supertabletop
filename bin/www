@@ -22,14 +22,18 @@ app.set('port', port);
 /**
  * Create HTTP server.
  */
-
 var server = http.createServer(app);
 
 
-var io = require('socket.io')(server);
+
+var io = require('socket.io')(server);/*
 io.use(function (socket,next) {
   app._SESSION_MIDDLEWARE(socket.request,socket.request.res,next);
+
 });
+*/
+//io.use(app._SESSION_MIDDLEWARE);
+io.set('authorization', app._SESSION_MIDDLEWARE);
 //var ConnectionHandler = new ConnectionHandler(io);
 ConnectionHandler.start(io);
 

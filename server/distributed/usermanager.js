@@ -427,7 +427,6 @@ class UserManager {
                 }.bind(this)
             )
         );
-
     }
 }
 

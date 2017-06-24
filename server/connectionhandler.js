@@ -11,23 +11,24 @@ var GameConnectionHandler = require('./gameconnectionhandler');
 var LobbyConnectionHandler = require('./lobbyconnectionhandler');
 
 var ChatModule = require('./servermodules/chatmodule');
+var LobbyOnlineUserModule = require('./servermodules/lobbyonlineusermodule');
 
 class ConnectionHandler {
 
-    constructor(io) {
+    constructor() {
         this.gameNsp = null;
         this.lobbyNsp = null;
 
 
     }
 
-    start(io){
+    start(io,options){
         this.io = io;
         this.gameNsp = this.io.of(Packages.NAMESPACES.GAME);
         this.lobbyNsp = this.io.of(Packages.NAMESPACES.LOBBY);
 
         this.gameConnectionHandler = new GameConnectionHandler(this.gameNsp);
-        this.lobbyConnectionHandler = new LobbyConnectionHandler(this.lobbyNsp);
+        this.lobbyConnectionHandler = new LobbyConnectionHandler(this.lobbyNsp,options.userManager);
 
         this.lobbyConnectionHandler.use(new ChatModule());
 
@@ -38,4 +39,4 @@ class ConnectionHandler {
 }
 
 
-module.exports = new ConnectionHandler();
+module.exports = ConnectionHandler;

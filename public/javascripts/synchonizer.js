@@ -140,7 +140,7 @@ class Synchronizer extends EventEmitter3{
         this.socket.on(Packages.PROTOCOL.SERVER.CLIENT_VALUE_UPDATE, this._onClientValueUpdate.bind(this));
 
         // if chat message from server is received
-        this.socket.on(Packages.PROTOCOL.CHAT.SERVER_CHAT_MSG, this._onChatMessageReceived.bind(this));
+        this.socket.on(Packages.PROTOCOL.MODULES.CHAT.SERVER_CHAT_MSG, this._onChatMessageReceived.bind(this));
 
         // if value reject from serveris received
         this.socket.on(Packages.PROTOCOL.SERVER.CLIENT_VALUE_UPDATE_REJECTED, this._onClientValueUpdateRejected.bind(this));
@@ -170,7 +170,7 @@ class Synchronizer extends EventEmitter3{
         this.socket.removeListener(Packages.PROTOCOL.SERVER.CLIENT_VALUE_UPDATE, this._onClientValueUpdate.bind(this));
 
         // if chat message from server is received
-        this.socket.removeListener(Packages.PROTOCOL.CHAT.SERVER_CHAT_MSG, this._onChatMessageReceived.bind(this));
+        this.socket.removeListener(Packages.PROTOCOL.MODULES.CHAT.SERVER_CHAT_MSG, this._onChatMessageReceived.bind(this));
 
         // if value reject from serveris received
         this.socket.removeListener(Packages.PROTOCOL.SERVER.CLIENT_VALUE_UPDATE_REJECTED, this._onClientValueUpdateRejected.bind(this));
@@ -293,7 +293,7 @@ class Synchronizer extends EventEmitter3{
 
     sendChatMessage(msg){
         this.socket.emit(
-            Packages.PROTOCOL.CHAT.CLIENT_CHAT_MSG,
+            Packages.PROTOCOL.MODULES.CHAT.CLIENT_CHAT_MSG,
             Packages.createEvent(this.CLIENT_INFO.id,{message:msg},this.CLIENT_INFO.token)
         );
     }

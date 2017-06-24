@@ -10,19 +10,19 @@ var Util = require('./../core/util');
 const uuidV1 = require('uuid/v1');
 
 
-class LobbyConnectionHandler {
+/**
+ * TODO: heiraus alle serer ableiten
+ */
+class BaseServer {
 
     /**
      *
      * @param io
      * @param serverModules
      */
-    constructor(io,userManager) {
+    constructor(io) {
         this.io = io;
-        this.userManager = userManager;
-
         this.ID = uuidV1();
-
         this.io.on('connection', this._onConnectionReceived.bind(this));
 
         this.serverModules = [];
@@ -111,4 +111,4 @@ class LobbyConnectionHandler {
     }
 }
 
-module.exports = LobbyConnectionHandler;
+module.exports = BaseServer;

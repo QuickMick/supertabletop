@@ -115,6 +115,7 @@ app._SESSION_MIDDLEWARE = passportSocketIo(cookieParser(sessionsSecret),sessionS
 
 
 var userManager = new UserManager(passport);
+app._userManager = userManager;
 var guestNameMiddleware = require('./routes/guestnamemiddleware')(userManager);
 var userManagementRoute = require('./routes/user_management_route')(passport, userManager);
 

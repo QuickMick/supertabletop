@@ -35,7 +35,10 @@ io.use(function (socket,next) {
 //io.use(app._SESSION_MIDDLEWARE);
 io.set('authorization', app._SESSION_MIDDLEWARE);
 //var ConnectionHandler = new ConnectionHandler(io);
-ConnectionHandler.start(io);
+
+var connectionHanlder = new ConnectionHandler();
+
+connectionHanlder.start(io,{userManager:app._userManager});
 
 //gameServer.start();
 

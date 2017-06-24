@@ -361,7 +361,7 @@ h1{
 }
 
 #header .current-user-info .name{
-    padding-right: 15px;
+   /* padding-right: 15px;*/
     margin: auto 10px;
 }
 
@@ -756,6 +756,12 @@ h1{
     margin-top:10px;
 }
 
+
+#player-lobby-list .list-color-box{
+    width: 30px;
+    height: 30px;
+}
+
 .chat-container{
     display: flex;
     flex-direction: column;
@@ -776,7 +782,8 @@ h1{
 
 .chat-container.show .chat-content .chat-output{
     flex-grow: 1;
-
+    background-color: rgba(0,0,0,0.05);
+    margin-bottom: 5px;
     /*margin: 0px 0 10px 10px;*/
     display: flex;
     flex-direction: column;

@@ -86,7 +86,7 @@ class GameServer{
     _sendEntityUpdates(){
         if(!this.updateQueue.updateRequired) return;
 
-        this._boradcast(Packages.PROTOCOL.SERVER.UPDATE_STATE,Packages.createEvent(
+        this._broadcast(Packages.PROTOCOL.SERVER.UPDATE_STATE,Packages.createEvent(
             this.ID,
             this.updateQueue.popUpdatedData()
             )
@@ -135,7 +135,7 @@ class GameServer{
 
         socket.on(Packages.PROTOCOL.CLIENT.CLIENT_VALUE_UPDATE, this._onValueUpdateReceived.bind({self:this,socket:socket}));
 
-        socket.on(Packages.PROTOCOL.CHAT.CLIENT_CHAT_MSG, this._onChatMessageReceived.bind({self:this,socket:socket}));
+        socket.on(Packages.PROTOCOL.MODULES.CHAT.CLIENT_CHAT_MSG, this._onChatMessageReceived.bind({self:this,socket:socket}));
 
         // server receives client entity updates in this event
         socket.on(Packages.PROTOCOL.CLIENT.SEND_STATE, this._onClientStateUpdate.bind({self:this,socket:socket}));
@@ -147,7 +147,7 @@ class GameServer{
 
         socket.removeListener(Packages.PROTOCOL.CLIENT.CLIENT_VALUE_UPDATE, this._onValueUpdateReceived.bind({self:this,socket:socket}));
 
-        socket.removeListener(Packages.PROTOCOL.CHAT.CLIENT_CHAT_MSG, this._onChatMessageReceived.bind({self:this,socket:socket}));
+        socket.removeListener(Packages.PROTOCOL.MODULES.CHAT.CLIENT_CHAT_MSG, this._onChatMessageReceived.bind({self:this,socket:socket}));
 
         // server receives client entity updates in this event
         socket.removeListener(Packages.PROTOCOL.CLIENT.SEND_STATE, this._onClientStateUpdate.bind({self:this,socket:socket}));
@@ -197,7 +197,7 @@ class GameServer{
 
         var violations = this.self._processClientValueUpdates(evt);
         if(violations.length <=0) {
-            this.self._boradcast(    // if the change was valid, send everyone the new information
+            this.self._broadcast(    // if the change was valid, send everyone the new information
                 Packages.PROTOCOL.SERVER.CLIENT_VALUE_UPDATE,
                 Packages.createEvent(
                     this.self.ID,
@@ -232,7 +232,7 @@ class GameServer{
         }
 
         if(!this.self.clientManager.verificateClient(evt.senderID,evt.token)){
-            console.warn("User sends unverificated messages!",evt.senderID,this.socket.handshake.address,Packages.PROTOCOL.CHAT.CLIENT_CHAT_MSG);
+            console.warn("User sends unverificated messages!",evt.senderID,this.socket.handshake.address,Packages.PROTOCOL.MODULES.CHAT.CLIENT_CHAT_MSG);
             return;
         }
 
@@ -240,8 +240,8 @@ class GameServer{
             return; // no chat message to share
         }
 
-        this.self._boradcast(    // if the change was valid, send everyone the new information
-            Packages.PROTOCOL.CHAT.SERVER_CHAT_MSG,
+        this.self._broadcast(    // if the change was valid, send everyone the new information
+            Packages.PROTOCOL.MODULES.CHAT.SERVER_CHAT_MSG,
             Packages.createEvent(
                 this.self.ID,
                 {
@@ -442,7 +442,7 @@ class GameServer{
         }
 
         // share public info of newly connected client with everyone
-        this._boradcastExceptSender(
+        this._broadcastExceptSender(
             socket,
             Packages.PROTOCOL.SERVER.CLIENT_CONNECTED,
             Packages.createEvent(
@@ -482,12 +482,12 @@ class GameServer{
         clientConnectionSocket.emit(type,msg);
     }*/
 
-    _boradcast(type,msg){
+    _broadcast(type,msg){
       //  this.io.sockets.emit(type,msg);
         this.io.to(this.ID).emit(type,msg);
     }
 
-    _boradcastExceptSender(senderSocket,type,msg){
+    _broadcastExceptSender(senderSocket,type,msg){
         senderSocket.broadcast.to(this.ID).emit(type,msg);
     }
 

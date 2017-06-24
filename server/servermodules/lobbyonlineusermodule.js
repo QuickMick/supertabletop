@@ -8,22 +8,22 @@ var Packages = require('./../../core/packages');
 var Rights = require('./../../core/rights');
 var BaseServerModule = require('./baseservermodule');
 
+
 /**
- * distributes the chat messages of the users
+ * distributes the online user list, when a player connects an when it gets updated
  */
-class ChatModule extends BaseServerModule{
+class LobbyOnlineUserModule extends BaseServerModule{
 
-    constructor() {
+    constructor(userManager) {
         super();
-
     }
 
     onConnectionReceived(socket){
-        socket.on(Packages.PROTOCOL.MODULES.CHAT.CLIENT_CHAT_MSG, this._onChatMessageReceived.bind({self:this,socket:socket}));
+        socket.on(Packages.PROTOCOL.CHAT.CLIENT_CHAT_MSG, this._onChatMessageReceived.bind({self:this,socket:socket}));
     }
 
     onConnectionLost(socket){
-        socket.removeListener(Packages.PROTOCOL.MODULES.CHAT.CLIENT_CHAT_MSG, this._onChatMessageReceived.bind({self:this,socket:socket}));
+        socket.removeListener(Packages.PROTOCOL.CHAT.CLIENT_CHAT_MSG, this._onChatMessageReceived.bind({self:this,socket:socket}));
     }
 
     _onChatMessageReceived (evt) {
@@ -33,15 +33,15 @@ class ChatModule extends BaseServerModule{
         }
 
         /*
-        if(!this.self.clientManager.doesClientExist(evt.senderID)){
-            console.log("message received from not existing client!",evt.senderID);
-            return;
-        }
+         if(!this.self.clientManager.doesClientExist(evt.senderID)){
+         console.log("message received from not existing client!",evt.senderID);
+         return;
+         }
 
-        if(!this.self.clientManager.verificateClient(evt.senderID,evt.token)){
-            console.warn("User sends unverificated messages!",evt.senderID,this.socket.handshake.address,Packages.PROTOCOL.CHAT.CLIENT_CHAT_MSG);
-            return;
-        }*/
+         if(!this.self.clientManager.verificateClient(evt.senderID,evt.token)){
+         console.warn("User sends unverificated messages!",evt.senderID,this.socket.handshake.address,Packages.PROTOCOL.CHAT.CLIENT_CHAT_MSG);
+         return;
+         }*/
 
         if(!evt.data.message){
             return; // no chat message to share
@@ -58,7 +58,7 @@ class ChatModule extends BaseServerModule{
         }
 
         this.self._broadcast(    // if the change was valid, send everyone the new information
-            Packages.PROTOCOL.MODULES.CHAT.SERVER_CHAT_MSG,
+            Packages.PROTOCOL.CHAT.SERVER_CHAT_MSG,
             Packages.createEvent(
                 this.self.SERVER_ID,
                 {
@@ -75,4 +75,4 @@ class ChatModule extends BaseServerModule{
     }
 }
 
-module.exports = ChatModule;
+module.exports = LobbyOnlineUserModule;

@@ -25,7 +25,7 @@ class Client{
         this.socket = socket;
         this.color = clientInfo.color || -1;
         this.name = clientInfo.name || "anonymous";
-        this.userStatus = clientInfo.userStatus || Rights.RIGHTS.guest;
+        this.userStatus = clientInfo.userStatus || 0;
         this.cursor = clientInfo.cursor || "default";
         this.position = {x:0,y:0};
         this.playerIndex =-1;

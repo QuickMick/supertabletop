@@ -46,14 +46,14 @@ class LobbyConnectionHandler extends EventEmitter3{
     _initHandlers(){
         this.socket.on(Packages.PROTOCOL.SERVER.RESPONSE_CLIENT_ACCEPTED, this._onClientAccepted.bind(this));
         // if chat message from server is received
-        this.socket.on(Packages.PROTOCOL.CHAT.SERVER_CHAT_MSG, this._onChatMessageReceived.bind(this));
+        this.socket.on(Packages.PROTOCOL.MODULES.CHAT.SERVER_CHAT_MSG, this._onChatMessageReceived.bind(this));
     }
 
     _removeHandlers(){
         this.socket.removeListener(Packages.PROTOCOL.SERVER.RESPONSE_CLIENT_ACCEPTED, this._onClientAccepted.bind(this));
 
         // if chat message from server is received
-        this.socket.removeListener(Packages.PROTOCOL.CHAT.SERVER_CHAT_MSG, this._onChatMessageReceived.bind(this));
+        this.socket.removeListener(Packages.PROTOCOL.MODULES.CHAT.SERVER_CHAT_MSG, this._onChatMessageReceived.bind(this));
     }
 
 
@@ -92,7 +92,7 @@ class LobbyConnectionHandler extends EventEmitter3{
 
     sendChatMessage(msg){
         this.socket.emit(
-            Packages.PROTOCOL.CHAT.CLIENT_CHAT_MSG,
+            Packages.PROTOCOL.MODULES.CHAT.CLIENT_CHAT_MSG,
             Packages.createEvent(this.CLIENT_INFO.id,{message:msg},this.CLIENT_INFO.token)
         );
     }

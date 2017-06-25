@@ -12,8 +12,8 @@ module.exports = function(userManager){
      * creates a fame for a guest, if he has not one
      */
     return function(req, res,next) {
-        if(!req.session.USER_ID){
-            req.session.USER_ID = uuidv1();
+        if(!req.session.TMP_SESSION_USER_ID){
+            req.session.TMP_SESSION_USER_ID = uuidv1();
         }
         if(!req.session.guestName && !req.isAuthenticated()){
             req.session.guestName = userManager.getRandomGuestName();

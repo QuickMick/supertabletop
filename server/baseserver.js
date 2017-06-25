@@ -32,7 +32,7 @@ class BaseServer {
          * necessary for broadcast
          * @type {Array}
          */
-        this.allSockets = [];
+       // this.allSockets = [];
     }
 
     use(serverModule){
@@ -40,6 +40,9 @@ class BaseServer {
             throw "passed module does not exist";
 
         this.serverModules.push(serverModule);
+
+
+
         serverModule.init({
             SERVER_ID:this.ID,
             _broadcast:this._broadcast.bind(this),
@@ -51,7 +54,16 @@ class BaseServer {
     _onConnectionReceived(socket){
         socket.on('disconnect', this._onDisconnect.bind({self:this,socket:socket}));
 
-        this.allSockets.push(socket);
+        //this.allSockets.push(socket);
+
+        // create a function, which normalizes the user
+        socket.getNormalizedUser = function () {
+            return this.request.user || {
+                    displayName: this.request.session.guestName,
+                    status : 0 // 0 is equal to "guest"
+                };
+        };
+
 
         for(var i=0; i< this.serverModules.length; i++){
             this.serverModules[i].onConnectionReceived(socket);
@@ -81,7 +93,7 @@ class BaseServer {
             this.self.serverModules[i].onConnectionLost(this.socket);
         }
 
-        this.self.allSockets = Util.removeByValue(this.self.allSockets,this.socket);
+       // this.self.allSockets = Util.removeByValue(this.self.allSockets,this.socket);
 
 
         if(!this.socket.request.session) return; //TODO: remove
@@ -91,7 +103,7 @@ class BaseServer {
             Packages.PROTOCOL.SERVER.CLIENT_DISCONNECTED,
             Packages.createEvent(
                 this.self.ID,
-                {id: this.socket.request.session.USER_ID} //this.socket.id}
+                {id: this.socket.request.session.TMP_SESSION_USER_ID} //this.socket.id}
             )
         );
     }

@@ -9,7 +9,7 @@ class GameState{
         /**
          * {String} ID of the current user
          */
-        this.USER_ID=null;
+        this.TMP_SESSION_USER_ID=null;
 
         /**
          * true, when the camera is moving,

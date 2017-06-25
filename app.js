@@ -14,6 +14,9 @@ var passport = require('passport');
 var expressSession = require('express-session');
 
 const MongoStore = require('connect-mongo')(expressSession);
+const RedisStore = require('connect-redis')(expressSession);
+
+const COOKIE_MAX_AGE = 1000*60*5; // 5 min
 
 /**
  * used to make the session and user available in socketIO
@@ -23,6 +26,7 @@ const MongoStore = require('connect-mongo')(expressSession);
  * @param cookie
  * @returns {auth}
  */
+/*
 var passportSocketIo = function(cookieParser, sessionStore, passport, cookie){
     var _cookie = cookie || 'sessions.sid';
     var _cookieParser = cookieParser;
@@ -62,7 +66,8 @@ var passportSocketIo = function(cookieParser, sessionStore, passport, cookie){
     };
 
     return auth;
-};
+};*/
+
 var index = require('./routes/index');
 var users = require('./routes/users');
 var editorRoute = require('./routes/editor_route');
@@ -90,20 +95,68 @@ var sessionsKey = "sessions.sid";
 const mongoose = require('mongoose');
 mongoose.connect(require('./server/distributed/db.json').userDB.old);
 
-var sessionStore = new MongoStore({mongooseConnection: mongoose.connection});
+var sessionStore = new MongoStore({
+    mongooseConnection: mongoose.connection,
+    autoRemove: 'native',
+    touchAfter: 60 // time period in seconds
+});
 
-app.use(expressSession(
+
+/*var sessionStore = new RedisStore({
+    unset: "destroy"
+});*/
+
+var sessionInstance = expressSession(
     {
         key: sessionsKey,
+        saveUninitialized: false, // don't create session until something stored
+        resave: false, //don't save session if unmodified
         store: sessionStore, // new RedisStore({}),
-        secret: sessionsSecret //, cookie:{maxAge:6000}
+        secret: sessionsSecret
+        ,cookie:{maxAge:COOKIE_MAX_AGE}  // expires in 5 minutes
     }
-));
+);
+
+app.use(sessionInstance);
 
 app.use(passport.initialize());
 app.use(passport.session());
 
-app._SESSION_MIDDLEWARE = passportSocketIo(cookieParser(sessionsSecret),sessionStore,passport);
+
+
+
+
+
+var passportSocketIo = function(app,sessionInstance, passport){
+
+    var auth = function(req, accept){
+
+        sessionInstance(req,req.res,
+            function (x) {
+                console.log(x);
+
+                if(req.session && req.session.passport && req.session.passport.user)
+                passport.deserializeUser(req.session.passport.user, data, function (err, user) {
+                    reqreq.user = user;
+                    req.user.logged_in = true;
+                    accept(null, true);
+                });
+
+                return accept(null, true);
+            }
+        );
+    };
+
+    return auth;
+};
+
+
+
+
+//app._SESSION_MIDDLEWARE = passportSocketIo(cookieParser(sessionsSecret),sessionStore,passport);
+
+
+app._SESSION_MIDDLEWARE = passportSocketIo(app,sessionInstance,passport);
 
 /*.authornize({
     cookieParser: cookieParser,

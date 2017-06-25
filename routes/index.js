@@ -46,10 +46,13 @@ router.get('/',
             user.displayName = u.displayName;
             user.language = u.preferredLanguage;
             user.status = Rights.RIGHTS_STRENGTH[u.status];
+            user.id = u.id;
             delete user.default;
+
         }else{
             user.displayName= req.session.guestName;
             user.status = Rights.RIGHTS.guest;
+            user.id = req.session.TMP_SESSION_USER_ID;
         }
 
         var currentLanguage = data.queryLanguage || user.language || data.languageID;

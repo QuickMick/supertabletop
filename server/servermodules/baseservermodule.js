@@ -18,7 +18,7 @@ class BaseServerModule {
     init(data){
         this.SERVER_ID = data.SERVER_ID;
         this._broadcast = data._broadcast;
-        this._broadcastExpectSender = data._broadcastExceptSender;
+        this._broadcastExceptSender = data._broadcastExceptSender;
         this._sendToClient = data._sendToClient;
     }
 

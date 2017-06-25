@@ -15,16 +15,18 @@ class ChatModule extends BaseServerModule{
 
     constructor() {
         super();
-
     }
 
     onConnectionReceived(socket){
-        socket.on(Packages.PROTOCOL.MODULES.CHAT.CLIENT_CHAT_MSG, this._onChatMessageReceived.bind({self:this,socket:socket}));
+        // set the bound function as variable of the socket, so we can remove it later
+        socket._onChatMessageReceived_BOUND = this._onChatMessageReceived.bind({self:this,socket:socket});
+        socket.on(Packages.PROTOCOL.MODULES.CHAT.CLIENT_CHAT_MSG, socket._onChatMessageReceived_BOUND);
     }
 
     onConnectionLost(socket){
-        socket.removeListener(Packages.PROTOCOL.MODULES.CHAT.CLIENT_CHAT_MSG, this._onChatMessageReceived.bind({self:this,socket:socket}));
+        socket.removeListener(Packages.PROTOCOL.MODULES.CHAT.CLIENT_CHAT_MSG, socket._onChatMessageReceived_BOUND);
     }
+
 
     _onChatMessageReceived (evt) {
         if(!evt || !evt.data){
@@ -48,14 +50,7 @@ class ChatModule extends BaseServerModule{
         }
 
 
-        var user = this.socket.request.user;
-
-        if(!user){
-            user  = {
-                displayName: this.socket.request.session.guestName || "anonymous",
-                status : 0 // 0 is equal to "guest"
-            };
-        }
+        var user = this.socket.getNormalizedUser();
 
         this.self._broadcast(    // if the change was valid, send everyone the new information
             Packages.PROTOCOL.MODULES.CHAT.SERVER_CHAT_MSG,

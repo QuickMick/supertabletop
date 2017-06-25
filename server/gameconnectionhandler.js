@@ -43,6 +43,16 @@ class GameConnectionHandler {
         }
 
         socket.join(gameID);
+
+      /*  var onevent = socket.onevent;
+        socket.onevent = function (packet) {
+            onevent.call (this, packet);
+            if(socket.request.session) {
+                socket.request.session.touch();
+            }
+        };*/
+
+
         game.onConnectionReceived(socket);
     }
 

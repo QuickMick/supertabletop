@@ -17,7 +17,7 @@ class LobbyConnectionHandler {
      * @param io
      * @param serverModules
      */
-    constructor(io,userManager) {
+    constructor(io, userManager) {
         this.io = io;
         this.userManager = userManager;
 
@@ -32,28 +32,46 @@ class LobbyConnectionHandler {
          * necessary for broadcast
          * @type {Array}
          */
-        this.allSockets = [];
+        // this.allSockets = [];
     }
 
-    use(serverModule){
-        if(!serverModule)
+    use(serverModule) {
+        if (!serverModule)
             throw "passed module does not exist";
 
         this.serverModules.push(serverModule);
         serverModule.init({
-            SERVER_ID:this.ID,
-            _broadcast:this._broadcast.bind(this),
-            _broadcastExpectSender:this._broadcastExceptSender.bind(this),
-            _sendToClient:this._sendToClient.bind(this)
+            SERVER_ID: this.ID,
+            _broadcast: this._broadcast.bind(this),
+            _broadcastExpectSender: this._broadcastExceptSender.bind(this),
+            _sendToClient: this._sendToClient.bind(this)
         })
     }
 
-    _onConnectionReceived(socket){
-        socket.on('disconnect', this._onDisconnect.bind({self:this,socket:socket}));
+    _onConnectionReceived(socket) {
+        socket.on('disconnect', this._onDisconnect.bind({self: this, socket: socket}));
 
-        this.allSockets.push(socket);
+     /*   var onevent = socket.onevent;
+        socket.onevent = function (packet) {
+            onevent.call(this, packet);
 
-        for(var i=0; i< this.serverModules.length; i++){
+            if (socket.request.session) {
+                socket.request.session.touch();
+            }
+        };*/
+
+        // this.allSockets.push(socket);
+
+        // create a function, which normalizes the user
+        socket.getNormalizedUser = function () {
+            return this.request.user || {
+                    displayName: this.request.session.guestName,
+                    id: this.request.session.TMP_SESSION_USER_ID,
+                    status: 0 // 0 is equal to "guest"
+                };
+        };
+
+        for (var i = 0; i < this.serverModules.length; i++) {
             this.serverModules[i].onConnectionReceived(socket);
         }
 
@@ -64,50 +82,50 @@ class LobbyConnectionHandler {
             Packages.createEvent(
                 this.ID,
                 {
-                    clientInfo:{},
+                    clientInfo: {},
                     serverID: this.ID
                 }
             )
         );
     }
 
-    _onDisconnect (data) {
-        if(!data){
+    _onDisconnect(data) {
+        if (!data) {
             console.log("disconnect: no data received");
             return;
         }
 
-        for(var i=0; i< this.self.serverModules.length; i++){
+        for (var i = 0; i < this.self.serverModules.length; i++) {
             this.self.serverModules[i].onConnectionLost(this.socket);
         }
 
-        this.self.allSockets = Util.removeByValue(this.self.allSockets,this.socket);
+        //   this.self.allSockets = Util.removeByValue(this.self.allSockets,this.socket);
 
 
-        if(!this.socket.request.session) return; //TODO: remove
+        if (!this.socket.request.session) return; //TODO: remove
 
         this.self._broadcastExceptSender(
             this.socket,
             Packages.PROTOCOL.SERVER.CLIENT_DISCONNECTED,
             Packages.createEvent(
                 this.self.ID,
-                {id: this.socket.request.session.USER_ID} //this.socket.id}
+                {id: this.socket.request.session.TMP_SESSION_USER_ID} //this.socket.id}
             )
         );
     }
 
 
-    _broadcast(type,msg){
+    _broadcast(type, msg) {
         //this.io.sockets.emit(type,msg);
-        this.io.emit(type,msg);
+        this.io.emit(type, msg);
     }
 
-    _broadcastExceptSender(senderSocket, type, msg){
-        senderSocket.broadcast.emit(type,msg);
+    _broadcastExceptSender(senderSocket, type, msg) {
+        senderSocket.broadcast.emit(type, msg);
     }
 
-    _sendToClient(clientConnectionSocket,type,msg){
-        clientConnectionSocket.emit(type,msg);
+    _sendToClient(clientConnectionSocket, type, msg) {
+        clientConnectionSocket.emit(type, msg);
     }
 }
 

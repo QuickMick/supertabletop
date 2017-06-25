@@ -88,7 +88,7 @@ var app = express();
 
 app.use(helmet());
 
-var sessionsSecret = uuidv1();
+var sessionsSecret = "ranzenpanzen"; //uuidv1();
 var sessionsKey = "sessions.sid";
 
 //TODO replace mongoose durch redis
@@ -135,14 +135,15 @@ var passportSocketIo = function(app,sessionInstance, passport){
             function (x) {
                 console.log(x);
 
-                if(req.session && req.session.passport && req.session.passport.user)
-                passport.deserializeUser(req.session.passport.user, data, function (err, user) {
-                    reqreq.user = user;
-                    req.user.logged_in = true;
-                    accept(null, true);
-                });
-
-                return accept(null, true);
+                if(req.session && req.session.passport && req.session.passport.user) {
+                    passport.deserializeUser(req.session.passport.user, req, function (err, user) {
+                        req.user = user;
+                        req.user.logged_in = true;
+                        accept(null, true);
+                    });
+                }else {
+                    return accept(null, true);
+                }
             }
         );
     };

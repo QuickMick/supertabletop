@@ -12,6 +12,7 @@ module.exports = function(userManager){
      * creates a fame for a guest, if he has not one
      */
     return function(req, res,next) {
+        console.log(req.sessionID);
         if(!req.session.TMP_SESSION_USER_ID){
             req.session.TMP_SESSION_USER_ID = uuidv1();
         }

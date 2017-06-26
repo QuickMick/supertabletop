@@ -12,7 +12,8 @@
     "compile-word-list": "node compilecards.js source=wortliste.txt target=wordstack_content.json",
     "compile-trashmail-list": "node compiletrashmails.js target=server/trashmails.json",
     "test": "mocha",
-    "debug": "node --inspect --debug-brk ./bin/www"
+    "debug": "node --inspect --debug-brk ./bin/www",
+    "start redis":"start ./redis/redis-server"
   },
   "devDependencies": {
     "mocha": "*",
@@ -46,6 +47,7 @@
     "pixi-filters": "^1.0.6",
     "pixi.js": "*",
     "pug": "^2.0.0-rc.2",
+    "redis": "^2.7.1",
     "serve-favicon": "~2.3.2",
     "socket.io": "*",
     "socket.io-client": "*",

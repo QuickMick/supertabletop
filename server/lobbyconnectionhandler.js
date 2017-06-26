@@ -9,6 +9,10 @@ var Util = require('./../core/util');
 
 const uuidV1 = require('uuid/v1');
 
+var Redis = require("redis");
+const DBs = require('./distributed/db.json');
+
+
 // TODO: von baseserver ableiten
 class LobbyConnectionHandler {
 
@@ -33,6 +37,26 @@ class LobbyConnectionHandler {
          * @type {Array}
          */
         // this.allSockets = [];
+
+
+        this.redis = Redis.createClient(DBs.sessionDB_redis.port,DBs.sessionDB_redis.host);
+       // this.redis.select(3, function() { /* ... */ });
+        this.redis.on("error", function (err) {
+            console.log("LobbyConnectionHandler;Redis-Error " + err);
+        });
+
+
+
+        this.redis.set("string key", "string val", Redis.print);
+        this.redis.hset("hash key", "hashtest 1", "some value", Redis.print);
+        this.redis.hset(["hash key", "hashtest 2", "some other value"], Redis.print);
+        this.redis.hkeys("hash key",  (err, replies) =>{
+            console.log(replies.length + " replies:");
+            replies.forEach( (reply, i) =>{
+                console.log("    " + i + ": " + reply);
+            });
+            this.redis.quit();
+        });
     }
 
     use(serverModule) {
@@ -59,6 +83,8 @@ class LobbyConnectionHandler {
                 socket.request.session.touch();
             }
         };*/
+
+        socket.request.session.isInLobby=true;
 
         // this.allSockets.push(socket);
 
@@ -95,10 +121,13 @@ class LobbyConnectionHandler {
             return;
         }
 
+        delete this.socket.request.session.isInLobby;
+
         for (var i = 0; i < this.self.serverModules.length; i++) {
             this.self.serverModules[i].onConnectionLost(this.socket);
         }
 
+        this.socket.request.session.isInLobby=false;
         //   this.self.allSockets = Util.removeByValue(this.self.allSockets,this.socket);
 
 

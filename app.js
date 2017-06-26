@@ -13,7 +13,7 @@ var Flash = require('connect-flash');
 var passport = require('passport');
 var expressSession = require('express-session');
 
-const MongoStore = require('connect-mongo')(expressSession);
+// const MongoStore = require('connect-mongo')(expressSession);
 const RedisStore = require('connect-redis')(expressSession);
 
 const COOKIE_MAX_AGE = 1000*60*5; // 5 min
@@ -92,19 +92,19 @@ var sessionsSecret = "ranzenpanzen"; //uuidv1();
 var sessionsKey = "sessions.sid";
 
 //TODO replace mongoose durch redis
-const mongoose = require('mongoose');
+/*const mongoose = require('mongoose');
 mongoose.connect(require('./server/distributed/db.json').userDB.old);
 
 var sessionStore = new MongoStore({
     mongooseConnection: mongoose.connection,
     autoRemove: 'native',
     touchAfter: 60 // time period in seconds
-});
-
-
-/*var sessionStore = new RedisStore({
-    unset: "destroy"
 });*/
+
+
+var sessionStore = new RedisStore({
+    unset: "destroy"
+});
 
 var sessionInstance = expressSession(
     {

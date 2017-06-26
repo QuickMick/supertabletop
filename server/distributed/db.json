@@ -4,5 +4,9 @@
     "user":"user",
     "pw":"userpw1",
     "old":"mongodb://user:userpw1@ds123662.mlab.com:23662/supertabletop"
+  },
+  "sessionDB_redis":{
+    "port":6379,
+    "host":"127.0.0.1"
   }
 }

@@ -14,9 +14,12 @@ var passport = require('passport');
 var expressSession = require('express-session');
 
 // const MongoStore = require('connect-mongo')(expressSession);
-const RedisStore = require('connect-redis')(expressSession);
 
-const COOKIE_MAX_AGE = 1000*60*5; // 5 min
+var Redis = require("redis");
+const RedisStore = require('connect-redis')(expressSession);
+const DBs = require('./server/distributed/db.json');
+
+const COOKIE_MAX_AGE = 1000*60*60*24; // 1 day
 
 /**
  * used to make the session and user available in socketIO
@@ -103,7 +106,14 @@ var sessionStore = new MongoStore({
 
 
 var sessionStore = new RedisStore({
-    unset: "destroy"
+    unset: "destroy",
+    pass: DBs.sessionStore_redis.password,
+    client: Redis.createClient({
+        port: DBs.sessionStore_redis.port,
+        host: DBs.sessionStore_redis.host,
+        password: DBs.sessionStore_redis.password,
+        db: DBs.sessionStore_redis.database
+    })
 });
 
 var sessionInstance = expressSession(

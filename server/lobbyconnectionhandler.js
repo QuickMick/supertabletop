@@ -39,7 +39,13 @@ class LobbyConnectionHandler {
         // this.allSockets = [];
 
 
-        this.redis = Redis.createClient(DBs.sessionDB_redis.port,DBs.sessionDB_redis.host);
+        this.redis = Redis.createClient({
+            port: DBs.lobbyDB_redis.port,
+            host: DBs.lobbyDB_redis.host,
+            password: DBs.lobbyDB_redis.password,
+            db: DBs.lobbyDB_redis.database
+        });
+
        // this.redis.select(3, function() { /* ... */ });
         this.redis.on("error", function (err) {
             console.log("LobbyConnectionHandler;Redis-Error " + err);

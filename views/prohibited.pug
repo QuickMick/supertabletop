@@ -1,0 +1,10 @@
+html
+    head
+        title #{I18N.title}
+        link(rel='stylesheet', href='/stylesheets/users.css')
+    body
+        div.stanalone-container
+            div.input-content
+                div.formular-title #{I18N.already_connected}
+                p.centered #{I18N.cannot_open_tab_twice}
+                a.link(href='/') #{I18N.back_to_lobby}

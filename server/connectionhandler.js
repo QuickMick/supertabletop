@@ -24,6 +24,25 @@ class ConnectionHandler {
 
     start(io,options){
         this.io = io;
+
+        this.io.on('connection', (socket) => {
+
+         //   socket.request._socket = true;
+         //   socket.request.session.opened = true;
+           // console.log("socket",socket.request.session.t);
+            socket.request.session.opened = true;
+            socket.request.session.save();
+
+                socket.on('disconnect', ()=>{
+                        console.log("DISCO");
+                        socket.request.session.opened = false;
+                        socket.request.session.save();
+                    }
+                );
+            }
+        );
+
+
         this.gameNsp = this.io.of(Packages.NAMESPACES.GAME);
         this.lobbyNsp = this.io.of(Packages.NAMESPACES.LOBBY);
 

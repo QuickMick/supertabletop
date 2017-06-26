@@ -131,26 +131,34 @@ class GameServer{
         this._initClient(socket);
 
         //removes this client from the serverclient list and broadcasts the information to all remaining clients
-        socket.on('disconnect', this._onDisconnect.bind({self:this,socket:socket}));
+        socket._onDisconnect = this._onDisconnect.bind({self:this,socket:socket});
+        socket.on('disconnect', socket._onDisconnect);
 
-        socket.on(Packages.PROTOCOL.CLIENT.CLIENT_VALUE_UPDATE, this._onValueUpdateReceived.bind({self:this,socket:socket}));
+        socket._onClientValueUpdate = this._onValueUpdateReceived.bind({self:this,socket:socket});
+        socket.on(Packages.PROTOCOL.CLIENT.CLIENT_VALUE_UPDATE,socket._onClientValueUpdate );
 
-        socket.on(Packages.PROTOCOL.MODULES.CHAT.CLIENT_CHAT_MSG, this._onChatMessageReceived.bind({self:this,socket:socket}));
+        socket._onChatMessageReceived = this._onChatMessageReceived.bind({self:this,socket:socket});
+        socket.on(Packages.PROTOCOL.MODULES.CHAT.CLIENT_CHAT_MSG, socket._onChatMessageReceived);
 
         // server receives client entity updates in this event
-        socket.on(Packages.PROTOCOL.CLIENT.SEND_STATE, this._onClientStateUpdate.bind({self:this,socket:socket}));
+        socket._onClientStateUpdate = this._onClientStateUpdate.bind({self:this,socket:socket});
+        socket.on(Packages.PROTOCOL.CLIENT.SEND_STATE, socket._onClientStateUpdate);
     }
 
     /** removes all listeners */
     onConnectionLost(socket){
-        socket.removeListener('disconnect', this._onDisconnect.bind({self:this,socket:socket}));
+        socket.removeListener('disconnect', socket._onDisconnect);
+        delete socket._onDisconnect;
 
-        socket.removeListener(Packages.PROTOCOL.CLIENT.CLIENT_VALUE_UPDATE, this._onValueUpdateReceived.bind({self:this,socket:socket}));
+        socket.removeListener(Packages.PROTOCOL.CLIENT.CLIENT_VALUE_UPDATE, socket._onClientValueUpdate);
+        delete socket._onClientValueUpdate;
 
-        socket.removeListener(Packages.PROTOCOL.MODULES.CHAT.CLIENT_CHAT_MSG, this._onChatMessageReceived.bind({self:this,socket:socket}));
+        socket.removeListener(Packages.PROTOCOL.MODULES.CHAT.CLIENT_CHAT_MSG, socket._onChatMessageReceived);
+        delete socket._onChatMessageReceived;
 
         // server receives client entity updates in this event
-        socket.removeListener(Packages.PROTOCOL.CLIENT.SEND_STATE, this._onClientStateUpdate.bind({self:this,socket:socket}));
+        socket.removeListener(Packages.PROTOCOL.CLIENT.SEND_STATE, socket._onClientStateUpdate);
+        delete socket._onClientStateUpdate;
     }
 
     _onDisconnect (data) {

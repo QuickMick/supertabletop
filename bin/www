@@ -26,21 +26,10 @@ var server = http.createServer(app);
 
 
 
-var io = require('socket.io')(server);/*
-io.use(function (socket,next) {
-  app._SESSION_MIDDLEWARE(socket.request,socket.request.res,next);
-
-});
-*/
-//io.use(app._SESSION_MIDDLEWARE);
-io.set('authorization', app._SESSION_MIDDLEWARE);
-//var ConnectionHandler = new ConnectionHandler(io);
-
+var io = require('socket.io')(server);
+io.set('authorization', app._SESSION_SOCKET_CONNECTION_MIDDLEWARE);
 var connectionHanlder = new ConnectionHandler();
-
 connectionHanlder.start(io,{userManager:app._userManager});
-
-//gameServer.start();
 
 
 

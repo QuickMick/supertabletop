@@ -88,6 +88,7 @@
     "user_login_successfully":"login was successful",
     "register":"register",
     "back_to_login":"back to login",
+    "back_to_lobby":"back to lobby",
     "sign_up_for_app":"Registrieren",
     "agree_terms_and_conditions":"I have read and agree the terms and conditions",
     "terms_and_conditions_not_agreed":"You have to agree the terms and conditions to use this service",
@@ -126,7 +127,9 @@
     "verification_successfully_sent":"Verification request successfully sent. Please check your mails.",
     "successfully_logged_out":"Logging out was successfully.",
 
-    "no_players_online":"no players online"
+    "no_players_online":"no players online",
+    "already_connected":"Already connected",
+    "cannot_open_tab_twice":"You cannot open this page more than once. Close the other widows/tabs first, if you want to continue in this window."
   },
   "de":{
     "_LANG":"Deutsch",
@@ -217,6 +220,7 @@
     "user_login_successfully":"Anmeldung war erfolgreich",
     "register":"registrieren",
     "back_to_login":"zurück zum Login",
+    "back_to_lobby": "zurück zur Lobby",
     "sign_up_for_app":"Registrieren",
     "agree_terms_and_conditions":"Ich habe die AGBs gelesen und stimme ihnen zu",
     "terms_and_conditions_not_agreed":"Du musst den AGBs zustimmen, um diesen Service nutzen zu können.",
@@ -256,6 +260,8 @@
     "verification_successfully_sent":"Verificationsanfrage erfolgreich gesendet. Bitte checke deine Mails.",
     "successfully_logged_out":"Sie haben sich erfolgreich ausgeloggt.",
 
-    "no_players_online":"keine Spieler online"
+    "no_players_online":"keine Spieler online",
+    "already_connected":"Bereits verbunden",
+    "cannot_open_tab_twice":"Du kannst diese Seite nicht mehrmals öffnen. Schließe erst die anderen Tabs/Fenster und lade diese Seite erneut, wenn du dieses Fenster verwenden möchtest."
   }
 }

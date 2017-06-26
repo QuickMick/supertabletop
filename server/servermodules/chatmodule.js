@@ -19,12 +19,13 @@ class ChatModule extends BaseServerModule{
 
     onConnectionReceived(socket){
         // set the bound function as variable of the socket, so we can remove it later
-        socket._onChatMessageReceived_BOUND = this._onChatMessageReceived.bind({self:this,socket:socket});
-        socket.on(Packages.PROTOCOL.MODULES.CHAT.CLIENT_CHAT_MSG, socket._onChatMessageReceived_BOUND);
+        socket._onChatMessageReceived = this._onChatMessageReceived.bind({self:this,socket:socket});
+        socket.on(Packages.PROTOCOL.MODULES.CHAT.CLIENT_CHAT_MSG, socket._onChatMessageReceived);
     }
 
     onConnectionLost(socket){
-        socket.removeListener(Packages.PROTOCOL.MODULES.CHAT.CLIENT_CHAT_MSG, socket._onChatMessageReceived_BOUND);
+        socket.removeListener(Packages.PROTOCOL.MODULES.CHAT.CLIENT_CHAT_MSG, socket._onChatMessageReceived);
+        delete socket._onChatMessageReceived;
     }
 
 

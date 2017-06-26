@@ -151,33 +151,36 @@ class Synchronizer extends EventEmitter3{
     }
 
     _remmoveHandlers(){
-        // get clientdata of this client
-        this.socket.removeListener(Packages.PROTOCOL.SERVER.RESPONSE_CLIENT_ACCEPTED, this._onClientAccepted.bind(this));
+        this.socket.removeAllListeners();
 
-        // receive data about the dame (after initialisation, or gamechange
-        this.socket.removeListener(Packages.PROTOCOL.SERVER.INIT_GAME, this._onInitGame.bind(this));
-
-        // receive game updates
-        this.socket.removeListener(Packages.PROTOCOL.SERVER.UPDATE_STATE, this._onStateUpdate.bind(this));
-
-        // another player connected
-        this.socket.removeListener(Packages.PROTOCOL.SERVER.CLIENT_CONNECTED, this._onClientConnected.bind(this));
-
-        // an client disconnects
-        this.socket.removeListener(Packages.PROTOCOL.SERVER.CLIENT_DISCONNECTED, this._onClientDisconnected.bind(this));
-
-        // a value of a client/player has changed
-        this.socket.removeListener(Packages.PROTOCOL.SERVER.CLIENT_VALUE_UPDATE, this._onClientValueUpdate.bind(this));
-
-        // if chat message from server is received
-        this.socket.removeListener(Packages.PROTOCOL.MODULES.CHAT.SERVER_CHAT_MSG, this._onChatMessageReceived.bind(this));
-
-        // if value reject from serveris received
-        this.socket.removeListener(Packages.PROTOCOL.SERVER.CLIENT_VALUE_UPDATE_REJECTED, this._onClientValueUpdateRejected.bind(this));
-
-        this.socket.removeListener('disconnect', this._onDisconnect.bind(this));
-
-        this.socket.removeListener(Packages.PROTOCOL.SERVER.ERROR,this._onServerError.bind(this));
+        // return;
+        // // get clientdata of this client
+        // this.socket.removeListener(Packages.PROTOCOL.SERVER.RESPONSE_CLIENT_ACCEPTED, this._onClientAccepted.bind(this));
+        //
+        // // receive data about the dame (after initialisation, or gamechange
+        // this.socket.removeListener(Packages.PROTOCOL.SERVER.INIT_GAME, this._onInitGame.bind(this));
+        //
+        // // receive game updates
+        // this.socket.removeListener(Packages.PROTOCOL.SERVER.UPDATE_STATE, this._onStateUpdate.bind(this));
+        //
+        // // another player connected
+        // this.socket.removeListener(Packages.PROTOCOL.SERVER.CLIENT_CONNECTED, this._onClientConnected.bind(this));
+        //
+        // // an client disconnects
+        // this.socket.removeListener(Packages.PROTOCOL.SERVER.CLIENT_DISCONNECTED, this._onClientDisconnected.bind(this));
+        //
+        // // a value of a client/player has changed
+        // this.socket.removeListener(Packages.PROTOCOL.SERVER.CLIENT_VALUE_UPDATE, this._onClientValueUpdate.bind(this));
+        //
+        // // if chat message from server is received
+        // this.socket.removeListener(Packages.PROTOCOL.MODULES.CHAT.SERVER_CHAT_MSG, this._onChatMessageReceived.bind(this));
+        //
+        // // if value reject from serveris received
+        // this.socket.removeListener(Packages.PROTOCOL.SERVER.CLIENT_VALUE_UPDATE_REJECTED, this._onClientValueUpdateRejected.bind(this));
+        //
+        // this.socket.removeListener('disconnect', this._onDisconnect.bind(this));
+        //
+        // this.socket.removeListener(Packages.PROTOCOL.SERVER.ERROR,this._onServerError.bind(this));
     }
 
     _onClientAccepted(evt) {

@@ -13,7 +13,8 @@
     "compile-trashmail-list": "node compiletrashmails.js target=server/trashmails.json",
     "test": "mocha",
     "debug": "node --inspect --debug-brk ./bin/www",
-    "start redis":"start ./redis/redis-server"
+    "start redis-server":"start ./redis/redis-server",
+    "start redis-client":"start ./redis/redis-cli"
   },
   "devDependencies": {
     "mocha": "*",

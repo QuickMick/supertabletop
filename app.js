@@ -13,6 +13,8 @@ var Flash = require('connect-flash');
 var passport = require('passport');
 var expressSession = require('express-session');
 
+var LanguageMiddleware = require('./routes/languagemiddleware');
+
 // const MongoStore = require('connect-mongo')(expressSession);
 
 var Redis = require("redis");
@@ -20,56 +22,6 @@ const RedisStore = require('connect-redis')(expressSession);
 const DBs = require('./server/distributed/db.json');
 
 const COOKIE_MAX_AGE = 1000*60*60*24; // 1 day
-
-/**
- * used to make the session and user available in socketIO
- * @param cookieParser
- * @param sessionStore
- * @param passport
- * @param cookie
- * @returns {auth}
- */
-/*
-var passportSocketIo = function(cookieParser, sessionStore, passport, cookie){
-    var _cookie = cookie || 'sessions.sid';
-    var _cookieParser = cookieParser;
-    var _sessionStore = sessionStore;
-    var _passport = passport;
-
-    var auth = function(data, accept){
-        if (data && !data.session && data.headers && data.headers.cookie) {
-            _cookieParser(data, {}, function(err){
-                if(err){
-                    return accept('COOKIE_PARSE_ERROR');
-                }
-                var sessionId = data.signedCookies[_cookie] || data.cookies[_cookie];
-                _sessionStore.get(sessionId, function(err, session){
-
-                    data.session = session;
-
-                    if(err || !session || !session.passport || !session.passport.user || !session.passport.user) {
-                        return accept(null, true);
-                    }
-
-                    if(data.session && data.session.passport && data.session.passport.user) {
-                        _passport.deserializeUser(data.session.passport.user, data, function (err, user) {
-                            data.user = user;
-                            data.user.logged_in = true;
-                            accept(null, true);
-                        });
-                    }else{
-                        accept(null, true);
-                    }
-
-                });
-            });
-        } else {
-            return accept('MISSING_COOKIE', false);
-        }
-    };
-
-    return auth;
-};*/
 
 var index = require('./routes/index');
 var users = require('./routes/users');
@@ -93,17 +45,6 @@ app.use(helmet());
 
 var sessionsSecret = "ranzenpanzen"; //uuidv1();
 var sessionsKey = "sessions.sid";
-
-//TODO replace mongoose durch redis
-/*const mongoose = require('mongoose');
-mongoose.connect(require('./server/distributed/db.json').userDB.old);
-
-var sessionStore = new MongoStore({
-    mongooseConnection: mongoose.connection,
-    autoRemove: 'native',
-    touchAfter: 60 // time period in seconds
-});*/
-
 
 var sessionStore = new RedisStore({
     unset: "destroy",
@@ -133,14 +74,8 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 
-
-
-
-
 var passportSocketIo = function(app,sessionInstance, passport){
-
-    var auth = function(req, accept){
-
+    return function(req, accept){
         sessionInstance(req,req.res,
             function (x) {
                 console.log(x);
@@ -157,17 +92,15 @@ var passportSocketIo = function(app,sessionInstance, passport){
             }
         );
     };
-
-    return auth;
 };
 
 
 
 
-//app._SESSION_MIDDLEWARE = passportSocketIo(cookieParser(sessionsSecret),sessionStore,passport);
+//app._SESSION_SOCKET_CONNECTION_MIDDLEWARE = passportSocketIo(cookieParser(sessionsSecret),sessionStore,passport);
 
 
-app._SESSION_MIDDLEWARE = passportSocketIo(app,sessionInstance,passport);
+app._SESSION_SOCKET_CONNECTION_MIDDLEWARE = passportSocketIo(app,sessionInstance,passport);
 
 /*.authornize({
     cookieParser: cookieParser,
@@ -224,6 +157,28 @@ var ensureAuthenticatedMiddleware = function (req, res, next) {
         return next();
     res.redirect('/login');
 };
+
+
+app.use('/prohibited',
+    LanguageMiddleware,
+    function (data,req, res, next) {
+        if(req.session && req.session.opened) { //session opened are set in connectionhandler
+            res.render('prohibited', {I18N: data.i18n});
+        }else{
+            return res.redirect('/');
+        }
+    }
+);
+
+/// check if the user already has obened the page in another tab, if yes, redirect him
+app.use('/',function(req,res,next){
+    console.log("lobby",req.session.isInLobby);
+    if(req.session && req.session.opened){
+        req.flash('message',"already_connected");
+        return res.redirect('/prohibited');
+    }
+    next();
+});
 
 
 app.use('/', guestNameMiddleware);

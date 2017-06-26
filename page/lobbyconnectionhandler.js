@@ -61,13 +61,14 @@ class LobbyConnectionHandler extends EventEmitter3{
     }
 
     _removeHandlers(){
-        this.socket.removeListener(Packages.PROTOCOL.SERVER.RESPONSE_CLIENT_ACCEPTED, this.socket._onClientAccepted);
-
-        // if chat message from server is received
-        this.socket.removeListener(Packages.PROTOCOL.MODULES.CHAT.SERVER_CHAT_MSG, this.socket._onChatMessageReceived);
-
-        this.socket.removeListener(Packages.PROTOCOL.MODULES.LOBBY_ONLINE_USERS.PLAYER_CONNECTS, this.socket._onUserConnected);
-        this.socket.removeListener(Packages.PROTOCOL.MODULES.LOBBY_ONLINE_USERS.PLAYER_DISCONNECTS, this.socket._onUserDisconnected);
+        this.socket.removeAllListeners();
+        // this.socket.removeListener(Packages.PROTOCOL.SERVER.RESPONSE_CLIENT_ACCEPTED, this.socket._onClientAccepted);
+        //
+        // // if chat message from server is received
+        // this.socket.removeListener(Packages.PROTOCOL.MODULES.CHAT.SERVER_CHAT_MSG, this.socket._onChatMessageReceived);
+        //
+        // this.socket.removeListener(Packages.PROTOCOL.MODULES.LOBBY_ONLINE_USERS.PLAYER_CONNECTS, this.socket._onUserConnected);
+        // this.socket.removeListener(Packages.PROTOCOL.MODULES.LOBBY_ONLINE_USERS.PLAYER_DISCONNECTS, this.socket._onUserDisconnected);
     }
 
     _onUserConnected(evt){

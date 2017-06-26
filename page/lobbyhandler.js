@@ -85,6 +85,8 @@ class LobbyHandler {
 
     show(){
         this.lobbyConnectionHandler.start();
+
+        window.onunload
     }
 }
 

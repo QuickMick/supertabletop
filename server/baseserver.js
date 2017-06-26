@@ -98,14 +98,14 @@ class BaseServer {
 
         if(!this.socket.request.session) return; //TODO: remove
 
-        this.self._broadcastExceptSender(
+     /*   this.self._broadcastExceptSender(
             this.socket,
             Packages.PROTOCOL.SERVER.CLIENT_DISCONNECTED,
             Packages.createEvent(
                 this.self.ID,
                 {id: this.socket.request.session.TMP_SESSION_USER_ID} //this.socket.id}
             )
-        );
+        );*/
     }
 
 

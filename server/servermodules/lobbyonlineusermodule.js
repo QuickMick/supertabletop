@@ -17,23 +17,37 @@ class LobbyOnlineUserModule extends BaseServerModule{
     constructor(userManager) {
         super();
 
-
+        /**
+         * contains all users which are currenlty in the lobby.
+         * the users inside of this object are shared with the clients and displayed
+         * in the "online user list"
+         * @type {{}}
+         */
+        this.onlineUsers = {
+            //id:{displayName:"",name:"",color:0,status:0},
+        }
     }
 
     onConnectionReceived(socket){
         var currentUser = socket.getNormalizedUser();
         this._broadcastExceptSender(    // if the change was valid, send everyone the new information
+            socket,
             Packages.PROTOCOL.MODULES.LOBBY_ONLINE_USERS.PLAYER_CONNECTS,
             Packages.createEvent(
                 this.SERVER_ID,
                 {
                     sender:{
-                        name:currentUser.displayName,
-                        userStatus:currentUser.status
+                        displayName:currentUser.displayName,
+                        name:currentUser.name,
+                        status:currentUser.status,
+                        color:currentUser.color
                     }
                 }
             )
         );
+
+
+        socket.request.session.isInLobby=this.SERVER_ID;
 
         // set the bound function as variable of the socket, so we can remove it later
         socket._onChatMessageReceived_BOUND = this._onChatMessageReceived.bind({self:this,socket:socket});
@@ -43,15 +57,19 @@ class LobbyOnlineUserModule extends BaseServerModule{
     onConnectionLost(socket){
         socket.removeListener(Packages.PROTOCOL.MODULES.CHAT.CLIENT_CHAT_MSG, socket._onChatMessageReceived_BOUND);
 
+        delete socket.request.session.isInLobby;
+
         var currentUser = socket.getNormalizedUser();
         this._broadcastExceptSender(    // if the change was valid, send everyone the new information
-            Packages.PROTOCOL.MODULES.LOBBY_ONLINE_USERS.PLAYER_CONNECTS,
+            socket,
+            Packages.PROTOCOL.MODULES.LOBBY_ONLINE_USERS.PLAYER_DISCONNECTS,
             Packages.createEvent(
                 this.SERVER_ID,
                 {
                     sender:{
+                        id:currentUser.id/*,
                         name:currentUser.displayName,
-                        userStatus:currentUser.status
+                        status:currentUser.status*/
                     }
                 }
             )

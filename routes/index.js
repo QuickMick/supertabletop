@@ -6,7 +6,7 @@ var Rights = require('./../core/rights');
 var Util = require('./../core/util');
 
 var Colors = require('./../public/resources/colors.json');
-
+var LOBBY_CONFIG = require('./../server/lobby_config.json');
 /* GET home page. */
 router.get('/',
     LanguageMiddleware,
@@ -34,13 +34,15 @@ router.get('/',
 
         var isAutenticated = req.isAuthenticated();
         var user = {
-            color:"green",   // default color for lobby view
+            //color:"green",   // default color for lobby view
+            color:LOBBY_CONFIG.GUEST_USER.COLOR,
             default:true
         };
         if(isAutenticated) {
             var u = req.user;
             user.email = u.email;
-            user.color = Colors.PLAYERS_COLOR_NAMES[u.color];
+            //user.color = Colors.PLAYERS_COLOR_NAMES[u.color];
+            user.color = u.color;
             user.verifiedOn = u.verifiedOn;
             user.name = u.name;
             user.displayName = u.displayName;
@@ -50,9 +52,11 @@ router.get('/',
             delete user.default;
 
         }else{
-            user.displayName= req.session.guestName;
+            user.displayName= req.session.guestUser.displayName;
             user.status = Rights.RIGHTS.guest;
-            user.id = req.session.TMP_SESSION_USER_ID;
+            //user.color = Colors.PLAYERS_COLOR_NAMES[req.session.guestUser.color];
+            user.color = req.session.guestUser.color;
+            user.id = req.session.guestUser.id;//req.session.TMP_SESSION_USER_ID;
         }
 
         var currentLanguage = data.queryLanguage || user.language || data.languageID;
@@ -67,6 +71,7 @@ router.get('/',
                 messages: req.flash('message'),
                 errors:req.flash('error'),
                 user:user,
+                colorName:Colors.PLAYERS_COLOR_NAMES[user.color],
                 fs: {
                     translate:data.translate
                 }

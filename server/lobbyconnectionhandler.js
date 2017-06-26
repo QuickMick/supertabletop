@@ -9,8 +9,8 @@ var Util = require('./../core/util');
 
 const uuidV1 = require('uuid/v1');
 
-var Redis = require("redis");
-const DBs = require('./distributed/db.json');
+//var Redis = require("redis");
+//const DBs = require('./distributed/db.json');
 
 
 // TODO: von baseserver ableiten
@@ -36,8 +36,8 @@ class LobbyConnectionHandler {
          * necessary for broadcast
          * @type {Array}
          */
-        // this.allSockets = [];
-
+       //  this.allSockets = [];
+/*
 
         this.redis = Redis.createClient({
             port: DBs.lobbyDB_redis.port,
@@ -46,7 +46,6 @@ class LobbyConnectionHandler {
             db: DBs.lobbyDB_redis.database
         });
 
-       // this.redis.select(3, function() { /* ... */ });
         this.redis.on("error", function (err) {
             console.log("LobbyConnectionHandler;Redis-Error " + err);
         });
@@ -62,7 +61,7 @@ class LobbyConnectionHandler {
                 console.log("    " + i + ": " + reply);
             });
             this.redis.quit();
-        });
+        });*/
     }
 
     use(serverModule) {
@@ -73,7 +72,7 @@ class LobbyConnectionHandler {
         serverModule.init({
             SERVER_ID: this.ID,
             _broadcast: this._broadcast.bind(this),
-            _broadcastExpectSender: this._broadcastExceptSender.bind(this),
+            _broadcastExceptSender: this._broadcastExceptSender.bind(this),
             _sendToClient: this._sendToClient.bind(this)
         })
     }
@@ -81,26 +80,13 @@ class LobbyConnectionHandler {
     _onConnectionReceived(socket) {
         socket.on('disconnect', this._onDisconnect.bind({self: this, socket: socket}));
 
-     /*   var onevent = socket.onevent;
-        socket.onevent = function (packet) {
-            onevent.call(this, packet);
-
-            if (socket.request.session) {
-                socket.request.session.touch();
-            }
-        };*/
-
-        socket.request.session.isInLobby=true;
-
-        // this.allSockets.push(socket);
-
         // create a function, which normalizes the user
         socket.getNormalizedUser = function () {
-            return this.request.user || {
+            return this.request.user || this.request.session.guestUser;/* {
                     displayName: this.request.session.guestName,
                     id: this.request.session.TMP_SESSION_USER_ID,
                     status: 0 // 0 is equal to "guest"
-                };
+                };*/
         };
 
         for (var i = 0; i < this.serverModules.length; i++) {
@@ -127,31 +113,24 @@ class LobbyConnectionHandler {
             return;
         }
 
-        delete this.socket.request.session.isInLobby;
-
         for (var i = 0; i < this.self.serverModules.length; i++) {
             this.self.serverModules[i].onConnectionLost(this.socket);
         }
 
-        this.socket.request.session.isInLobby=false;
-        //   this.self.allSockets = Util.removeByValue(this.self.allSockets,this.socket);
-
-
         if (!this.socket.request.session) return; //TODO: remove
 
-        this.self._broadcastExceptSender(
+     /*   this.self._broadcastExceptSender(
             this.socket,
             Packages.PROTOCOL.SERVER.CLIENT_DISCONNECTED,
             Packages.createEvent(
                 this.self.ID,
                 {id: this.socket.request.session.TMP_SESSION_USER_ID} //this.socket.id}
             )
-        );
+        );*/
     }
 
 
     _broadcast(type, msg) {
-        //this.io.sockets.emit(type,msg);
         this.io.emit(type, msg);
     }
 

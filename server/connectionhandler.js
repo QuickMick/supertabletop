@@ -31,6 +31,7 @@ class ConnectionHandler {
         this.lobbyConnectionHandler = new LobbyConnectionHandler(this.lobbyNsp,options.userManager);
 
         this.lobbyConnectionHandler.use(new ChatModule());
+        this.lobbyConnectionHandler.use(new LobbyOnlineUserModule());
 
       /*  this.gameNsp.on('connection', this.gameConnectionHandler._onConnectionReceived.bind(this.gameConnectionHandler));
         this.lobbyNsp.on('connection',this.lobbyConnectionHandler._onConnectionReceived.bind(this.lobbyConnectionHandler));*/

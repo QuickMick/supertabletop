@@ -18,7 +18,10 @@ module.exports = function(userManager){
         if(!req.session.TMP_SESSION_USER_ID){
             req.session.TMP_SESSION_USER_ID = uuidv1();
         }*/
-        if(!req.session.guestUser && !req.isAuthenticated()){
+
+        var authed = req.isAuthenticated();
+
+        if(!req.session.guestUser && !authed){
             var n = userManager.getRandomGuestName();
             req.session.guestUser= {
                 displayName:n,
@@ -27,9 +30,15 @@ module.exports = function(userManager){
                 status:0,
                 id:uuidv1()
             };
-        }else if(req.isAuthenticated() && req.session.guestUser){
+        }else if(authed && req.session.guestUser){
             delete req.session.guestUser;
         }
+/*
+        if(authed && !req.user)
+        {
+            req.session.reload(next);
+        }else
+            next();*/
 
         next();
     };

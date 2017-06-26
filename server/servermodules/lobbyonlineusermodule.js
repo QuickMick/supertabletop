@@ -5,7 +5,6 @@
 'use strict';
 
 var Packages = require('./../../core/packages');
-var Rights = require('./../../core/rights');
 var BaseServerModule = require('./baseservermodule');
 
 
@@ -30,60 +29,88 @@ class LobbyOnlineUserModule extends BaseServerModule{
 
     onConnectionReceived(socket){
         var currentUser = socket.getNormalizedUser();
-        this._broadcastExceptSender(    // if the change was valid, send everyone the new information
+
+        socket.request.session.isInLobby=this.SERVER_ID;    // save in session, in which lobby the user currently is
+
+        var connectedUser = {
+            displayName:currentUser.displayName,
+            name:currentUser.name,
+            status:currentUser.status,
+            color:currentUser.color,
+            id:currentUser.id
+        };
+
+        // create the connected users list, before the new user is added,
+        // because the newly connected user just needs to see everyone else, not himself.
+        var connectedUsersList = Object.keys(this.onlineUsers).map((k) => this.onlineUsers[k]);
+
+        // save to onlien users list
+        this.onlineUsers[connectedUser.id] = connectedUser;
+
+        // share info with everyone else, that a new client has connected
+        this._broadcastExceptSender(
             socket,
             Packages.PROTOCOL.MODULES.LOBBY_ONLINE_USERS.PLAYER_CONNECTS,
             Packages.createEvent(
                 this.SERVER_ID,
                 {
-                    sender:{
-                        displayName:currentUser.displayName,
-                        name:currentUser.name,
-                        status:currentUser.status,
-                        color:currentUser.color
-                    }
+                    connects:[connectedUser]
                 }
             )
         );
 
+        // share all already connected clients with the newly connected player
 
-        socket.request.session.isInLobby=this.SERVER_ID;
+        if(connectedUsersList && connectedUsersList.length>0) {
+            this._sendToClient(
+                socket,
+                Packages.PROTOCOL.MODULES.LOBBY_ONLINE_USERS.PLAYER_CONNECTS,
+                Packages.createEvent(
+                    this.SERVER_ID,
+                    {
+                        connects: connectedUsersList
+                    }
+                )
+            );
+        }
+
+
 
         // set the bound function as variable of the socket, so we can remove it later
-        socket._onChatMessageReceived_BOUND = this._onChatMessageReceived.bind({self:this,socket:socket});
-        socket.on(Packages.PROTOCOL.MODULES.CHAT.CLIENT_CHAT_MSG, socket._onChatMessageReceived_BOUND);
+       /* socket._onChatMessageReceived_BOUND = this._onChatMessageReceived.bind({self:this,socket:socket});
+        socket.on(Packages.PROTOCOL.MODULES.CHAT.CLIENT_CHAT_MSG, socket._onChatMessageReceived_BOUND);*/
     }
 
     onConnectionLost(socket){
-        socket.removeListener(Packages.PROTOCOL.MODULES.CHAT.CLIENT_CHAT_MSG, socket._onChatMessageReceived_BOUND);
+     //   socket.removeListener(Packages.PROTOCOL.MODULES.CHAT.CLIENT_CHAT_MSG, socket._onChatMessageReceived_BOUND);
 
-        delete socket.request.session.isInLobby;
+        delete socket.request.session.isInLobby;    // user is in no lobby anymore
 
         var currentUser = socket.getNormalizedUser();
-        this._broadcastExceptSender(    // if the change was valid, send everyone the new information
+
+        delete this.onlineUsers[currentUser.id];    // user is no more in online list from now on
+
+        // tell every client, the user has disconnected
+        this._broadcastExceptSender(
             socket,
             Packages.PROTOCOL.MODULES.LOBBY_ONLINE_USERS.PLAYER_DISCONNECTS,
             Packages.createEvent(
                 this.SERVER_ID,
                 {
-                    sender:{
-                        id:currentUser.id/*,
-                        name:currentUser.displayName,
-                        status:currentUser.status*/
-                    }
+                    disconnects:[currentUser.id]
                 }
             )
-        );
+        )
     }
 
-
+/*
     _onChatMessageReceived (evt) {
         if(!evt || !evt.data){
             console.log("CLIENT_CHAT_MSG: no data received");
             return;
         }
 
-        /*
+
          if(!this.self.clientManager.doesClientExist(evt.senderID)){
          console.log("message received from not existing client!",evt.senderID);
          return;
@@ -92,7 +119,7 @@ class LobbyOnlineUserModule extends BaseServerModule{
          if(!this.self.clientManager.verificateClient(evt.senderID,evt.token)){
          console.warn("User sends unverificated messages!",evt.senderID,this.socket.handshake.address,Packages.PROTOCOL.CHAT.CLIENT_CHAT_MSG);
          return;
-         }*/
+         }
 
         if(!evt.data.message){
             return; // no chat message to share
@@ -123,7 +150,7 @@ class LobbyOnlineUserModule extends BaseServerModule{
                 }
             )
         );
-    }
+    }*/
 }
 
 module.exports = LobbyOnlineUserModule;

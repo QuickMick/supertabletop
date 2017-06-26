@@ -1,8 +1,13 @@
-div.online-player
-    -var c = color || "#000000";
-    div.list-color-box(style="background-color:"+c)
-    span.user-message-prefix [#{prefix}]
-    span.user-message-name #{name} :
-    span.user-message-content #{msg}
+-if(!playerID)
+    div.no-user-online() #{I18N.no_players_online}
+-else
+    div.online-player(data-id=playerID)
+        -var c = color || "#000000";
+        -if(!isGuest)
+            div.list-color-box(style="background-color:"+c)
+        -else
+            div.list-color-box.guest
+        span.user-message-prefix [#{prefix}]
+        span.user-message-name #{displayName}
 
 

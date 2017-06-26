@@ -89,10 +89,6 @@ class LobbyConnectionHandler {
                 };*/
         };
 
-        for (var i = 0; i < this.serverModules.length; i++) {
-            this.serverModules[i].onConnectionReceived(socket);
-        }
-
         // share info with client (that he is connected and his own info)
         this._sendToClient(
             socket,
@@ -105,6 +101,10 @@ class LobbyConnectionHandler {
                 }
             )
         );
+
+        for (var i = 0; i < this.serverModules.length; i++) {
+            this.serverModules[i].onConnectionReceived(socket);
+        }
     }
 
     _onDisconnect(data) {

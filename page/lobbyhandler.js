@@ -3,9 +3,11 @@
  */
 
 'use strict';
+var LobbyConnectionHandler = require('./lobbyconnectionhandler');
 
 var ChatHandler = require('./../public/javascripts/chathandler');
-var LobbyConnectionHandler = require('./lobbyconnectionhandler');
+var OnlinePlayersHandler = require('./lobby/onlineplayershandler');
+
 
 var LoginDialog = require('./dialogs/logindialog');
 var SignupDialog = require('./dialogs/signupdialog');
@@ -18,6 +20,8 @@ class LobbyHandler {
         this.lobbyConnectionHandler = new LobbyConnectionHandler();
 
         this.chatHandler = new ChatHandler("lobby-chat-container",false,150);
+        this.onlinePlayersHandler = new OnlinePlayersHandler("player-lobby-list");
+
 
         this.chatHandler.on('send',(msg)=>{
             this.lobbyConnectionHandler.sendChatMessage(msg);
@@ -26,6 +30,9 @@ class LobbyHandler {
         this.lobbyConnectionHandler.on('chatmessagereceived',(evt)=>
             this.chatHandler.pushMessage(evt.data.message, evt.data.type, evt.timeStamp, evt.data.sender)
         );
+
+        this.lobbyConnectionHandler.on('lobbyuserconnected',this.onlinePlayersHandler.onUserConnected.bind(this.onlinePlayersHandler));
+        this.lobbyConnectionHandler.on('lobbyuserdisconnected',this.onlinePlayersHandler.onUserDisconnected.bind(this.onlinePlayersHandler));
 
         var log_in_btn = document.getElementById("log-in");
         if(log_in_btn){

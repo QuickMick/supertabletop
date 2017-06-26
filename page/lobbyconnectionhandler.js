@@ -8,6 +8,8 @@ var EventEmitter3 = require('eventemitter3');
 var Packages = require('./../core/packages');
 
 const EVT_CHATMESSAGE_RECEIVED = 'chatmessagereceived';
+const EVT_LOBBY_USER_CONNECTED = 'lobbyuserconnected';
+const EVT_LOBBY_USER_DISCONNECTED = 'lobbyuserdisconnected';
 
 class LobbyConnectionHandler extends EventEmitter3{
 
@@ -44,18 +46,39 @@ class LobbyConnectionHandler extends EventEmitter3{
     }
 
     _initHandlers(){
-        this.socket.on(Packages.PROTOCOL.SERVER.RESPONSE_CLIENT_ACCEPTED, this._onClientAccepted.bind(this));
+        this.socket._onClientAccepted = this._onClientAccepted.bind(this);
+        this.socket.on(Packages.PROTOCOL.SERVER.RESPONSE_CLIENT_ACCEPTED, this.socket._onClientAccepted);
+
         // if chat message from server is received
-        this.socket.on(Packages.PROTOCOL.MODULES.CHAT.SERVER_CHAT_MSG, this._onChatMessageReceived.bind(this));
+        this.socket._onChatMessageReceived = this._onChatMessageReceived.bind(this);
+        this.socket.on(Packages.PROTOCOL.MODULES.CHAT.SERVER_CHAT_MSG, this.socket._onChatMessageReceived);
+
+        this.socket._onUserConnected = this._onUserConnected.bind(this);
+        this.socket.on(Packages.PROTOCOL.MODULES.LOBBY_ONLINE_USERS.PLAYER_CONNECTS, this.socket._onUserConnected);
+
+        this.socket._onUserDisconnected = this._onUserDisconnected.bind(this);
+        this.socket.on(Packages.PROTOCOL.MODULES.LOBBY_ONLINE_USERS.PLAYER_DISCONNECTS, this.socket._onUserDisconnected);
     }
 
     _removeHandlers(){
-        this.socket.removeListener(Packages.PROTOCOL.SERVER.RESPONSE_CLIENT_ACCEPTED, this._onClientAccepted.bind(this));
+        this.socket.removeListener(Packages.PROTOCOL.SERVER.RESPONSE_CLIENT_ACCEPTED, this.socket._onClientAccepted);
 
         // if chat message from server is received
-        this.socket.removeListener(Packages.PROTOCOL.MODULES.CHAT.SERVER_CHAT_MSG, this._onChatMessageReceived.bind(this));
+        this.socket.removeListener(Packages.PROTOCOL.MODULES.CHAT.SERVER_CHAT_MSG, this.socket._onChatMessageReceived);
+
+        this.socket.removeListener(Packages.PROTOCOL.MODULES.LOBBY_ONLINE_USERS.PLAYER_CONNECTS, this.socket._onUserConnected);
+        this.socket.removeListener(Packages.PROTOCOL.MODULES.LOBBY_ONLINE_USERS.PLAYER_DISCONNECTS, this.socket._onUserDisconnected);
     }
 
+    _onUserConnected(evt){
+        if(!this._vertifyServer(evt.senderID)){console.log("message is not from server"); return; }
+        this.emit(EVT_LOBBY_USER_CONNECTED,evt.data);
+    }
+
+    _onUserDisconnected(evt){
+        if(!this._vertifyServer(evt.senderID)){console.log("message is not from server"); return; }
+        this.emit(EVT_LOBBY_USER_DISCONNECTED,evt.data);
+    }
 
     _onClientAccepted(evt) {
         if(this.connectedServerID && this.CLIENT_INFO) return;    // another received package could be from another game, to which the client is connected

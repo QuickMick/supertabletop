@@ -757,9 +757,32 @@ h1{
 }
 
 
-#player-lobby-list .list-color-box{
-    width: 30px;
-    height: 30px;
+#player-lobby-list .online-player .list-color-box{
+    width: 10px;
+    height: 10px;
+    display: inline-block;
+    border-radius: 50%;
+    margin: auto 0px auto 5px;
+    box-shadow: black 0 0 3px;
+}
+
+#player-lobby-list .online-player .user-message-prefix,
+#player-lobby-list .online-player .user-message-name
+{
+    margin-left: 5px;
+}
+
+#player-lobby-list .no-user-online{
+    text-align: center;
+    font-style: italic;
+    margin-top: 4px;
+    width: 100%;
+    color:var(--color-dark);
+}
+
+#player-lobby-list .list-color-box.guest{
+    background-color:black;
+   /* border:1px solid black;*/
 }
 
 .chat-container{

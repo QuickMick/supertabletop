@@ -60,8 +60,8 @@ var sessionStore = new RedisStore({
 var sessionInstance = expressSession(
     {
         key: sessionsKey,
-        saveUninitialized: false, // don't create session until something stored
-        resave: false, //don't save session if unmodified
+     //   saveUninitialized: false, // don't create session until something stored
+    //    resave: false, //don't save session if unmodified
         store: sessionStore, // new RedisStore({}),
         secret: sessionsSecret
         ,cookie:{maxAge:COOKIE_MAX_AGE}  // expires in 5 minutes

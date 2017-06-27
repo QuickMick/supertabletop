@@ -39,7 +39,7 @@ class LobbyHandler {
             //TODO: close lobby?
             new YesNoDialog({
                 title:"already_connected",
-                message:I18N.translate(e.reason)
+                message:I18N.translate((e.data||{}).reason)
                 //,positive:"confirm"
 
             }).show();

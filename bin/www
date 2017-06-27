@@ -27,12 +27,15 @@ var server = http.createServer(app);
 
 
 var io = require('socket.io')(server);
-io.set('authorization', app._SESSION_SOCKET_CONNECTION_MIDDLEWARE);
+//io.set('authorization', app._SESSION_SOCKET_CONNECTION_MIDDLEWARE);
 
-io.set(app._SESSION_SOCKET_CONNECTION_MIDDLEWARE);
+//io.use(app._SESSION_SOCKET_CONNECTION_MIDDLEWARE);
 
 var connectionHandlder = new ConnectionHandler();
-connectionHandlder.start(io,{userManager:app._userManager});
+connectionHandlder.start(io,{
+  userManager:app._userManager,
+  sessionMiddleware:app._SESSION_SOCKET_CONNECTION_MIDDLEWARE
+});
 
 
 

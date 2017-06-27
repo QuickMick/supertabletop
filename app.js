@@ -78,6 +78,8 @@ var sessionInstance = expressSession(
         key: sessionsKey,
       //  saveUninitialized: false, // don't create session until something stored
       //  resave: false, //don't save session if unmodified
+        resave: true,
+        saveUninitialized: true,
         store: sessionStore, // new RedisStore({}),
         secret: sessionsSecret
         ,cookie:{maxAge:COOKIE_MAX_AGE}  // expires in 5 minutes
@@ -101,21 +103,31 @@ app.use(sessionInstance);
 app.use(passport.initialize());
 app.use(passport.session());
 
-
 var passportSocketIo = function(app,sessionInstance, passport,cookieParser,sessionService,sessionsSecret){
 
     return function (req, next) {
         var parseCookie = cookieParser(sessionsSecret);
-
+        req = req.request;
         parseCookie(req, null, function (err, data) {
             sessionService.get(req, function (err, session) {
                 if (err)
                     return next(new Error(err.message),false);
                 if (!session)
                     return next(new Error("Not authorized"),false);
-
+console.log("sockeio_request",session);
                 req.session = session;
-
+                if(session) {
+                    req.updateSessionValue = function (propertyName, propertyValue, callback) {
+                      //  console.log("beforesave:",session);
+                         sessionService.getSessionBySessionID(session.id, (err, session)=>{
+                            session[propertyName] = propertyValue;
+                            session.touch().save();
+                             req.session = session;
+                        });
+                     //   sessionService.setSessionProperty(session, propertyName, propertyValue, callback);
+                      //  console.log("aftersave:",session);
+                    };
+                }
                 if (req.session.passport && req.session.passport.user) {
                     passport.deserializeUser(req.session.passport.user, req, function (err, user) {
                         req.user = user;
@@ -149,13 +161,7 @@ var passportSocketIo = function(app,sessionInstance, passport,cookieParser,sessi
 
 
 
-
-//app._SESSION_SOCKET_CONNECTION_MIDDLEWARE = passportSocketIo(cookieParser(sessionsSecret),sessionStore,passport);
-
-
-//app._SESSION_SOCKET_CONNECTION_MIDDLEWARE = passportSocketIo(app,sessionInstance,passport);
 sessionService.initialize(sessionStoreClient,sessionStore,sessionsKey);
-
 app._SESSION_SOCKET_CONNECTION_MIDDLEWARE = passportSocketIo(app,sessionInstance,passport,cookieParser,sessionService,sessionsSecret);
 
 
@@ -216,7 +222,12 @@ var ensureAuthenticatedMiddleware = function (req, res, next) {
     res.redirect('/login');
 };
 
+app.use('/',function(req,res,next){
+    console.log("session_request",req.session);
+    next();
+});
 
+/*
 app.use('/already-connected',
     LanguageMiddleware,
     function (data,req, res, next) {
@@ -226,7 +237,7 @@ app.use('/already-connected',
             return res.redirect('/');
         }
     }
-);
+);*/
 /*
 /// check if the user already has obened the page in another tab, if yes, redirect him
 app.use('/',function(req,res,next){

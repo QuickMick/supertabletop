@@ -26,7 +26,11 @@ class ConnectionHandler {
         this.gameNsp = this.io.of(Packages.NAMESPACES.GAME);
         this.lobbyNsp = this.io.of(Packages.NAMESPACES.LOBBY);
 
-
+        if(options.sessionMiddleware) {
+            this.gameNsp.use(options.sessionMiddleware);
+            this.lobbyNsp.use(options.sessionMiddleware);
+        }
+//sio.sockets.on('connection', function (socket) {
         this.gameNsp.on('connection', this._clientConnected.bind(this));
         this.lobbyNsp.on('connection', this._clientConnected.bind(this));
 
@@ -83,17 +87,14 @@ class ConnectionHandler {
         }
 
         // if player is not connected, mark him as connected
-        socket.request.session.opened = true;
-       // socket.request.session.save();
+        socket.request.updateSessionValue("opened",true);
 
         // if he disconnects, release him, so he can connect again
         socket.on('disconnect', ()=> {
-                socket.request.session.opened = false;
-              //  socket.request.session.save();
+            socket.request.updateSessionValue("opened",undefined);
             }
         );
     }
-
 }
 
 

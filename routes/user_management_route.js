@@ -122,7 +122,7 @@ module.exports = function(passport,userManager){
                 (req,success,err)=>{
                     var m = req.flash('message');
                     var e = req.flash('error');
-                    console.log(m,e);
+
                     res.render('mail_verification',{
                             messages: m,
                             errors:e,
@@ -190,6 +190,7 @@ module.exports = function(passport,userManager){
                     return res;
                 }
 
+               // req.session.touch().save();
                 return res.json({
                     messages: req.flash('message'),
                     errors:req.flash('error')
@@ -203,6 +204,7 @@ module.exports = function(passport,userManager){
                     return res;
                 }
 
+                //req.session.touch().save();
                 return res.json({
                         messages: req.flash('message'),
                         errors:req.flash('error')
@@ -218,6 +220,7 @@ module.exports = function(passport,userManager){
                         return res;
                     }
 
+                    //req.session.touch().save();
                     return res.json({
                         messages: req.flash('message'),
                         errors:req.flash('error')

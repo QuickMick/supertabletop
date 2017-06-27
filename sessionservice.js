@@ -46,15 +46,29 @@ var self = module.exports = {
         try {
             session.reload(function () {
                 session.touch().save();
-                callback(null, session);
+                if(callback)
+                    callback(null, session);
             });
         }
         catch (err) {
-            callback(err);
+            if(callback)
+                callback(err);
         }
     },
     setSessionProperty: function (session, propertyName, propertyValue, callback) {
-        session[propertyName] = propertyValue;
-        self.updateSession(session, callback);
+     //   session[propertyName] = propertyValue;
+        //self.updateSession(session, callback);
+        try {
+            session.reload(function () {
+                session[propertyName] = propertyValue;
+                session.touch().save();
+                if(callback)
+                    callback(null, session);
+            });
+        }
+        catch (err) {
+            if(callback)
+                callback(err);
+        }
     }
 };

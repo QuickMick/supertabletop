@@ -13,6 +13,8 @@ var Flash = require('connect-flash');
 var passport = require('passport');
 var expressSession = require('express-session');
 
+var sessionService = require('./sessionservice');
+
 var LanguageMiddleware = require('./routes/languagemiddleware');
 
 // const MongoStore = require('connect-mongo')(expressSession);
@@ -45,28 +47,54 @@ app.use(helmet());
 
 var sessionsSecret = "ranzenpanzen"; //uuidv1();
 var sessionsKey = "sessions.sid";
+var allowedCORSOrigins = "http://127.0.0.1:9000";
 
+/*
+ const MongoStore = require('connect-mongo')(expressSession);
+//TODO replace mongoose durch redis
+const mongoose = require('mongoose');
+ mongoose.connect(require('./server/distributed/db.json').userDB.old);
+
+ var sessionStore = new MongoStore({
+ mongooseConnection: mongoose.connection,
+ autoRemove: 'native',
+ touchAfter: 60 // time period in seconds
+ });
+*/
+
+var sessionStoreClient = Redis.createClient({
+    port: DBs.sessionStore_redis.port,
+    host: DBs.sessionStore_redis.host,
+    password: DBs.sessionStore_redis.password,
+    db: DBs.sessionStore_redis.database
+});
 var sessionStore = new RedisStore({
     unset: "destroy",
-    pass: DBs.sessionStore_redis.password,
-    client: Redis.createClient({
-        port: DBs.sessionStore_redis.port,
-        host: DBs.sessionStore_redis.host,
-        password: DBs.sessionStore_redis.password,
-        db: DBs.sessionStore_redis.database
-    })
+    client: sessionStoreClient
 });
 
 var sessionInstance = expressSession(
     {
         key: sessionsKey,
-     //   saveUninitialized: false, // don't create session until something stored
-    //    resave: false, //don't save session if unmodified
+      //  saveUninitialized: false, // don't create session until something stored
+      //  resave: false, //don't save session if unmodified
         store: sessionStore, // new RedisStore({}),
         secret: sessionsSecret
         ,cookie:{maxAge:COOKIE_MAX_AGE}  // expires in 5 minutes
     }
 );
+
+
+// Enable CORS
+var allowCrossDomain = function (req, res, next) {
+    res.header("Access-Control-Allow-Origin", allowedCORSOrigins);
+    res.header("Access-Control-Allow-Methods", "GET,PUT,POST,DELETE");
+    res.header("Access-Control-Allow-Headers", "Content-Type");
+    res.header("Access-Control-Allow-Credentials", "true");
+    next();
+};
+
+app.use(allowCrossDomain);
 
 app.use(sessionInstance);
 
@@ -74,8 +102,33 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 
-var passportSocketIo = function(app,sessionInstance, passport){
-    return function(req, accept){
+var passportSocketIo = function(app,sessionInstance, passport,cookieParser,sessionService,sessionsSecret){
+
+    return function (req, next) {
+        var parseCookie = cookieParser(sessionsSecret);
+
+        parseCookie(req, null, function (err, data) {
+            sessionService.get(req, function (err, session) {
+                if (err)
+                    return next(new Error(err.message),false);
+                if (!session)
+                    return next(new Error("Not authorized"),false);
+
+                req.session = session;
+
+                if (req.session.passport && req.session.passport.user) {
+                    passport.deserializeUser(req.session.passport.user, req, function (err, user) {
+                        req.user = user;
+                        req.user.logged_in = true;
+                        next(null, true);
+                    });
+                } else {
+                    next(null,true);
+                }
+            });
+        });
+    };
+  /*  return function(req, accept){
         sessionInstance(req,req.res,
             function (x) {
                 console.log(x);
@@ -91,7 +144,7 @@ var passportSocketIo = function(app,sessionInstance, passport){
                 }
             }
         );
-    };
+    };*/
 };
 
 
@@ -100,7 +153,12 @@ var passportSocketIo = function(app,sessionInstance, passport){
 //app._SESSION_SOCKET_CONNECTION_MIDDLEWARE = passportSocketIo(cookieParser(sessionsSecret),sessionStore,passport);
 
 
-app._SESSION_SOCKET_CONNECTION_MIDDLEWARE = passportSocketIo(app,sessionInstance,passport);
+//app._SESSION_SOCKET_CONNECTION_MIDDLEWARE = passportSocketIo(app,sessionInstance,passport);
+sessionService.initialize(sessionStoreClient,sessionStore,sessionsKey);
+
+app._SESSION_SOCKET_CONNECTION_MIDDLEWARE = passportSocketIo(app,sessionInstance,passport,cookieParser,sessionService,sessionsSecret);
+
+
 
 /*.authornize({
     cookieParser: cookieParser,

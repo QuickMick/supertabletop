@@ -39,7 +39,7 @@ class LobbyHandler {
             //TODO: close lobby?
             new YesNoDialog({
                 title:"already_connected",
-                message:I18N.translate("cannot_open_tab_twice")
+                message:I18N.translate(e.reason)
                 //,positive:"confirm"
 
             }).show();

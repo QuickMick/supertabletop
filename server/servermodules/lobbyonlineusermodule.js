@@ -31,7 +31,7 @@ class LobbyOnlineUserModule extends BaseServerModule{
         var currentUser = socket.getNormalizedUser();
 
         socket.request.session.isInLobby=this.SERVER_ID;    // save in session, in which lobby the user currently is
-        socket.request.session.save();
+     //   socket.request.session.save();
 
         var connectedUser = {
             displayName:currentUser.displayName,
@@ -86,7 +86,7 @@ class LobbyOnlineUserModule extends BaseServerModule{
      //   socket.removeListener(Packages.PROTOCOL.MODULES.CHAT.CLIENT_CHAT_MSG, socket._onChatMessageReceived_BOUND);
 
         delete socket.request.session.isInLobby;    // user is in no lobby anymore
-        socket.request.session.save();
+      //  socket.request.session.save();
 
         var currentUser = socket.getNormalizedUser();
 

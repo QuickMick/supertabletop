@@ -48,9 +48,25 @@ class ConnectionHandler {
      */
     _clientConnected(socket){
 
+        if (!socket.request.session) {
+            socket.emit(
+                Packages.PROTOCOL.SERVER.RESPONSE_CLIENT_REJECTED,
+
+                Packages.createEvent(
+                    this.ID,
+                    {
+                        reason: "no_session_found"
+                    }
+                )
+            );
+            socket.forceDisconnected = true;
+            socket.disconnect();
+            return;
+        }
+
+
         // if player is connected in another tab, refues the connection
         if (socket.request.session.opened) {
-            console.log(Packages.PROTOCOL.SERVER.RESPONSE_CLIENT_REJECTED);
             socket.emit(
                 Packages.PROTOCOL.SERVER.RESPONSE_CLIENT_REJECTED,
 
@@ -68,12 +84,12 @@ class ConnectionHandler {
 
         // if player is not connected, mark him as connected
         socket.request.session.opened = true;
-        socket.request.session.save();
+       // socket.request.session.save();
 
         // if he disconnects, release him, so he can connect again
         socket.on('disconnect', ()=> {
                 socket.request.session.opened = false;
-                socket.request.session.save();
+              //  socket.request.session.save();
             }
         );
     }

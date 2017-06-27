@@ -159,7 +159,7 @@ var ensureAuthenticatedMiddleware = function (req, res, next) {
 };
 
 
-app.use('/prohibited',
+app.use('/already-connected',
     LanguageMiddleware,
     function (data,req, res, next) {
         if(req.session && req.session.opened) { //session opened are set in connectionhandler
@@ -169,7 +169,7 @@ app.use('/prohibited',
         }
     }
 );
-
+/*
 /// check if the user already has obened the page in another tab, if yes, redirect him
 app.use('/',function(req,res,next){
     console.log("lobby",req.session.isInLobby);
@@ -179,7 +179,7 @@ app.use('/',function(req,res,next){
     }
     next();
 });
-
+*/
 
 app.use('/', guestNameMiddleware);
 app.use('/', userManagementRoute);

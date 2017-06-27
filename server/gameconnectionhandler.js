@@ -22,6 +22,7 @@ class GameConnectionHandler {
     }
 
     _onConnectionReceived(socket){
+        if(socket.forceDisconnected) return;
         console.log("connection received from:"+socket.handshake.address);
 
         var gameID = socket.handshake.query.gameid;

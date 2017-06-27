@@ -1,0 +1,17 @@
+div.overlay
+    div.overlay-content
+        div.input-content
+            div.formular-title #{I18N[title]}
+            p #{message}
+            .flash-messages
+            -if(positive || negative)
+                div.option-btns
+                    -if(positive)
+                        div.btn.action(data-action="positive") #{I18N[positive]}
+                    -if(negative)
+                        div.btn.action(data-action="negative") #{I18N[negative]}
+
+            -if(links && links.length >=0)
+                each e in links
+                    a.link(href=e.href) #{e.text}
+

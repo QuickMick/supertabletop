@@ -134,7 +134,13 @@ body,html {
 }
 
 .input-content p{
-    margin: 0 10px;
+    margin: 10px 10px;
+}
+
+.input-content .option-btns{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
 }
 
 .link{

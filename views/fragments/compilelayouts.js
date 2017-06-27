@@ -34,6 +34,7 @@ class CompileLayouts {
         tabletop += this._add('page/signup_dialog.pug',"signupDialog");
         tabletop += this._add('page/profile_dialog.pug',"profileDialog");
         tabletop += this._add('page/empty_dialog.pug',"emptyDialog");
+        tabletop += this._add('page/yesno_dialog.pug',"yesNoDialog");
         tabletop += this._add('page/messages.pug',"messages");
 
         tabletop += this._add('page/lobby_online_player_list_item.pug',"lobbyOnlinePlayerListItem");

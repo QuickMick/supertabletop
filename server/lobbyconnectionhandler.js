@@ -78,6 +78,9 @@ class LobbyConnectionHandler {
     }
 
     _onConnectionReceived(socket) {
+
+        if(socket.forceDisconnected) return;
+
         socket.on('disconnect', this._onDisconnect.bind({self: this, socket: socket}));
 
         // create a function, which normalizes the user

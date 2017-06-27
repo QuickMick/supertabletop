@@ -31,7 +31,9 @@ class Page
     }
 
 }
-window.onunload
+window.onunload = function () {
+  console.log("window.onunload");
+};
 
 window.showLoadingDialog=function(){
     document.getElementById("loading-overlay").style.display=""; //"flex";

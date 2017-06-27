@@ -13,6 +13,8 @@ var LoginDialog = require('./dialogs/logindialog');
 var SignupDialog = require('./dialogs/signupdialog');
 var ProfileDialog = require('./dialogs/profiledialog');
 
+var YesNoDialog = require('./dialogs/yesnodialog');
+
 class LobbyHandler {
 
     constructor() {
@@ -21,7 +23,6 @@ class LobbyHandler {
 
         this.chatHandler = new ChatHandler("lobby-chat-container",false,150);
         this.onlinePlayersHandler = new OnlinePlayersHandler("player-lobby-list");
-
 
         this.chatHandler.on('send',(msg)=>{
             this.lobbyConnectionHandler.sendChatMessage(msg);
@@ -33,6 +34,17 @@ class LobbyHandler {
 
         this.lobbyConnectionHandler.on('lobbyuserconnected',this.onlinePlayersHandler.onUserConnected.bind(this.onlinePlayersHandler));
         this.lobbyConnectionHandler.on('lobbyuserdisconnected',this.onlinePlayersHandler.onUserDisconnected.bind(this.onlinePlayersHandler));
+
+        this.lobbyConnectionHandler.on('currentuserrejected',(e)=>{
+            //TODO: close lobby?
+            new YesNoDialog({
+                title:"already_connected",
+                message:I18N.translate("cannot_open_tab_twice")
+                //,positive:"confirm"
+
+            }).show();
+        });
+
 
         var log_in_btn = document.getElementById("log-in");
         if(log_in_btn){

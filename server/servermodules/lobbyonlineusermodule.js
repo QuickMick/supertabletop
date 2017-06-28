@@ -28,10 +28,11 @@ class LobbyOnlineUserModule extends BaseServerModule{
     }
 
     onConnectionReceived(socket){
-        var currentUser = socket.getNormalizedUser();
+        var currentUser = socket.request.getNormalizedUser();
 
         //socket.request.session.isInLobby=this.SERVER_ID;    // save in session, in which lobby the user currently is
-        socket.request.updateSessionValue("isInLobby",this.SERVER_ID);
+       // socket.request.updateSessionValue("isInLobby",this.SERVER_ID);
+
 
         var connectedUser = {
             displayName:currentUser.displayName,
@@ -74,23 +75,12 @@ class LobbyOnlineUserModule extends BaseServerModule{
                 )
             );
         }
-
-
-
-        // set the bound function as variable of the socket, so we can remove it later
-       /* socket._onChatMessageReceived_BOUND = this._onChatMessageReceived.bind({self:this,socket:socket});
-        socket.on(Packages.PROTOCOL.MODULES.CHAT.CLIENT_CHAT_MSG, socket._onChatMessageReceived_BOUND);*/
     }
 
     onConnectionLost(socket){
-     //   socket.removeListener(Packages.PROTOCOL.MODULES.CHAT.CLIENT_CHAT_MSG, socket._onChatMessageReceived_BOUND);
+      //  socket.request.updateSessionValue("isInLobby",undefined);
 
-        socket.request.updateSessionValue("isInLobby",undefined);
-
-      //  delete socket.request.session.isInLobby;    // user is in no lobby anymore
-      //  socket.request.session.save();
-
-        var currentUser = socket.getNormalizedUser();
+        var currentUser = socket.request.getNormalizedUser();
 
         delete this.onlineUsers[currentUser.id];    // user is no more in online list from now on
 
@@ -106,55 +96,6 @@ class LobbyOnlineUserModule extends BaseServerModule{
             )
         )
     }
-
-/*
-    _onChatMessageReceived (evt) {
-        if(!evt || !evt.data){
-            console.log("CLIENT_CHAT_MSG: no data received");
-            return;
-        }
-
-
-         if(!this.self.clientManager.doesClientExist(evt.senderID)){
-         console.log("message received from not existing client!",evt.senderID);
-         return;
-         }
-
-         if(!this.self.clientManager.verificateClient(evt.senderID,evt.token)){
-         console.warn("User sends unverificated messages!",evt.senderID,this.socket.handshake.address,Packages.PROTOCOL.CHAT.CLIENT_CHAT_MSG);
-         return;
-         }
-
-        if(!evt.data.message){
-            return; // no chat message to share
-        }
-
-
-        var user = this.socket.request.user;
-
-        if(!user){
-            user  = {
-                displayName: this.socket.request.session.guestName,
-                status : 0 // 0 is equal to "guest"
-            };
-        }
-
-        this.self._broadcast(    // if the change was valid, send everyone the new information
-            Packages.PROTOCOL.CHAT.SERVER_CHAT_MSG,
-            Packages.createEvent(
-                this.self.SERVER_ID,
-                {
-                    clientID: evt.senderID,
-                    type:"user",
-                    sender:{
-                        name:user.displayName,
-                        userStatus:user.status
-                    },
-                    message: evt.data.message
-                }
-            )
-        );
-    }*/
 }
 
 module.exports = LobbyOnlineUserModule;

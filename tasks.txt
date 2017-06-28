@@ -1,3 +1,7 @@
+### i18n todo ###
+no_user_found
+no_session_found
+unknown_error
 
 ####################################################  ISSUES  ##########################################################
 -isSensor bei drag an un aus is noch n bissl buggy -> wenn an kanten collision war, un dann in iSensor geht is des glaub immer

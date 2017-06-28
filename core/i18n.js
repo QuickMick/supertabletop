@@ -27,6 +27,7 @@ class I18N {
     }
 
     translate(key){
+
         if(!key || !this._languageData[key]) return "!"+(key || "UNKNOWN");
 
         var result = this._languageData[key] || "!"+key;

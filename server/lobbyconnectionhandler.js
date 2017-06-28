@@ -84,13 +84,13 @@ class LobbyConnectionHandler {
         socket.on('disconnect', this._onDisconnect.bind({self: this, socket: socket}));
 
         // create a function, which normalizes the user
-        socket.getNormalizedUser = function () {
-            return this.request.user || this.request.session.guestUser;/* {
-                    displayName: this.request.session.guestName,
-                    id: this.request.session.TMP_SESSION_USER_ID,
-                    status: 0 // 0 is equal to "guest"
-                };*/
-        };
+        // socket.getNormalizedUser = function () {
+        //     return this.request.user || this.request.session.guestUser;/* {
+        //             displayName: this.request.session.guestName,
+        //             id: this.request.session.TMP_SESSION_USER_ID,
+        //             status: 0 // 0 is equal to "guest"
+        //         };*/
+        // };
 
         // share info with client (that he is connected and his own info)
         this._sendToClient(

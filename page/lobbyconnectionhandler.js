@@ -14,6 +14,8 @@ const EVT_LOBBY_USER_DISCONNECTED = 'lobbyuserdisconnected';
 const EVT_CURRENT_USER_ACCEPTED = 'currentuseraccepted';
 const EVT_CURRENT_USER_REJECTED = 'currentuserrejected';
 
+const EVT_CURRENT_USER_DISCONNECTED = 'disconnected';
+
 class LobbyConnectionHandler extends EventEmitter3{
 
     constructor() {
@@ -41,6 +43,7 @@ class LobbyConnectionHandler extends EventEmitter3{
     start(){
         this.socket = require('socket.io-client').connect(Packages.NAMESPACES.LOBBY);
 
+
         this._initHandlers();
     }
 
@@ -55,6 +58,8 @@ class LobbyConnectionHandler extends EventEmitter3{
 
         this.socket._onClientRejected = this._onClientRejected.bind(this);
         this.socket.on(Packages.PROTOCOL.SERVER.RESPONSE_CLIENT_REJECTED, this.socket._onClientRejected);
+        this.socket.on("error", this.socket._onClientRejected);
+        this.socket.on("connection_error", this.socket._onClientRejected);
 
         // if chat message from server is received
         this.socket._onChatMessageReceived = this._onChatMessageReceived.bind(this);
@@ -65,6 +70,14 @@ class LobbyConnectionHandler extends EventEmitter3{
 
         this.socket._onUserDisconnected = this._onUserDisconnected.bind(this);
         this.socket.on(Packages.PROTOCOL.MODULES.LOBBY_ONLINE_USERS.PLAYER_DISCONNECTS, this.socket._onUserDisconnected);
+
+        this.socket._onDisconnect = this._onDisconnect.bind(this);
+        this.socket.on('disconnect', this.socket._onDisconnect);
+    }
+
+    _onDisconnect(evt){
+        if(!this._vertifyServer(evt.senderID)){console.log("message is not from server"); return; }
+        this.emit(EVT_CURRENT_USER_DISCONNECTED,evt);
     }
 
     _removeHandlers(){
@@ -103,6 +116,7 @@ class LobbyConnectionHandler extends EventEmitter3{
     }
 
     _onClientRejected(evt){
+        console.log("err",evt);
         window.hideLoadingDialog();
         this.stop();
         this.emit(EVT_CURRENT_USER_REJECTED,evt);

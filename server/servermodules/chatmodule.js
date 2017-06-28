@@ -35,6 +35,7 @@ class ChatModule extends BaseServerModule{
             return;
         }
 
+
         /*
         if(!this.self.clientManager.doesClientExist(evt.senderID)){
             console.log("message received from not existing client!",evt.senderID);
@@ -46,12 +47,13 @@ class ChatModule extends BaseServerModule{
             return;
         }*/
 
-        if(!evt.data.message){
+        if(!evt.data.message || typeof evt.data.message != "string"){
             return; // no chat message to share
         }
 
+        evt.data.message = evt.data.message.trim(); //TODO: bad word filter?
 
-        var user = this.socket.getNormalizedUser();
+        var user = this.socket.request.getNormalizedUser();
 
         this.self._broadcast(    // if the change was valid, send everyone the new information
             Packages.PROTOCOL.MODULES.CHAT.SERVER_CHAT_MSG,

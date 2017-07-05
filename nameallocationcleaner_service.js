@@ -26,11 +26,8 @@ var clean = function(onDoneCallback) {
 
     const KEY_PATH = DBs.sessionStore_redis.prefix.session + DBs.sessionStore_redis.table.allocated_names;
 
-    var x = redisClient.streamified('HSCAN');
-
-  //  var remove = [];        //TODO: really save in ram?
     var lastName = "";
-    x(KEY_PATH, '*')
+    redisClient.streamified('HSCAN')(KEY_PATH, '*')
         .on('data', function (data) {
 
             if (!data.startsWith(DBs.sessionStore_redis.prefix.id)) {
@@ -58,31 +55,6 @@ var clean = function(onDoneCallback) {
             console.log("done");
             console.log("waiting for next operation...");
         });
-      /*  .on('end', function () {
-            setTimeout(()=> {
-                console.log("iteration done");
-
-                if (!remove) {
-                    console.log("remove list is null");
-                    redisClient.quit();
-                    console.log("done");
-                    console.log("waiting for next operation...");
-                    if(onDoneCallback)onDoneCallback();
-                    return;
-                }
-
-                console.log("start cleaning");
-                for (let i = 0; i < remove.length; i++) {
-                    redisClient.hdel(KEY_PATH, remove[i], (e, k)=> {
-                        //console.log(e,k);
-                    });
-                }
-                console.log("done");
-                console.log("waiting for next operation...");
-                redisClient.quit();
-                if(onDoneCallback)onDoneCallback();
-            }, 1000);
-        });*/
 };
 
 console.log("start name allocation cleaning service in intervall",CLEAN_INTERVAL,"ms =>",CLEAN_INTERVAL/60/60/1000,"min");

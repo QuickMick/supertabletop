@@ -13,7 +13,7 @@ var Flash = require('connect-flash');
 var passport = require('passport');
 var expressSession = require('express-session');
 
-var sessionService = require('./sessionservice');
+//var sessionService = require('./sessionservice');
 
 var LanguageMiddleware = require('./routes/languagemiddleware');
 
@@ -269,8 +269,8 @@ app.use(function(req, res, next) {
 
 */
 
-sessionService.initialize(sessionStoreClient,sessionStore,sessionsKey);
-app._SESSION_SOCKET_CONNECTION_MIDDLEWARE = passportSocketIo(app,sessionInstance,passport,cookieParser(sessionsSecret),sessionService);
+//sessionService.initialize(sessionStoreClient,sessionStore,sessionsKey);
+app._SESSION_SOCKET_CONNECTION_MIDDLEWARE = passportSocketIo(app,sessionInstance,passport/*,cookieParser(sessionsSecret),sessionService*/);
 
 
 

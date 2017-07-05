@@ -3,7 +3,7 @@
  */
 
 'use strict';
-
+/*
 var redisClient = null;
 var redisStore = null;
 var sessionCookieKey= "";
@@ -71,4 +71,4 @@ var self = module.exports = {
                 callback(err);
         }
     }
-};
+};*/

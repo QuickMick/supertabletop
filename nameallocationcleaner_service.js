@@ -13,7 +13,7 @@ var Redis = require("redis");
 require('node-redis-streamify')(Redis);
 var DBs = require('./server/distributed/db.json');
 
-const CLEAN_INTERVAL = 10*(1000*60*60); // 10 minutes
+const CLEAN_INTERVAL = 10*(1000*60); // 10 minutes
 
 var clean = function(onDoneCallback) {
     console.log("perform cleansing action");
@@ -57,7 +57,7 @@ var clean = function(onDoneCallback) {
         });
 };
 
-console.log("start name allocation cleaning service in intervall",CLEAN_INTERVAL,"ms =>",CLEAN_INTERVAL/60/60/1000,"min");
+console.log("start name allocation cleaning service in intervall",CLEAN_INTERVAL,"ms =>",CLEAN_INTERVAL/60/1000,"min");
 
 clean(()=>{
     setInterval(clean,CLEAN_INTERVAL);

@@ -388,7 +388,7 @@ class UserManager {
                     agreed = (agreed === "true");
 
                     // db validation cannot be used, because the hash is stored there, and it is always equally long
-                    if(!password
+                 /*   if(!password
                         || password.length < SharedConfig.MIN_PASSWORD_LENGTH
                         || password.length > SharedConfig.MAX_PASSWORD_LENGTH){
                         return done(null, false,req.flash('error', 'incorrect_password_length'));
@@ -401,13 +401,13 @@ class UserManager {
 
                     if(color < 0){
                         return done(null, false,req.flash('error', 'no_color_chosen'));
-                    }
+                    }*/
 
                     this.userDataManager.createUser(
                         mail,
                         password,
                         name,
-                        color,
+                        parseInt(color),
                         language,
                         agreed,
                         null,

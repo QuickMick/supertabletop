@@ -127,6 +127,8 @@
     "verification_successfully_sent":"Verification request successfully sent. Please check your mails.",
     "successfully_logged_out":"Logging out was successfully.",
 
+    "invalid_data":"Invalid data passed.",
+
     "no_players_online":"no players online",
     "already_connected":"Already connected",
     "cannot_open_tab_twice":"You cannot open this page more than once. Close the other widows/tabs first, if you want to continue in this window."
@@ -259,6 +261,8 @@
     "error_while_sending_verification":"Fehler beim senden, bitte versuche es später erneut.",
     "verification_successfully_sent":"Verificationsanfrage erfolgreich gesendet. Bitte checke deine Mails.",
     "successfully_logged_out":"Sie haben sich erfolgreich ausgeloggt.",
+
+    "invalid_data":"Ungültige Daten übergeben.",
 
     "no_players_online":"keine Spieler online",
     "already_connected":"Bereits verbunden",

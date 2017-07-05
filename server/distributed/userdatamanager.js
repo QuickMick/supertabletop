@@ -7,6 +7,8 @@ const DBs = require('./db.json');
 var bCrypt = require('bcrypt');
 var mongoose = require('mongoose');
 
+var SharedConfig = require('./../../core/sharedconfig.json');
+
 var UserEntry = require('./model/useraccountdatamodel');
 var AccountLinkDataModel = UserEntry.AccountLinkModel;
 var UserAccountDataModel = UserEntry.UserAccountModel;
@@ -16,6 +18,7 @@ var ACCOUNT_TYPE_ENUM = UserEntry.ACCOUNT_TYPE_ENUM;
 const RANDOM_NAMES = require('./../../core/random_names.json');
 const ADJECTIVES = require('./../../core/adjectives.json');
 
+var BadwordsFilter = require('bad-words');
 
 var Redis = require("redis");
 
@@ -25,7 +28,7 @@ var uuidv1 = require('uuid/V1');
 class UserDataManager {
 
     constructor() {
-
+        this.badWordsFilter = new BadwordsFilter();
     }
 
     init(successCallback,errorCallback) {
@@ -111,6 +114,46 @@ class UserDataManager {
      * @param failCallback @type{function]  returns: {{fieldName:errorMessage}} also can contain a field called "code" with an errorcode
      */
     createUser(mail, password, name, color, language, agreed, linkedAccounts, successCallback, failCallback) {
+
+        var errors = {_occurred:false};
+
+        if(typeof mail != 'string'
+            || typeof password != 'string'
+            || typeof password != 'string'
+            || typeof password != 'string'
+            || typeof color != 'number'){
+            errors.data = "invalid_data";
+            errors._occurred = true;
+        }
+
+        if(!agreed){
+             errors.agreed='terms_and_conditions_not_agreed';
+             errors._occurred = true;
+        }
+
+        if(!password
+            || typeof password != "string"
+            || password.length < SharedConfig.MIN_PASSWORD_LENGTH
+            || password.length > SharedConfig.MAX_PASSWORD_LENGTH){
+            errors.password='incorrect_password_length';
+            errors._occurred = true;
+        }
+
+        if( color < 0){
+            errors.color='no_color_chosen';
+            errors._occurred = true;
+        }
+
+        if(name && this.badWordsFilter.isProfane(name)){
+            errors.name="chosen_name_is_forbidden";
+            errors._occurred = true;
+        }
+
+        if(errors._occurred){
+            delete errors._occurred;
+            failCallback(errors);
+        }
+
 
         var newUserID = uuidv1();
         var accounts = [];
@@ -468,7 +511,6 @@ class UserDataManager {
     /**
      * get a random name. If the name is already assigned, take another one
      * @param allocatedNames {Set} contains the allocated names
-     * @returns {*}
      */
     getRandomName(i=0,callback){
 

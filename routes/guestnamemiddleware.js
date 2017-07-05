@@ -22,19 +22,24 @@ module.exports = function (userManager) {
         }
 
         if (!req.session.guestUser && !authed) {
-            var n = userManager.getRandomGuestName();
-            req.session.guestUser = {
-                displayName: n,
-                name: n,
-                color: LOBBY_CONFIG.GUEST_USER.COLOR, // index of color (green)
-                status: 0,
-                id: uuidv1()
-            };
+            userManager.getRandomGuestName(req.sessionID, (guestName,err)=>{
+                req.session.guestUser = {
+                    displayName: guestName,
+                    name: guestName,
+                    color: LOBBY_CONFIG.GUEST_USER.COLOR, // index of color (green)
+                    status: 0,
+                    id: uuidv1()
+                };
+                req.session.save();
+                next();
+            });
+
         } else if (authed && req.session.guestUser) {
             delete req.session.guestUser;
+            next();
+        }else{
+            next();
         }
-
-        next();
     };
 
 };

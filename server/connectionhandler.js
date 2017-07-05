@@ -15,8 +15,6 @@ var LobbyOnlineUserModule = require('./servermodules/lobbyonlineusermodule');
 var Redis = require("redis");
 const DBs = require('./distributed/db.json');
 
-const REDIS_CONNECTION_SET_PREFIX = "sc";
-
 class ConnectionHandler {
 
     constructor() {
@@ -47,8 +45,16 @@ class ConnectionHandler {
                 console.log(succeeded); // will be true if successfull
             });
 
-            this.gameNsp.use(preventMultiSessions(redisClient,REDIS_CONNECTION_SET_PREFIX));
-            this.lobbyNsp.use(preventMultiSessions(redisClient,REDIS_CONNECTION_SET_PREFIX));
+            this.gameNsp.use(preventMultiSessions(redisClient,
+                DBs.connectionHandlingDB_redis.prefixes.connection_handler,
+                DBs.connectionHandlingDB_redis.tables.running_sessions,
+                DBs.connectionHandlingDB_redis.tables.allocated_names
+            ));
+            this.lobbyNsp.use(preventMultiSessions(redisClient,
+                DBs.connectionHandlingDB_redis.prefixes.connection_handler,
+                DBs.connectionHandlingDB_redis.tables.running_sessions,
+                DBs.connectionHandlingDB_redis.tables.allocated_names
+            ));
         }
 
         this.gameConnectionHandler = new GameConnectionHandler(this.gameNsp);
@@ -67,9 +73,10 @@ class ConnectionHandler {
  * @param key
  * @returns {Function}
  */
-function preventMultiSessions(redisClient,key){
+function preventMultiSessions(redisClient,key,setNameRunningSessions){
     var redis = redisClient;
-    var setKey = key+":runningsessions";
+    var setKeyRunningSessions = key+":"+setNameRunningSessions;
+
     return function(socket,agree){
         if (!socket.request.session) {
             return agree(new Error('no_session_found'), false);
@@ -81,7 +88,7 @@ function preventMultiSessions(redisClient,key){
             return agree(new Error('no_user_found'), false);
         }
 
-        redis.sismember(setKey,user.id,(e,k)=>{
+        redis.sismember(setKeyRunningSessions,user.id,(e,k)=>{
             if(e){
                 return agree(new Error('unknown_error'), false);
             }
@@ -96,16 +103,17 @@ function preventMultiSessions(redisClient,key){
                 socket.request.session.reload( function () {
                     socket.request.session.touch().save();
                 });
-            }, 60 * 1000);
+            }, 5 * 1000);
 
 
             // add the user id to redis and add a event, which removes it again on disconnect
-            redis.sadd([setKey,user.id]);
+            redis.sadd([setKeyRunningSessions,user.id]);
 
             socket.on('disconnect', ()=> {
                 console.log('A socket with sessionID ' + socket.request.sessionID+ ' disconnected!');
                 clearInterval(intervalID);
-                redis.srem(setKey, user.id);
+                // remove the session token from redis, which is used to block multiple connections
+                redis.srem(setKeyRunningSessions, user.id);
             });
 
             return agree(null, true);

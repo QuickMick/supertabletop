@@ -70,15 +70,16 @@ var sessionStoreClient = Redis.createClient({
     db: DBs.sessionStore_redis.database
 });
 var sessionStore = new RedisStore({
-    unset: "destroy",
-    client: sessionStoreClient
+    ttl: COOKIE_MAX_AGE/1000,
+    client: sessionStoreClient,
+    prefix:DBs.sessionStore_redis.prefix.session
 });
 
 var sessionInstance = expressSession(
     {
         key: sessionsKey,
-      //  saveUninitialized: false, // don't create session until something stored
-      //  resave: false, //don't save session if unmodified
+        saveUninitialized: false, // don't create session until something stored
+        resave: false, //don't save session if unmodified
       /*  resave: true,
         saveUninitialized: true,*/
         store: sessionStore, // new RedisStore({}),

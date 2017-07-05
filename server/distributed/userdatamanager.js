@@ -17,12 +17,15 @@ const RANDOM_NAMES = require('./../../core/random_names.json');
 const ADJECTIVES = require('./../../core/adjectives.json');
 
 
+var Redis = require("redis");
+
+
 var uuidv1 = require('uuid/V1');
-//TODO use memcached und des heir eigentlich als service -> die classe connectet zum service beim laden, aber saved alles im memcached
+//TODO use redis for user loading und des heir eigentlich als service -> die classe connectet zum service beim laden, aber saved alles im memcached
 class UserDataManager {
 
     constructor() {
-        this.allocatedGuestNames = new Set();   //TODO: in redis store
+
     }
 
     init(successCallback,errorCallback) {
@@ -39,6 +42,14 @@ class UserDataManager {
 
         conn.once('open', successCallback);
 
+
+
+        this.redisClient = Redis.createClient({
+            port: DBs.sessionStore_redis.port,
+            host: DBs.sessionStore_redis.host,
+            password: DBs.sessionStore_redis.password,
+            db: DBs.sessionStore_redis.database
+        });
     }
 
     /**
@@ -434,22 +445,26 @@ class UserDataManager {
         });
     }
 
-
-    getRandomGuestName(){
-        var name = UserDataManager.getRandomName(this.allocatedGuestNames);
-        this.allocatedGuestNames.add(name.toLowerCase());
-        return name;
+    /**
+     * creates a ranom name for a guest
+     * @param guestUserID
+     * @param callback {function} callback(name,error)
+     */
+    getRandomGuestName(guestSessionID,callback){
+         this.getRandomName(0,(name)=>{
+            this.redisClient.hmset(DBs.sessionStore_redis.prefix.session+DBs.sessionStore_redis.table.allocated_names,name.toLowerCase(),guestSessionID, (e,k)=>{
+                callback(name);
+            });
+        });
     }
-
-
-//TODO: die names in microservice
 
     /**
      * get a random name. If the name is already assigned, take another one
      * @param allocatedNames {Set} contains the allocated names
      * @returns {*}
      */
-    static getRandomName(allocatedNames, i=0){
+    getRandomName(i=0,callback){
+
         var result = RANDOM_NAMES[Math.floor(Math.random()*RANDOM_NAMES.length)];
 
         if(i>5){    // if it is called mare then 5 times recursively, then combine two random names
@@ -457,19 +472,28 @@ class UserDataManager {
         }else if(i>10){
            // return this.getAlternativeNameIfOccupied(result);
             // force a name, if there is no free one found after 10 tries
-            result = name;
-            var i=1;
-            while(allocatedNames.has(result.toLowerCase())){
-                result = name+" ("+i+")";
-                i++;
-            }
+            this.redisClient.hexists(DBs.sessionStore_redis.prefix+DBs.sessionStore_redis.table.allocated_names,(result+" ("+i+")").toLowerCase(),(e,k)=>{
+                    if(e) return callback("unknown");  // error -> namecreation not possible
+                    if(!k) {
+                        return callback(result+" ("+i+")"); // name not in set -> done
+                    }
+
+                    i++;
+                    this.getRandomName(allocatedNames,i,callback);
+                }
+            );
         }
 
-        if(allocatedNames.has(result.toLowerCase())){
-            i++;
-            return UserDataManager.getRandomName(allocatedNames,i);
-        }
-        return result;
+        this.redisClient.hexists(DBs.sessionStore_redis.prefix+DBs.sessionStore_redis.table.allocated_names,result.toLowerCase(),(e,k)=>{
+                if(e) return callback("unknown");  // error -> namecreation not possible
+                if(!k) {
+                    return callback(result); // name not in set -> done
+                }
+
+                i++;
+                this.getRandomName(allocatedNames,i,callback);
+            }
+        );
     }
 }
 

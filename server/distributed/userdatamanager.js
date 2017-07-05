@@ -450,12 +450,19 @@ class UserDataManager {
      * @param guestUserID
      * @param callback {function} callback(name,error)
      */
-    getRandomGuestName(guestSessionID,callback){
-         this.getRandomName(0,(name)=>{
-            this.redisClient.hmset(DBs.sessionStore_redis.prefix.session+DBs.sessionStore_redis.table.allocated_names,name.toLowerCase(),guestSessionID, (e,k)=>{
-                callback(name);
+    getAndAllocateRandomGuestName(guestSessionID,callback){
+
+            this.getRandomName(0, (name)=> {
+                this.redisClient.hmset(
+                    DBs.sessionStore_redis.prefix.session + DBs.sessionStore_redis.table.allocated_names,
+                    name.toLowerCase(),
+                    DBs.sessionStore_redis.prefix.id+guestSessionID,
+                    (e, k)=> {
+                        callback(name); // callback the created name
+                    }
+                );
             });
-        });
+
     }
 
     /**
@@ -472,26 +479,28 @@ class UserDataManager {
         }else if(i>10){
            // return this.getAlternativeNameIfOccupied(result);
             // force a name, if there is no free one found after 10 tries
-            this.redisClient.hexists(DBs.sessionStore_redis.prefix+DBs.sessionStore_redis.table.allocated_names,(result+" ("+i+")").toLowerCase(),(e,k)=>{
+            this.redisClient.hexists(DBs.sessionStore_redis.prefix.session+DBs.sessionStore_redis.table.allocated_names,(result+" ("+i+")").toLowerCase(),(e,k)=>{
                     if(e) return callback("unknown");  // error -> namecreation not possible
                     if(!k) {
-                        return callback(result+" ("+i+")"); // name not in set -> done
+                        return callback(result+" ("+(i-9)+")"); // name not in set -> done
                     }
 
                     i++;
-                    this.getRandomName(allocatedNames,i,callback);
+                    this.getRandomName(i,callback);
                 }
             );
         }
 
-        this.redisClient.hexists(DBs.sessionStore_redis.prefix+DBs.sessionStore_redis.table.allocated_names,result.toLowerCase(),(e,k)=>{
+        this.redisClient.hexists(DBs.sessionStore_redis.prefix.session+DBs.sessionStore_redis.table.allocated_names,result.toLowerCase(),(e,k)=>{
                 if(e) return callback("unknown");  // error -> namecreation not possible
+            console.log("exists",k,e);
                 if(!k) {
+                    console.log("n",result);
                     return callback(result); // name not in set -> done
                 }
 
                 i++;
-                this.getRandomName(allocatedNames,i,callback);
+                this.getRandomName(i,callback);
             }
         );
     }

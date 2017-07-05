@@ -11,7 +11,8 @@
     "database":0,
     "password":"",
     "prefix":{
-      "session":"sess:"
+      "session":"sess:",
+      "id":"id:"
     },
     "table":{
       "allocated_names":"allocnames"

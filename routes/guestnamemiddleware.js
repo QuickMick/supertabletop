@@ -22,7 +22,7 @@ module.exports = function (userManager) {
         }
 
         if (!req.session.guestUser && !authed) {
-            userManager.getRandomGuestName(req.sessionID, (guestName,err)=>{
+            userManager.getAndAllocateRandomGuestName(req.sessionID, (guestName,err)=>{
                 req.session.guestUser = {
                     displayName: guestName,
                     name: guestName,

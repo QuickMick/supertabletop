@@ -14,7 +14,8 @@
     "test": "mocha",
     "debug": "node --inspect --debug-brk ./bin/www",
     "start redis-server": "start ./redis/redis-server",
-    "start redis-client": "start ./redis/redis-cli"
+    "start redis-client": "start ./redis/redis-cli",
+    "start clean_allocated_guestnames service":"node nameallocationcleaner_service"
   },
   "devDependencies": {
     "mocha": "*",
@@ -53,6 +54,7 @@
     "socket.io": "*",
     "socket.io-client": "*",
     "uuid": "^3.0.1",
-    "xml2json": "^0.11.0"
+    "xml2json": "^0.11.0",
+    "node-redis-streamify":"0.1.6"
   }
 }

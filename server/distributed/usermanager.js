@@ -73,8 +73,8 @@ class UserManager {
         return null;
     };
 
-    getRandomGuestName(guestSessionID,callback){
-        return this.userDataManager.getRandomGuestName(guestSessionID,callback);
+    getAndAllocateRandomGuestName(guestSessionID,callback){
+        return this.userDataManager.getAndAllocateRandomGuestName(guestSessionID,callback);
     }
 
     /**

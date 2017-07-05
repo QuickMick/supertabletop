@@ -28,7 +28,7 @@ var clean = function(onDoneCallback) {
 
     var x = redisClient.streamified('HSCAN');
 
-    var remove = [];
+  //  var remove = [];        //TODO: really save in ram?
     var lastName = "";
     x(KEY_PATH, '*')
         .on('data', function (data) {
@@ -45,15 +45,20 @@ var clean = function(onDoneCallback) {
 
             redisClient.exists(DBs.sessionStore_redis.prefix.session + id, (e, k)=> {
                 if (!e && !k) {
-                    remove.push(n);
+                 //   remove.push(n);
+                    redisClient.hdel(KEY_PATH, n, (e, k)=> {
+                        console.log(n,e,k);
+                    });
                 }
             });
-
         })
         .on('error', function (error) {
             console.log(error);
-        })
-        .on('end', function () {
+        }).on('end', function () {
+            console.log("done");
+            console.log("waiting for next operation...");
+        });
+      /*  .on('end', function () {
             setTimeout(()=> {
                 console.log("iteration done");
 
@@ -77,7 +82,7 @@ var clean = function(onDoneCallback) {
                 redisClient.quit();
                 if(onDoneCallback)onDoneCallback();
             }, 1000);
-        });
+        });*/
 };
 
 console.log("start name allocation cleaning service in intervall",CLEAN_INTERVAL,"ms =>",CLEAN_INTERVAL/60/60/1000,"min");

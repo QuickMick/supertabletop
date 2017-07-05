@@ -450,7 +450,7 @@ class UserDataManager {
      * @param guestUserID
      * @param callback {function} callback(name,error)
      */
-    getAndAllocateRandomGuestName(guestSessionID,callback){
+   /* getAndAllocateRandomGuestName(guestSessionID,callback){
 
             this.getRandomName(0, (name)=> {
                 this.redisClient.hmset(
@@ -463,7 +463,32 @@ class UserDataManager {
                 );
             });
 
+    }*/
+
+    getAndAllocateRandomGuestName(guestSessionID,callback){
+
+        this.getRandomName(0, (name)=> {
+            this.redisClient.hmset(
+                DBs.sessionStore_redis.prefix.session + DBs.sessionStore_redis.table.allocated_names,
+                name.toLowerCase(),
+                DBs.sessionStore_redis.prefix.id+guestSessionID+(this.i||""),
+                (e, k)=> {
+                    console.log(this.i,'save');
+                    this.i = (this.i||0)+1;
+
+                    if (this.i == 9999)
+                        callback(name);
+                    else{
+                        this.getAndAllocateRandomGuestName(guestSessionID,callback);
+                    }
+                }
+            );
+        });
+
     }
+
+
+
 
     /**
      * get a random name. If the name is already assigned, take another one

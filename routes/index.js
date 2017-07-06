@@ -50,7 +50,6 @@ router.get('/',
             user.status = Rights.RIGHTS_STRENGTH[u.status];
             user.id = u.id;
             delete user.default;
-
         }else{
             user.displayName= req.session.guestUser.displayName;
             user.status = Rights.RIGHTS.guest;

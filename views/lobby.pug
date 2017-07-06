@@ -20,9 +20,15 @@ html
                     div.name #{user.displayName}
                     -if(!isAuthenticated)
                         div.separator
-                        div.not-logged-in-sign
-                            span  #{I18N_LAYOUT.not_logged_in}
+                        div.text
+                            span #{I18N_LAYOUT.not_logged_in}&#x20
                             span#sign-up.a #{I18N_LAYOUT.create_account}
+                            span ?
+                    -else if(!user.verifiedOn)
+                        div.separator
+                        div.text.notification
+                            span #{I18N_LAYOUT.verification_outstanding}&#x20
+                            span.a(data-action="resend") #{I18N_LAYOUT.send_again}
                             span ?
                 div.separator
                 div.sign-in-out

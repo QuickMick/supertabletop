@@ -79,7 +79,7 @@
     "enter_password":"Enter password if desired",
     "save":"save",
     "verified_on":"verified on",
-    "verification_outstanding":"verification outstanding",
+    "verification_outstanding":"E-mail cerification outstanding",
 
     "login_to_app":"Log in with your user credentials",
     "continue_without_login":"continue without logging in",
@@ -213,11 +213,11 @@
     "enter_password":"Passwort eingeben, falls gewünscht",
     "save":"speichern",
     "verified_on":"verifiziert am",
-    "verification_outstanding":"verifizierung ausstehend",
+    "verification_outstanding":"E-Mail Verifizierung ausstehend",
 
     "login_to_app":"Melde dich mit deinen Nutzerdaten an",
     "continue_without_login":"ohne Anmeldung fortfahren",
-    "not_logged_in":"Du bist nicht eingeloggt, möchtest du ein ",
+    "not_logged_in":"Du bist nicht eingeloggt, möchtest du ein",
     "create_account":"Benutzerkonto erstellen",
     "user_login_successfully":"Anmeldung war erfolgreich",
     "register":"registrieren",

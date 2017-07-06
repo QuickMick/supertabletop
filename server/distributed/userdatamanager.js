@@ -165,28 +165,18 @@ class UserDataManager {
         }
 
         if(this._validateUserData("agreed",agreed,errors)){
-             //errors.agreed='terms_and_conditions_not_agreed';
              errors._occurred = true;
         }
 
         if(this._validateUserData("password",password,errors)){
-       /* if(!password
-            || typeof password != "string"
-            || password.length < SharedConfig.MIN_PASSWORD_LENGTH
-            || password.length > SharedConfig.MAX_PASSWORD_LENGTH){*/
-            //errors.password='incorrect_password_length';
             errors._occurred = true;
         }
 
         if(this._validateUserData("color",color,errors)){
-      //  if( color < 0){
-           // errors.color='no_color_chosen';
             errors._occurred = true;
         }
 
         if(this._validateUserData("name",name,errors)){
-        //if(name && this.badWordsFilter.isProfane(name)){
-           // errors.name="chosen_name_is_forbidden";
             errors._occurred = true;
         }
 
@@ -195,7 +185,6 @@ class UserDataManager {
             failCallback(errors);
             return;
         }
-
 
         var newUserID = uuidv1();
         var accounts = [];
@@ -376,9 +365,9 @@ class UserDataManager {
         }
 
         // get the user, update the values, and save it again
-        process.nextTick(function () {
+        process.nextTick( () => {
             UserAccountDataModel.findOne({"id":userID}, //{'id': id},
-                function (err, user) {
+                (err, user) =>{
 
                     // Username does not exist, log error & redirect back
                     if (!user) {

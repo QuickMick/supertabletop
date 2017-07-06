@@ -119,6 +119,8 @@ class UserManager {
             html: I18N.replace(lang.verify_mail_html,Hosts.MAIL_VERIFICATION_LINK+verification.token) // html body
         };
 
+        console.log("_sendVerificationAsMail",mailOptions);
+
         // send mail with defined transport object
         this.mailTransporter.sendMail(mailOptions, (error, info) => {
             if (error) {

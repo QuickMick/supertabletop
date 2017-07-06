@@ -3,6 +3,9 @@
  */
 
 'use strict';
+
+const Util = require('./../core/util');
+
 var LobbyConnectionHandler = require('./lobbyconnectionhandler');
 
 var ChatHandler = require('./../public/javascripts/chathandler');
@@ -14,6 +17,7 @@ var SignupDialog = require('./dialogs/signupdialog');
 var ProfileDialog = require('./dialogs/profiledialog');
 
 var YesNoDialog = require('./dialogs/yesnodialog');
+
 
 class LobbyHandler {
 
@@ -66,6 +70,13 @@ class LobbyHandler {
                 this._createProfileDialog().show();
             }
         }
+
+        var resend_verification_btn = document.getElementById("resend-verification");
+        if(resend_verification_btn){
+            resend_verification_btn.onclick = () => {
+                Util.postXHTML("request-mail-verification","async=true&email="+CURRENT_USER.email);
+            }
+        }
     }
 
     _createProfileDialog(){
@@ -98,8 +109,9 @@ class LobbyHandler {
     show(){
         this.lobbyConnectionHandler.start();
 
-        window.onunload
+       // window.onunload
     }
+
 }
 
 module.exports = LobbyHandler;

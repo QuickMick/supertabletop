@@ -326,6 +326,32 @@ class Util {
         htmlNode.addEventListener("keyup", (e)=>e.stopPropagation(), true);
       //  htmlNode.addEventListener("click", (e)=>e.stopPropagation(), true);
     }
+
+
+    static postXHTML(postAction, query,succesCallback,sentCallback,errorCallback){
+        if(!postAction || !query){
+            errorCallback("no_action_or_query_passed");
+            return;
+        }
+
+        var xhttp = new XMLHttpRequest();
+        xhttp.onerror = errorCallback;
+
+        xhttp.onreadystatechange = function() {
+            if (xhttp.readyState != 4) return;
+
+            var result = JSON.parse(xhttp.response || "{]");
+            if(succesCallback)
+                succesCallback({action:postAction, query:query,result:result});
+        };
+
+        xhttp.open("POST", postAction, true);
+        xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+
+        xhttp.send(query);
+        if(sentCallback)
+            sentCallback({action:postAction, query:query});
+    }
 }
 
 module.exports = Util;

@@ -104,6 +104,44 @@ class UserDataManager {
 
     /**
      *
+     * @param field field to check
+     * @param value value to check
+     * @param errors error object (adds error message to this object
+     * @returns {string} empty string, if no error, otherwise the error as string
+     * @private
+     */
+    _validateUserData(field,value,errors){
+        var err = "";
+        switch(field){
+            case "agreed": err= (!value || (typeof value == "string" && value.toLowerCase()=="false"))?'terms_and_conditions_not_agreed':"";
+                break;
+            case "password":err=  (!value
+                            || typeof value != "string"
+                            || value.length < SharedConfig.MIN_PASSWORD_LENGTH
+                            || value.length > SharedConfig.MAX_PASSWORD_LENGTH)
+                                ?
+                                'incorrect_password_length':"";
+                break;
+            case "color":err=  (typeof value != "number" || isNaN(value) || value < 0)?"no_color_chosen":"";
+                break;
+
+            case "name":err=  (!value || typeof value != "string" || this.badWordsFilter.isProfane(value))? "chosen_name_is_forbidden":"";
+                break;
+
+            default: break;
+        }
+
+        if(err){
+            if(errors)
+                errors[field] = err;
+            console.log(field,err,errors);
+        }
+
+        return err;
+    }
+
+    /**
+     *
      * @param mail @type{string]
      * @param password @type{string]
      * @param name @type{string]
@@ -119,39 +157,43 @@ class UserDataManager {
 
         if(typeof mail != 'string'
             || typeof password != 'string'
-            || typeof password != 'string'
-            || typeof password != 'string'
+            || typeof name != 'string'
+            || typeof language != 'string'
             || typeof color != 'number'){
             errors.data = "invalid_data";
             errors._occurred = true;
         }
 
-        if(!agreed){
-             errors.agreed='terms_and_conditions_not_agreed';
+        if(this._validateUserData("agreed",agreed,errors)){
+             //errors.agreed='terms_and_conditions_not_agreed';
              errors._occurred = true;
         }
 
-        if(!password
+        if(this._validateUserData("password",password,errors)){
+       /* if(!password
             || typeof password != "string"
             || password.length < SharedConfig.MIN_PASSWORD_LENGTH
-            || password.length > SharedConfig.MAX_PASSWORD_LENGTH){
-            errors.password='incorrect_password_length';
+            || password.length > SharedConfig.MAX_PASSWORD_LENGTH){*/
+            //errors.password='incorrect_password_length';
             errors._occurred = true;
         }
 
-        if( color < 0){
-            errors.color='no_color_chosen';
+        if(this._validateUserData("color",color,errors)){
+      //  if( color < 0){
+           // errors.color='no_color_chosen';
             errors._occurred = true;
         }
 
-        if(name && this.badWordsFilter.isProfane(name)){
-            errors.name="chosen_name_is_forbidden";
+        if(this._validateUserData("name",name,errors)){
+        //if(name && this.badWordsFilter.isProfane(name)){
+           // errors.name="chosen_name_is_forbidden";
             errors._occurred = true;
         }
 
         if(errors._occurred){
             delete errors._occurred;
             failCallback(errors);
+            return;
         }
 
 
@@ -345,16 +387,30 @@ class UserDataManager {
                         return;
                     }
 
+                    var errors = {_occurred:false};
                     // apply the passed changes to the userobject
                     for(var i=0; i< changes.length; i++){
                         var cur = changes[i];
                         if(!cur || !cur.key)continue; // if the object does not exist, or no key was passed --> continue
+
+                        // if an error/wrong data occurs, log it an continue
+                        if(this._validateUserData(cur.key,cur.value,errors)){
+                            errors._occurred = true;
+                            continue;
+                        }
+
                         if(cur.$push){
                             if(!user[cur.key]) user[cur.key]=[];    //if array does not exist, create one
                             user[cur.key].push(cur.value);          // afterwards push value
                         }else {
                             user[cur.key] = cur.value;
                         }
+                    }
+
+                    if(errors._occurred){
+                        delete errors._occurred;
+                        failCallback(errors);
+                        return;
                     }
 
                     // set to false, so it is not created as new object

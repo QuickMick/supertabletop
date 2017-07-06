@@ -21,8 +21,9 @@ class LobbyConnectionHandler {
      * @param io
      * @param serverModules
      */
-    constructor(io, userManager) {
+    constructor(io, pubSub, userManager) {
         this.io = io;
+        this.pubSub = pubSub;
         this.userManager = userManager;
 
         this.ID = uuidV1();
@@ -73,7 +74,8 @@ class LobbyConnectionHandler {
             SERVER_ID: this.ID,
             _broadcast: this._broadcast.bind(this),
             _broadcastExceptSender: this._broadcastExceptSender.bind(this),
-            _sendToClient: this._sendToClient.bind(this)
+            _sendToClient: this._sendToClient.bind(this),
+            _pubSub:this.pubSub
         })
     }
 
@@ -99,7 +101,9 @@ class LobbyConnectionHandler {
             Packages.createEvent(
                 this.ID,
                 {
-                    clientInfo: {},
+                    clientInfo: {
+                        id: (socket.request.getNormalizedUser() || {}).id
+                    },
                     serverID: this.ID
                 }
             )

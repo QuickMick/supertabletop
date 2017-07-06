@@ -74,12 +74,14 @@ class LobbyHandler {
         var resend_verification_btn = document.getElementById("resend-verification");
         if(resend_verification_btn){
             resend_verification_btn.onclick = () => {
-                Util.postXHTML("request-mail-verification",
+                Util.postXHTML(
+                    "request-mail-verification",
                     "async=true&email="+CURRENT_USER.email,
                     null,
-                    ()=>{
+                    ()=>{   //change the label
                         resend_verification_btn.parentNode.innerHTML = I18N.translate("verification_successfully_sent");
-                    });
+                    }
+                );
             }
         }
     }

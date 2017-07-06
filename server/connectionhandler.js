@@ -15,21 +15,37 @@ var LobbyOnlineUserModule = require('./servermodules/lobbyonlineusermodule');
 var Redis = require("redis");
 const DBs = require('./distributed/db.json');
 
+var pubSubFactory = require("mq-pubsub").default;
+
+
 class ConnectionHandler {
 
     constructor() {
         this.gameNsp = null;
         this.lobbyNsp = null;
+
+        /**
+         * connection the amqp message broker
+         * @type {null}
+         */
+        this.pubSub = null;
     }
 
     start(io, options) {
         this.io = io;
 
+        options = options || {};
 
+        this.pubSub = options.pubSub || pubSubFactory(options.pubSubUrl || DBs.messageBroker.url);
 
         this.gameNsp = this.io.of(Packages.NAMESPACES.GAME);
         this.lobbyNsp = this.io.of(Packages.NAMESPACES.LOBBY);
 
+        /**
+         * add session middleware to the namespaces,
+         * which shares the request-sessions with socket.io,
+         * so that you have every information wich you also have in the get/post-routes
+         */
         if(options.sessionMiddleware) {
             this.gameNsp.use(options.sessionMiddleware);
             this.lobbyNsp.use(options.sessionMiddleware);
@@ -58,7 +74,7 @@ class ConnectionHandler {
         }
 
         this.gameConnectionHandler = new GameConnectionHandler(this.gameNsp);
-        this.lobbyConnectionHandler = new LobbyConnectionHandler(this.lobbyNsp, options.userManager);
+        this.lobbyConnectionHandler = new LobbyConnectionHandler(this.lobbyNsp, this.pubSub, options.userManager);
 
         this.lobbyConnectionHandler.use(new ChatModule());
         this.lobbyConnectionHandler.use(new LobbyOnlineUserModule());

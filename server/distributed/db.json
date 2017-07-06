@@ -31,5 +31,18 @@
       "running_sessions":"runningsessions",
       "allocated_names":"acclocatednames"
     }
+  },
+  "messageBroker":{
+    "url":"amqp://bobhttfm:6EKz94TUXW-XY5CmUUVdFmjfWsntd2Er@antelope.rmq.cloudamqp.com/bobhttfm",
+    "password":"6EKz94TUXW-XY5CmUUVdFmjfWsntd2Er",
+    "queues":{
+      "chat_queue":"chat_queue",
+      "join_queue":"join_queue",
+      "game_queue":"game_queue"
+    },
+    "pub_sub_events":{
+      "chat_msg_evt":"chat_msg_evt",
+      "user_join_evt":"user_join_evt"
+    }
   }
 }

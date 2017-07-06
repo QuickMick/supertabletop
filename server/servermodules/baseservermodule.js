@@ -20,6 +20,7 @@ class BaseServerModule {
         this._broadcast = data._broadcast;
         this._broadcastExceptSender = data._broadcastExceptSender;
         this._sendToClient = data._sendToClient;
+        this.pubSub = data._pubSub;
     }
 
     onConnectionReceived(socket){
@@ -31,6 +32,9 @@ class BaseServerModule {
         throw "abstract-method";
     }
 
+    tearDown(){
+        //TODO: implement teardown method
+    }
 }
 
 module.exports = BaseServerModule;
